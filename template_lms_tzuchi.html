@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS Coding & AI - SDS Cinta Kasih Tzu Chi</title>
+  <!-- Google Fonts: Fredoka & Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            title: ['Fredoka', 'sans-serif'],
+            body: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              blue: '#2563EB',
+              sky: '#38BDF8',
+              purple: '#7C3AED',
+              green: '#16A34A',
+              orange: '#F97316',
+              tzuchi: '#15803D'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #F8FAFC;
+    }
+    h1, h2, h3, h4, h5, h6, .font-title {
+      font-family: 'Fredoka', sans-serif;
+    }
+    .shadow-smooth {
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+    }
+    .hover-lift {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px -4px rgba(37, 99, 235, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800 antialiased selection:bg-sky-200">
+
+  <!-- ======================================================== -->
+  <!-- 1. TOP NAVBAR -->
+  <!-- ======================================================== -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo Kiri: LMS Coding & AI -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-500 flex items-center justify-center text-white text-2xl font-black shadow-md shadow-blue-500/30 group-hover:scale-105 transition">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div>
+          <h1 class="font-title font-bold text-xl sm:text-2xl text-slate-900 leading-none">
+            LMS Coding & AI
+          </h1>
+          <p class="text-xs sm:text-sm font-semibold text-slate-500 mt-1">
+            SDS Cinta Kasih Tzu Chi
+          </p>
+        </div>
+      </a>
+
+      <!-- Menu Navigasi Tengah -->
+      <nav class="hidden md:flex items-center gap-2">
+        <!-- Beranda (Active Pill) -->
+        <a href="#beranda" class="bg-[#2563EB] text-white px-5 py-2.5 rounded-full font-title font-bold text-sm flex items-center gap-2 shadow-sm shadow-blue-600/30">
+          <i class="fa-solid fa-house"></i>
+          <span>Beranda</span>
+        </a>
+
+        <!-- Modul Belajar -->
+        <a href="index.html#tab-modul" class="text-slate-700 hover:text-blue-600 hover:bg-slate-50 px-4 py-2.5 rounded-full font-title font-bold text-sm flex items-center gap-2 transition">
+          <i class="fa-solid fa-book-open text-blue-500"></i>
+          <span>Modul Belajar</span>
+        </a>
+
+        <!-- Demo Praktik -->
+        <a href="index.html#tab-demo" class="text-slate-700 hover:text-blue-600 hover:bg-slate-50 px-4 py-2.5 rounded-full font-title font-bold text-sm flex items-center gap-2 transition">
+          <i class="fa-solid fa-circle-play text-purple-500"></i>
+          <span>Demo Praktik</span>
+        </a>
+
+        <!-- Shortcut Lab MS Word Poster -->
+        <a href="index.html#tab-msword" class="text-slate-700 hover:text-blue-600 hover:bg-slate-50 px-4 py-2.5 rounded-full font-title font-bold text-sm flex items-center gap-2 transition">
+          <i class="fa-solid fa-file-word text-blue-600"></i>
+          <span>Lab MS Word</span>
+        </a>
+      </nav>
+
+      <!-- Menu Kanan: Aksi Cepat -->
+      <div class="flex items-center gap-3">
+        <a href="index.html#tab-msword" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-full shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-word"></i> Buat Poster
+        </a>
+      </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- 2. HERO BANNER SECTION (Persis Desain Atas) -->
+  <!-- ======================================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-6">
+    
+    <div class="relative rounded-[32px] overflow-hidden bg-gradient-to-r from-[#38BDF8] via-[#0EA5E9] to-[#0284C7] p-6 sm:p-10 lg:p-12 shadow-lg shadow-sky-500/20 text-white">
+      
+      <!-- Dekorasi Aksen Lingkaran & Grid di Latar Belakang -->
+      <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute left-1/3 top-0 w-64 h-64 bg-sky-300/20 rounded-full blur-xl pointer-events-none"></div>
+      <div class="absolute right-12 top-8 text-white/10 text-9xl pointer-events-none">
+        <i class="fa-solid fa-network-wired"></i>
+      </div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- KOLOM KIRI HERO: Teks & Tombol Semester (7 Kolom) -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- Badge Pill Atas -->
+          <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-white border border-white/30 shadow-xs">
+            <span>LMS Coding & AI</span>
+          </div>
+
+          <!-- Headline Utama -->
+          <h2 class="font-title font-extrabold text-3xl sm:text-4xl md:text-5xl leading-tight tracking-tight drop-shadow-xs">
+            Belajar Coding & AI<br>
+            Bersama, Untuk Masa Depan
+          </h2>
+
+          <!-- Subtitle Penjelas -->
+          <p class="text-sky-50 text-sm sm:text-base leading-relaxed max-w-xl font-medium">
+            Membangun keterampilan digital, kreativitas, dan karakter baik di era teknologi bersama SDS Cinta Kasih Tzu Chi.
+          </p>
+
+          <!-- Tombol Pilihan Semester -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <!-- Semester 1 (Biru Solid) -->
+            <a href="index.html" class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-6 py-3 rounded-full font-title font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-md shadow-blue-900/20 border border-white/20 transition transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-graduation-cap text-base"></i>
+              <span>Semester 1</span>
+            </a>
+
+            <!-- Semester 2 (Putih Bersih) -->
+            <button onclick="bukaModalSemester2()" class="bg-white hover:bg-slate-50 text-[#2563EB] px-6 py-3 rounded-full font-title font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-md transition transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-graduation-cap text-base text-[#2563EB]"></i>
+              <span>Semester 2</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- KOLOM KANAN HERO: Ilustrasi Karakter & Floating Badges (5 Kolom) -->
+        <div class="lg:col-span-5 flex items-center justify-center relative">
+          
+          <div class="relative w-full max-w-md">
+            
+            <!-- Ilustrasi Komposit Vektor (Guru, Siswa, Laptop, Robot AI) -->
+            <div class="bg-white/10 backdrop-blur-xs rounded-3xl p-4 border border-white/20 shadow-inner flex items-center justify-center">
+              <svg viewBox="0 0 460 300" class="w-full h-auto drop-shadow-xl">
+                <!-- Meja & Ruang Kelas -->
+                <rect x="20" y="230" width="420" height="15" rx="7" fill="#0369A1" opacity="0.6"/>
+                
+                <!-- GURU (Tengah Belakang) -->
+                <!-- Rambut Guru -->
+                <path d="M190 60 C190 25, 270 25, 270 60 C270 95, 255 100, 255 100 C255 100, 250 85, 245 85 C240 85, 235 90, 230 90 C225 90, 220 85, 215 85 C210 85, 205 100, 205 100 C205 100, 190 95, 190 60 Z" fill="#1E293B"/>
+                <!-- Wajah Guru -->
+                <circle cx="230" cy="75" r="26" fill="#FCE7F3"/>
+                <!-- Senyum & Mata Guru -->
+                <circle cx="221" cy="73" r="3" fill="#0F172A"/>
+                <circle cx="239" cy="73" r="3" fill="#0F172A"/>
+                <path d="M224 83 Q230 90 236 83" stroke="#E11D48" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <!-- Baju Tzu Chi Guru (Biru Navy) -->
+                <path d="M195 125 C195 100, 265 100, 265 125 L280 230 L180 230 Z" fill="#1E3A8A"/>
+                <!-- Kerah Putih & Lambang Tzu Chi di Dada -->
+                <polygon points="230,102 222,118 238,118" fill="#FFFFFF"/>
+                <circle cx="212" cy="130" r="5" fill="#15803D"/>
+                
+                <!-- Lampu Ide Kuning Bersinar di Atas Kepala Guru -->
+                <g transform="translate(230, 22)">
+                  <circle cx="0" cy="0" r="10" fill="#FDE047"/>
+                  <rect x="-4" y="8" width="8" height="4" rx="1" fill="#CA8A04"/>
+                  <!-- Sinar -->
+                  <line x1="0" y1="-16" x2="0" y2="-12" stroke="#FDE047" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="-12" y1="-10" x2="-9" y2="-7" stroke="#FDE047" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="12" y1="-10" x2="9" y2="-7" stroke="#FDE047" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+
+                <!-- SISWA LAKI-LAKI (Kiri Depan) -->
+                <!-- Rambut Siswa Laki-laki -->
+                <path d="M110 135 C110 105, 160 105, 160 135 C160 145, 155 145, 155 145 C155 145, 145 138, 135 138 C125 138, 115 145, 115 145 Z" fill="#0F172A"/>
+                <!-- Wajah Siswa -->
+                <circle cx="135" cy="145" r="20" fill="#FED7AA"/>
+                <!-- Mata Ceria & Senyum -->
+                <circle cx="128" cy="143" r="2.5" fill="#0F172A"/>
+                <circle cx="142" cy="143" r="2.5" fill="#0F172A"/>
+                <path d="M130 152 Q135 157 140 152" stroke="#EA580C" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Seragam Putih Sekolah -->
+                <path d="M110 180 C110 165, 160 165, 160 180 L168 230 L102 230 Z" fill="#FFFFFF"/>
+                <polygon points="135,165 129,176 141,176" fill="#0284C7"/>
+
+                <!-- LAPTOP CODING DI TENGAH DENGAN SIMBOL </> -->
+                <rect x="180" y="165" width="100" height="65" rx="6" fill="#334155" stroke="#94A3B8" stroke-width="2"/>
+                <text x="230" y="206" fill="#38BDF8" font-family="Fredoka" font-size="24" font-weight="bold" text-anchor="middle">&lt;/&gt;</text>
+                <polygon points="165,230 295,230 280,233 180,233" fill="#64748B"/>
+
+                <!-- SISWA PEREMPUAN (Kanan Depan) -->
+                <!-- Rambut Siswa Perempuan (Kuncir Dua) -->
+                <path d="M295 135 C295 105, 345 105, 345 135 C345 155, 300 155, 295 135 Z" fill="#312E81"/>
+                <circle cx="292" cy="140" r="7" fill="#312E81"/>
+                <circle cx="348" cy="140" r="7" fill="#312E81"/>
+                <!-- Wajah Siswa -->
+                <circle cx="320" cy="145" r="20" fill="#FBCFE8"/>
+                <!-- Mata Ceria & Senyum -->
+                <circle cx="313" cy="143" r="2.5" fill="#0F172A"/>
+                <circle cx="327" cy="143" r="2.5" fill="#0F172A"/>
+                <path d="M315 152 Q320 157 325 152" stroke="#E11D48" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Seragam Putih Siswa -->
+                <path d="M298 180 C298 165, 342 165, 342 180 L350 230 L290 230 Z" fill="#FFFFFF"/>
+                <polygon points="320,165 314,176 326,176" fill="#EC4899"/>
+
+                <!-- ROBOT AI PINTAR DI KANAN -->
+                <g transform="translate(370, 70)">
+                  <!-- Antena Robot -->
+                  <line x1="25" y1="5" x2="25" y2="15" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="25" cy="4" r="4" fill="#38BDF8"/>
+                  <!-- Kepala Robot -->
+                  <rect x="5" y="15" width="40" height="30" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+                  <!-- Layar Wajah Robot (Biru Cerah) -->
+                  <rect x="10" y="20" width="30" height="20" rx="4" fill="#0284C7"/>
+                  <!-- Mata Digital Robot -->
+                  <circle cx="19" cy="30" r="3" fill="#67E8F9"/>
+                  <circle cx="31" cy="30" r="3" fill="#67E8F9"/>
+                  <!-- Badan Robot -->
+                  <rect x="8" y="48" width="34" height="34" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+                  <!-- Badge AI di Dada Robot -->
+                  <rect x="15" y="56" width="20" height="12" rx="4" fill="#2563EB"/>
+                  <text x="25" y="65" fill="#FFFFFF" font-family="Fredoka" font-size="8" font-weight="bold" text-anchor="middle">AI</text>
+                  <!-- Lengan Melambai -->
+                  <path d="M5 55 Q-5 45 0 35" stroke="#94A3B8" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <circle cx="0" cy="35" r="3.5" fill="#38BDF8"/>
+                </g>
+              </svg>
+            </div>
+
+            <!-- 4 FLOATING BADGE PILLS DI SISI KANAN (Persis Gambar) -->
+            <div class="absolute -right-3 top-4 flex flex-col gap-2 z-20">
+              <!-- Pill 1: Coding (Biru) -->
+              <div class="bg-[#2563EB] text-white px-3.5 py-1.5 rounded-full font-title font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-900/30">
+                <i class="fa-solid fa-code text-[11px]"></i> Coding
+              </div>
+              <!-- Pill 2: AI (Ungu) -->
+              <div class="bg-[#8B5CF6] text-white px-3.5 py-1.5 rounded-full font-title font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-900/30">
+                <i class="fa-solid fa-brain text-[11px]"></i> AI
+              </div>
+              <!-- Pill 3: Creativity (Hijau) -->
+              <div class="bg-[#10B981] text-white px-3.5 py-1.5 rounded-full font-title font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-900/30">
+                <i class="fa-solid fa-lightbulb text-[11px]"></i> Creativity
+              </div>
+              <!-- Pill 4: Character (Oranye) -->
+              <div class="bg-[#F97316] text-white px-3.5 py-1.5 rounded-full font-title font-bold text-xs flex items-center gap-1.5 shadow-md shadow-orange-900/30">
+                <i class="fa-solid fa-heart text-[11px]"></i> Character
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 3. TIGA KOLOM UTAMA (Beranda, Modul Belajar, Demo Praktik) -->
+    <!-- ======================================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      
+      <!-- ========================================== -->
+      <!-- KOLOM 1: BERANDA -->
+      <!-- ========================================== -->
+      <div class="bg-white rounded-[28px] border border-slate-200 p-6 shadow-smooth flex flex-col justify-between hover-lift">
+        
+        <div>
+          <!-- Header Kolom 1 -->
+          <div class="flex items-center gap-3.5 mb-3">
+            <div class="w-12 h-12 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-xl shadow-md shadow-blue-500/20 shrink-0">
+              <i class="fa-solid fa-house"></i>
+            </div>
+            <div>
+              <h3 class="font-title font-bold text-2xl text-slate-800 leading-tight">Beranda</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">
+                Tampilan utama LMS dengan pilihan Semester 1 dan Semester 2.
+              </p>
+            </div>
+          </div>
+
+          <!-- Body Kolom 1: Dua Sub-Card (Semester 1 & Semester 2) -->
+          <div class="grid grid-cols-2 gap-3.5 mt-5">
+            
+            <!-- Sub-Card Semester 1 -->
+            <div class="bg-blue-50/50 hover:bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center flex flex-col items-center justify-between transition group">
+              <!-- Avatar Siswa Kecil -->
+              <div class="w-16 h-12 flex items-center justify-center mb-2">
+                <svg viewBox="0 0 100 65" class="w-full h-full">
+                  <!-- Karakter 1 (Boy) -->
+                  <circle cx="35" cy="24" r="14" fill="#FED7AA"/>
+                  <path d="M22 20 C22 10, 48 10, 48 20 Z" fill="#1E293B"/>
+                  <circle cx="31" cy="23" r="1.8" fill="#1E293B"/>
+                  <circle cx="39" cy="23" r="1.8" fill="#1E293B"/>
+                  <path d="M20 55 C20 40, 50 40, 50 55 Z" fill="#2563EB"/>
+                  <!-- Karakter 2 (Girl) -->
+                  <circle cx="65" cy="24" r="14" fill="#FBCFE8"/>
+                  <path d="M52 20 C52 10, 78 10, 78 20 Z" fill="#4338CA"/>
+                  <circle cx="61" cy="23" r="1.8" fill="#1E293B"/>
+                  <circle cx="69" cy="23" r="1.8" fill="#1E293B"/>
+                  <path d="M50 55 C50 40, 80 40, 80 55 Z" fill="#EC4899"/>
+                </svg>
+              </div>
+
+              <!-- Badge Judul Semester 1 -->
+              <span class="bg-[#2563EB] text-white text-[11px] font-title font-bold px-3 py-1 rounded-full shadow-xs">
+                Semester 1
+              </span>
+
+              <p class="text-[11px] text-slate-600 font-medium my-2.5 leading-snug">
+                Belajar dasar coding, logika, dan AI.
+              </p>
+
+              <a href="index.html" class="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-title font-bold text-xs py-2 rounded-xl transition shadow-xs flex items-center justify-center gap-1">
+                <span>Masuk</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+              </a>
+            </div>
+
+            <!-- Sub-Card Semester 2 -->
+            <div class="bg-purple-50/50 hover:bg-purple-50 border border-purple-100 rounded-2xl p-4 text-center flex flex-col items-center justify-between transition group">
+              <!-- Avatar Siswa Kecil -->
+              <div class="w-16 h-12 flex items-center justify-center mb-2">
+                <svg viewBox="0 0 100 65" class="w-full h-full">
+                  <!-- Karakter 1 (Boy) -->
+                  <circle cx="35" cy="24" r="14" fill="#FED7AA"/>
+                  <path d="M22 20 C22 10, 48 10, 48 20 Z" fill="#0F172A"/>
+                  <circle cx="31" cy="23" r="1.8" fill="#1E293B"/>
+                  <circle cx="39" cy="23" r="1.8" fill="#1E293B"/>
+                  <path d="M20 55 C20 40, 50 40, 50 55 Z" fill="#7C3AED"/>
+                  <!-- Karakter 2 (Girl) -->
+                  <circle cx="65" cy="24" r="14" fill="#FBCFE8"/>
+                  <path d="M52 20 C52 10, 78 10, 78 20 Z" fill="#581C87"/>
+                  <circle cx="61" cy="23" r="1.8" fill="#1E293B"/>
+                  <circle cx="69" cy="23" r="1.8" fill="#1E293B"/>
+                  <path d="M50 55 C50 40, 80 40, 80 55 Z" fill="#A855F7"/>
+                </svg>
+              </div>
+
+              <!-- Badge Judul Semester 2 -->
+              <span class="bg-[#7C3AED] text-white text-[11px] font-title font-bold px-3 py-1 rounded-full shadow-xs">
+                Semester 2
+              </span>
+
+              <p class="text-[11px] text-slate-600 font-medium my-2.5 leading-snug">
+                Mengembangkan proyek dan kreativitas digital.
+              </p>
+
+              <button onclick="bukaModalSemester2()" class="w-full bg-[#7C3AED] hover:bg-purple-700 text-white font-title font-bold text-xs py-2 rounded-xl transition shadow-xs flex items-center justify-center gap-1">
+                <span>Masuk</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Catatan Kaki Kolom 1 -->
+        <div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Kurikulum Merdeka 2026</span>
+          <span class="font-bold text-blue-600">SDS Cinta Kasih Tzu Chi</span>
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- KOLOM 2: MODUL BELAJAR -->
+      <!-- ========================================== -->
+      <div class="bg-gradient-to-b from-[#F0FDF4]/80 to-white rounded-[28px] border-2 border-emerald-100 p-6 shadow-smooth flex flex-col justify-between hover-lift">
+        
+        <div>
+          <!-- Header Kolom 2 -->
+          <div class="flex items-center gap-3.5 mb-3">
+            <div class="w-12 h-12 rounded-full bg-[#16A34A] text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/20 shrink-0">
+              <i class="fa-solid fa-book-open"></i>
+            </div>
+            <div>
+              <h3 class="font-title font-bold text-2xl text-slate-800 leading-tight">Modul Belajar</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">
+                Gambaran umum semester 1 dan semester 2 berisi konten pembelajaran.
+              </p>
+            </div>
+          </div>
+
+          <!-- Body Kolom 2: 2 Box Silabus Semester -->
+          <div class="grid grid-cols-2 gap-3.5 mt-5">
+            
+            <!-- Box Modul Semester 1 (Tema Biru) -->
+            <div class="bg-white rounded-2xl border border-blue-200 overflow-hidden shadow-xs flex flex-col justify-between">
+              <div>
+                <!-- Header Box -->
+                <div class="bg-[#2563EB] text-white text-center py-2 text-xs font-title font-bold">
+                  Semester 1
+                </div>
+                <!-- Keterangan Usia -->
+                <div class="bg-blue-50/60 text-slate-600 text-[10px] font-bold text-center py-1.5 border-b border-blue-100 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-user text-blue-500"></i> Usia 9 – 10 tahun
+                </div>
+                <!-- List 4 Modul -->
+                <div class="p-2 space-y-1 text-slate-700 text-[11px] font-semibold">
+                  <a href="index.html#tab-modul" class="p-1.5 rounded-lg hover:bg-blue-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-desktop text-blue-500 text-[10px]"></i> Pengenalan Komputer
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-blue-600"></i>
+                  </a>
+
+                  <a href="index.html#tab-modul" class="p-1.5 rounded-lg hover:bg-blue-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-code-fork text-blue-500 text-[10px]"></i> Logika & Algoritma
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-blue-600"></i>
+                  </a>
+
+                  <a href="index.html#tab-modul" class="p-1.5 rounded-lg hover:bg-blue-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-code text-blue-500 text-[10px]"></i> Scratch / Blockly
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-blue-600"></i>
+                  </a>
+
+                  <a href="index.html#tab-modul" class="p-1.5 rounded-lg hover:bg-blue-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-robot text-blue-500 text-[10px]"></i> AI Dasar
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-blue-600"></i>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Tombol Lihat Semua Modul (Semester 1) -->
+              <div class="p-2 pt-0">
+                <a href="index.html#tab-modul" class="block w-full bg-[#2563EB] hover:bg-blue-700 text-white font-title font-bold text-[11px] py-1.5 rounded-full text-center transition shadow-xs">
+                  Lihat Semua Modul &gt;
+                </a>
+              </div>
+            </div>
+
+            <!-- Box Modul Semester 2 (Tema Ungu) -->
+            <div class="bg-white rounded-2xl border border-purple-200 overflow-hidden shadow-xs flex flex-col justify-between">
+              <div>
+                <!-- Header Box -->
+                <div class="bg-[#7C3AED] text-white text-center py-2 text-xs font-title font-bold">
+                  Semester 2
+                </div>
+                <!-- Keterangan Usia -->
+                <div class="bg-purple-50/60 text-slate-600 text-[10px] font-bold text-center py-1.5 border-b border-purple-100 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-user text-purple-500"></i> Usia 10 – 12 tahun
+                </div>
+                <!-- List 4 Modul -->
+                <div class="p-2 space-y-1 text-slate-700 text-[11px] font-semibold">
+                  <button onclick="bukaModalSemester2()" class="w-full text-left p-1.5 rounded-lg hover:bg-purple-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-code text-purple-500 text-[10px]"></i> Pemrograman Lanjut
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-purple-600"></i>
+                  </button>
+
+                  <button onclick="bukaModalSemester2()" class="w-full text-left p-1.5 rounded-lg hover:bg-purple-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-cube text-purple-500 text-[10px]"></i> Proyek Mini
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-purple-600"></i>
+                  </button>
+
+                  <button onclick="bukaModalSemester2()" class="w-full text-left p-1.5 rounded-lg hover:bg-purple-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-brain text-purple-500 text-[10px]"></i> AI & Machine Learning
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-purple-600"></i>
+                  </button>
+
+                  <button onclick="bukaModalSemester2()" class="w-full text-left p-1.5 rounded-lg hover:bg-purple-50 flex items-center justify-between transition group">
+                    <span class="flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-shield-halved text-purple-500 text-[10px]"></i> Etika Digital
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover:text-purple-600"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tombol Lihat Semua Modul (Semester 2) -->
+              <div class="p-2 pt-0">
+                <button onclick="bukaModalSemester2()" class="block w-full bg-[#7C3AED] hover:bg-purple-700 text-white font-title font-bold text-[11px] py-1.5 rounded-full text-center transition shadow-xs">
+                  Lihat Semua Modul &gt;
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Catatan Kaki Kolom 2 -->
+        <div class="pt-4 border-t border-emerald-100 mt-4 flex items-center justify-between text-[11px] text-emerald-800">
+          <span>8 Modul Terstruktur</span>
+          <span class="font-bold">20 JP Total Belajar</span>
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- KOLOM 3: DEMO PRAKTIK -->
+      <!-- ========================================== -->
+      <div class="bg-white rounded-[28px] border border-slate-200 p-6 shadow-smooth flex flex-col justify-between hover-lift">
+        
+        <div>
+          <!-- Header Kolom 3 -->
+          <div class="flex items-center gap-3.5 mb-3">
+            <div class="w-12 h-12 rounded-full bg-[#7C3AED] text-white flex items-center justify-center text-xl shadow-md shadow-purple-500/20 shrink-0">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <div>
+              <h3 class="font-title font-bold text-2xl text-slate-800 leading-tight">Demo Praktik</h3>
+              <p class="text-xs text-slate-500 mt-0.5 leading-snug">
+                Lihat contoh praktik dan hasil karya siswa di setiap semester.
+              </p>
+            </div>
+          </div>
+
+          <!-- Body Kolom 3: Dua Kartu Showcase Demo -->
+          <div class="space-y-3.5 mt-5">
+            
+            <!-- Item Demo Semester 1 -->
+            <div class="bg-slate-50 hover:bg-blue-50/40 rounded-2xl p-4 border border-slate-200 transition flex items-center justify-between gap-3">
+              <div class="space-y-1.5 max-w-[170px]">
+                <span class="bg-[#2563EB] text-white text-[10px] font-title font-bold px-2.5 py-0.5 rounded-full">
+                  Semester 1
+                </span>
+                <p class="text-xs text-slate-600 font-medium leading-snug">
+                  Demo proyek dan praktik coding sederhana.
+                </p>
+                <a href="index.html#tab-demo" class="inline-flex items-center gap-1 bg-[#2563EB] hover:bg-blue-700 text-white font-title font-bold text-[11px] px-3.5 py-1.5 rounded-full shadow-xs transition">
+                  Lihat Demo <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                </a>
+              </div>
+
+              <!-- Mockup Laptop Scratch Project -->
+              <div class="w-28 shrink-0">
+                <svg viewBox="0 0 160 110" class="w-full h-auto drop-shadow-md">
+                  <!-- Layar Laptop -->
+                  <rect x="15" y="8" width="130" height="84" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="2"/>
+                  <!-- Isi Layar Scratch -->
+                  <rect x="22" y="15" width="116" height="70" rx="3" fill="#38BDF8"/>
+                  <!-- Kucing Scratch & Rumput -->
+                  <rect x="22" y="65" width="116" height="20" fill="#16A34A"/>
+                  <circle cx="80" cy="52" r="12" fill="#F97316"/>
+                  <polygon points="73,42 77,48 83,48 87,42" fill="#F97316"/>
+                  <circle cx="76" cy="50" r="1.5" fill="#FFFFFF"/>
+                  <circle cx="84" cy="50" r="1.5" fill="#FFFFFF"/>
+                  <!-- Base Laptop -->
+                  <polygon points="5,94 155,94 145,102 15,102" fill="#94A3B8"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Item Demo Semester 2 -->
+            <div class="bg-slate-50 hover:bg-purple-50/40 rounded-2xl p-4 border border-slate-200 transition flex items-center justify-between gap-3">
+              <div class="space-y-1.5 max-w-[170px]">
+                <span class="bg-[#7C3AED] text-white text-[10px] font-title font-bold px-2.5 py-0.5 rounded-full">
+                  Semester 2
+                </span>
+                <p class="text-xs text-slate-600 font-medium leading-snug">
+                  Demo proyek AI dan aplikasi interaktif.
+                </p>
+                <button onclick="bukaModalSemester2()" class="inline-flex items-center gap-1 bg-[#7C3AED] hover:bg-purple-700 text-white font-title font-bold text-[11px] px-3.5 py-1.5 rounded-full shadow-xs transition">
+                  Lihat Demo <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                </button>
+              </div>
+
+              <!-- Mockup Robot AI & Screen -->
+              <div class="w-28 shrink-0 flex items-center justify-center">
+                <svg viewBox="0 0 160 110" class="w-full h-auto drop-shadow-md">
+                  <!-- Layar Monitor AI -->
+                  <rect x="65" y="10" width="90" height="65" rx="5" fill="#1E293B" stroke="#8B5CF6" stroke-width="2"/>
+                  <!-- Otak AI Neural Network di Layar -->
+                  <rect x="70" y="15" width="80" height="55" rx="3" fill="#0F172A"/>
+                  <circle cx="110" cy="38" r="12" fill="#8B5CF6" opacity="0.3"/>
+                  <path d="M100 38 Q110 25 120 38 Q110 50 100 38" stroke="#A855F7" stroke-width="2" fill="none"/>
+                  <circle cx="102" cy="32" r="2.5" fill="#38BDF8"/>
+                  <circle cx="118" cy="32" r="2.5" fill="#38BDF8"/>
+                  <circle cx="110" cy="45" r="2.5" fill="#38BDF8"/>
+                  <!-- Bar Chart AI -->
+                  <rect x="75" y="55" width="6" height="12" fill="#10B981"/>
+                  <rect x="84" y="50" width="6" height="17" fill="#38BDF8"/>
+                  <rect x="93" y="45" width="6" height="22" fill="#F59E0B"/>
+                  <!-- Stand Monitor -->
+                  <rect x="105" y="75" width="10" height="15" fill="#64748B"/>
+                  <rect x="95" y="90" width="30" height="4" rx="2" fill="#64748B"/>
+                  <!-- Robot Berdiri di Samping -->
+                  <g transform="translate(10, 20)">
+                    <rect x="10" y="10" width="30" height="22" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+                    <rect x="15" y="14" width="20" height="14" rx="3" fill="#2563EB"/>
+                    <circle cx="21" cy="21" r="2" fill="#67E8F9"/>
+                    <circle cx="29" cy="21" r="2" fill="#67E8F9"/>
+                    <rect x="12" y="34" width="26" height="28" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+                    <text x="25" y="48" fill="#7C3AED" font-family="Fredoka" font-size="8" font-weight="bold" text-anchor="middle">AI</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Catatan Kaki Kolom 3 -->
+        <div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-purple-700">
+          <span>Karya Asli Siswa</span>
+          <span class="font-bold">Interaktif & Menyenangkan</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 4. FOOTER DENGAN NILAI BUDAYA TZU CHI (Persis Gambar) -->
+    <!-- ======================================================== -->
+    <footer class="pt-8 pb-4 text-center space-y-3 relative overflow-hidden">
+      
+      <!-- Daun Teratai Dekoratif Kiri Bawah -->
+      <div class="absolute left-4 bottom-2 text-emerald-600/20 text-5xl pointer-events-none">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <!-- Daun Teratai Dekoratif Kanan Bawah -->
+      <div class="absolute right-4 bottom-2 text-emerald-600/20 text-5xl pointer-events-none transform -scale-x-100">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+
+      <!-- Kutipan Kata Bijak Master Cheng Yen / Nilai Budi Pekerti Tzu Chi -->
+      <p class="text-sm sm:text-base font-medium text-slate-700 italic max-w-2xl mx-auto px-4">
+        &ldquo;Teknologi adalah alat, tetapi nilai-nilai baik adalah tujuan kita.&rdquo;
+      </p>
+
+      <!-- Garis Pemisah & Nama Sekolah -->
+      <div class="flex items-center justify-center gap-3 text-xs sm:text-sm font-bold text-slate-500">
+        <span class="w-12 h-0.5 bg-slate-300"></span>
+        <span class="text-slate-800 font-title">SDS Cinta Kasih Tzu Chi</span>
+        <span class="w-12 h-0.5 bg-slate-300"></span>
+      </div>
+
+      <p class="text-[11px] text-slate-400">
+        Laboratorium Komputer & Inovasi Pembelajaran Digital © 2026
+      </p>
+    </footer>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL INTERAKTIF: PREVIEW SEMESTER 2 -->
+  <!-- ======================================================== -->
+  <div id="modal-semester-2" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-purple-200 space-y-5 animate-fadeIn">
+      
+      <div class="flex items-center justify-between border-b pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl font-bold">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-full uppercase">Tingkat Lanjutan</span>
+            <h3 class="font-title text-xl sm:text-2xl font-bold text-slate-800">Kurikulum Semester 2</h3>
+            <p class="text-xs text-slate-500">Usia 10 – 12 tahun • Eksplorasi AI & Coding Interaktif</p>
+          </div>
+        </div>
+        <button onclick="tutupModalSemester2()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+        <div class="p-3.5 bg-purple-50 rounded-2xl border border-purple-200 flex items-start gap-3">
+          <i class="fa-solid fa-code text-purple-600 text-lg mt-0.5"></i>
+          <div>
+            <h5 class="font-bold text-purple-950 text-sm">1. Pemrograman Lanjutan (Visual Blocks)</h5>
+            <p class="text-xs text-purple-800">Membuat game interaktif, animasi logika, dan variabel percabangan (if-else).</p>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-indigo-50 rounded-2xl border border-indigo-200 flex items-start gap-3">
+          <i class="fa-solid fa-cube text-indigo-600 text-lg mt-0.5"></i>
+          <div>
+            <h5 class="font-bold text-indigo-950 text-sm">2. Proyek Mini Solutif</h5>
+            <p class="text-xs text-indigo-800">Membuat proyek bertema lingkungan, kesehatan, dan gotong royong.</p>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-sky-50 rounded-2xl border border-sky-200 flex items-start gap-3">
+          <i class="fa-solid fa-brain text-sky-600 text-lg mt-0.5"></i>
+          <div>
+            <h5 class="font-bold text-sky-950 text-sm">3. AI & Machine Learning Sederhana</h5>
+            <p class="text-xs text-sky-800">Mengenal bagaimana komputer mengenali gambar, suara, dan teks cerdas.</p>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-start gap-3">
+          <i class="fa-solid fa-shield-heart text-emerald-600 text-lg mt-0.5"></i>
+          <div>
+            <h5 class="font-bold text-emerald-950 text-sm">4. Etika Digital & Karakter Luhur Tzu Chi</h5>
+            <p class="text-xs text-emerald-800">Menjaga tutur kata santun, melindungi privasi diri, dan menjunjung budi pekerti.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <a href="index.html" class="flex-1 bg-[#2563EB] hover:bg-blue-700 text-white font-title text-xs sm:text-sm font-bold py-3 rounded-2xl text-center shadow transition">
+          Mulai dari Semester 1 Terlebih Dahulu 🚀
+        </a>
+        <button onclick="tutupModalSemester2()" class="px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs sm:text-sm font-bold py-3 rounded-2xl transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleTeacherMenu() {
+      const menu = document.getElementById('teacher-dropdown');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function bukaModalSemester2() {
+      const modal = document.getElementById('modal-semester-2');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function tutupModalSemester2() {
+      const modal = document.getElementById('modal-semester-2');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // Klik di luar untuk menutup dropdown
+    window.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('teacher-dropdown');
+      if (dropdown && !e.target.closest('button[onclick="toggleTeacherMenu()"]') && !e.target.closest('#teacher-dropdown')) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  </script>
+
+</body>
+</html>

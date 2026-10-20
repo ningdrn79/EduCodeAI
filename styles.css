@@ -1,0 +1,1728 @@
+/* Custom Styling untuk Aplikasi Pembelajaran Kelas 4 SD */
+
+/* Font Family Defaults */
+body {
+  font-family: 'Nunito', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #050714;
+  color: #f1f5f9;
+}
+
+h1, h2, h3, h4, h5, h6, .font-title {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.shadow-smooth {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* ======================================================== */
+/* 3D TACTILE MENU & NAVIGATION BAR (COOL 3D DOCK DESIGN)   */
+/* ======================================================== */
+
+/* 1. Capsule Dock Container 3D (Floating Glass Cyber Dock) */
+.nav-dock-3d {
+  background: linear-gradient(180deg, rgba(26, 36, 56, 0.95) 0%, rgba(13, 19, 36, 0.98) 100%);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.28);
+  border-bottom: 2.5px solid rgba(2, 6, 23, 0.95);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 14px 35px -4px rgba(0, 0, 0, 0.8),
+    0 6px 12px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 2. Tombol Navigasi 3D (.nav-btn-3d) */
+.nav-btn-3d {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: 9999px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.015em;
+  color: #cbd5e1;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Hover State untuk Tombol 3D Belum Aktif */
+.nav-btn-3d:not(.active-tab):hover {
+  color: #ffffff !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 
+    0 4px 14px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  transform: translateY(-2px);
+}
+
+.nav-btn-3d:not(.active-tab):active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 3. TOMBOL NAVIGASI AKTIF 3D SEJATI (Claymorphic 3D Bevel & Extrusion) */
+.nav-btn-3d.active-tab,
+.active-tab.nav-btn,
+.active-tab {
+  background: linear-gradient(180deg, #38bdf8 0%, #2563eb 55%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+  border-bottom: 3.5px solid #172554 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 
+    0 5px 0 #0f172a, 
+    0 10px 22px rgba(37, 99, 235, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-2px);
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.7) !important;
+}
+
+.nav-btn-3d.active-tab:hover,
+.active-tab.nav-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 
+    0 6px 0 #0f172a, 
+    0 12px 26px rgba(37, 99, 235, 0.7),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-btn-3d.active-tab:active,
+.active-tab.nav-btn:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 
+    0 1.5px 0 #0f172a, 
+    0 4px 10px rgba(37, 99, 235, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Modul tab aktif 3D */
+.active-modul-tab {
+  background: linear-gradient(180deg, #c084fc 0%, #9333ea 55%, #7e22ce 100%) !important;
+  color: #ffffff !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  border-bottom: 3.5px solid #3b0764 !important;
+  box-shadow: 
+    0 5px 0 #2e0854, 
+    0 10px 22px rgba(147, 51, 234, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.6) !important;
+  transform: translateY(-2px);
+}
+
+.active-demo-sub {
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 55%, #1e40af 100%) !important;
+  color: #ffffff !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  border-bottom: 3.5px solid #172554 !important;
+  box-shadow: 
+    0 5px 0 #0f172a, 
+    0 8px 18px rgba(37, 99, 235, 0.5),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.6) !important;
+}
+
+.active-praktik-sub {
+  background: linear-gradient(180deg, #f472b6 0%, #db2777 55%, #be185d 100%) !important;
+  color: #ffffff !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  border-bottom: 3.5px solid #831843 !important;
+  box-shadow: 
+    0 5px 0 #500724, 
+    0 8px 18px rgba(219, 39, 119, 0.5),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 4. Ikon 3D Berwarna Khusus Menu (Vibrant 3D Icons) */
+.icon-3d-glow {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-block;
+}
+
+.nav-btn-3d:hover .icon-3d-glow {
+  transform: scale(1.22) translateY(-1px);
+}
+
+.nav-btn-3d.active-tab .icon-3d-glow,
+.active-tab .icon-3d-glow {
+  transform: scale(1.15);
+  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.7)) drop-shadow(0 0 12px rgba(56, 189, 248, 0.9));
+  animation: bounceMini 2.2s infinite ease-in-out;
+}
+
+@keyframes bounceMini {
+  0%, 100% { transform: scale(1.15) translateY(0); }
+  50% { transform: scale(1.2) translateY(-2px); }
+}
+
+/* 5. Tombol Suara 3D Orb (.btn-sound-3d) */
+.btn-sound-3d {
+  position: relative;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #b45309 0%, #78350f 55%, #451a03 100%);
+  border-top: 1.5px solid rgba(253, 224, 71, 0.8);
+  border-bottom: 3px solid #290e02;
+  border-left: 1px solid rgba(245, 158, 11, 0.5);
+  border-right: 1px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 
+    0 4px 0 #290e02,
+    0 7px 16px rgba(217, 119, 6, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+  color: #fef08a;
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-sound-3d:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #d97706 0%, #92400e 55%, #5b2108 100%);
+  box-shadow: 
+    0 6px 0 #290e02,
+    0 9px 20px rgba(245, 158, 11, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65);
+  color: #ffffff;
+}
+
+.btn-sound-3d:active {
+  transform: translateY(2.5px);
+  border-bottom-width: 1.5px;
+  box-shadow: 
+    0 1px 0 #290e02,
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 6. Badge Poin Bintang 3D (.badge-points-3d) */
+.badge-points-3d {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.48rem 1.15rem;
+  border-radius: 9999px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.8125rem;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 55%, #172554 100%);
+  border-top: 1.5px solid rgba(147, 197, 253, 0.8);
+  border-bottom: 3px solid #0f172a;
+  border-left: 1px solid rgba(59, 130, 246, 0.45);
+  border-right: 1px solid rgba(59, 130, 246, 0.45);
+  box-shadow: 
+    0 4px 0 #0f172a,
+    0 7px 18px rgba(37, 99, 235, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.badge-points-3d:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 
+    0 5.5px 0 #0f172a,
+    0 9px 22px rgba(59, 130, 246, 0.6);
+}
+
+/* 7. Tombol Beranda Utama (Persis Sesuai Screenshot User: Dark Capsule + Cyan House Icon) */
+.btn-home-3d {
+  background: linear-gradient(180deg, #182236 0%, #0f172a 55%, #080d1a 100%) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.24) !important;
+  border-bottom: 2.5px solid #020617 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4) !important;
+  color: #ffffff !important;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.btn-home-3d:hover {
+  transform: translateY(-1.5px) !important;
+  background: linear-gradient(180deg, #223049 0%, #131f36 55%, #0b1222 100%) !important;
+  border-top-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    0 6px 14px rgba(0, 0, 0, 0.7),
+    0 0 12px rgba(56, 189, 248, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.btn-home-3d:active {
+  transform: translateY(1.5px) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 0 1px 0 #020617, inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Tombol Semester Aktif 3D */
+.btn-sem-active-3d {
+  background: linear-gradient(180deg, #38bdf8 0%, #2563eb 55%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+  border-bottom: 3.5px solid #172554 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 
+    0 4.5px 0 #0f172a, 
+    0 8px 18px rgba(37, 99, 235, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65) !important;
+}
+
+.btn-game-3d {
+  background: linear-gradient(180deg, #c084fc 0%, #9333ea 40%, #7e22ce 100%) !important;
+  border-top: 1.5px solid rgba(245, 208, 254, 0.8) !important;
+  border-bottom: 3.5px solid #3b0764 !important;
+  box-shadow: 
+    0 4.5px 0 #2e0854,
+    0 8px 20px rgba(147, 51, 234, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.btn-game-3d:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 6.5px 0 #2e0854,
+    0 12px 24px rgba(168, 85, 247, 0.7),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65) !important;
+}
+
+.btn-game-3d:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 0 1px 0 #2e0854 !important;
+}
+
+/* Tombol Login Siswa 3D Tactile Capsule */
+.btn-login-siswa-3d {
+  background: linear-gradient(180deg, #059669 0%, #047857 55%, #064e3b 100%) !important;
+  border-top: 1.5px solid rgba(167, 243, 208, 0.75) !important;
+  border-bottom: 3px solid #022c22 !important;
+  border-left: 1px solid rgba(52, 211, 153, 0.4) !important;
+  border-right: 1px solid rgba(52, 211, 153, 0.4) !important;
+  box-shadow: 
+    0 4px 0 #022c22,
+    0 7px 18px rgba(16, 185, 129, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3) !important;
+  color: #ffffff !important;
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.btn-login-siswa-3d:hover {
+  transform: translateY(-2px) !important;
+  background: linear-gradient(180deg, #10b981 0%, #059669 55%, #047857 100%) !important;
+  box-shadow: 
+    0 6px 0 #022c22,
+    0 10px 22px rgba(16, 185, 129, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65) !important;
+  color: #ffffff !important;
+}
+
+.btn-login-siswa-3d:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 0 1px 0 #022c22 !important;
+}
+
+/* Tombol Login Guru 3D Tactile Capsule */
+.btn-login-guru-3d {
+  background: linear-gradient(180deg, #b45309 0%, #78350f 55%, #451a03 100%) !important;
+  border-top: 1.5px solid rgba(253, 224, 71, 0.8) !important;
+  border-bottom: 3px solid #290e02 !important;
+  border-left: 1px solid rgba(245, 158, 11, 0.5) !important;
+  border-right: 1px solid rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 
+    0 4px 0 #290e02,
+    0 7px 16px rgba(217, 119, 6, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.4) !important;
+  color: #fef08a !important;
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.btn-login-guru-3d:hover {
+  transform: translateY(-2px) !important;
+  background: linear-gradient(180deg, #d97706 0%, #92400e 55%, #5b2108 100%) !important;
+  box-shadow: 
+    0 6px 0 #290e02,
+    0 9px 20px rgba(245, 158, 11, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.65) !important;
+  color: #ffffff !important;
+}
+
+.btn-login-guru-3d:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 0 1px 0 #290e02 !important;
+}
+
+.btn-lang-3d {
+  background: linear-gradient(180deg, #334155 0%, #1e293b 55%, #0f172a 100%) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+  border-bottom: 3px solid #020617 !important;
+  box-shadow: 
+    0 3.5px 0 #020617,
+    0 6px 14px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.btn-lang-3d:hover {
+  transform: translateY(-2px) !important;
+  color: #ffffff !important;
+  border-top-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 5.5px 0 #020617, 0 8px 18px rgba(0, 0, 0, 0.6) !important;
+}
+
+.btn-lang-3d:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 0 1px 0 #020617 !important;
+}
+
+/* Mobile Bottom Nav 3D */
+.nav-btn-mobile {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0.35rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.nav-btn-mobile:active {
+  transform: scale(0.92);
+}
+
+.nav-btn-mobile i {
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+}
+
+/* Tombol Lembut Bubbly untuk Anak-Anak */
+.btn-bubbly {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-bubbly:hover {
+  transform: translateY(-2px);
+}
+
+.btn-bubbly:active {
+  transform: translateY(1px);
+}
+
+/* Card Hover Effects */
+.card-fun {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.card-fun:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Canvas Styling */
+#p1-canvas {
+  background-color: #ffffff;
+  border: 3px dashed #cbd5e1;
+  touch-action: none;
+}
+
+#p1-canvas:active {
+  cursor: crosshair;
+}
+
+/* Drag & Drop Visuals */
+.p2-draggable {
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.p2-draggable.selected {
+  outline: 3px solid #3b82f6;
+  background-color: #eff6ff;
+  transform: scale(1.02);
+}
+
+/* Toast Message */
+#toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Custom Scrollbar Cosmic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090d1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+  border: 2px solid #090d1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* Print Styling untuk Sertifikat */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #certificate-box, #certificate-box *, #word-paper, #word-paper * {
+    visibility: visible;
+  }
+  #certificate-box, #word-paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  button {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   SIMULATOR MICROSOFT WORD STYLES
+   ========================================= */
+.word-element {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.word-element:active {
+  cursor: grabbing;
+}
+
+.word-element.active-element {
+  outline: 1.5px solid #0078d4;
+  outline-offset: 2px;
+}
+
+.word-element .element-handle-box {
+  display: none;
+}
+
+.word-element.active-element .element-handle-box {
+  display: flex;
+}
+
+/* Authentic MS Word Resize Handles & Rotate Handle */
+.word-resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #ffffff;
+  border: 1.5px solid #0078d4;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  z-index: 50;
+  display: none;
+}
+
+.word-element.active-element .word-resize-handle {
+  display: block;
+}
+
+/* 8 titik posisi handle seperti MS Word */
+.word-resize-handle.handle-nw { top: -6px; left: -6px; cursor: nwse-resize; }
+.word-resize-handle.handle-n  { top: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.word-resize-handle.handle-ne { top: -6px; right: -6px; cursor: nesw-resize; }
+.word-resize-handle.handle-e  { top: 50%; right: -6px; transform: translateY(-50%); cursor: ew-resize; }
+.word-resize-handle.handle-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+.word-resize-handle.handle-s  { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.word-resize-handle.handle-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.word-resize-handle.handle-w  { top: 50%; left: -6px; transform: translateY(-50%); cursor: ew-resize; }
+
+/* Optimalisasi Sentuhan Jari pada Smartphone / Layar Sentuh */
+@media (pointer: coarse), (max-width: 768px) {
+  .word-resize-handle {
+    width: 14px;
+    height: 14px;
+  }
+  .word-resize-handle.handle-nw { top: -7px; left: -7px; }
+  .word-resize-handle.handle-n  { top: -7px; }
+  .word-resize-handle.handle-ne { top: -7px; right: -7px; }
+  .word-resize-handle.handle-e  { right: -7px; }
+  .word-resize-handle.handle-se { bottom: -7px; right: -7px; }
+  .word-resize-handle.handle-s  { bottom: -7px; }
+  .word-resize-handle.handle-sw { bottom: -7px; left: -7px; }
+  .word-resize-handle.handle-w  { left: -7px; }
+  
+  .word-rotate-handle {
+    width: 26px;
+    height: 26px;
+    top: -38px;
+    font-size: 13px;
+  }
+  .word-ctrl-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
+
+/* Handle Putar (Rotate) Khas Microsoft Word di Atas */
+.word-rotate-connector {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 1.5px;
+  height: 20px;
+  background-color: #0078d4;
+  transform: translateX(-50%);
+  display: none;
+  pointer-events: none;
+  z-index: 49;
+}
+
+.word-rotate-handle {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  background-color: #ffffff;
+  border: 1.5px solid #0078d4;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  cursor: grab;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #0078d4;
+  font-size: 11px;
+  z-index: 55;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.word-rotate-handle:hover {
+  background-color: #f0f7ff;
+  transform: translateX(-50%) scale(1.15);
+}
+
+.word-rotate-handle:active {
+  cursor: grabbing;
+}
+
+.word-element.active-element .word-rotate-connector,
+.word-element.active-element .word-rotate-handle {
+  display: flex;
+}
+
+/* Kontrol Cepat di pojok elemen Word */
+.word-ctrl-btn {
+  width: 22px;
+  height: 22px;
+  background-color: #ffffff;
+  border: 1px solid #0078d4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  transition: transform 0.1s ease;
+}
+
+.word-ctrl-btn:hover {
+  transform: scale(1.15);
+}
+
+/* =========================================
+   SIMULATOR APLIKASI PAINT TERBARU
+   ========================================= */
+#paint-canvas {
+  background-color: #ffffff;
+  touch-action: none;
+}
+
+.paint-tool-btn.active-paint-tool {
+  background-color: #fce7f3 !important;
+  color: #db2777 !important;
+  border-color: #f472b6 !important;
+  outline: 2px solid #ec4899;
+}
+
+.paint-shape-btn.active-paint-shape {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-color: #60a5fa !important;
+  outline: 2px solid #3b82f6;
+}
+
+.paint-size-btn.active-paint-size {
+  background-color: #e0e7ff !important;
+  color: #4338ca !important;
+  border-color: #6366f1 !important;
+  outline: 2px solid #6366f1;
+}
+
+/* =========================================
+   SIMULATOR ROBOMIND 7.0 DESKTOP
+   ========================================= */
+#robomind-script-editor::-webkit-scrollbar,
+#robomind-line-numbers::-webkit-scrollbar,
+#robomind-console-log::-webkit-scrollbar,
+#robomind-world-viewport::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#robomind-script-editor::-webkit-scrollbar-thumb,
+#robomind-console-log::-webkit-scrollbar-thumb,
+#robomind-world-viewport::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+#robomind-script-editor::-webkit-scrollbar-track,
+#robomind-console-log::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sem2-demo-tab-btn.active-sem2-subdemo {
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* Efek Cahaya Beacon RoboMind */
+@keyframes beaconPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.8));
+  }
+  50% {
+    transform: scale(1.12);
+    filter: drop-shadow(0 0 10px rgba(52, 211, 153, 1));
+  }
+}
+
+[id^="robo-beacon-"] {
+  animation: beaconPulse 2s infinite ease-in-out;
+}
+
+/* =========================================
+   MODE LAYAR PENUH (FULLSCREEN) ROBOMIND
+   ========================================= */
+.robomind-fullscreen-mode {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  z-index: 99999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  background-color: #001f3f !important;
+}
+
+.robomind-fullscreen-mode .grid {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.robomind-fullscreen-mode #robomind-world-viewport {
+  max-height: 68vh !important;
+}
+
+.robomind-fullscreen-mode #robomind-script-editor {
+  min-height: 100% !important;
+}
+
+/* =========================================
+   SIMULATOR MICROSOFT EXCEL CILIK
+   ========================================= */
+.excel-cell-active-indicator {
+  position: relative;
+  outline: 2px solid #107c41 !important;
+  outline-offset: -1px !important;
+  background-color: rgba(209, 250, 229, 0.25) !important;
+  z-index: 20 !important;
+}
+
+/* Kursor sel Excel autentik: Plus putih tebal (+) */
+#excel-grid-table td {
+  cursor: cell !important;
+}
+
+/* Handle Autofill pojok kanan bawah sel aktif (Plus hitam kecil) */
+.excel-autofill-handle {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background-color: #107c41;
+  border: 1px solid #ffffff;
+  border-radius: 1px;
+  z-index: 35;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  cursor: crosshair !important; /* Pointer plus hitam tipis (+) autofill */
+  pointer-events: auto;
+  transition: transform 0.1s ease;
+}
+.excel-autofill-handle:hover {
+  transform: scale(1.3);
+  background-color: #047857;
+}
+
+/* Pemisah Resizer Kolom (Panah horizontal ↔) */
+.excel-col-resizer {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize !important;
+  z-index: 40;
+  user-select: none;
+}
+.excel-col-resizer:hover, .excel-col-resizer.active-resizing {
+  background-color: #0284c7;
+}
+
+/* Pemisah Resizer Baris (Panah vertikal ↕) */
+.excel-row-resizer {
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  cursor: row-resize !important;
+  z-index: 35;
+  user-select: none;
+}
+.excel-row-resizer:hover, .excel-row-resizer.active-resizing {
+  background-color: #0284c7;
+}
+
+/* Rentang target Autofill saat diseret */
+.excel-autofill-target-range {
+  outline: 2px dashed #059669 !important;
+  outline-offset: -1px;
+  background-color: rgba(167, 243, 208, 0.35) !important;
+}
+
+/* Tooltip ukuran piksel saat di-drag */
+.excel-resize-tooltip {
+  position: fixed;
+  z-index: 99999;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: monospace;
+  pointer-events: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* Marching-ants dashed border saat memilih sel/rentang untuk rumus (=SUM(C2:C8) */
+.excel-formula-range-active {
+  outline: 2px dashed #0284c7 !important;
+  outline-offset: -2px !important;
+  background-color: rgba(186, 230, 253, 0.45) !important;
+  animation: excelMarchingAnts 1.2s infinite linear !important;
+  z-index: 15 !important;
+}
+
+@keyframes excelMarchingAnts {
+  0% {
+    outline-color: #0284c7;
+  }
+  50% {
+    outline-color: #10b981;
+  }
+  100% {
+    outline-color: #0284c7;
+  }
+}
+
+/* Blok sel / Range selection biasa */
+.excel-range-selected {
+  outline: 2px solid #0284c7 !important;
+  outline-offset: -1px;
+  background-color: rgba(186, 230, 253, 0.35);
+}
+.excel-range-selected[style*="background-color"] {
+  outline: 2px solid #0284c7 !important;
+}
+
+.excel-cell-referenced {
+  outline: 2px dashed #0284c7 !important;
+  outline-offset: -2px !important;
+  background-color: rgba(186, 230, 253, 0.4) !important;
+  animation: cellRefPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes cellRefPulse {
+  0%, 100% {
+    outline-color: #0284c7;
+    background-color: rgba(186, 230, 253, 0.4);
+  }
+  50% {
+    outline-color: #10b981;
+    background-color: rgba(209, 250, 229, 0.4);
+  }
+}
+
+/* Garis putus-putus berputar saat sel disalin (Ctrl+C / Copy) */
+.excel-clipboard-active {
+  outline: 2px dashed #107c41 !important;
+  outline-offset: -1px;
+  animation: excelMarchingAnts 1s infinite linear !important;
+  z-index: 22 !important;
+}
+
+/* Menu Klik Kanan Excel (Context Menu) */
+.excel-context-menu {
+  position: fixed;
+  z-index: 9999;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  min-width: 190px;
+  padding: 4px;
+  font-family: inherit;
+  user-select: none;
+}
+.excel-context-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.excel-context-item:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+.excel-context-item i {
+  width: 16px;
+  font-size: 11px;
+  margin-right: 8px;
+}
+.excel-context-shortcut {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-left: 12px;
+  font-family: monospace;
+}
+.excel-context-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 4px 2px;
+}
+
+/* Freeze Header Excel (Sticky Panes) */
+.excel-sticky-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 30;
+  background-color: #f1f5f9;
+}
+
+.excel-sticky-corner {
+  position: sticky !important;
+  top: 0;
+  left: 0;
+  z-index: 35;
+  background-color: #e2e8f0;
+}
+
+.excel-sticky-row {
+  position: sticky !important;
+  left: 0;
+  z-index: 25;
+  background-color: #f8fafc;
+}
+
+/* =========================================
+   AUTHENTIC MICROSOFT EXCEL RIBBON BAR
+   ========================================= */
+.excel-ribbon-tab-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2f0d9;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  transition: all 0.12s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+.excel-ribbon-tab-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.excel-ribbon-tab-btn.active-tab {
+  background-color: #f3f2f1 !important;
+  color: #107c41 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.excel-ribbon-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 7px 4px 7px;
+  border-right: 1px solid #d1d5db;
+  position: relative;
+  min-height: 86px;
+  flex-shrink: 0;
+}
+.excel-ribbon-group-title {
+  font-size: 10px;
+  color: #6b7280;
+  text-align: center;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding-top: 3px;
+  letter-spacing: -0.2px;
+}
+.excel-group-launcher {
+  position: absolute;
+  right: -2px;
+  bottom: 0px;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 1px;
+}
+.excel-group-launcher:hover {
+  color: #107c41;
+}
+
+.excel-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 2px 4px;
+  color: #374151;
+  font-size: 11px;
+  background-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.1s, border-color 0.1s;
+}
+.excel-tool-btn:hover {
+  background-color: #e5e7eb;
+  border-color: #cbd5e1;
+}
+.excel-tool-btn:active, .excel-tool-btn.active {
+  background-color: #d1d5db;
+  border-color: #94a3b8;
+}
+
+.excel-tool-btn-highlight {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+/* =========================================
+   MODE LAYAR PENUH (FULLSCREEN) MICROSOFT EXCEL
+   ========================================= */
+body.excel-fs-active {
+  overflow: hidden !important;
+}
+
+body.excel-fs-active header,
+body.excel-fs-active nav,
+body.excel-fs-active footer,
+body.excel-fs-active #header-nav,
+body.excel-fs-active .navbar-main {
+  display: none !important;
+}
+
+body.excel-fs-active #tab-msexcel {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Sembunyikan elemen pengantar di luar jendela utama Excel saat layar penuh aktif */
+body.excel-fs-active #tab-msexcel > div:not(#excel-main-window):not(#excel-floating-exit-btn) {
+  display: none !important;
+}
+
+.excel-fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  z-index: 9999999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: #ffffff !important;
+}
+
+.excel-fullscreen-mode #excel-titlebar {
+  border-radius: 0 !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  height: 42px !important;
+}
+
+.excel-fullscreen-mode .grid {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.excel-fullscreen-mode #excel-grid-container-col {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  padding: 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.excel-fullscreen-mode #excel-grid-container-col > div {
+  max-height: none !important;
+  flex: 1 1 0% !important;
+  height: calc(100vh - 175px) !important;
+  border-radius: 4px !important;
+}
+
+/* ========================================================== */
+/* FITUR LAYAR PENUH (FULLSCREEN) SEJATI UNTUK MICROSOFT WORD */
+/* ========================================================== */
+body.word-fs-active {
+  overflow: hidden !important;
+}
+
+body.word-fs-active #tab-sem1 > div:not(#word-simulator-window):not(#word-floating-exit-btn) {
+  display: none !important;
+}
+
+.word-fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  z-index: 9999999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: #2b579a !important;
+}
+
+.word-fullscreen-mode > div:first-of-type {
+  border-radius: 0 !important;
+}
+
+.word-fullscreen-mode .grid {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: calc(100vh - 170px) !important;
+}
+
+.word-fullscreen-mode .lg\:col-span-4 {
+  max-height: calc(100vh - 170px) !important;
+}
+
+.word-fullscreen-mode .lg\:col-span-8 {
+  max-height: calc(100vh - 170px) !important;
+}
+
+.word-fullscreen-mode #word-paper {
+  height: calc(100vh - 250px) !important;
+  min-height: 580px !important;
+}
+
+/* ========================================================== */
+/* EFEK 3D ANTARIKSA LUCU & MENARIK (HERO BANNER SPACE 3D)   */
+/* ========================================================== */
+
+@keyframes float3D {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+@keyframes float3DReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(-4deg);
+  }
+}
+
+@keyframes twinkleStar {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes shootingStarMove {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  65% {
+    transform: translateX(-450px) translateY(450px) rotate(-45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-600px) translateY(600px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseNebula {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+}
+
+.animate-float-3d {
+  animation: float3D 4.5s ease-in-out infinite;
+}
+
+.animate-float-3d-slow {
+  animation: float3D 6.5s ease-in-out infinite;
+}
+
+.animate-float-3d-reverse {
+  animation: float3DReverse 5.5s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkleStar 2.5s ease-in-out infinite;
+}
+
+.animate-shooting-star {
+  animation: shootingStarMove 7.5s linear infinite;
+}
+
+.animate-pulse-nebula {
+  animation: pulseNebula 5s ease-in-out infinite;
+}
+
+/* 3D Sphere Shading Helpers */
+.sphere-3d-planet {
+  background: radial-gradient(circle at 35% 35%, #f472b6, #a855f7 45%, #4338ca 80%, #1e1b4b 100%);
+  box-shadow: inset -8px -8px 20px rgba(0, 0, 0, 0.45), 0 0 35px rgba(168, 85, 247, 0.45);
+}
+
+.sphere-3d-cyan {
+  background: radial-gradient(circle at 35% 35%, #67e8f9, #0284c7 50%, #0369a1 80%, #082f49 100%);
+  box-shadow: inset -6px -6px 16px rgba(0, 0, 0, 0.4), 0 0 30px rgba(56, 189, 248, 0.45);
+}
+
+.sphere-3d-yellow {
+  background: radial-gradient(circle at 35% 35%, #fef08a, #eab308 50%, #ca8a04 80%, #713f12 100%);
+  box-shadow: inset -6px -6px 15px rgba(0, 0, 0, 0.35), 0 0 25px rgba(250, 204, 21, 0.55);
+}
+
+/* ========================================================
+   1. 3D BUMI (EARTH): BERPUTAR PADA POROSNYA SECARA SEAMLESS
+   ======================================================== */
+@keyframes spinEarthMap {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes spinEarthClouds {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes orbitEarth3D {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(3deg);
+  }
+}
+
+.earth-container-3d {
+  animation: orbitEarth3D 14s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.earth-sphere {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 35%, #0284c7 0%, #1e40af 45%, #1e3a8a 70%, #03071e 100%);
+  box-shadow: 
+    inset -18px -18px 30px rgba(0, 0, 0, 0.88),
+    inset 8px 8px 18px rgba(255, 255, 255, 0.45),
+    0 0 35px rgba(56, 189, 248, 0.7),
+    0 0 75px rgba(37, 99, 235, 0.4);
+  transform: rotate(-18deg);
+}
+
+.earth-map-seamless {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  display: flex;
+  animation: spinEarthMap 16s linear infinite;
+  pointer-events: none;
+}
+
+.earth-clouds-seamless {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  display: flex;
+  opacity: 0.52;
+  mix-blend-mode: screen;
+  animation: spinEarthClouds 10s linear infinite;
+  pointer-events: none;
+}
+
+.earth-atmosphere-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 0 22px rgba(56, 189, 248, 0.6),
+    0 0 30px rgba(56, 189, 248, 0.5);
+  pointer-events: none;
+}
+
+/* ========================================================
+   2. 3D BULAN (THE MOON): KAWAH, MARIA, & KILAU REMBULAN
+   ======================================================== */
+.moon-container-3d {
+  animation: float3D 6.5s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.moon-sphere {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e2e8f0 35%, #94a3b8 70%, #334155 90%, #0f172a 100%);
+  box-shadow: 
+    inset -14px -14px 24px rgba(15, 23, 42, 0.9),
+    inset 6px 6px 14px rgba(255, 255, 255, 0.8),
+    0 0 28px rgba(241, 245, 249, 0.65),
+    0 0 55px rgba(226, 232, 240, 0.3);
+}
+
+.moon-craters-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ========================================================
+   3. 3D MERKURIUS (MERCURY): PLANET BATU DENGAN KAWAH
+   ======================================================== */
+.mercury-container-3d {
+  animation: float3DReverse 5.8s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.mercury-sphere {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 32% 32%, #f5f5f4 0%, #d6d3d1 35%, #a8a29e 60%, #57534e 85%, #1c1917 100%);
+  box-shadow: 
+    inset -12px -12px 20px rgba(0, 0, 0, 0.92),
+    inset 5px 5px 12px rgba(255, 255, 255, 0.5),
+    0 0 24px rgba(214, 211, 209, 0.5),
+    0 0 45px rgba(168, 162, 158, 0.25);
+}
+
+/* ========================================================
+   4. 3D MARS (THE RED PLANET): KUTUB ES & LEMBAH MARS BERPUTAR
+   ======================================================== */
+@keyframes spinMarsMap {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.mars-container-3d {
+  animation: float3D 7.5s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.mars-sphere {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 35%, #fb923c 0%, #ea580c 40%, #c2410c 65%, #7c2d12 85%, #2a0b04 100%);
+  box-shadow: 
+    inset -16px -16px 28px rgba(26, 4, 1, 0.9),
+    inset 6px 6px 14px rgba(254, 215, 170, 0.5),
+    0 0 38px rgba(239, 68, 68, 0.65),
+    0 0 70px rgba(249, 115, 22, 0.35);
+  transform: rotate(-24deg);
+}
+
+.mars-map-seamless {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  display: flex;
+  animation: spinMarsMap 22s linear infinite;
+  pointer-events: none;
+}
+
+.mars-atmosphere-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 0 18px rgba(249, 115, 22, 0.6),
+    0 0 28px rgba(239, 68, 68, 0.5);
+  pointer-events: none;
+}
+
+/* Polar Ice Cap Mars */
+.mars-polar-ice {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 12%;
+  background: radial-gradient(ellipse at center, #ffffff 0%, rgba(255, 255, 255, 0.9) 55%, transparent 100%);
+  border-radius: 50%;
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+/* ========================================================
+   5. BINTANG BERKELAP-KELIP (TWINKLING STARS & SPARKLES)
+   ======================================================== */
+@keyframes starPulseGlow {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.75);
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.35);
+    filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 14px currentColor);
+  }
+}
+
+@keyframes starFlareSpin {
+  0% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.4) rotate(45deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 10px #fef08a) drop-shadow(0 0 20px #eab308);
+  }
+  100% {
+    transform: scale(0.8) rotate(90deg);
+    opacity: 0.3;
+  }
+}
+
+.star-twinkle-glow {
+  animation: starPulseGlow 2.4s ease-in-out infinite;
+  display: inline-block;
+}
+
+.star-flare-spin {
+  animation: starFlareSpin 3.6s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ========================================================
+   6. ANIMASI KOMET & METEOR (COMETS & SHOOTING METEORS)
+   ======================================================== */
+@keyframes cometFlight1 {
+  0% {
+    transform: translate3d(-200px, -100px, 0) rotate(38deg);
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate3d(calc(100vw + 250px), calc(75vh), 0) rotate(38deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(calc(100vw + 450px), calc(90vh), 0) rotate(38deg);
+    opacity: 0;
+  }
+}
+
+@keyframes cometFlight2 {
+  0% {
+    transform: translate3d(calc(100vw + 180px), -60px, 0) rotate(-142deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate3d(-280px, calc(80vh), 0) rotate(-142deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-450px, calc(98vh), 0) rotate(-142deg);
+    opacity: 0;
+  }
+}
+
+@keyframes meteorFlash {
+  0% {
+    transform: translate3d(calc(100vw * 0.7), -40px, 0) rotate(-35deg);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  12% {
+    transform: translate3d(calc(100vw * 0.2), calc(50vh), 0) rotate(-35deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(calc(100vw * 0.2), calc(50vh), 0) rotate(-35deg);
+    opacity: 0;
+  }
+}
+
+@keyframes cometTailFlicker {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.12);
+  }
+}
+
+.comet-object-1 {
+  animation: cometFlight1 11s linear infinite;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.comet-object-2 {
+  animation: cometFlight2 15s linear infinite;
+  animation-delay: 5.5s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.meteor-shooting-fast {
+  animation: meteorFlash 7s ease-out infinite;
+  animation-delay: 2s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.comet-tail-streak {
+  animation: cometTailFlicker 1.5s ease-in-out infinite;
+}
+
+/* ========================================================
+   7. INTERACTIVE PLANET HOVER TAGS (EDUKASI SISWA KELAS 4)
+   ======================================================== */
+.planet-interactive {
+  pointer-events: auto !important;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.planet-interactive:hover {
+  transform: scale(1.1) !important;
+  z-index: 40 !important;
+}
+
+.planet-tag-pill {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 10px rgba(56, 189, 248, 0.3);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.22s ease-in-out;
+}
+
+.planet-interactive:hover .planet-tag-pill {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Custom Cute Slim Scrollbar untuk Tabel Gradebook */
+.custom-slim-scroll::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.custom-slim-scroll::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.7);
+  border-radius: 9999px;
+}
+.custom-slim-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.custom-slim-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Pastikan Mobile Bottom Navbar Hanya Muncul di Mobile (< 768px), Tidak Pernah Muncul Ganda di Desktop */
+@media (min-width: 768px) {
+  #m-navbar-utama,
+  #m-navbar-sem1,
+  #m-navbar-guru {
+    display: none !important;
+  }
+}
+
+
+
+
