@@ -10773,19 +10773,22 @@ function mulaiDengarSuaraSiswa(event) {
 
 // Catatan: Konstanta DB_STORAGE_KEY, ACTIVE_STUDENT_KEY, dsb. dideklarasikan di bagian paling atas skrip.
 
+// Master URL Google Spreadsheet Terpusat (Otomatis aktif di seluruh siswa & guru di perangkat mana pun)
+const DEFAULT_MASTER_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/16fKDdyZpLqTznn6crU1yZ0c5_srXd2XiLvfRtGSztEs/edit?usp=sharing';
+
 // Default konfigurasi penyimpanan Google Sheets per kelas
 const DEFAULT_CLASS_SHEETS_CONFIG = {
-  '4A': { label: 'Kelas 4A', sheetUrl: '', tabName: '4A', tingkat: '4', count: 0 },
-  '4B': { label: 'Kelas 4B', sheetUrl: '', tabName: '4B', tingkat: '4', count: 0 },
-  '4C': { label: 'Kelas 4C', sheetUrl: '', tabName: '4C', tingkat: '4', count: 0 },
-  '4D': { label: 'Kelas 4D', sheetUrl: '', tabName: '4D', tingkat: '4', count: 0 },
-  '4E': { label: 'Kelas 4E', sheetUrl: '', tabName: '4E', tingkat: '4', count: 0 },
-  '5D': { label: 'Kelas 5D', sheetUrl: '', tabName: '5D', tingkat: '5', count: 0 },
-  '6A': { label: 'Kelas 6A', sheetUrl: '', tabName: '6A', tingkat: '6', count: 0 },
-  '6B': { label: 'Kelas 6B', sheetUrl: '', tabName: '6B', tingkat: '6', count: 0 },
-  '6C': { label: 'Kelas 6C', sheetUrl: '', tabName: '6C', tingkat: '6', count: 0 },
-  '6D': { label: 'Kelas 6D', sheetUrl: '', tabName: '6D', tingkat: '6', count: 0 },
-  '6E': { label: 'Kelas 6E', sheetUrl: '', tabName: '6E', tingkat: '6', count: 0 }
+  '4A': { label: 'Kelas 4A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4A', tingkat: '4', count: 0 },
+  '4B': { label: 'Kelas 4B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4B', tingkat: '4', count: 0 },
+  '4C': { label: 'Kelas 4C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4C', tingkat: '4', count: 0 },
+  '4D': { label: 'Kelas 4D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4D', tingkat: '4', count: 0 },
+  '4E': { label: 'Kelas 4E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4E', tingkat: '4', count: 0 },
+  '5D': { label: 'Kelas 5D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5D', tingkat: '5', count: 0 },
+  '6A': { label: 'Kelas 6A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6A', tingkat: '6', count: 0 },
+  '6B': { label: 'Kelas 6B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6B', tingkat: '6', count: 0 },
+  '6C': { label: 'Kelas 6C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6C', tingkat: '6', count: 0 },
+  '6D': { label: 'Kelas 6D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6D', tingkat: '6', count: 0 },
+  '6E': { label: 'Kelas 6E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6E', tingkat: '6', count: 0 }
 };
 
 // Inisialisasi State Dasbor Guru
@@ -11582,6 +11585,12 @@ function initTeacherDatabase() {
   } catch (eDb) {
     console.warn('Inisialisasi database siswa:', eDb);
   }
+
+  try {
+    if (!localStorage.getItem(SPREADSHEET_ID_KEY) && DEFAULT_MASTER_SPREADSHEET_URL) {
+      localStorage.setItem(SPREADSHEET_ID_KEY, DEFAULT_MASTER_SPREADSHEET_URL);
+    }
+  } catch (e) {}
   
   try {
     const savedWebhook = localStorage.getItem(WEBHOOK_KEY);
@@ -14072,17 +14081,17 @@ function getClassSheetsConfig() {
   try {
     const raw = localStorage.getItem(CLASS_SHEETS_KEY);
     const cfg = raw ? JSON.parse(raw) : {};
+    const masterUrl = (localStorage.getItem(SPREADSHEET_ID_KEY) || DEFAULT_MASTER_SPREADSHEET_URL || '').trim();
     const merged = {};
+
     Object.keys(DEFAULT_CLASS_SHEETS_CONFIG).forEach(k => {
       merged[k] = { ...DEFAULT_CLASS_SHEETS_CONFIG[k], ...(cfg[k] || {}) };
+      // Fallback Cerdas: Jika kelas ini belum disetel link khusus, gunakan link master
+      if (!merged[k].sheetUrl && masterUrl) {
+        merged[k].sheetUrl = masterUrl;
+      }
     });
-    // Migrasi jika pengguna sebelumnya menyimpan di SPREADSHEET_ID_KEY single
-    const oldSheet = localStorage.getItem(SPREADSHEET_ID_KEY);
-    if (oldSheet && !merged['4A'].sheetUrl) {
-      Object.keys(merged).forEach(k => {
-        if (!merged[k].sheetUrl) merged[k].sheetUrl = oldSheet;
-      });
-    }
+
     return merged;
   } catch (e) {
     return { ...DEFAULT_CLASS_SHEETS_CONFIG };
@@ -14218,12 +14227,44 @@ function simpanPengaturanSheetKelasAktif() {
   cfg[activeKey].tabName = tabName || activeKey;
   saveClassSheetsConfig(cfg);
 
+  // Selalu perbarui master SPREADSHEET_ID_KEY agar kelas lain otomatis mewarisi jika menggunakan 1 berkas yang sama
+  if (rawUrl) {
+    try { localStorage.setItem(SPREADSHEET_ID_KEY, rawUrl); } catch (e) {}
+  }
+
   playSound('success');
   renderTabsKelasSheet();
   renderRingkasanKoneksiKelas();
   showToast(`Pengaturan Google Sheet untuk Kelas ${activeKey} berhasil disimpan! ☁️`, 'success');
 }
 window.simpanPengaturanSheetKelasAktif = simpanPengaturanSheetKelasAktif;
+
+function terapkanLinkKeSemuaKelas() {
+  const inputUrl = document.getElementById('guru-sheet-url-id-kelas');
+  const rawUrl = inputUrl ? inputUrl.value.trim() : '';
+  if (!rawUrl) {
+    showToast('Ketik atau tempel link / ID Google Spreadsheet terlebih dahulu!', 'warning');
+    if (inputUrl) inputUrl.focus();
+    return;
+  }
+
+  const cfg = getClassSheetsConfig();
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  classes.forEach(cls => {
+    if (!cfg[cls]) cfg[cls] = { ...DEFAULT_CLASS_SHEETS_CONFIG[cls] };
+    cfg[cls].sheetUrl = rawUrl;
+    if (!cfg[cls].tabName) cfg[cls].tabName = cls;
+  });
+
+  saveClassSheetsConfig(cfg);
+  try { localStorage.setItem(SPREADSHEET_ID_KEY, rawUrl); } catch (e) {}
+
+  playSound('success');
+  renderTabsKelasSheet();
+  renderRingkasanKoneksiKelas();
+  showToast('✅ Link Google Spreadsheet berhasil diterapkan ke seluruh 11 kelas sekaligus! ☁️🎉', 'success');
+}
+window.terapkanLinkKeSemuaKelas = terapkanLinkKeSemuaKelas;
 
 function updateStatusKoneksiGoogleSheet() {
   renderTabsKelasSheet();
@@ -14705,12 +14746,12 @@ async function cekNisGoogleSheet(nisVal) {
 
   // 2. Jika tidak ada di lokal, tebak kelas dari awalan NIS dan lakukan sinkronisasi live
   const cfg = getClassSheetsConfig();
-  const guessClass = targetVal.startsWith('41') ? '4A' 
-    : targetVal.startsWith('42') ? '4B' 
-    : targetVal.startsWith('43') ? '4C'
-    : targetVal.startsWith('44') ? '4D'
-    : targetVal.startsWith('45') ? '4E'
-    : targetVal.startsWith('54') ? '5D'
+  const guessClass = (targetVal.startsWith('41') || targetVal.startsWith('31')) ? '4A' 
+    : (targetVal.startsWith('42') || targetVal.startsWith('32')) ? '4B' 
+    : (targetVal.startsWith('43') || targetVal.startsWith('33')) ? '4C'
+    : (targetVal.startsWith('44') || targetVal.startsWith('34')) ? '4D'
+    : (targetVal.startsWith('45') || targetVal.startsWith('35')) ? '4E'
+    : (targetVal.startsWith('54') || targetVal.startsWith('51') || targetVal.startsWith('52')) ? '5D'
     : targetVal.startsWith('61') ? '6A'
     : targetVal.startsWith('62') ? '6B'
     : targetVal.startsWith('63') ? '6C'
