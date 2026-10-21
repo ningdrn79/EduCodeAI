@@ -10778,10 +10778,14 @@ const DEFAULT_CLASS_SHEETS_CONFIG = {
   '4A': { label: 'Kelas 4A', sheetUrl: '', tabName: '4A', tingkat: '4', count: 0 },
   '4B': { label: 'Kelas 4B', sheetUrl: '', tabName: '4B', tingkat: '4', count: 0 },
   '4C': { label: 'Kelas 4C', sheetUrl: '', tabName: '4C', tingkat: '4', count: 0 },
-  '5A': { label: 'Kelas 5A', sheetUrl: '', tabName: '5A', tingkat: '5', count: 0 },
-  '5B': { label: 'Kelas 5B', sheetUrl: '', tabName: '5B', tingkat: '5', count: 0 },
+  '4D': { label: 'Kelas 4D', sheetUrl: '', tabName: '4D', tingkat: '4', count: 0 },
+  '4E': { label: 'Kelas 4E', sheetUrl: '', tabName: '4E', tingkat: '4', count: 0 },
+  '5D': { label: 'Kelas 5D', sheetUrl: '', tabName: '5D', tingkat: '5', count: 0 },
   '6A': { label: 'Kelas 6A', sheetUrl: '', tabName: '6A', tingkat: '6', count: 0 },
-  '6B': { label: 'Kelas 6B', sheetUrl: '', tabName: '6B', tingkat: '6', count: 0 }
+  '6B': { label: 'Kelas 6B', sheetUrl: '', tabName: '6B', tingkat: '6', count: 0 },
+  '6C': { label: 'Kelas 6C', sheetUrl: '', tabName: '6C', tingkat: '6', count: 0 },
+  '6D': { label: 'Kelas 6D', sheetUrl: '', tabName: '6D', tingkat: '6', count: 0 },
+  '6E': { label: 'Kelas 6E', sheetUrl: '', tabName: '6E', tingkat: '6', count: 0 }
 };
 
 // Inisialisasi State Dasbor Guru
@@ -11032,12 +11036,78 @@ const SEED_STUDENTS = [
     terakhirAktif: '08 Okt 2026, 10:55',
     catatanGuru: 'Karya poster sangat harmonis dan rapi.'
   },
-  // --- KELAS 5 ---
+  // --- KELAS 4D ---
   {
-    id: 'STD-5A-01',
-    nis: '5101',
+    id: 'STD-4D-01',
+    nis: '4401',
+    nama: 'Patrick Jonathan',
+    kelas: '4D',
+    absen: '01',
+    kuisSem1: 90,
+    kuisSem2: 85,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
+    posterWord: 3,
+    excelTabel: 2,
+    poinBintang: 230,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 10:15',
+    catatanGuru: 'Kreatif dan aktif bertanya saat praktik Word dan Excel.'
+  },
+  {
+    id: 'STD-4D-05',
+    nis: '4405',
+    nama: 'Queen Olivia',
+    kelas: '4D',
+    absen: '05',
+    kuisSem1: 95,
+    kuisSem2: 90,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
+    posterWord: 4,
+    excelTabel: 3,
+    poinBintang: 285,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 11:20',
+    catatanGuru: 'Desain poster sangat rapi dan estetik.'
+  },
+  // --- KELAS 4E ---
+  {
+    id: 'STD-4E-01',
+    nis: '4501',
+    nama: 'Rafael Santoso',
+    kelas: '4E',
+    absen: '01',
+    kuisSem1: 85,
+    kuisSem2: 85,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
+    posterWord: 2,
+    excelTabel: 2,
+    poinBintang: 200,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '07 Okt 2026, 13:30',
+    catatanGuru: 'Pemahaman materi tabel Excel dan rumus penjumlahan baik.'
+  },
+  {
+    id: 'STD-4E-05',
+    nis: '4505',
+    nama: 'Stella Angeline',
+    kelas: '4E',
+    absen: '05',
+    kuisSem1: 100,
+    kuisSem2: 95,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
+    posterWord: 4,
+    excelTabel: 4,
+    poinBintang: 330,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 14:10',
+    catatanGuru: 'Sangat mandiri dan teliti merumuskan tabel Excel.'
+  },
+  // --- KELAS 5D ---
+  {
+    id: 'STD-5D-01',
+    nis: '5401',
     nama: 'Ahmad Fauzan',
-    kelas: '5A',
+    kelas: '5D',
     absen: '01',
     kuisSem1: 95,
     kuisSem2: 90,
@@ -11050,10 +11120,10 @@ const SEED_STUDENTS = [
     catatanGuru: 'Pemahaman logika pemrograman Scratch sangat kuat.'
   },
   {
-    id: 'STD-5A-05',
-    nis: '5105',
+    id: 'STD-5D-05',
+    nis: '5405',
     nama: 'Clarissa Valerie',
-    kelas: '5A',
+    kelas: '5D',
     absen: '05',
     kuisSem1: 100,
     kuisSem2: 95,
@@ -11066,11 +11136,11 @@ const SEED_STUDENTS = [
     catatanGuru: 'Sangat mandiri dan teliti dalam membuat animasi cerita.'
   },
   {
-    id: 'STD-5B-02',
-    nis: '5202',
+    id: 'STD-5D-08',
+    nis: '5408',
     nama: 'Darren Salim',
-    kelas: '5B',
-    absen: '02',
+    kelas: '5D',
+    absen: '08',
     kuisSem1: 85,
     kuisSem2: 90,
     tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
@@ -11080,22 +11150,6 @@ const SEED_STUDENTS = [
     statusKkm: 'Tuntas',
     terakhirAktif: '07 Okt 2026, 14:10',
     catatanGuru: 'Aktif bereksplorasi sensor kamera dan logika robot.'
-  },
-  {
-    id: 'STD-5B-08',
-    nis: '5208',
-    nama: 'Eveline Chen',
-    kelas: '5B',
-    absen: '08',
-    kuisSem1: 90,
-    kuisSem2: 85,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 2,
-    poinBintang: 240,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 10:20',
-    catatanGuru: 'Kreatif dalam memadukan warna dan tata letak desain.'
   },
   // --- KELAS 6 ---
   {
@@ -11161,30 +11215,128 @@ const SEED_STUDENTS = [
     statusKkm: 'Tuntas',
     terakhirAktif: '08 Okt 2026, 11:15',
     catatanGuru: 'Sangat teliti dalam pengolahan data tabel dan grafik.'
+  },
+  // --- KELAS 6C, 6D, 6E ---
+  {
+    id: 'STD-6C-01',
+    nis: '6301',
+    nama: 'Leonhart Surya',
+    kelas: '6C',
+    absen: '01',
+    kuisSem1: 95,
+    kuisSem2: 90,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
+    posterWord: 3,
+    excelTabel: 3,
+    poinBintang: 260,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 09:50',
+    catatanGuru: 'Pemahaman logika berpikir komputasional sangat baik.'
+  },
+  {
+    id: 'STD-6C-05',
+    nis: '6305',
+    nama: 'Megan Florencia',
+    kelas: '6C',
+    absen: '05',
+    kuisSem1: 100,
+    kuisSem2: 95,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
+    posterWord: 4,
+    excelTabel: 3,
+    poinBintang: 310,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 11:40',
+    catatanGuru: 'Teliti dan kreatif dalam pembuatan dokumen multimedia.'
+  },
+  {
+    id: 'STD-6D-01',
+    nis: '6401',
+    nama: 'Nathaniel Hartono',
+    kelas: '6D',
+    absen: '01',
+    kuisSem1: 90,
+    kuisSem2: 90,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
+    posterWord: 3,
+    excelTabel: 2,
+    poinBintang: 240,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '07 Okt 2026, 13:20',
+    catatanGuru: 'Mampu memecahkan studi kasus robotik dengan cepat.'
+  },
+  {
+    id: 'STD-6D-05',
+    nis: '6405',
+    nama: 'Patricia Tan',
+    kelas: '6D',
+    absen: '05',
+    kuisSem1: 95,
+    kuisSem2: 95,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
+    posterWord: 4,
+    excelTabel: 3,
+    poinBintang: 295,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 10:35',
+    catatanGuru: 'Sangat rapi dalam penyusunan grafik dan diagram.'
+  },
+  {
+    id: 'STD-6E-01',
+    nis: '6501',
+    nama: 'Reinhard Wijaya',
+    kelas: '6E',
+    absen: '01',
+    kuisSem1: 90,
+    kuisSem2: 95,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
+    posterWord: 3,
+    excelTabel: 3,
+    poinBintang: 270,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 09:15',
+    catatanGuru: 'Kemampuan analisis komputasi dan pemrograman baik.'
+  },
+  {
+    id: 'STD-6E-05',
+    nis: '6505',
+    nama: 'Sharon Valerie',
+    kelas: '6E',
+    absen: '05',
+    kuisSem1: 100,
+    kuisSem2: 100,
+    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
+    posterWord: 5,
+    excelTabel: 4,
+    poinBintang: 375,
+    statusKkm: 'Tuntas',
+    terakhirAktif: '08 Okt 2026, 14:00',
+    catatanGuru: 'Prestasi luar biasa, mandiri dan berkarakter luhur.'
   }
 ];
 
-// Helper: Normalisasi nama kelas ke standar (4A, 4B, 4C, 5A, 5B, 6A, 6B)
+// Helper: Normalisasi nama kelas ke standar (4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E)
 function normalisasiNamaKelas(raw, fallback = '4A') {
   if (!raw) return fallback;
   const str = raw.toString().trim();
   const clean = str.toUpperCase().replace(/\s+/g, '').replace(/[-._]/g, '');
 
-  const m = clean.match(/([4-6])([A-C])/);
+  const m = clean.match(/([4-6])([A-E])/);
   if (m) return `${m[1]}${m[2]}`;
 
-  const mRom = clean.match(/(IV|VI|V)([A-C])/);
+  const mRom = clean.match(/(IV|VI|V)([A-E])/);
   if (mRom) {
     const num = mRom[1] === 'IV' ? '4' : mRom[1] === 'VI' ? '6' : '5';
     return `${num}${mRom[2]}`;
   }
 
-  if (clean.length === 1 && 'ABC'.includes(clean)) {
+  if (clean.length === 1 && 'ABCDE'.includes(clean)) {
     const tgk = fallback ? fallback.charAt(0) : '4';
     return `${tgk}${clean}`;
   }
 
-  if (['4A', '4B', '4C', '5A', '5B', '6A', '6B'].includes(clean)) {
+  const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  if (validClasses.includes(clean)) {
     return clean;
   }
 
@@ -11215,8 +11367,8 @@ function getStudentDatabase() {
         changed = true;
       }
 
-      // Pastikan kelas 4B, 4C, 5A, 5B, 6A, 6B terisi jika belum ada di database
-      const classesNeeded = ['4A', '4B', '4C', '5A', '5B', '6A', '6B'];
+      // Pastikan seluruh 11 kelas terisi jika belum ada di database
+      const classesNeeded = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
       classesNeeded.forEach(cn => {
         const hasClass = parsed.some(s => s.kelas === cn);
         if (!hasClass) {
@@ -11233,26 +11385,42 @@ function getStudentDatabase() {
           if (s.kelas !== '4B') { s.kelas = '4B'; changed = true; }
         } else if (s.id && s.id.includes('4C-')) {
           if (s.kelas !== '4C') { s.kelas = '4C'; changed = true; }
-        } else if (s.id && s.id.includes('5A-')) {
-          if (s.kelas !== '5A') { s.kelas = '5A'; changed = true; }
-        } else if (s.id && s.id.includes('5B-')) {
-          if (s.kelas !== '5B') { s.kelas = '5B'; changed = true; }
+        } else if (s.id && s.id.includes('4D-')) {
+          if (s.kelas !== '4D') { s.kelas = '4D'; changed = true; }
+        } else if (s.id && s.id.includes('4E-')) {
+          if (s.kelas !== '4E') { s.kelas = '4E'; changed = true; }
+        } else if (s.id && s.id.includes('5D-')) {
+          if (s.kelas !== '5D') { s.kelas = '5D'; changed = true; }
         } else if (s.id && s.id.includes('6A-')) {
           if (s.kelas !== '6A') { s.kelas = '6A'; changed = true; }
         } else if (s.id && s.id.includes('6B-')) {
           if (s.kelas !== '6B') { s.kelas = '6B'; changed = true; }
+        } else if (s.id && s.id.includes('6C-')) {
+          if (s.kelas !== '6C') { s.kelas = '6C'; changed = true; }
+        } else if (s.id && s.id.includes('6D-')) {
+          if (s.kelas !== '6D') { s.kelas = '6D'; changed = true; }
+        } else if (s.id && s.id.includes('6E-')) {
+          if (s.kelas !== '6E') { s.kelas = '6E'; changed = true; }
         } else if (s.nis && s.nis.startsWith('42')) {
           if (s.kelas !== '4B') { s.kelas = '4B'; changed = true; }
         } else if (s.nis && s.nis.startsWith('43')) {
           if (s.kelas !== '4C') { s.kelas = '4C'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('51')) {
-          if (s.kelas !== '5A') { s.kelas = '5A'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('52')) {
-          if (s.kelas !== '5B') { s.kelas = '5B'; changed = true; }
+        } else if (s.nis && s.nis.startsWith('44')) {
+          if (s.kelas !== '4D') { s.kelas = '4D'; changed = true; }
+        } else if (s.nis && s.nis.startsWith('45')) {
+          if (s.kelas !== '4E') { s.kelas = '4E'; changed = true; }
+        } else if (s.nis && s.nis.startsWith('54')) {
+          if (s.kelas !== '5D') { s.kelas = '5D'; changed = true; }
         } else if (s.nis && s.nis.startsWith('61')) {
           if (s.kelas !== '6A') { s.kelas = '6A'; changed = true; }
         } else if (s.nis && s.nis.startsWith('62')) {
           if (s.kelas !== '6B') { s.kelas = '6B'; changed = true; }
+        } else if (s.nis && s.nis.startsWith('63')) {
+          if (s.kelas !== '6C') { s.kelas = '6C'; changed = true; }
+        } else if (s.nis && s.nis.startsWith('64')) {
+          if (s.kelas !== '6D') { s.kelas = '6D'; changed = true; }
+        } else if (s.nis && s.nis.startsWith('65')) {
+          if (s.kelas !== '6E') { s.kelas = '6E'; changed = true; }
         } else if (s.kelas) {
           const norm = normalisasiNamaKelas(s.kelas, '4A');
           if (s.kelas !== norm) { s.kelas = norm; changed = true; }
@@ -11279,7 +11447,8 @@ function getStudentDatabase() {
           if (matchSeed && matchSeed.nis) {
             s.nis = matchSeed.nis;
           } else {
-            const clsPrefix = s.kelas === '4A' ? '41' : s.kelas === '4B' ? '42' : '43';
+            const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5D': '54', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
+            const clsPrefix = clsMap[s.kelas] || '41';
             s.nis = `${clsPrefix}${s.absen || '01'}`;
           }
           changed = true;
@@ -11427,7 +11596,7 @@ window.initTeacherDatabase = initTeacherDatabase;
 // AUTENTIKASI PIN GURU
 // --------------------------------------------------------------------------
 function bukaModalLoginGuru() {
-  playSound('click');
+  try { playSound('click'); } catch (e) {}
   const modal = document.getElementById('modal-login-guru');
   const inputPin = document.getElementById('input-pin-guru');
   const errorMsg = document.getElementById('pesan-error-pin');
@@ -11436,15 +11605,23 @@ function bukaModalLoginGuru() {
     inputPin.value = '';
     setTimeout(() => inputPin.focus(), 150);
   }
-  perbaruiTampilanStatusPinGuru();
-  if (modal) modal.classList.remove('hidden');
+  try { perbaruiTampilanStatusPinGuru(); } catch (e) {}
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  }
 }
+window.bukaModalLoginGuru = bukaModalLoginGuru;
 
 function tutupModalLoginGuru() {
-  playSound('click');
+  try { playSound('click'); } catch (e) {}
   const modal = document.getElementById('modal-login-guru');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
 }
+window.tutupModalLoginGuru = tutupModalLoginGuru;
 
 function toggleLihatPinGuru() {
   const input = document.getElementById('input-pin-guru');
@@ -11554,22 +11731,18 @@ function perbaruiTampilanStatusPinGuru() {
   const badgeLogin = document.getElementById('badge-login-pin-default');
   const badgeSettings = document.getElementById('badge-status-pin-guru');
 
+  if (badgeLogin) {
+    badgeLogin.remove();
+  }
+
   if (currentPin && currentPin !== DEFAULT_GURU_PIN) {
-    if (badgeLogin) {
-      badgeLogin.innerHTML = '🔒 Menggunakan <strong>PIN Kustom</strong> (Atur di Dasbor)';
-      badgeLogin.className = 'inline-block mt-2 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-semibold rounded-lg border border-emerald-200';
-    }
     if (badgeSettings) {
       badgeSettings.innerText = 'PIN Kustom Aktif';
       badgeSettings.className = 'self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
     }
   } else {
-    if (badgeLogin) {
-      badgeLogin.innerHTML = '🔑 PIN Default: <strong>1234</strong>';
-      badgeLogin.className = 'inline-block mt-2 px-2.5 py-1 bg-amber-50 text-amber-700 text-[11px] font-semibold rounded-lg border border-amber-200';
-    }
     if (badgeSettings) {
-      badgeSettings.innerText = 'PIN Default: 1234';
+      badgeSettings.innerText = 'PIN Terlindungi';
       badgeSettings.className = 'self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200';
     }
   }
@@ -12016,7 +12189,7 @@ function renderOpsiPilihSiswa() {
 
   dropdown.innerHTML = '<option value="">-- Pilih Nama Siswa dari Database Kelas --</option>';
 
-  const classes = ['4A', '4B', '4C', '5A', '5B', '6A', '6B'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
   classes.forEach(cls => {
     const group = document.createElement('optgroup');
     group.label = `Kelas ${cls}`;
@@ -12079,7 +12252,8 @@ function simpanProfilSiswa() {
   if (absen.length === 1) absen = '0' + absen;
   let nis = inputNis ? inputNis.value.trim() : '';
   if (!nis) {
-    const clsCode = kelas === '4A' ? '41' : kelas === '4B' ? '42' : '43';
+    const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5D': '54', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
+    const clsCode = clsMap[kelas] || '41';
     nis = `${clsCode}${absen}`;
   }
 
@@ -12702,22 +12876,35 @@ function updateFilterKelasTabs(tingkat) {
   const container = document.getElementById('guru-filter-kelas-container');
   if (!container) return;
 
+  const classMap = {
+    '4': ['4A', '4B', '4C', '4D', '4E'],
+    '5': ['5D'],
+    '6': ['6A', '6B', '6C', '6D', '6E']
+  };
+
   if (tingkat === 'all') {
     container.innerHTML = `
       <span class="text-xs font-bold text-slate-400 uppercase mr-1">Kelas:</span>
-      <button onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition">Semua Kelas</button>
-      <button onclick="pilihKelasGuruNav('4')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Kelas 4</button>
-      <button onclick="pilihKelasGuruNav('5')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Kelas 5</button>
-      <button onclick="pilihKelasGuruNav('6')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Kelas 6</button>
+      <button onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition">Semua</button>
+      <button onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4A</button>
+      <button onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4B</button>
+      <button onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4C</button>
+      <button onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4D</button>
+      <button onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4E</button>
+      <button onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">5D</button>
+      <button onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6A</button>
+      <button onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6B</button>
+      <button onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6C</button>
+      <button onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6D</button>
+      <button onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6E</button>
     `;
   } else {
-    const letters = (tingkat === '4') ? ['A', 'B', 'C'] : ['A', 'B'];
+    const list = classMap[tingkat] || ['4A', '4B', '4C', '4D', '4E'];
     let btns = `
       <span class="text-xs font-bold text-slate-400 uppercase mr-1">Tingkat ${tingkat}:</span>
       <button onclick="setFilterKelasGuru('tingkat_${tingkat}')" id="btn-filter-kelas-tingkat_${tingkat}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition">Semua Kelas ${tingkat}</button>
     `;
-    letters.forEach(lettr => {
-      const clsName = `${tingkat}${lettr}`;
+    list.forEach(clsName => {
       btns += `<button onclick="setFilterKelasGuru('${clsName}')" id="btn-filter-kelas-${clsName}" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">${clsName}</button>`;
     });
     container.innerHTML = btns;
@@ -13504,7 +13691,8 @@ function simpanSiswaBaruManual() {
   if (absen.length === 1) absen = '0' + absen;
   let nis = inputNis ? inputNis.value.trim() : '';
   if (!nis) {
-    const clsCode = kelas === '4A' ? '41' : kelas === '4B' ? '42' : '43';
+    const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5D': '54', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
+    const clsCode = clsMap[kelas] || '41';
     nis = `${clsCode}${absen}`;
   }
   const kuis1 = inputKuis1 ? parseInt(inputKuis1.value) || 0 : 0;
@@ -13804,9 +13992,9 @@ function getClassSheetsConfig() {
     // Migrasi jika pengguna sebelumnya menyimpan di SPREADSHEET_ID_KEY single
     const oldSheet = localStorage.getItem(SPREADSHEET_ID_KEY);
     if (oldSheet && !merged['4A'].sheetUrl) {
-      merged['4A'].sheetUrl = oldSheet;
-      merged['4B'].sheetUrl = oldSheet;
-      merged['4C'].sheetUrl = oldSheet;
+      Object.keys(merged).forEach(k => {
+        if (!merged[k].sheetUrl) merged[k].sheetUrl = oldSheet;
+      });
     }
     return merged;
   } catch (e) {
@@ -13843,7 +14031,7 @@ function renderTabsKelasSheet() {
 
   const cfg = getClassSheetsConfig();
   const activeKey = getActiveSheetClassKey();
-  const classes = ['4A', '4B', '4C', '5A', '5B', '6A', '6B'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
 
   container.innerHTML = classes.map(cls => {
     const isActive = cls === activeKey;
@@ -13895,7 +14083,7 @@ function renderRingkasanKoneksiKelas() {
 
   const cfg = getClassSheetsConfig();
   const db = getStudentDatabase();
-  const classes = ['4A', '4B', '4C', '5A', '5B', '6A', '6B'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
 
   container.innerHTML = classes.map(cls => {
     const c = cfg[cls] || DEFAULT_CLASS_SHEETS_CONFIG[cls] || { sheetUrl: '', tabName: cls };
@@ -14285,9 +14473,9 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
 }
 window.sinkronkanDataSiswaPerKelas = sinkronkanDataSiswaPerKelas;
 
-// 2. Sinkronkan Rombel per Tingkat (Contoh: Tingkat 4 -> 4A, 4B, 4C)
+// 2. Sinkronkan Rombel per Tingkat (Contoh: Tingkat 4 -> 4A-4E, Tingkat 5 -> 5D, Tingkat 6 -> 6A-6E)
 async function sinkronkanRombelTingkat(tingkat, silent = false) {
-  const rombels = (tingkat === '4') ? ['4A', '4B', '4C'] : (tingkat === '5') ? ['5A', '5B'] : ['6A', '6B'];
+  const rombels = (tingkat === '4') ? ['4A', '4B', '4C', '4D', '4E'] : (tingkat === '5') ? ['5D'] : ['6A', '6B', '6C', '6D', '6E'];
   let total = 0;
   for (const r of rombels) {
     const res = await sinkronkanDataSiswaPerKelas(r, true);
@@ -14312,7 +14500,7 @@ window.sinkronkanRombelTingkat = sinkronkanRombelTingkat;
 // 3. Sinkronkan Semua Kelas Sekaligus dari Google Sheets Masing-Masing
 async function sinkronkanSemuaKelasGoogleSheet(silent = false) {
   const cfg = getClassSheetsConfig();
-  const classes = ['4A', '4B', '4C', '5A', '5B', '6A', '6B'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
   let totalSynced = 0;
   let syncedClasses = [];
 
@@ -14359,7 +14547,7 @@ async function sinkronkanDataSiswaGoogleSheetAktif() {
   const t = state.tingkatKelasGuru || 'all';
   const f = state.filterKelasGuru || 'semua';
 
-  if (['4A', '4B', '4C', '5A', '5B', '6A', '6B'].includes(f)) {
+  if (['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'].includes(f)) {
     return await sinkronkanDataSiswaPerKelas(f);
   }
 
@@ -14422,10 +14610,14 @@ async function cekNisGoogleSheet(nisVal) {
   const guessClass = targetVal.startsWith('41') ? '4A' 
     : targetVal.startsWith('42') ? '4B' 
     : targetVal.startsWith('43') ? '4C'
-    : targetVal.startsWith('51') ? '5A'
-    : targetVal.startsWith('52') ? '5B'
+    : targetVal.startsWith('44') ? '4D'
+    : targetVal.startsWith('45') ? '4E'
+    : targetVal.startsWith('54') ? '5D'
     : targetVal.startsWith('61') ? '6A'
     : targetVal.startsWith('62') ? '6B'
+    : targetVal.startsWith('63') ? '6C'
+    : targetVal.startsWith('64') ? '6D'
+    : targetVal.startsWith('65') ? '6E'
     : null;
 
   if (guessClass && cfg[guessClass] && cfg[guessClass].sheetUrl) {

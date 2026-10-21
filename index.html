@@ -42,7 +42,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261012_hide_all_sem2_cards">
+  <link rel="stylesheet" href="styles.css?v=20261020_update_classes_11">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -7715,7 +7715,7 @@
               Dasbor Pemantauan Belajar & Nilai Siswa
             </h2>
             <p class="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Pantau progres latihan MS Excel & MS Word, skor kuis, tantangan poster, serta ketercapaian KKM (≥ 80) secara langsung dan terstruktur untuk Kelas 4A, 4B, dan 4C.
+              Pantau progres latihan MS Excel & MS Word, skor kuis, tantangan poster, serta ketercapaian KKM (≥ 80) secara langsung dan terstruktur untuk 11 Kelas: 4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, dan 6E.
             </p>
             <div class="flex items-center gap-3 pt-1 text-xs text-slate-400">
               <span><i class="fa-solid fa-user-tie text-amber-400"></i> Guru Pengampu: <strong>DARNINGSIH, ST</strong></span>
@@ -7758,7 +7758,7 @@
           <div>
             <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Siswa</div>
             <div id="guru-stat-total-siswa" class="text-2xl font-black text-slate-800">0</div>
-            <div class="text-[10px] text-slate-500">Kelas 4A, 4B, 4C</div>
+            <div class="text-[10px] text-slate-500">11 Kelas (4A-E, 5D, 6A-E)</div>
           </div>
         </div>
 
@@ -7873,6 +7873,14 @@
             <button onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4A</button>
             <button onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4B</button>
             <button onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4C</button>
+            <button onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4D</button>
+            <button onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4E</button>
+            <button onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">5D</button>
+            <button onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6A</button>
+            <button onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6B</button>
+            <button onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6C</button>
+            <button onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6D</button>
+            <button onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6E</button>
           </div>
 
           <!-- Filter KKM & Search -->
@@ -8118,7 +8126,7 @@
                 <i class="fa-solid fa-circle-info text-emerald-600"></i> Ketentuan Google Spreadsheet Tiap Kelas:
               </div>
               <ul class="list-disc list-inside space-y-1 text-[11px] text-emerald-800 leading-relaxed">
-                <li>Penyimpanan tiap kelas dapat menggunakan <strong>berkas Spreadsheet berbeda</strong> atau <strong>tab sheet terpisah</strong> (misal tab "4A", "4B", "4C", "Kelas 5", "Kelas 6").</li>
+                <li>Penyimpanan tiap kelas dapat menggunakan <strong>berkas Spreadsheet berbeda</strong> atau <strong>tab sheet terpisah</strong> (misal tab "4A", "4B", "4C", "4D", "4E", "5D", "6A", "6B", "6C", "6D", "6E").</li>
                 <li>Kolom di Spreadsheet: <strong>Kolom A: Urut/Absen</strong>, <strong>Kolom B: NIS</strong>, <strong>Kolom C: Nama Siswa</strong>, <strong>Kolom D: Jenis Kelamin</strong> (Format resmi Buku Nilai dikenali otomatis).</li>
                 <li>Pastikan akses berkas Spreadsheet disetel: <em>"Siapa saja yang memiliki link dapat melihat"</em> (Anyone with the link can view).</li>
               </ul>
@@ -8237,12 +8245,12 @@
                 </div>
               </div>
               <span id="badge-status-pin-guru" class="self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                PIN Default: 1234
+                PIN Terlindungi
               </span>
             </div>
 
             <p class="text-xs text-slate-600 leading-relaxed">
-              Demi keamanan data nilai dan rekap siswa, Anda dapat mengganti PIN bawaan (<strong>1234</strong>) dengan PIN rahasia pilihan Anda sendiri (4 hingga 6 digit angka).
+              Demi keamanan data nilai dan rekap siswa, Anda dapat mengganti PIN bawaan dengan PIN rahasia pilihan Anda sendiri (4 hingga 6 digit angka).
             </p>
 
             <div class="flex flex-wrap items-center gap-2.5 pt-1">
@@ -8284,7 +8292,7 @@
     </div>
 
     <p class="text-[11px] text-slate-400">
-      LMS Coding & AI • Kurikulum Merdeka Informatika © 2026
+      LMS Coding & AI • Kurikulum Merdeka © 2026
     </p>
   </footer>
 
@@ -8582,7 +8590,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: LOGIN / VERIFIKASI PIN GURU -->
   <!-- ======================================================== -->
-  <div id="modal-login-guru" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLoginGuru()">
+  <div id="modal-login-guru" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLoginGuru()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-5">
       <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto shadow-inner">
         <i class="fa-solid fa-lock"></i>
@@ -8590,9 +8598,6 @@
       <div>
         <h4 class="font-title font-bold text-slate-800 text-lg sm:text-xl">Akses Dasbor Guru</h4>
         <p class="text-xs text-slate-500 mt-1">Masukkan 4-digit PIN Guru untuk mengelola database dan nilai siswa.</p>
-        <span id="badge-login-pin-default" class="inline-block mt-2 px-2.5 py-1 bg-amber-50 text-amber-700 text-[11px] font-semibold rounded-lg border border-amber-200">
-          🔑 PIN Default: <strong>1234</strong>
-        </span>
       </div>
 
       <div class="space-y-3">
@@ -8666,7 +8671,7 @@
         <div>
           <label class="block font-bold text-slate-700 mb-1">PIN Lama Saat Ini:</label>
           <div class="relative">
-            <input type="password" id="input-pin-lama" maxlength="6" placeholder="Masukkan PIN saat ini (default: 1234)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 font-mono tracking-widest text-slate-800">
+            <input type="password" id="input-pin-lama" maxlength="6" placeholder="Masukkan PIN saat ini" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 font-mono tracking-widest text-slate-800">
             <button type="button" onclick="toggleLihatInputPin('input-pin-lama', 'icon-lihat-pin-lama')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
               <i id="icon-lihat-pin-lama" class="fa-solid fa-eye"></i>
             </button>
@@ -8958,6 +8963,14 @@
               <option value="4A">Kelas 4A</option>
               <option value="4B">Kelas 4B</option>
               <option value="4C">Kelas 4C</option>
+              <option value="4D">Kelas 4D</option>
+              <option value="4E">Kelas 4E</option>
+              <option value="5D">Kelas 5D</option>
+              <option value="6A">Kelas 6A</option>
+              <option value="6B">Kelas 6B</option>
+              <option value="6C">Kelas 6C</option>
+              <option value="6D">Kelas 6D</option>
+              <option value="6E">Kelas 6E</option>
             </select>
           </div>
           <div>
@@ -9115,10 +9128,14 @@
               <option value="4A">Kelas 4A</option>
               <option value="4B">Kelas 4B</option>
               <option value="4C">Kelas 4C</option>
-              <option value="5A">Kelas 5A</option>
-              <option value="5B">Kelas 5B</option>
+              <option value="4D">Kelas 4D</option>
+              <option value="4E">Kelas 4E</option>
+              <option value="5D">Kelas 5D</option>
               <option value="6A">Kelas 6A</option>
               <option value="6B">Kelas 6B</option>
+              <option value="6C">Kelas 6C</option>
+              <option value="6D">Kelas 6D</option>
+              <option value="6E">Kelas 6E</option>
             </select>
           </div>
           <div>
@@ -9162,7 +9179,7 @@
           </div>
           <div>
             <h4 class="font-title font-bold text-slate-800 text-base sm:text-lg">Rubrik Penilaian Otomatis Sistem</h4>
-            <p class="text-[11px] text-slate-500">Standar 4 aspek penilaian otomatis Kurikulum Merdeka Informatika SD.</p>
+            <p class="text-[11px] text-slate-500">Standar 4 aspek penilaian otomatis Kurikulum Merdeka SD.</p>
           </div>
         </div>
         <button onclick="tutupModalRubrikPenilaian()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm transition">
@@ -9317,6 +9334,6 @@
   <!-- Canvas Hidden Helper untuk Export Download Poster -->
   <canvas id="export-canvas" width="600" height="750" class="hidden"></canvas>
 
-  <script src="app.js?v=20261012_hide_all_sem2_cards"></script>
+  <script src="app.js?v=20261021_hide_default_pin"></script>
 </body>
 </html>
