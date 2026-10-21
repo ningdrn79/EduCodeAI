@@ -11344,6 +11344,31 @@ function normalisasiNamaKelas(raw, fallback = '4A') {
 }
 window.normalisasiNamaKelas = normalisasiNamaKelas;
 
+// Helper: Pelacakan Siswa yang Dihapus oleh Guru (Agar Tidak Pernah Dibangkitkan Lagi oleh Seed)
+const DELETED_STUDENTS_KEY = 'educode_deleted_students_list';
+
+function getDeletedStudentIds() {
+  try {
+    const raw = localStorage.getItem(DELETED_STUDENTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+window.getDeletedStudentIds = getDeletedStudentIds;
+
+function catatSiswaTerhapus(studentId) {
+  if (!studentId) return;
+  try {
+    const list = getDeletedStudentIds();
+    if (!list.includes(studentId)) {
+      list.push(studentId);
+      localStorage.setItem(DELETED_STUDENTS_KEY, JSON.stringify(list));
+    }
+  } catch (e) {}
+}
+window.catatSiswaTerhapus = catatSiswaTerhapus;
+
 // Helper: Ambil Database Siswa dari localStorage
 function getStudentDatabase() {
   try {
@@ -11367,17 +11392,54 @@ function getStudentDatabase() {
         changed = true;
       }
 
-      // Pastikan seluruh 11 kelas terisi jika belum ada di database
-      const classesNeeded = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
-      classesNeeded.forEach(cn => {
-        const hasClass = parsed.some(s => s.kelas === cn);
-        if (!hasClass) {
-          SEED_STUDENTS.filter(s => s.kelas === cn).forEach(ns => {
-            if (!parsed.some(p => p.id === ns.id)) parsed.push(ns);
-          });
+      // Bersihkan kelas yang tidak diajar oleh Ibu Darningsih, S.T.
+      // Pengampu resmi HANYA 11 kelas: 4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E.
+      // Hapus tuntas kelas seperti 5A, 5B, 5C, dsb. dari localStorage!
+      const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+      const preValidLen = parsed.length;
+      parsed = parsed.filter(s => {
+        if (!s.kelas) return false;
+        const norm = normalisasiNamaKelas(s.kelas, '');
+        return validClasses.includes(norm);
+      });
+      if (parsed.length !== preValidLen) {
+        changed = true;
+      }
+
+      // Bersihkan data silang: Siswa Kelas 4 yang keliru tercatat ke Kelas 5D atau Kelas 6
+      // (terjadi jika sebelumnya sync Google Sheet jatuh ke sheet pertama/Kelas 4)
+      const k4NamaSet = new Set(
+        parsed.filter(s => s.kelas && s.kelas.startsWith('4')).map(s => (s.nama || '').toLowerCase().trim())
+      );
+      const preCrossLen = parsed.length;
+      parsed = parsed.filter(s => {
+        if (s.kelas === '5D' || (s.kelas && s.kelas.startsWith('6'))) {
+          const isK4Id = s.id && (s.id.includes('4A-') || s.id.includes('4B-') || s.id.includes('4C-') || s.id.includes('4D-') || s.id.includes('4E-'));
+          const isK4Nis = s.nis && (s.nis.startsWith('31') || s.nis.startsWith('32') || s.nis.startsWith('41') || s.nis.startsWith('42') || s.nis.startsWith('43') || s.nis.startsWith('44') || s.nis.startsWith('45'));
+          const isK4Name = k4NamaSet.has((s.nama || '').toLowerCase().trim());
+          if (isK4Id || (isK4Nis && isK4Name)) {
+            return false; // Hapus duplikat siswa kelas 4 yang tersasar di kelas 5D / kelas 6
+          }
+        }
+        return true;
+      });
+      if (parsed.length !== preCrossLen) {
+        changed = true;
+      }
+
+      // Pastikan siswa yang sudah dihapus oleh guru TIDAK pernah dimuat kembali
+      const deletedIds = getDeletedStudentIds();
+      if (deletedIds && deletedIds.length > 0) {
+        const preDelLen = parsed.length;
+        parsed = parsed.filter(s => {
+          if (deletedIds.includes(s.id)) return false;
+          if (s.nis && deletedIds.includes(`NIS-${s.kelas}-${s.nis}`)) return false;
+          return true;
+        });
+        if (parsed.length !== preDelLen) {
           changed = true;
         }
-      });
+      }
 
       parsed.forEach(s => {
         // Pulihkan kelas jika tertimpa 4A padahal NIS atau ID berasal dari kelas lain
@@ -13024,10 +13086,16 @@ function filterDanCariSiswa() {
   const mode = state.modePenilaianGuru || 1;
 
   const filtered = db.filter(s => {
-    // Filter Kelas / Tingkat
+    // Filter Kelas / Tingkat (Disesuaikan dengan pengampu resmi Ibu Darningsih, S.T.)
     if (state.filterKelasGuru && state.filterKelasGuru.startsWith('tingkat_')) {
       const targetTingkat = state.filterKelasGuru.replace('tingkat_', '');
-      if (!s.kelas.startsWith(targetTingkat)) return false;
+      const tingkatClassMap = {
+        '4': ['4A', '4B', '4C', '4D', '4E'],
+        '5': ['5D'], // Hanya Kelas 5D di Tingkat 5!
+        '6': ['6A', '6B', '6C', '6D', '6E']
+      };
+      const allowedClasses = tingkatClassMap[targetTingkat] || [];
+      if (!allowedClasses.includes(s.kelas)) return false;
     } else if (state.filterKelasGuru !== 'semua' && s.kelas !== state.filterKelasGuru) {
       return false;
     }
@@ -13643,17 +13711,36 @@ function hapusSiswaTerpilih() {
 function hapusSiswaById(studentId) {
   playSound('click');
   const db = getStudentDatabase();
-  const student = db.find(s => s.id === studentId);
-  if (!student) return;
+  const student = db.find(s => s.id === studentId || (studentId && s.id && s.id.toLowerCase() === studentId.toLowerCase()));
+  if (!student) {
+    showToast('Data siswa tidak ditemukan di database!', 'warning');
+    return;
+  }
 
-  if (confirm(`Yakin ingin menghapus data siswa "${student.nama}"?`)) {
-    const updated = db.filter(s => s.id !== studentId);
+  if (confirm(`Yakin ingin menghapus data siswa "${student.nama}" (${student.kelas || ''})?`)) {
+    // 1. Catat ke daftar terhapus agar tidak pernah dibangkitkan lagi oleh sistem seed
+    catatSiswaTerhapus(student.id);
+    if (student.nis) {
+      catatSiswaTerhapus(`NIS-${student.kelas}-${student.nis}`);
+    }
+
+    // 2. Hapus tuntas dari database siswa aktif
+    const updated = db.filter(s => s.id !== student.id && !(s.nis && student.nis && s.nis === student.nis && s.kelas === student.kelas));
     saveStudentDatabase(updated);
+
+    // 3. Jika siswa yang dihapus sedang aktif login, bersihkan sesi
+    const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (activeStudent && (activeStudent.id === student.id || activeStudent.nis === student.nis)) {
+      if (typeof clearActiveStudentSession === 'function') clearActiveStudentSession();
+      if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
+    }
+
     playSound('success');
     showToast(`Data siswa "${student.nama}" berhasil dihapus 🗑️`, 'info');
     renderDasborGuru();
   }
 }
+window.hapusSiswaById = hapusSiswaById;
 
 // --------------------------------------------------------------------------
 // MODAL TAMBAH SISWA MANUAL
@@ -14277,6 +14364,13 @@ function parseGoogleSheetTable(parsed, defaultKelas = '4A') {
 
     const nama = getVal(colMap.nama) || `Siswa ${nis}`;
     let rawKelas = colMap.kelas !== -1 ? getVal(colMap.kelas) : '';
+    // Jika spreadsheet memiliki kolom Kelas eksplisit, pastikan baris ini milik kelas default yang diminta
+    if (colMap.kelas !== -1 && rawKelas) {
+      const rowKelasNorm = normalisasiNamaKelas(rawKelas, '');
+      if (defaultKelas && rowKelasNorm && rowKelasNorm !== defaultKelas.toUpperCase()) {
+        continue; // Lewati siswa kelas lain
+      }
+    }
     let kelas = normalisasiNamaKelas(rawKelas, defaultKelas || '4A');
     if (defaultKelas && (!rawKelas || rawKelas.length > 8)) {
       kelas = defaultKelas.toUpperCase();
@@ -14376,13 +14470,17 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
     `Kelas ${kelasKey.charAt(0)}-${kelasKey.charAt(1)}`,
     kelasKey.toLowerCase(),
     `DATA SISWA ${kelasKey}`,
-    `DATA SISWA KELAS ${kelasKey}`,
-    'DATA SISWA LMS',
-    'Sheet2',
-    'Sheet 2',
-    'Lembar 2',
-    '' // Tab pertama/aktif spreadsheet
+    `DATA SISWA KELAS ${kelasKey}`
   ];
+
+  // Hanya izinkan tab generic seperti 'DATA SISWA LMS' atau tab pertama ('') jika kelasKey adalah '4A' (default awal)
+  // atau jika guru secara khusus mengetikkan nama tab tersebut di konfigurasi tabName.
+  // Ini mencegah kelas lain (seperti 5D atau 6A) keliru menyalin data siswa Kelas 4 dari tab pertama!
+  if (kelasKey === '4A') {
+    candidateTabs.push('DATA SISWA LMS', 'Sheet1', 'Sheet 1', 'Lembar 1', '');
+  } else if (c.tabName && !candidateTabs.includes(c.tabName)) {
+    candidateTabs.unshift(c.tabName);
+  }
 
   const uniqueTabs = [...new Set(candidateTabs.map(t => (t || '').trim()))];
   let resolvedTab = primaryTab;
