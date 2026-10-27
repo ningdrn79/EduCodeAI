@@ -176,6 +176,18 @@ function clearActiveStudentSession() {
 }
 window.clearActiveStudentSession = clearActiveStudentSession;
 
+// Helper: Dapatkan kunci penyimpanan terisolasi per akun siswa (berdasarkan NIS unik / ID siswa)
+function getActiveStudentStorageKey(prefix = 'kreator_cilik_word_posters') {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (profile && (profile.nis || profile.id || profile.nama)) {
+    const rawId = profile.nis || profile.id || `${profile.kelas || '4'}_${profile.nama}`;
+    const cleanId = String(rawId).replace(/[^a-zA-Z0-9_-]/g, '_');
+    return `${prefix}_${cleanId}`;
+  }
+  return `${prefix}_guest`;
+}
+window.getActiveStudentStorageKey = getActiveStudentStorageKey;
+
 // ==========================================
 // 1. STATE & SOUND SYNTHESIZER (WEB AUDIO API)
 // ==========================================
@@ -189,7 +201,7 @@ let state = {
   userPoints: 0,
   ttsEnabled: true,
   // Praktik 1 State
-  p1Mode: 'teks',
+  p1Mode: 'gambar',
   p1BrushColor: '#000000',
   p1IsDrawing: false,
   // Praktik 2 State
@@ -412,7 +424,7 @@ const i18nDict = {
     heroDescSem1: 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan budi pekerti bersama SDS Cinta Kasih Tzu Chi.',
     heroTitleSem2: 'Petualangan Coding & AI Cilik<br>Animasi, Game & Robot Pintar',
     heroDescSem2: 'Mempelajari pemrograman visual (Scratch/Blockly), logika percabangan robot cerdas, dan pengenalan sensor kamera AI bersama SDS Cinta Kasih Tzu Chi.',
-    roboBadge: 'Jawaban Robo-Tzu Chi',
+    roboBadge: 'Jawaban Robo',
     btnReplayVoice: 'Ulangi Suara',
     youAsked: '👦 Kamu Bertanya: ',
     roboSpeaking: 'Robo berbicara... 🔊',
@@ -420,7 +432,7 @@ const i18nDict = {
     moodBadge: '⭐ Ceria',
     btnGreet: '👋 Sapa',
     btnTalkToRobo: 'Bicara ke Robo 🎙️',
-    initialSpeechRobo: 'Halo teman pintar! Aku Robo-Tzu Chi. Klik tombol <strong>"Bicara ke Robo 🎙️"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! ✨'
+    initialSpeechRobo: 'Halo teman pintar! Aku Robo. Klik tombol <strong>"Bicara ke Robo 🎙️"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! ✨'
   },
   en: {
     beranda: 'Home',
@@ -446,7 +458,7 @@ const i18nDict = {
     heroDescSem1: 'Building digital skills, word processing (MS Word), creativity, and good character in the tech era with SDS Cinta Kasih Tzu Chi.',
     heroTitleSem2: 'Junior Coding & AI Adventure<br>Animation, Games & Smart Robots',
     heroDescSem2: 'Learning visual block coding (Scratch/Blockly), smart robot branching logic, and AI vision sensors with SDS Cinta Kasih Tzu Chi.',
-    roboBadge: 'Robo-Tzu Chi Answer',
+    roboBadge: 'Robo Answer',
     btnReplayVoice: 'Replay Voice',
     youAsked: '👦 You Asked: ',
     roboSpeaking: 'Robo is speaking... 🔊',
@@ -454,7 +466,7 @@ const i18nDict = {
     moodBadge: '⭐ Cheerful',
     btnGreet: '👋 Greet',
     btnTalkToRobo: 'Talk to Robo 🎙️',
-    initialSpeechRobo: 'Hello smart friend! I am Robo-Tzu Chi. Click the <strong>"Talk to Robo 🎙️"</strong> button on the right to ask me anything, and I will answer you right away with my voice! ✨'
+    initialSpeechRobo: 'Hello smart friend! I am Robo. Click the <strong>"Talk to Robo 🎙️"</strong> button on the right to ask me anything, and I will answer you right away with my voice! ✨'
   }
 };
 
@@ -513,14 +525,14 @@ function terapkanBahasa() {
     speechBubbleText.innerHTML = dict.initialSpeechRobo;
   }
   window._jawabanTerakhirRobo = (lang === 'en')
-    ? "Hello smart friend! I am Robo-Tzu Chi, your friendly coding buddy! Click Talk to Robo to ask me anything!"
-    : "Halo teman pintar! Aku Robo-Tzu Chi! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara untuk bertanya padaku!";
+    ? "Hello smart friend! I am Robo, your friendly coding buddy! Click Talk to Robo to ask me anything!"
+    : "Halo teman pintar! Aku Robo! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara untuk bertanya padaku!";
 
   // Sapa langsung dengan suara jika narator aktif
   if (state.ttsEnabled && 'speechSynthesis' in window) {
     const greetingMsg = (lang === 'en')
-      ? "Hello! I am Robo-Tzu Chi. Let's learn coding and AI together!"
-      : "Halo teman pintar! Aku Robo-Tzu Chi. Ayo belajar coding dan AI bersama!";
+      ? "Hello! I am Robo. Let's learn coding and AI together!"
+      : "Halo teman pintar! Aku Robo. Ayo belajar coding dan AI bersama!";
     sapaRobotHalo(greetingMsg);
   }
 
@@ -959,6 +971,9 @@ function switchTab(tabId) {
       setTimeout(initPaintApp, 100);
     } else {
       setTimeout(renderGaleriPosterWord, 50);
+    }
+    if (typeof initPencariKartun === 'function') {
+      setTimeout(initPencariKartun, 80);
     }
   }
 
@@ -1628,6 +1643,69 @@ function gulirKeTabelProta() {
   }, 100);
 }
 
+// Link Cepat Membuka Aplikasi Paint Terbaru Khusus TP 2.2 (Membuat Konten Gambar Terpisah)
+function bukaAplikasiPaintTerbaru() {
+  playSound('click');
+  switchTab('praktik');
+  if (typeof setPraktikSubtab === 'function') {
+    setPraktikSubtab('praktik-tp1');
+  }
+  if (typeof setModePraktik1 === 'function') {
+    setModePraktik1('gambar');
+  }
+  showToast('Membuka Aplikasi Paint Terbaru untuk membuat gambar terpisah! 🎨✨', 'success');
+
+  // Gulir langsung ke kanvas Paint
+  setTimeout(() => {
+    const paintArea = document.getElementById('p1-area-gambar');
+    if (paintArea) {
+      paintArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 200);
+}
+window.bukaAplikasiPaintTerbaru = bukaAplikasiPaintTerbaru;
+
+// Link Cepat Praktik Poster di Lab Microsoft Word Khusus TP 2.2 & TP 2.3
+function bukaPraktikWordTP2_2() {
+  playSound('fanfare');
+  switchTab('msword');
+
+  const drive = (typeof muatDrive7Kebiasaan === 'function') ? muatDrive7Kebiasaan() : {};
+  const filledCount = Object.keys(drive).filter(k => typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined' && DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
+
+  if (filledCount >= 1) {
+    showToast(`Membuka Lab Ms. Word untuk TP 2.2! Kamu punya ${filledCount} gambar di Drive 7 Kebiasaan siap dipasang! 📄✨`, 'success');
+  } else {
+    showToast('Selamat datang di Lab Ms. Word! Mulai praktik menyusun teks dan gambar postermu (TP 2.2) 📄🎨', 'success');
+  }
+}
+window.bukaPraktikWordTP2_2 = bukaPraktikWordTP2_2;
+
+// Link Cepat Membuka Galeri Hasil Poster Siswa (TP 2.4 / Diseminasi Karya)
+function bukaGaleriHasilPosterSiswa() {
+  playSound('success');
+  switchTab('praktik');
+  if (typeof setPraktikSubtab === 'function') {
+    setPraktikSubtab('praktik-tp1');
+  }
+  if (typeof setModePraktik1 === 'function') {
+    setModePraktik1('word');
+  }
+  if (typeof renderGaleriPosterWord === 'function') {
+    renderGaleriPosterWord();
+  }
+  showToast('Membuka Galeri & Portofolio Hasil Poster Siswa! 🖼️✨', 'success');
+
+  // Gulir langsung ke wadah lemari galeri poster karya siswa
+  setTimeout(() => {
+    const galleryEl = document.getElementById('p1-word-poster-gallery');
+    if (galleryEl) {
+      galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 200);
+}
+window.bukaGaleriHasilPosterSiswa = bukaGaleriHasilPosterSiswa;
+
 function gantiBahasaModulTP1_1(lang) {
   playSound('click');
   window.speechSynthesis && window.speechSynthesis.cancel();
@@ -1885,11 +1963,93 @@ function evaluasiDemo3() {
   }
 }
 
+function bukaPaintDariPraktik1() {
+  playSound('click');
+  switchTab('praktik');
+  const allP = ['praktik-tp1', 'praktik-tp2', 'praktik-tp3', 'praktik-tp4'];
+  allP.forEach(p => {
+    const panel = document.getElementById(p);
+    const btn = document.getElementById(`btn-${p}`);
+    if (panel && btn) {
+      if (p === 'praktik-tp1') {
+        panel.classList.remove('hidden');
+        btn.className = 'praktik-sub-btn active-praktik-sub px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold';
+      } else {
+        panel.classList.add('hidden');
+        btn.className = 'praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer';
+      }
+    }
+  });
+  state.currentPraktik = 'praktik-tp1';
+  setModePraktik1('gambar');
+  showToast('Masuk ke dalam Aplikasi Paint Terbaru untuk menggambar digital! 🎨✨', 'success');
+  setTimeout(() => {
+    const paintArea = document.getElementById('p1-area-gambar');
+    if (paintArea) {
+      paintArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 120);
+}
+window.bukaPaintDariPraktik1 = bukaPaintDariPraktik1;
+
+function bukaLabWordDariPraktik3() {
+  playSound('fanfare');
+  switchTab('msword');
+  showToast('Masuk ke dalam Lab Ms. Word untuk praktik pembuatan poster! 📄✨', 'success');
+}
+window.bukaLabWordDariPraktik3 = bukaLabWordDariPraktik3;
+
+function bukaHasilPosterSiswaDariPraktik4() {
+  playSound('fanfare');
+  switchTab('praktik');
+  const allP = ['praktik-tp1', 'praktik-tp2', 'praktik-tp3', 'praktik-tp4'];
+  allP.forEach(p => {
+    const panel = document.getElementById(p);
+    const btn = document.getElementById(`btn-${p}`);
+    if (panel && btn) {
+      if (p === 'praktik-tp4') {
+        btn.className = 'praktik-sub-btn active-praktik-sub px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold';
+      } else {
+        btn.className = 'praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer';
+      }
+      if (p === 'praktik-tp1') {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+  });
+  state.currentPraktik = 'praktik-tp4';
+  setModePraktik1('word');
+  showToast('Masuk ke dalam Lemari Galeri Hasil Poster Siswa! 🖼️✨', 'success');
+  setTimeout(() => {
+    const galleryEl = document.getElementById('p1-word-poster-gallery');
+    if (galleryEl) {
+      galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 120);
+}
+window.bukaHasilPosterSiswaDariPraktik4 = bukaHasilPosterSiswaDariPraktik4;
+window.bukaGaleriHasilPosterSiswa = bukaHasilPosterSiswaDariPraktik4;
+
 // ==========================================
 // 7. PRAKTIK 1 (KONTEN SATUAN: TEKS & GAMBAR)
 // ==========================================
 function setPraktikSubtab(pKey) {
   playSound('click');
+  if (pKey === 'praktik-tp1') {
+    bukaPaintDariPraktik1();
+    return;
+  }
+  if (pKey === 'praktik-tp3') {
+    bukaLabWordDariPraktik3();
+    return;
+  }
+  if (pKey === 'praktik-tp4') {
+    bukaHasilPosterSiswaDariPraktik4();
+    return;
+  }
+
   const allP = ['praktik-tp1', 'praktik-tp2', 'praktik-tp3', 'praktik-tp4'];
   allP.forEach(p => {
     const panel = document.getElementById(p);
@@ -1912,6 +2072,8 @@ function setPraktikSubtab(pKey) {
     } else {
       setTimeout(renderGaleriPosterWord, 50);
     }
+  } else if (pKey === 'praktik-tp2') {
+    setTimeout(initAIStudioPraktik2, 50);
   }
 }
 
@@ -1959,7 +2121,7 @@ function addP1Emoji(emoji) {
 }
 
 // ==========================================
-// ENGINE APLIKASI PAINT TERBARU (MODERN EDITION)
+// ENGINE APLIKASI PAINT TERBARU (MODERN EDITION DENGAN FITUR GESER OBJEK)
 // ==========================================
 let paintApp = {
   canvas: null,
@@ -1967,14 +2129,16 @@ let paintApp = {
   initialized: false,
   color: '#000000',
   size: 6,
-  tool: 'brush', // brush, pencil, eraser, bucket, text
+  tool: 'brush', // brush, pencil, eraser, bucket, text, select
   shape: 'none', // none, line, rect, circle, star, heart
   isDrawing: false,
+  isMovingObject: false,
   startX: 0,
   startY: 0,
   snapshot: null,
   history: [],
-  redoList: []
+  redoList: [],
+  activeObject: null // Objek/Bentuk yang sedang aktif dan bisa digeser-geser
 };
 
 function initPaintApp() {
@@ -2005,8 +2169,39 @@ function initPaintApp() {
     }, { passive: false });
     paintApp.canvas.addEventListener('touchend', (e) => {
       e.preventDefault();
-      endPaintDraw();
+      endPaintDraw(e);
     }, { passive: false });
+
+    // Keyboard Arrow Keys Listener untuk menggeser objek aktif dengan presisi
+    window.addEventListener('keydown', (e) => {
+      if (!paintApp.activeObject) return;
+      const tabPraktik = document.getElementById('tab-praktik');
+      if (!tabPraktik || tabPraktik.classList.contains('hidden')) return;
+      const areaGambar = document.getElementById('p1-area-gambar');
+      if (!areaGambar || areaGambar.classList.contains('hidden')) return;
+
+      const step = e.shiftKey ? 10 : 3;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        paintApp.activeObject.x -= step;
+        renderActivePaintObject();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        paintApp.activeObject.x += step;
+        renderActivePaintObject();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        paintApp.activeObject.y -= step;
+        renderActivePaintObject();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        paintApp.activeObject.y += step;
+        renderActivePaintObject();
+      } else if (e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        commitActivePaintObject();
+      }
+    });
 
     paintApp.initialized = true;
   }
@@ -2017,101 +2212,430 @@ function getPaintPointerPos(e) {
   const scaleX = paintApp.canvas.width / rect.width;
   const scaleY = paintApp.canvas.height / rect.height;
 
-  const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-  const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+  let clientX = e.clientX;
+  let clientY = e.clientY;
+  if (clientX === undefined && e.touches && e.touches.length > 0) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+    clientX = e.changedTouches[0].clientX;
+    clientY = e.changedTouches[0].clientY;
+  }
 
   return {
-    x: (clientX - rect.left) * scaleX,
-    y: (clientY - rect.top) * scaleY
+    x: ((clientX !== undefined ? clientX : 0) - rect.left) * scaleX,
+    y: ((clientY !== undefined ? clientY : 0) - rect.top) * scaleY
   };
 }
 
+// Cek apakah kursor berada di dalam area objek yang sedang digeser
+function isPointInActiveObject(pos) {
+  if (!paintApp.activeObject) return false;
+  const pad = Math.max(10, (paintApp.activeObject.size || 6));
+  const obj = paintApp.activeObject;
+  return (
+    pos.x >= obj.x - pad &&
+    pos.x <= obj.x + obj.w + pad &&
+    pos.y >= obj.y - pad &&
+    pos.y <= obj.y + obj.h + pad
+  );
+}
+
+// Perbarui tombol "Tempel Objek" dan info status
+function updatePaintCommitButton() {
+  const btn = document.getElementById('paint-btn-commit');
+  const info = document.getElementById('paint-status-obj-info');
+  if (paintApp.activeObject) {
+    if (btn) btn.classList.remove('hidden');
+    if (info) info.classList.remove('hidden');
+  } else {
+    if (btn) btn.classList.add('hidden');
+    if (info) info.classList.add('hidden');
+  }
+}
+
+// Render objek aktif yang sedang digeser dengan bingkai putus-putus dan penanda
+function renderActivePaintObject() {
+  if (!paintApp.activeObject || !paintApp.ctx) return;
+  const obj = paintApp.activeObject;
+  const ctx = paintApp.ctx;
+
+  // 1. Pulihkan kanvas latar belakang bersih
+  if (obj.underneathSnapshot) {
+    ctx.putImageData(obj.underneathSnapshot, 0, 0);
+  }
+
+  // 2. Gambar objek di koordinat (x, y) saat ini
+  ctx.save();
+  if (obj.type === 'shape') {
+    ctx.strokeStyle = obj.color;
+    ctx.fillStyle = obj.color;
+    ctx.lineWidth = obj.size;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (obj.shape === 'rect') {
+      ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
+    } else if (obj.shape === 'circle') {
+      ctx.beginPath();
+      const radius = Math.min(obj.w, obj.h) / 2;
+      ctx.arc(obj.x + obj.w / 2, obj.y + obj.h / 2, Math.max(2, radius), 0, 2 * Math.PI);
+      ctx.stroke();
+    } else if (obj.shape === 'line') {
+      ctx.beginPath();
+      ctx.moveTo(obj.x, obj.y);
+      ctx.lineTo(obj.x + obj.w, obj.y + obj.h);
+      ctx.stroke();
+    } else if (obj.shape === 'star') {
+      drawPaintStar(obj.x + obj.w / 2, obj.y + obj.h / 2, obj.x + obj.w / 2, obj.y);
+    } else if (obj.shape === 'heart') {
+      drawPaintHeart(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    }
+  } else if (obj.type === 'selection' && obj.offscreen) {
+    ctx.drawImage(obj.offscreen, obj.x, obj.y);
+  }
+  ctx.restore();
+
+  // 3. Gambar kotak seleksi putus-putus (Dashed Bounding Box)
+  ctx.save();
+  ctx.setLineDash([6, 4]);
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(obj.x - 3, obj.y - 3, obj.w + 6, obj.h + 6);
+
+  // 4 Handle sudut solid biru
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#2563eb';
+  const hs = 7;
+  const corners = [
+    [obj.x - 3 - hs / 2, obj.y - 3 - hs / 2],
+    [obj.x + obj.w + 3 - hs / 2, obj.y - 3 - hs / 2],
+    [obj.x - 3 - hs / 2, obj.y + obj.h + 3 - hs / 2],
+    [obj.x + obj.w + 3 - hs / 2, obj.y + obj.h + 3 - hs / 2]
+  ];
+  corners.forEach(([hx, hy]) => {
+    ctx.fillRect(hx, hy, hs, hs);
+  });
+
+  // 4. Balon petunjuk geser (Floating Hint Badge)
+  const badgeText = '✥ Geser Objek (Klik & Drag)';
+  ctx.font = 'bold 11px Fredoka, sans-serif';
+  const tw = ctx.measureText(badgeText).width;
+  const bw = tw + 18;
+  const bh = 22;
+  const bx = Math.max(4, Math.min(paintApp.canvas.width - bw - 4, obj.x + obj.w / 2 - bw / 2));
+  const by = (obj.y - bh - 8 >= 4) ? obj.y - bh - 8 : (obj.y + obj.h + 8);
+
+  ctx.fillStyle = '#1e293b';
+  ctx.beginPath();
+  if (typeof ctx.roundRect === 'function') {
+    ctx.roundRect(bx, by, bw, bh, 8);
+  } else {
+    ctx.rect(bx, by, bw, bh);
+  }
+  ctx.fill();
+
+  ctx.fillStyle = '#f8fafc';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(badgeText, bx + bw / 2, by + bh / 2);
+
+  ctx.restore();
+  updatePaintCommitButton();
+}
+
+// Kunci dan tempel objek aktif ke kanvas secara permanen
+function commitActivePaintObject() {
+  if (!paintApp.activeObject || !paintApp.ctx) return;
+  const obj = paintApp.activeObject;
+  const ctx = paintApp.ctx;
+
+  // 1. Pulihkan latar belakang bersih
+  if (obj.underneathSnapshot) {
+    ctx.putImageData(obj.underneathSnapshot, 0, 0);
+  }
+
+  // 2. Gambar secara permanen tanpa kotak seleksi
+  ctx.save();
+  if (obj.type === 'shape') {
+    ctx.strokeStyle = obj.color;
+    ctx.fillStyle = obj.color;
+    ctx.lineWidth = obj.size;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (obj.shape === 'rect') {
+      ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
+    } else if (obj.shape === 'circle') {
+      ctx.beginPath();
+      const radius = Math.min(obj.w, obj.h) / 2;
+      ctx.arc(obj.x + obj.w / 2, obj.y + obj.h / 2, Math.max(2, radius), 0, 2 * Math.PI);
+      ctx.stroke();
+    } else if (obj.shape === 'line') {
+      ctx.beginPath();
+      ctx.moveTo(obj.x, obj.y);
+      ctx.lineTo(obj.x + obj.w, obj.y + obj.h);
+      ctx.stroke();
+    } else if (obj.shape === 'star') {
+      drawPaintStar(obj.x + obj.w / 2, obj.y + obj.h / 2, obj.x + obj.w / 2, obj.y);
+    } else if (obj.shape === 'heart') {
+      drawPaintHeart(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    }
+  } else if (obj.type === 'selection' && obj.offscreen) {
+    ctx.drawImage(obj.offscreen, obj.x, obj.y);
+  }
+  ctx.restore();
+
+  paintApp.activeObject = null;
+  paintApp.isMovingObject = false;
+  savePaintState();
+  updatePaintCommitButton();
+  playSound('click');
+}
+window.commitActivePaintObject = commitActivePaintObject;
+
 function startPaintDraw(e) {
   const pos = getPaintPointerPos(e);
-  paintApp.isDrawing = true;
-  paintApp.startX = pos.x;
-  paintApp.startY = pos.y;
 
-  // Simpan snapshot untuk preview shape
-  paintApp.snapshot = paintApp.ctx.getImageData(0, 0, paintApp.canvas.width, paintApp.canvas.height);
+  // 1. Jika sedang ada objek aktif yang bisa digeser
+  if (paintApp.activeObject) {
+    if (isPointInActiveObject(pos)) {
+      // Klik di dalam objek -> mulai menggeser!
+      paintApp.isMovingObject = true;
+      paintApp.isDrawing = false;
+      paintApp.activeObject.isDragging = true;
+      paintApp.activeObject.dragStartX = pos.x;
+      paintApp.activeObject.dragStartY = pos.y;
+      paintApp.activeObject.origX = paintApp.activeObject.x;
+      paintApp.activeObject.origY = paintApp.activeObject.y;
+      paintApp.canvas.style.cursor = 'grabbing';
+      return;
+    } else {
+      // Klik di luar objek -> kunci dan tempel objek tersebut
+      commitActivePaintObject();
+    }
+  }
 
-  // Jika alat Cat Tumpah (Bucket)
+  // 2. Mode Alat Geser / Seleksi Area (Select & Move)
+  if (paintApp.tool === 'select') {
+    paintApp.isDrawing = true;
+    paintApp.startX = pos.x;
+    paintApp.startY = pos.y;
+    paintApp.snapshot = paintApp.ctx.getImageData(0, 0, paintApp.canvas.width, paintApp.canvas.height);
+    return;
+  }
+
+  // 3. Cat Tumpah (Bucket)
   if (paintApp.tool === 'bucket') {
     paintApp.ctx.fillStyle = paintApp.color;
     paintApp.ctx.fillRect(0, 0, paintApp.canvas.width, paintApp.canvas.height);
     savePaintState();
-    paintApp.isDrawing = false;
     playSound('click');
     return;
   }
 
-  // Set gaya goresan
-  paintApp.ctx.beginPath();
-  paintApp.ctx.moveTo(pos.x, pos.y);
-  paintApp.ctx.strokeStyle = (paintApp.tool === 'eraser') ? '#ffffff' : paintApp.color;
-  paintApp.ctx.fillStyle = paintApp.color;
-  paintApp.ctx.lineWidth = (paintApp.tool === 'pencil') ? 2 : ((paintApp.tool === 'eraser') ? paintApp.size * 2 : paintApp.size);
-  paintApp.ctx.lineCap = 'round';
-  paintApp.ctx.lineJoin = 'round';
+  // 4. Menggambar Bentuk atau Goresan Bebas
+  paintApp.isDrawing = true;
+  paintApp.startX = pos.x;
+  paintApp.startY = pos.y;
+  paintApp.snapshot = paintApp.ctx.getImageData(0, 0, paintApp.canvas.width, paintApp.canvas.height);
 
-  if (paintApp.shape === 'none' && paintApp.tool !== 'bucket') {
+  if (paintApp.shape === 'none') {
+    // Mode goresan bebas (kuas, pensil, eraser)
+    paintApp.ctx.beginPath();
+    paintApp.ctx.moveTo(pos.x, pos.y);
+    paintApp.ctx.strokeStyle = (paintApp.tool === 'eraser') ? '#ffffff' : paintApp.color;
+    paintApp.ctx.fillStyle = paintApp.color;
+    paintApp.ctx.lineWidth = (paintApp.tool === 'pencil') ? 2 : ((paintApp.tool === 'eraser') ? paintApp.size * 2 : paintApp.size);
+    paintApp.ctx.lineCap = 'round';
+    paintApp.ctx.lineJoin = 'round';
     paintApp.ctx.lineTo(pos.x, pos.y);
     paintApp.ctx.stroke();
   }
 }
 
 function onPaintDrawMove(e) {
-  if (!paintApp.isDrawing) return;
   const pos = getPaintPointerPos(e);
 
+  // A. Jika sedang menggeser objek (Moving Object)
+  if (paintApp.isMovingObject && paintApp.activeObject) {
+    const dx = pos.x - paintApp.activeObject.dragStartX;
+    const dy = pos.y - paintApp.activeObject.dragStartY;
+    paintApp.activeObject.x = Math.round(paintApp.activeObject.origX + dx);
+    paintApp.activeObject.y = Math.round(paintApp.activeObject.origY + dy);
+    renderActivePaintObject();
+    return;
+  }
+
+  // B. Hover di atas objek aktif saat santai (tidak sedang menekan mouse)
+  if (!paintApp.isDrawing && paintApp.activeObject) {
+    if (isPointInActiveObject(pos)) {
+      paintApp.canvas.style.cursor = 'move';
+    } else {
+      paintApp.canvas.style.cursor = (paintApp.tool === 'select') ? 'crosshair' : 'default';
+    }
+    return;
+  }
+
+  // C. Jika sedang tidak menggambar, hentikan
+  if (!paintApp.isDrawing) return;
+
+  // C1. Mode Seleksi Marquee
+  if (paintApp.tool === 'select') {
+    paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
+    paintApp.ctx.save();
+    paintApp.ctx.setLineDash([6, 4]);
+    paintApp.ctx.strokeStyle = '#2563eb';
+    paintApp.ctx.lineWidth = 1.5;
+    const w = pos.x - paintApp.startX;
+    const h = pos.y - paintApp.startY;
+    paintApp.ctx.strokeRect(paintApp.startX, paintApp.startY, w, h);
+    paintApp.ctx.restore();
+    return;
+  }
+
+  // C2. Mode Goresan Bebas
   if (paintApp.shape === 'none') {
-    // Mode goresan bebas (kuas, pensil, eraser)
     paintApp.ctx.strokeStyle = (paintApp.tool === 'eraser') ? '#ffffff' : paintApp.color;
     paintApp.ctx.lineWidth = (paintApp.tool === 'pencil') ? 2 : ((paintApp.tool === 'eraser') ? paintApp.size * 2 : paintApp.size);
     paintApp.ctx.lineTo(pos.x, pos.y);
     paintApp.ctx.stroke();
-  } else {
-    // Mode gambar bentuk (shapes) dengan restore snapshot
-    paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
-    paintApp.ctx.strokeStyle = paintApp.color;
-    paintApp.ctx.lineWidth = paintApp.size;
-    paintApp.ctx.fillStyle = paintApp.color;
+    return;
+  }
 
-    const sx = paintApp.startX;
-    const sy = paintApp.startY;
-    const ex = pos.x;
-    const ey = pos.y;
-    const w = ex - sx;
-    const h = ey - sy;
+  // C3. Mode Gambar Bentuk (Rectangle, Circle, Star, Heart, Line)
+  paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
+  paintApp.ctx.strokeStyle = paintApp.color;
+  paintApp.ctx.lineWidth = paintApp.size;
+  paintApp.ctx.fillStyle = paintApp.color;
 
-    if (paintApp.shape === 'line') {
-      paintApp.ctx.beginPath();
-      paintApp.ctx.moveTo(sx, sy);
-      paintApp.ctx.lineTo(ex, ey);
-      paintApp.ctx.stroke();
-    } else if (paintApp.shape === 'rect') {
-      paintApp.ctx.strokeRect(sx, sy, w, h);
-    } else if (paintApp.shape === 'circle') {
-      paintApp.ctx.beginPath();
-      const radius = Math.sqrt(w * w + h * h) / 2;
-      const cx = (sx + ex) / 2;
-      const cy = (sy + ey) / 2;
-      paintApp.ctx.arc(cx, cy, Math.max(2, radius), 0, 2 * Math.PI);
-      paintApp.ctx.stroke();
-    } else if (paintApp.shape === 'star') {
-      drawPaintStar(sx, sy, ex, ey);
-    } else if (paintApp.shape === 'heart') {
-      drawPaintHeart(sx, sy, ex, ey);
-    }
+  const sx = paintApp.startX;
+  const sy = paintApp.startY;
+  const ex = pos.x;
+  const ey = pos.y;
+  const w = ex - sx;
+  const h = ey - sy;
+
+  if (paintApp.shape === 'line') {
+    paintApp.ctx.beginPath();
+    paintApp.ctx.moveTo(sx, sy);
+    paintApp.ctx.lineTo(ex, ey);
+    paintApp.ctx.stroke();
+  } else if (paintApp.shape === 'rect') {
+    paintApp.ctx.strokeRect(sx, sy, w, h);
+  } else if (paintApp.shape === 'circle') {
+    paintApp.ctx.beginPath();
+    const radius = Math.sqrt(w * w + h * h) / 2;
+    const cx = (sx + ex) / 2;
+    const cy = (sy + ey) / 2;
+    paintApp.ctx.arc(cx, cy, Math.max(2, radius), 0, 2 * Math.PI);
+    paintApp.ctx.stroke();
+  } else if (paintApp.shape === 'star') {
+    drawPaintStar(sx, sy, ex, ey);
+  } else if (paintApp.shape === 'heart') {
+    drawPaintHeart(sx, sy, ex, ey);
   }
 }
 
-function endPaintDraw() {
-  if (paintApp.isDrawing) {
-    paintApp.isDrawing = false;
-    paintApp.ctx.beginPath();
-    savePaintState();
+function endPaintDraw(e) {
+  // 1. Selesai menggeser objek
+  if (paintApp.isMovingObject) {
+    paintApp.isMovingObject = false;
+    if (paintApp.activeObject) {
+      paintApp.activeObject.isDragging = false;
+      renderActivePaintObject();
+    }
+    paintApp.canvas.style.cursor = 'move';
+    return;
   }
+
+  if (!paintApp.isDrawing) return;
+  paintApp.isDrawing = false;
+  const pos = getPaintPointerPos(e);
+  const sx = paintApp.startX;
+  const sy = paintApp.startY;
+  const ex = pos.x;
+  const ey = pos.y;
+  const w = ex - sx;
+  const h = ey - sy;
+
+  // 2. Selesai membuat seleksi (Tool 'select')
+  if (paintApp.tool === 'select') {
+    if (Math.abs(w) > 6 && Math.abs(h) > 6) {
+      const selX = Math.round(Math.min(sx, ex));
+      const selY = Math.round(Math.min(sy, ey));
+      const selW = Math.round(Math.abs(w));
+      const selH = Math.round(Math.abs(h));
+
+      // Kembalikan kanvas sebelum garis putus-putus
+      paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
+
+      // Angkat pixel area seleksi ke kanvas pembantu
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = selW;
+      offCanvas.height = selH;
+      const offCtx = offCanvas.getContext('2d');
+      const imgData = paintApp.ctx.getImageData(selX, selY, selW, selH);
+      offCtx.putImageData(imgData, 0, 0);
+
+      // Isi area asal dengan warna putih
+      paintApp.ctx.fillStyle = '#ffffff';
+      paintApp.ctx.fillRect(selX, selY, selW, selH);
+
+      // Ambil snapshot background dasar
+      const underneath = paintApp.ctx.getImageData(0, 0, paintApp.canvas.width, paintApp.canvas.height);
+
+      paintApp.activeObject = {
+        type: 'selection',
+        offscreen: offCanvas,
+        x: selX,
+        y: selY,
+        w: selW,
+        h: selH,
+        underneathSnapshot: underneath,
+        isDragging: false
+      };
+      renderActivePaintObject();
+      playSound('success');
+      showToast('Area terpilih! Klik & geser objek ini ke posisi yang kamu inginkan ✥', 'success');
+    } else {
+      paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
+    }
+    return;
+  }
+
+  // 3. Selesai menggambar bentuk (Rectangle, Circle, Star, Heart, Line)
+  if (paintApp.shape !== 'none') {
+    if (Math.abs(w) > 4 || Math.abs(h) > 4) {
+      const objX = Math.round(Math.min(sx, ex));
+      const objY = Math.round(Math.min(sy, ey));
+      const objW = Math.round(Math.abs(w));
+      const objH = Math.round(Math.abs(h));
+
+      paintApp.activeObject = {
+        type: 'shape',
+        shape: paintApp.shape,
+        color: paintApp.color,
+        size: paintApp.size,
+        x: objX,
+        y: objY,
+        w: objW,
+        h: objH,
+        underneathSnapshot: paintApp.snapshot,
+        isDragging: false
+      };
+      renderActivePaintObject();
+      playSound('success');
+      showToast('Bentuk dibuat! Kamu bisa klik & geser untuk memindahkan posisinya ✥', 'success');
+    } else {
+      paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
+    }
+    return;
+  }
+
+  // 4. Goresan bebas normal -> simpan langsung ke riwayat undo
+  paintApp.ctx.beginPath();
+  savePaintState();
 }
 
 // Menggambar Bentuk Bintang
@@ -2162,9 +2686,19 @@ function drawPaintHeart(sx, sy, ex, ey) {
 // Pengaturan Tool, Shape, Size, dan Color Paint
 function setPaintTool(toolName) {
   playSound('click');
+  // Jika sedang ada objek aktif dan pengguna memilih alat lain selain 'select', commit objek
+  if (paintApp.activeObject && toolName !== 'select') {
+    commitActivePaintObject();
+  }
+
   paintApp.tool = toolName;
 
-  const tools = ['brush', 'pencil', 'eraser', 'bucket', 'text'];
+  // Jika memilih alat 'select', matikan bentuk aktif agar bisa menyeleksi bebas
+  if (toolName === 'select') {
+    setPaintShape('none');
+  }
+
+  const tools = ['brush', 'pencil', 'eraser', 'bucket', 'text', 'select'];
   tools.forEach(t => {
     const btn = document.getElementById(`paint-tool-${t}`);
     if (btn) {
@@ -2176,7 +2710,7 @@ function setPaintTool(toolName) {
     }
   });
 
-  const toolLabels = { brush: 'Kuas', pencil: 'Pensil', eraser: 'Penghapus', bucket: 'Cat Tumpah', text: 'Teks' };
+  const toolLabels = { brush: 'Kuas', pencil: 'Pensil', eraser: 'Penghapus', bucket: 'Cat Tumpah', text: 'Teks', select: 'Geser / Seleksi ✥' };
   const labelEl = document.getElementById('paint-status-tool');
   if (labelEl) labelEl.innerText = toolLabels[toolName] || toolName;
 
@@ -2184,6 +2718,8 @@ function setPaintTool(toolName) {
     paintApp.canvas.style.cursor = 'cell';
   } else if (toolName === 'bucket') {
     paintApp.canvas.style.cursor = 'copy';
+  } else if (toolName === 'select') {
+    paintApp.canvas.style.cursor = paintApp.activeObject ? 'move' : 'crosshair';
   } else {
     paintApp.canvas.style.cursor = 'crosshair';
   }
@@ -2191,7 +2727,17 @@ function setPaintTool(toolName) {
 
 function setPaintShape(shapeName) {
   playSound('click');
+  // Jika sedang ada objek aktif dan pengguna memilih bentuk baru, commit objek sebelumnya
+  if (paintApp.activeObject) {
+    commitActivePaintObject();
+  }
+
   paintApp.shape = shapeName;
+
+  // Jika memilih bentuk, kembalikan alat dari seleksi ke kuas
+  if (shapeName !== 'none' && paintApp.tool === 'select') {
+    setPaintTool('brush');
+  }
 
   const shapes = ['none', 'line', 'rect', 'circle', 'star', 'heart'];
   shapes.forEach(s => {
@@ -2223,6 +2769,12 @@ function setPaintSize(sizeVal) {
 
   const sizeEl = document.getElementById('paint-status-size');
   if (sizeEl) sizeEl.innerText = `${sizeVal}px`;
+
+  // Jika sedang ada bentuk aktif yang belum ditempel, perbarui ketebalannya seketika!
+  if (paintApp.activeObject && paintApp.activeObject.type === 'shape') {
+    paintApp.activeObject.size = sizeVal;
+    renderActivePaintObject();
+  }
 }
 
 function setPaintColor(colorHex) {
@@ -2233,6 +2785,12 @@ function setPaintColor(colorHex) {
 
   const colorInput = document.getElementById('paint-custom-color');
   if (colorInput) colorInput.value = colorHex;
+
+  // Jika sedang ada bentuk aktif yang belum ditempel, perbarui warnanya seketika!
+  if (paintApp.activeObject && paintApp.activeObject.type === 'shape') {
+    paintApp.activeObject.color = colorHex;
+    renderActivePaintObject();
+  }
 }
 
 // Undo, Redo, Clear
@@ -2245,6 +2803,10 @@ function savePaintState() {
 }
 
 function undoPaintCanvas() {
+  if (paintApp.activeObject) {
+    paintApp.activeObject = null;
+    updatePaintCommitButton();
+  }
   if (paintApp.history.length > 1) {
     playSound('click');
     const current = paintApp.history.pop();
@@ -2256,6 +2818,10 @@ function undoPaintCanvas() {
 }
 
 function redoPaintCanvas() {
+  if (paintApp.activeObject) {
+    paintApp.activeObject = null;
+    updatePaintCommitButton();
+  }
   if (paintApp.redoList.length > 0) {
     playSound('click');
     const nextState = paintApp.redoList.pop();
@@ -2277,6 +2843,10 @@ function restorePaintState(dataUrl) {
 function clearPaintCanvas() {
   playSound('click');
   if (confirm('Kosongkan lembar kanvas Paint dan mulai lukisan baru?')) {
+    if (paintApp.activeObject) {
+      paintApp.activeObject = null;
+      updatePaintCommitButton();
+    }
     paintApp.ctx.fillStyle = '#ffffff';
     paintApp.ctx.fillRect(0, 0, paintApp.canvas.width, paintApp.canvas.height);
     savePaintState();
@@ -2286,6 +2856,9 @@ function clearPaintCanvas() {
 
 function tambahTeksKePaintPrompt() {
   playSound('click');
+  if (paintApp.activeObject) {
+    commitActivePaintObject();
+  }
   const userText = prompt('Ketik kata atau kalimat yang ingin ditempel ke lukisan:', 'CINTAI ALAM');
   if (userText && userText.trim()) {
     paintApp.ctx.fillStyle = paintApp.color;
@@ -2302,6 +2875,9 @@ function tambahTeksKePaintPrompt() {
 function downloadPaintCanvas() {
   playSound('fanfare');
   if (!paintApp.canvas) return;
+  if (paintApp.activeObject) {
+    commitActivePaintObject();
+  }
 
   const link = document.createElement('a');
   link.download = `Lukisan-Paint-Cilik-Kelas4-${Date.now()}.png`;
@@ -2316,12 +2892,52 @@ function downloadPaintCanvas() {
 function kirimPaintKeWord() {
   playSound('success');
   if (!paintApp.canvas) return;
+  if (paintApp.activeObject) {
+    commitActivePaintObject();
+  }
 
   const dataUrl = paintApp.canvas.toDataURL('image/png');
   sisipkanGambarLuarKeWord(dataUrl, 'Lukisan dari Paint');
   switchTab('msword');
   showToast('Lukisan Paint langsung dipasang di lembar kerja Word! 📄', 'success');
 }
+
+// FITUR SIMPAN HASIL LUKISAN PAINT KE DRIVE 7 KEBIASAAN
+function simpanPaintKeDrivePrompt() {
+  if (!paintApp.canvas) return;
+  if (paintApp.activeObject) {
+    commitActivePaintObject();
+  }
+  playSound('click');
+
+  const pilihan = prompt(
+    '📁 SIMPAN LUKISAN KE DRIVE 7 KEBIASAAN:\n\nPilih nomor kebiasaan untuk lukisan ini (1 - 7):\n' +
+    '1. Bangun Pagi\n' +
+    '2. Beribadah & Berdoa\n' +
+    '3. Berolahraga\n' +
+    '4. Makan Sehat & Bergizi\n' +
+    '5. Gemar Belajar & Membaca\n' +
+    '6. Bermasyarakat / Hidup Rukun\n' +
+    '7. Tidur Tepat Waktu\n\n' +
+    'Ketik nomor pilihan (1 s/d 7):',
+    '1'
+  );
+  if (!pilihan) return;
+
+  const num = parseInt(pilihan.trim(), 10);
+  const cfg = (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined') ? DRIVE_7KEBIASAAN_CONFIG.find(c => c.slotNumber === num) : null;
+  if (!cfg) {
+    alert('Nomor pilihan tidak valid. Masukkan angka antara 1 sampai 7.');
+    return;
+  }
+
+  const dataUrl = paintApp.canvas.toDataURL('image/png');
+  simpanGambarKeSlotDrive(cfg.key, dataUrl, `Lukisan Paint: ${cfg.cleanTitle}`, '🖌️ Gambar Sendiri');
+  setPraktikSubtab('praktik-tp2');
+  setModeAIStudio('drive');
+  showToast(`Lukisanmu berhasil disimpan ke Slot #${num}: ${cfg.cleanTitle}! 📁✨`, 'success');
+}
+window.simpanPaintKeDrivePrompt = simpanPaintKeDrivePrompt;
 
 // Backward compatibility helper
 function clearP1Canvas() {
@@ -2332,101 +2948,3862 @@ function setP1BrushColor(c) {
 }
 
 // ==========================================
-// 8. PRAKTIK 2: PUZZLE DEKOMPOSISI
+// 8. PRAKTIK 2: STUDIO GAMBAR AI 7 KEBIASAAN ANAK INDONESIA HEBAT (TP 2.2)
 // ==========================================
-function selectP2Item(itemId, itemType) {
+
+const AI_HABITS_DATA = {
+  bangun_pagi: {
+    id: 1,
+    title: 'Bangun Pagi Ceria',
+    emoji: '🌅',
+    desc: 'Menyambut pagi dengan penuh semangat, berterima kasih atas hari baru, dan merapikan tempat tidur sendiri.',
+    quote: '"Bangun pagi membuat tubuh segar, batin damai, dan siap belajar dengan gembira."',
+    promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan ceria, baru bangun tidur merentangkan tangan dengan riang di tempat tidur kayu rapi, memakai piyama tidur sopan tertutup, senyum manis bahagia, ada jam weker di meja samping dan jendela kamar dengan sinar matahari pagi yang cerah, gaya ilustrasi kartun edukasi anak Canva yang bersih dan indah',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, cute modest Indonesian elementary school student waking up early morning stretching arms happily on a neat wooden bed, wearing modest cute pajamas, smiling cheerfully, cute alarm clock on bedside table, warm morning sunshine streaming through window, tidy clean bedroom, Canva educational cartoon art style, child-friendly, wholesome, positive, masterpiece'
+  },
+  beribadah: {
+    id: 2,
+    title: 'Beribadah & Bersyukur (Gan En)',
+    emoji: '🙏',
+    desc: 'Menjalankan doa ibadah dengan khusyuk tepat waktu serta senantiasa bersyukur atas cinta kasih orang tua dan guru.',
+    quote: '"Bersyukur (Gan En) melahirkan kedamaian hati dan menghargai setiap berkah yang kita miliki."',
+    promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan santun, sedang berdoa dan bersyukur dengan kedua tangan terkatup khusyuk, berpakaian seragam sekolah rapi tertutup, senyum damai penuh cinta kasih, suasana hangat bercahaya kebaikan, gaya kartun edukasi anak Canva yang sopan dan mulia',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, cute respectful Indonesian elementary school student praying and giving gratitude Gan En with hands together, wearing neat modest school uniform, peaceful kind smile, warm golden serene glow, wholesome and polite, Canva children book illustration style, masterpiece'
+  },
+  olahraga: {
+    id: 3,
+    title: 'Rajin Berolahraga',
+    emoji: '⚽',
+    desc: 'Senam pagi, berlari ceria, dan aktif bergerak agar badan selalu bugar, lincah, dan memiliki daya tahan kuat.',
+    quote: '"Di dalam tubuh yang sehat terdapat jiwa yang kuat dan pikiran yang cemerlang."',
+    promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan ceria, memakai pakaian olahraga sekolah lengkap dan santun, sedang senam pagi dan lari riang di lapangan sekolah yang hijau dan bersih, membawa bola, senyum bugar dan gembira, gaya ilustrasi kartun edukasi anak Canva',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, cute polite Indonesian elementary student in modest clean school PE sports uniform, happily doing morning stretches and jogging on a bright green school playground, friendly cheerful smile, sunny fresh morning, Canva kids cartoon vector style, wholesome and active'
+  },
+  makan_sehat: {
+    id: 4,
+    title: 'Makan Sehat Bergizi',
+    emoji: '🥗',
+    desc: 'Memilih makanan bergizi seimbang, gemar makan sayur-mayur, buah segar, dan cukup minum air putih setiap hari.',
+    quote: '"Makanan sehat bergizi adalah bahan bakar terbaik untuk kecerdasan otak dan pertumbuhan anak."',
+    promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan beradab, duduk rapi di meja makan dengan sikap santun, menikmati bekal makanan sehat bergizi berupa sayur hijau, buah segar, dan susu, tersenyum ceria, gaya ilustrasi kartun edukasi anak Canva yang higienis dan mendidik',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, cute well-mannered Indonesian elementary student sitting politely at dining table, happily eating a colorful healthy meal with fresh vegetables, fruits, and milk, modest neat clothing, polite dining etiquette, bright clean cheerful atmosphere, Canva storybook style'
+  },
+  belajar_membaca: {
+    id: 5,
+    title: 'Gemar Belajar & Membaca',
+    emoji: '📚',
+    desc: 'Meluangkan waktu 15 menit setiap hari membaca buku, mengasah logika koding, dan berani bertanya hal baru.',
+    quote: '"Buku adalah jendela dunia. Anak yang gemar membaca akan tumbuh menjadi generasi berwawasan luas."',
+    promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan cerdas, duduk membaca buku cerita bergambar dengan penuh minat di perpustakaan sekolah yang rapi, berpakaian seragam merah putih santun, senyum manis penuh rasa ingin tahu, gaya ilustrasi kartun edukasi anak Canva',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, cute studious Indonesian elementary student sitting neatly and reading a colorful storybook in a cozy school library, wearing modest tidy uniform, curious bright smiling eyes, clean bookshelves background, Canva educational cartoon art, masterpiece'
+  },
+  rukun_berbagi: {
+    id: 6,
+    title: 'Bermasyarakat, Rukun & Berbagi',
+    emoji: '🤝',
+    desc: 'Saling tolong-menolong sesama teman tanpa membedakan latar belakang, hidup rukun (Hu Ai), dan suka berbagi kebaikan.',
+    quote: '"Saling mengasihi dan tolong-menolong menjadikan persahabatan indah dan dunia penuh kehangatan."',
+    promptBaseId: 'gambar kartun sekelompok anak SD Indonesia yang rukun dan sopan, saling tersenyum, berbagi kue bekal dan bermain bersama dengan gembira di taman sekolah, berpakaian seragam rapi dan sopan, mencerminkan persahabatan dan cinta kasih yang hangat, gaya kartun edukasi anak Canva',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, group of polite Indonesian elementary school children smiling together harmoniously, sharing snacks and supporting each other, wearing neat modest school uniforms, warm friendship Hu Ai, colorful school garden, Canva storybook vector style'
+  },
+  tidur_tepat: {
+    id: 7,
+    title: 'Tidur Tepat Waktu',
+    emoji: '🌙',
+    desc: 'Istirahat lebih awal tanpa bermain gawai (HP) larut malam agar sel otak beregenerasi dan bangun dalam kondisi prima.',
+    quote: '"Tidur tepat waktu menjaga kecerdasan ingatan dan stamina tubuh agar selalu siap berprestasi."',
+    promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan manis, sudah tidur nyenyak di tempat tidur yang rapi dan nyaman dengan selimut hangat, memakai piyama tidur sopan, ada boneka atau jam weker, suasana malam berbintang yang tenang dan damai, gaya ilustrasi kartun edukasi anak Canva',
+    promptBaseEn: 'charming polite 2D cartoon illustration for kids, cute modest Indonesian elementary student peacefully sleeping on a cozy wooden bed under a warm neat blanket, wearing modest pajamas, sweet peaceful smile, quiet starry night through window, gentle bedside lamp glow, wholesome Canva kids illustration'
+  }
+};
+
+const AI_STUDIO_STATE = {
+  currentHabit: 'bangun_pagi',
+  currentKarakter: 'siswa_laki',
+  currentStyle: 'kartun_canva',
+  currentEngine: 'local_cartoon',
+  currentImageUrl: '',
+  currentDataUrl: '',
+  isGenerating: false,
+  claimedPoints: false
+};
+
+function gantiMesinAI(engine) {
+  AI_STUDIO_STATE.currentEngine = engine;
+  if (engine === 'local_cartoon') {
+    showToast('Mode Studio Kartun Edukasi Aktif: Bebas kuota & instan! 🌟', 'success');
+  } else if (engine === 'pollinations') {
+    showToast('Mode AI Online (Pollinations.ai) Aktif 🤖 (Batas 1 gambar per 45 detik)', 'info');
+  }
+}
+window.gantiMesinAI = gantiMesinAI;
+
+function salinPromptAI(lang = 'id') {
   playSound('click');
-  // Hapus seleksi sebelumnya
-  document.querySelectorAll('.p2-draggable').forEach(el => el.classList.remove('selected'));
+  const promptInput = document.getElementById('ai-custom-prompt');
+  const habitKey = document.getElementById('ai-select-kebiasaan')?.value || AI_STUDIO_STATE.currentHabit;
+  const habit = AI_HABITS_DATA[habitKey] || AI_HABITS_DATA.bangun_pagi;
 
-  const el = document.getElementById(itemId);
-  if (!el) return;
+  let teksPrompt = '';
+  if (lang === 'en') {
+    const charInput = document.querySelector('input[name="ai-karakter"]:checked');
+    const charVal = charInput ? charInput.value : 'siswa_laki';
+    const styleInput = document.querySelector('input[name="ai-style"]:checked');
+    const styleVal = styleInput ? styleInput.value : 'kartun_canva';
+    teksPrompt = `${habit.promptBaseEn}, cute polite Indonesian elementary student, Canva educational cartoon art style, modest decent clothing, beautiful masterpiece`;
+  } else {
+    teksPrompt = (promptInput && promptInput.value.trim()) ? promptInput.value.trim() : habit.promptBaseId;
+  }
 
-  el.classList.add('selected');
-  state.p2SelectedItem = { id: itemId, type: itemType };
-  document.getElementById('p2-selected-info').innerText =
-    `Item terpilih: "${state.p2Items[itemId].label}". Sekarang klik wadah tujuannya!`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(teksPrompt).then(() => {
+      showToast('Prompt AI berhasil disalin ke Clipboard! 📋 Silakan tempel di Canva / Bing AI.', 'success');
+    }).catch(() => {
+      prompt('Salin teks prompt AI ini:', teksPrompt);
+    });
+  } else {
+    prompt('Salin teks prompt AI ini:', teksPrompt);
+  }
+}
+window.salinPromptAI = salinPromptAI;
+
+function aktifkanKartunEdukasiBebasLimit() {
+  playSound('fanfare');
+  const engineSelect = document.getElementById('ai-select-engine');
+  if (engineSelect) engineSelect.value = 'local_cartoon';
+  AI_STUDIO_STATE.currentEngine = 'local_cartoon';
+  const habitKey = document.getElementById('ai-select-kebiasaan')?.value || AI_STUDIO_STATE.currentHabit;
+  const styleInput = document.querySelector('input[name="ai-style"]:checked');
+  const styleVal = styleInput ? styleInput.value : 'kartun_canva';
+
+  renderFallbackArtwork(habitKey, styleVal);
+  selesaikanGenerasiGambarAI(true);
+  showToast('✨ Berhasil beralih ke Ilustrasi Kartun Edukasi Bebas Limit!', 'success');
+}
+window.aktifkanKartunEdukasiBebasLimit = aktifkanKartunEdukasiBebasLimit;
+
+// ==========================================
+// MESIN PENCARI GAMBAR KARTUN CILIK (KATALOG 30+ ASET VEKTOR EDUKASI)
+// ==========================================
+const CARTOON_SEARCH_STATE = {
+  currentQuery: '',
+  activeCategory: 'semua',
+  sumberMode: 'vektor' // Selalu gunakan 'vektor' terkurasi lokal yang 100% aman & ramah anak
+};
+
+const KATALOG_KARTUN_7KEBIASAAN = [
+  // 1. BANGUN PAGI (6 VARIASI - Persis Sesuai Screenshot User)
+  {
+    id: 'bp_1',
+    title: 'Anak Bangun Pagi Merentang Tangan',
+    habitKey: 'bangun_pagi',
+    category: 'Bangun Pagi',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-blue-100 text-blue-800',
+    tags: ['bangun', 'pagi', 'tidur', 'merentang', 'tangan', 'ranjang', 'senyum', 'piyama'],
+    icon: 'fa-sun',
+    dataUrl: null
+  },
+  {
+    id: 'bp_2',
+    title: 'Siswi Ceria Bangun Tidur di Ranjang Pink',
+    habitKey: 'bangun_pagi',
+    category: 'Bangun Pagi',
+    source: 'Pinterest Kartun',
+    badgeClass: 'bg-pink-100 text-pink-800',
+    tags: ['bangun', 'pagi', 'tidur', 'perempuan', 'pink', 'selimut', 'senyum', 'siswi'],
+    icon: 'fa-bed',
+    dataUrl: null
+  },
+  {
+    id: 'bp_3',
+    title: 'Jam Weker 05:00 & Anak Siap Bangun',
+    habitKey: 'bangun_pagi',
+    category: 'Bangun Pagi',
+    source: 'Pngtree Kids',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    tags: ['bangun', 'pagi', 'tidur', 'weker', 'jam', 'waktu', 'dinding', 'mentari'],
+    icon: 'fa-clock',
+    dataUrl: null
+  },
+  {
+    id: 'bp_4',
+    title: 'Kamar Pagi Bersih & Jendela Terbuka',
+    habitKey: 'bangun_pagi',
+    category: 'Bangun Pagi',
+    source: 'Animasi 3D',
+    badgeClass: 'bg-emerald-100 text-emerald-800',
+    tags: ['bangun', 'pagi', 'kamar', 'jendela', 'mentari', 'meja', 'rapi', 'bersih'],
+    icon: 'fa-door-open',
+    dataUrl: null
+  },
+  {
+    id: 'bp_5',
+    title: 'Siswi Berhijab Bangun Pagi Bersyukur',
+    habitKey: 'bangun_pagi',
+    category: 'Bangun Pagi',
+    source: 'Vektor Sopan',
+    badgeClass: 'bg-purple-100 text-purple-800',
+    tags: ['bangun', 'pagi', 'hijab', 'muslimah', 'syukur', 'sopan', 'senyum'],
+    icon: 'fa-hands-praying',
+    dataUrl: null
+  },
+  {
+    id: 'bp_6',
+    title: 'Anak Merapikan & Melipat Selimut Rapi',
+    habitKey: 'bangun_pagi',
+    category: 'Bangun Pagi',
+    source: 'Buku Dongeng',
+    badgeClass: 'bg-indigo-100 text-indigo-800',
+    tags: ['bangun', 'pagi', 'merapikan', 'melipat', 'selimut', 'disiplin', 'mandiri', 'kamar'],
+    icon: 'fa-hand-sparkles',
+    dataUrl: null
+  },
+
+  // 2. BERIBADAH & BERSYUKUR (GAN EN) (4 VARIASI)
+  {
+    id: 'bi_1',
+    title: 'Anak Berdoa Khusyuk dengan Tangan Berkatup',
+    habitKey: 'beribadah',
+    category: 'Beribadah',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-sky-100 text-sky-800',
+    tags: ['ibadah', 'berdoa', 'doa', 'syukur', 'gan en', 'tangan', 'khusyuk'],
+    icon: 'fa-hands-praying',
+    dataUrl: null
+  },
+  {
+    id: 'bi_2',
+    title: 'Siswi Berhijab Berdoa di Sajadah Suci',
+    habitKey: 'beribadah',
+    category: 'Beribadah',
+    source: 'Vektor Sopan',
+    badgeClass: 'bg-emerald-100 text-emerald-800',
+    tags: ['ibadah', 'berdoa', 'sholat', 'sajadah', 'hijab', 'muslimah', 'syukur'],
+    icon: 'fa-mosque',
+    dataUrl: null
+  },
+  {
+    id: 'bi_3',
+    title: 'Bunga Teratai Suci & Cahaya Kasih Gan En',
+    habitKey: 'beribadah',
+    category: 'Beribadah',
+    source: 'Tzu Chi Humanis',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    tags: ['ibadah', 'teratai', 'gan en', 'cinta kasih', 'bersyukur', 'bunga', 'damai'],
+    icon: 'fa-spa',
+    dataUrl: null
+  },
+  {
+    id: 'bi_4',
+    title: 'Anak Berbakti Menyajikan Teh kepada Orang Tua',
+    habitKey: 'beribadah',
+    category: 'Beribadah',
+    source: 'Budi Pekerti',
+    badgeClass: 'bg-purple-100 text-purple-800',
+    tags: ['ibadah', 'berbakti', 'orang tua', 'teh', 'hormat', 'sopan', 'gan en'],
+    icon: 'fa-heart',
+    dataUrl: null
+  },
+
+  // 3. RAJIN BEROLAHRAGA (4 VARIASI)
+  {
+    id: 'or_1',
+    title: 'Lari Pagi Ceria di Lapangan Hijau',
+    habitKey: 'olahraga',
+    category: 'Olahraga',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-orange-100 text-orange-800',
+    tags: ['olahraga', 'lari', 'jogging', 'pagi', 'lapangan', 'bugar', 'sehat'],
+    icon: 'fa-person-running',
+    dataUrl: null
+  },
+  {
+    id: 'or_2',
+    title: 'Bermain Sepak Bola di Bawah Mentari',
+    habitKey: 'olahraga',
+    category: 'Olahraga',
+    source: 'Pngtree Kids',
+    badgeClass: 'bg-lime-100 text-lime-800',
+    tags: ['olahraga', 'bola', 'sepak bola', 'lapangan', 'tendang', 'seru', 'teman'],
+    icon: 'fa-futbol',
+    dataUrl: null
+  },
+  {
+    id: 'or_3',
+    title: 'Senam Pagi Anak Indonesia Bugar',
+    habitKey: 'olahraga',
+    category: 'Olahraga',
+    source: 'Vektor Sopan',
+    badgeClass: 'bg-yellow-100 text-yellow-800',
+    tags: ['olahraga', 'senam', 'pagi', 'rentang', 'sekolah', 'kompak', 'sehat'],
+    icon: 'fa-child-reaching',
+    dataUrl: null
+  },
+  {
+    id: 'or_4',
+    title: 'Bersepeda Santai di Taman Sekolah',
+    habitKey: 'olahraga',
+    category: 'Olahraga',
+    source: 'Animasi 3D',
+    badgeClass: 'bg-teal-100 text-teal-800',
+    tags: ['olahraga', 'sepeda', 'gowes', 'taman', 'helm', 'santai', 'sehat'],
+    icon: 'fa-bicycle',
+    dataUrl: null
+  },
+
+  // 4. MAKAN SEHAT BERGIZI (4 VARIASI)
+  {
+    id: 'ms_1',
+    title: 'Piring Sayur Brokoli, Wortel & Apel Merah',
+    habitKey: 'makan_sehat',
+    category: 'Makan Sehat',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-emerald-100 text-emerald-800',
+    tags: ['makan', 'sehat', 'sayur', 'buah', 'brokoli', 'apel', 'piring', 'gizi'],
+    icon: 'fa-apple-whole',
+    dataUrl: null
+  },
+  {
+    id: 'ms_2',
+    title: 'Gelas Susu Segar & Mangkuk Buah Bersih',
+    habitKey: 'makan_sehat',
+    category: 'Makan Sehat',
+    source: 'Vektor Sopan',
+    badgeClass: 'bg-blue-100 text-blue-800',
+    tags: ['makan', 'sehat', 'susu', 'buah', 'pisang', 'jeruk', 'sarapan', 'meja'],
+    icon: 'fa-glass-water',
+    dataUrl: null
+  },
+  {
+    id: 'ms_3',
+    title: 'Anak Duduk Santun Makan dengan Baik',
+    habitKey: 'makan_sehat',
+    category: 'Makan Sehat',
+    source: 'Buku Dongeng',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    tags: ['makan', 'sehat', 'santun', 'sendok', 'meja makan', 'tata krama', 'sop'],
+    icon: 'fa-utensils',
+    dataUrl: null
+  },
+  {
+    id: 'ms_4',
+    title: 'Kotak Bekal 4 Sehat 5 Sempurna',
+    habitKey: 'makan_sehat',
+    category: 'Makan Sehat',
+    source: 'Pinterest Kartun',
+    badgeClass: 'bg-rose-100 text-rose-800',
+    tags: ['makan', 'sehat', 'bekal', 'kotak', 'nasi', 'lauk', 'sekolah', 'nutrisi'],
+    icon: 'fa-box',
+    dataUrl: null
+  },
+
+  // 5. GEMAR BELAJAR & MEMBACA (4 VARIASI)
+  {
+    id: 'gb_1',
+    title: 'Membaca Buku Dongeng Cerita Bergambar',
+    habitKey: 'belajar_membaca',
+    category: 'Gemar Belajar',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-purple-100 text-purple-800',
+    tags: ['belajar', 'buku', 'membaca', 'dongeng', 'cerita', 'bintang', 'pintar'],
+    icon: 'fa-book-open',
+    dataUrl: null
+  },
+  {
+    id: 'gb_2',
+    title: 'Rak Buku Perpustakaan Warna-Warni',
+    habitKey: 'belajar_membaca',
+    category: 'Gemar Belajar',
+    source: 'Pngtree Kids',
+    badgeClass: 'bg-indigo-100 text-indigo-800',
+    tags: ['belajar', 'rak buku', 'perpustakaan', 'buku', 'ilmu', 'pelajaran', 'sekolah'],
+    icon: 'fa-book',
+    dataUrl: null
+  },
+  {
+    id: 'gb_3',
+    title: 'Meja Belajar Rapi dengan Lampu Belajar',
+    habitKey: 'belajar_membaca',
+    category: 'Gemar Belajar',
+    source: 'Animasi 3D',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    tags: ['belajar', 'meja', 'lampu', 'buku tulis', 'pensil', 'rapi', 'rajin'],
+    icon: 'fa-pencil',
+    dataUrl: null
+  },
+  {
+    id: 'gb_4',
+    title: 'Belajar Koding Komputer Bersama Robot',
+    habitKey: 'belajar_membaca',
+    category: 'Gemar Belajar',
+    source: 'EduCode Kids',
+    badgeClass: 'bg-sky-100 text-sky-800',
+    tags: ['belajar', 'koding', 'komputer', 'laptop', 'robot', 'ai', 'teknologi'],
+    icon: 'fa-laptop-code',
+    dataUrl: null
+  },
+
+  // 6. BERMASYARAKAT, RUKUN & BERBAGI (4 VARIASI)
+  {
+    id: 'rk_1',
+    title: 'Dua Sahabat Berbagi Bekal Kue & Buah',
+    habitKey: 'rukun_berbagi',
+    category: 'Hidup Rukun',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-teal-100 text-teal-800',
+    tags: ['rukun', 'teman', 'sahabat', 'berbagi', 'bekal', 'taman', 'hu ai', 'cinta kasih'],
+    icon: 'fa-hand-holding-heart',
+    dataUrl: null
+  },
+  {
+    id: 'rk_2',
+    title: 'Gotong Royong Membersihkan Kelas Bersama',
+    habitKey: 'rukun_berbagi',
+    category: 'Hidup Rukun',
+    source: 'Vektor Sopan',
+    badgeClass: 'bg-emerald-100 text-emerald-800',
+    tags: ['rukun', 'gotong royong', 'sapu', 'bersih', 'kelas', 'daur ulang', 'kompak'],
+    icon: 'fa-broom',
+    dataUrl: null
+  },
+  {
+    id: 'rk_3',
+    title: 'Saling Menyapa Santun & Senyum Ramah',
+    habitKey: 'rukun_berbagi',
+    category: 'Hidup Rukun',
+    source: 'Tzu Chi Humanis',
+    badgeClass: 'bg-purple-100 text-purple-800',
+    tags: ['rukun', 'menyapa', 'sopan', 'senyum', 'salam', 'budi pekerti', 'gan en'],
+    icon: 'fa-users',
+    dataUrl: null
+  },
+  {
+    id: 'rk_4',
+    title: 'Lingkaran Sahabat Bergandengan Tangan',
+    habitKey: 'rukun_berbagi',
+    category: 'Hidup Rukun',
+    source: 'Buku Dongeng',
+    badgeClass: 'bg-pink-100 text-pink-800',
+    tags: ['rukun', 'persahabatan', 'bergandengan', 'lingkaran', 'pohon', 'damai'],
+    icon: 'fa-people-group',
+    dataUrl: null
+  },
+
+  // 7. TIDUR TEPAT WAKTU (4 VARIASI)
+  {
+    id: 'tt_1',
+    title: 'Tidur Pulas di Bawah Selimut Bintang',
+    habitKey: 'tidur_tepat',
+    category: 'Tidur Cepat',
+    source: 'Canva Edukasi',
+    badgeClass: 'bg-indigo-100 text-indigo-800',
+    tags: ['tidur', 'malam', 'selimut', 'bintang', 'pulas', 'nyenyak', 'zzz', 'piyama'],
+    icon: 'fa-moon',
+    dataUrl: null
+  },
+  {
+    id: 'tt_2',
+    title: 'Jendela Malam Tenang & Bulan Sabit Senyum',
+    habitKey: 'tidur_tepat',
+    category: 'Tidur Cepat',
+    source: 'Pinterest Kartun',
+    badgeClass: 'bg-slate-100 text-slate-800',
+    tags: ['tidur', 'malam', 'bulan', 'bintang', 'jendela', 'langit', 'tenang'],
+    icon: 'fa-cloud-moon',
+    dataUrl: null
+  },
+  {
+    id: 'tt_3',
+    title: 'Jam Dinding Pukul 20:30 (Tidak Begadang)',
+    habitKey: 'tidur_tepat',
+    category: 'Tidur Cepat',
+    source: 'Vektor Sopan',
+    badgeClass: 'bg-purple-100 text-purple-800',
+    tags: ['tidur', 'waktu', 'jam', '20:30', 'disiplin', 'sehat', 'istirahat'],
+    icon: 'fa-clock',
+    dataUrl: null
+  },
+  {
+    id: 'tt_4',
+    title: 'Lampu Tidur Temaram Hangat & Damai',
+    habitKey: 'tidur_tepat',
+    category: 'Tidur Cepat',
+    source: 'Animasi 3D',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    tags: ['tidur', 'lampu', 'temaram', 'meja', 'hangat', 'istirahat', 'kamar'],
+    icon: 'fa-lightbulb',
+    dataUrl: null
+  }
+];
+
+// GENERATOR ILUSTRASI VEKTOR KARTUN HIGH-DEFINITION (GAYA CANVA & PINTEREST)
+function buatSvgKartunKatalog(id, title, habitKey) {
+  const defs = `
+    <defs>
+      <linearGradient id="gSky" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#bae6fd"/><stop offset="60%" stop-color="#fef08a"/><stop offset="100%" stop-color="#fed7aa"/>
+      </linearGradient>
+      <linearGradient id="gPinkRoom" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fce7f3"/><stop offset="70%" stop-color="#fbcfe8"/><stop offset="100%" stop-color="#f472b6"/>
+      </linearGradient>
+      <linearGradient id="gNight" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#020617"/><stop offset="50%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e1b4b"/>
+      </linearGradient>
+      <linearGradient id="gWarmRoom" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fef3c7"/><stop offset="60%" stop-color="#ede9fe"/><stop offset="100%" stop-color="#e0e7ff"/>
+      </linearGradient>
+      <linearGradient id="gPark" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#bae6fd"/><stop offset="55%" stop-color="#dcfce7"/><stop offset="100%" stop-color="#86efac"/>
+      </linearGradient>
+      <linearGradient id="gWood" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#d97706"/><stop offset="100%" stop-color="#78350f"/>
+      </linearGradient>
+      <linearGradient id="gSun" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/><stop offset="100%" stop-color="#f59e0b"/>
+      </linearGradient>
+      <linearGradient id="gBlueBlanket" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#1d4ed8"/>
+      </linearGradient>
+      <linearGradient id="gPinkBlanket" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#db2777"/>
+      </linearGradient>
+      <linearGradient id="gGoldHalo" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#f59e0b"/>
+      </linearGradient>
+      <linearGradient id="gMint" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ccfbf1"/><stop offset="100%" stop-color="#14b8a6"/>
+      </linearGradient>
+      <linearGradient id="gLavender" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ede9fe"/><stop offset="100%" stop-color="#8b5cf6"/>
+      </linearGradient>
+      <filter id="sh" x="-10%" y="-10%" width="120%" height="120%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.14"/>
+      </filter>
+      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="8" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+    </defs>
+  `;
+
+  let body = '';
+
+  // 1. BANGUN PAGI
+  if (id === 'bp_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <g filter="url(#sh)">
+        <rect x="30" y="40" width="100" height="130" rx="12" fill="#f0f9ff" stroke="#ffffff" stroke-width="5"/>
+        <circle cx="80" cy="95" r="28" fill="url(#gSun)"/>
+        <path d="M80 40 L80 170 M30 105 L130 105" stroke="#ffffff" stroke-width="4"/>
+      </g>
+      <rect x="120" y="140" width="250" height="100" rx="16" fill="url(#gWood)" filter="url(#sh)"/>
+      <rect x="130" y="210" width="230" height="60" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="150" y="180" width="80" height="40" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" filter="url(#sh)"/>
+      <!-- Chibi Boy stretching -->
+      <path d="M190 150 Q215 115 240 150 Q245 170 230 180 Q215 185 195 180 Z" fill="#451a03"/>
+      <circle cx="215" cy="165" r="28" fill="#fed7aa"/>
+      <ellipse cx="206" cy="163" rx="4" ry="6" fill="#0f172a"/>
+      <ellipse cx="224" cy="163" rx="4" ry="6" fill="#0f172a"/>
+      <circle cx="204.5" cy="161" r="1.8" fill="#ffffff"/>
+      <circle cx="222.5" cy="161" r="1.8" fill="#ffffff"/>
+      <ellipse cx="203" cy="172" rx="6" ry="3.5" fill="#fb7185" opacity="0.6"/>
+      <ellipse cx="227" cy="172" rx="6" ry="3.5" fill="#fb7185" opacity="0.6"/>
+      <path d="M210 174 Q215 183 220 174" stroke="#b91c1c" stroke-width="3" fill="#f43f5e" stroke-linecap="round"/>
+      <rect x="190" y="195" width="50" height="60" rx="12" fill="#93c5fd" stroke="#3b82f6" stroke-width="2"/>
+      <path d="M192 205 Q165 175 160 150" stroke="#fed7aa" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <path d="M238 205 Q265 175 270 150" stroke="#fed7aa" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <g filter="url(#sh)">
+        <path d="M130 235 Q250 220 360 240 L360 340 Q250 360 130 340 Z" fill="url(#gBlueBlanket)"/>
+        <circle cx="180" cy="270" r="4" fill="#fef08a"/><circle cx="250" cy="290" r="5" fill="#fef08a"/><circle cx="320" cy="270" r="4" fill="#fef08a"/>
+      </g>
+      <rect x="35" y="240" width="70" height="100" rx="10" fill="url(#gWood)" filter="url(#sh)"/>
+      <circle cx="70" cy="225" r="20" fill="#ef4444" stroke="#ffffff" stroke-width="3" filter="url(#sh)"/>
+      <circle cx="70" cy="225" r="14" fill="#ffffff"/>
+      <path d="M70 225 L70 215 M70 225 L78 230" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">★ Bangun Pagi Ceria &amp; Merentang Tangan ★</text>
+    `;
+  } else if (id === 'bp_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPinkRoom)"/>
+      <circle cx="60" cy="80" r="18" fill="#ffffff" opacity="0.4"/>
+      <circle cx="100" cy="60" r="12" fill="#ffffff" opacity="0.4"/>
+      <rect x="110" y="140" width="260" height="110" rx="18" fill="#fda4af" filter="url(#sh)"/>
+      <rect x="130" y="210" width="220" height="60" rx="12" fill="#ffffff"/>
+      <rect x="150" y="175" width="80" height="40" rx="14" fill="#fdf2f8" stroke="#f472b6" stroke-width="1.5" filter="url(#sh)"/>
+      <!-- Chibi Girl Twin Buns -->
+      <circle cx="175" cy="145" r="13" fill="#451a03"/><circle cx="245" cy="145" r="13" fill="#451a03"/>
+      <circle cx="175" cy="145" r="5" fill="#f43f5e"/><circle cx="245" cy="145" r="5" fill="#f43f5e"/>
+      <circle cx="210" cy="165" r="28" fill="#fed7aa"/>
+      <path d="M185 155 Q210 135 235 155" fill="#451a03"/>
+      <ellipse cx="202" cy="163" rx="4" ry="6" fill="#0f172a"/>
+      <ellipse cx="218" cy="163" rx="4" ry="6" fill="#0f172a"/>
+      <circle cx="200.5" cy="161" r="1.8" fill="#ffffff"/>
+      <circle cx="216.5" cy="161" r="1.8" fill="#ffffff"/>
+      <ellipse cx="198" cy="172" rx="6" ry="3.5" fill="#f43f5e" opacity="0.6"/>
+      <ellipse cx="222" cy="172" rx="6" ry="3.5" fill="#f43f5e" opacity="0.6"/>
+      <path d="M205 174 Q210 184 215 174" stroke="#b91c1c" stroke-width="3" fill="#f43f5e" stroke-linecap="round"/>
+      <rect x="185" y="195" width="50" height="60" rx="12" fill="#f472b6" stroke="#db2777" stroke-width="2"/>
+      <path d="M187 205 Q160 175 155 150" stroke="#fed7aa" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <path d="M233 205 Q260 175 265 150" stroke="#fed7aa" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <g filter="url(#sh)">
+        <path d="M120 235 Q240 220 350 240 L350 340 Q240 360 120 340 Z" fill="url(#gPinkBlanket)"/>
+        <circle cx="160" cy="270" r="5" fill="#ffffff" opacity="0.8"/><circle cx="230" cy="290" r="6" fill="#ffffff" opacity="0.8"/><circle cx="300" cy="270" r="5" fill="#ffffff" opacity="0.8"/>
+      </g>
+      <rect x="30" y="240" width="70" height="100" rx="10" fill="#fbcfe8" filter="url(#sh)"/>
+      <circle cx="65" cy="225" r="16" fill="#fb7185"/>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#db2777" text-anchor="middle">★ Siswi Ceria Bangun Tidur di Ranjang Pink ★</text>
+    `;
+  } else if (id === 'bp_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <circle cx="140" cy="180" r="90" fill="#fee2e2" filter="url(#sh)"/>
+      <circle cx="140" cy="180" r="75" fill="#ef4444" stroke="#ffffff" stroke-width="5" filter="url(#sh)"/>
+      <circle cx="140" cy="180" r="58" fill="#ffffff"/>
+      <path d="M100 115 Q115 100 130 115 Z M150 115 Q165 100 180 115 Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+      <path d="M140 180 L140 145 M140 180 L168 195" stroke="#0f172a" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="140" cy="180" r="6" fill="#ef4444"/>
+      <path d="M80 120 L65 105 M200 120 L215 105 M140 95 L140 75" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+      <!-- Anak tersenyum segar -->
+      <g filter="url(#sh)">
+        <path d="M260 140 Q290 105 320 140" fill="#451a03"/>
+        <circle cx="290" cy="160" r="30" fill="#fed7aa"/>
+        <ellipse cx="282" cy="158" rx="4" ry="6" fill="#0f172a"/>
+        <ellipse cx="298" cy="158" rx="4" ry="6" fill="#0f172a"/>
+        <circle cx="280.5" cy="156" r="1.8" fill="#ffffff"/>
+        <circle cx="296.5" cy="156" r="1.8" fill="#ffffff"/>
+        <ellipse cx="278" cy="166" rx="5" ry="3" fill="#fb7185" opacity="0.6"/>
+        <ellipse cx="302" cy="166" rx="5" ry="3" fill="#fb7185" opacity="0.6"/>
+        <path d="M285 170 Q290 178 295 170" stroke="#b91c1c" stroke-width="3" fill="#f43f5e"/>
+        <rect x="265" y="195" width="50" height="70" rx="14" fill="#3b82f6"/>
+        <path d="M265 210 Q240 230 230 250" stroke="#fed7aa" stroke-width="11" stroke-linecap="round" fill="none"/>
+      </g>
+      <rect x="60" y="295" width="160" height="40" rx="12" fill="#ffffff" filter="url(#sh)"/>
+      <text x="140" y="322" font-family="Fredoka, sans-serif" font-size="20" font-weight="900" fill="#ef4444" text-anchor="middle">05 : 00 PAGI</text>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">★ Jam Weker 05:00 &amp; Bangun Tepat Waktu ★</text>
+    `;
+  } else if (id === 'bp_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <!-- Jendela Besar & Mentari -->
+      <g filter="url(#sh)">
+        <rect x="40" y="40" width="160" height="180" rx="16" fill="#bae6fd" stroke="#ffffff" stroke-width="6"/>
+        <circle cx="120" cy="110" r="35" fill="url(#gSun)"/>
+        <path d="M120 40 L120 220 M40 130 L200 130" stroke="#ffffff" stroke-width="4"/>
+        <path d="M30 30 Q45 130 25 230 L50 230 Q65 130 45 30 Z" fill="#38bdf8" opacity="0.8"/>
+        <path d="M210 30 Q195 130 215 230 L190 230 Q175 130 195 30 Z" fill="#38bdf8" opacity="0.8"/>
+      </g>
+      <!-- Pot Tanaman Hijau di Jendela -->
+      <rect x="140" y="195" width="30" height="25" rx="5" fill="#d97706"/>
+      <circle cx="155" cy="188" r="14" fill="#22c55e"/>
+      <!-- Siswi Membuka Jendela Ceria -->
+      <g filter="url(#sh)">
+        <path d="M245 130 Q275 95 305 130" fill="#451a03"/>
+        <circle cx="275" cy="150" r="28" fill="#fed7aa"/>
+        <ellipse cx="267" cy="148" rx="4" ry="6" fill="#0f172a"/>
+        <ellipse cx="283" cy="148" rx="4" ry="6" fill="#0f172a"/>
+        <circle cx="265.5" cy="146" r="1.8" fill="#ffffff"/>
+        <circle cx="281.5" cy="146" r="1.8" fill="#ffffff"/>
+        <ellipse cx="263" cy="156" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <ellipse cx="287" cy="156" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M270 159 Q275 167 280 159" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="250" y="180" width="50" height="75" rx="14" fill="#0284c7"/>
+        <path d="M250 195 L200 160" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Kamar Pagi Bersih &amp; Jendela Terbuka ★</text>
+    `;
+  } else if (id === 'bp_5') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <g filter="url(#sh)">
+        <rect x="40" y="50" width="100" height="130" rx="12" fill="#f0f9ff" stroke="#ffffff" stroke-width="5"/>
+        <circle cx="90" cy="100" r="25" fill="url(#gSun)"/>
+      </g>
+      <rect x="130" y="160" width="230" height="90" rx="14" fill="url(#gWood)" filter="url(#sh)"/>
+      <rect x="140" y="220" width="210" height="60" rx="10" fill="#ffffff"/>
+      <!-- Karakter Hijab Bersyukur -->
+      <g filter="url(#sh)">
+        <path d="M200 120 Q235 90 270 120 L280 195 Q235 210 190 195 Z" fill="#e9d5ff" stroke="#c084fc" stroke-width="2"/>
+        <ellipse cx="235" cy="150" rx="22" ry="24" fill="#fed7aa"/>
+        <ellipse cx="227" cy="148" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <ellipse cx="243" cy="148" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <circle cx="225.5" cy="146" r="1.5" fill="#ffffff"/>
+        <circle cx="241.5" cy="146" r="1.5" fill="#ffffff"/>
+        <ellipse cx="222" cy="156" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="248" cy="156" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M230 160 Q235 168 240 160" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <!-- Tangan cupped bersyukur -->
+        <path d="M225 200 Q235 190 245 200" stroke="#fed7aa" stroke-width="12" stroke-linecap="round" fill="none"/>
+        <rect x="205" y="190" width="60" height="65" rx="12" fill="#c084fc"/>
+      </g>
+      <g filter="url(#sh)">
+        <path d="M140 245 Q245 230 350 245 L350 340 Q245 360 140 340 Z" fill="#a855f7"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#7e22ce" text-anchor="middle">★ Siswi Berhijab Bangun Pagi Bersyukur ★</text>
+    `;
+  } else if (id === 'bp_6') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <rect x="70" y="170" width="280" height="80" rx="12" fill="url(#gWood)" filter="url(#sh)"/>
+      <rect x="80" y="200" width="130" height="110" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="90" y="180" width="60" height="30" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+      <!-- Selimut terlipat rapi -->
+      <g filter="url(#sh)">
+        <rect x="90" y="230" width="110" height="70" rx="10" fill="#0284c7" stroke="#38bdf8" stroke-width="3"/>
+        <path d="M90 255 L200 255 M90 275 L200 275" stroke="#38bdf8" stroke-width="2"/>
+        <circle cx="145" cy="265" r="5" fill="#fde047"/>
+      </g>
+      <!-- Anak berdiri merapikan -->
+      <g filter="url(#sh)">
+        <path d="M250 110 Q275 75 300 110" fill="#451a03"/>
+        <circle cx="275" cy="125" r="26" fill="#fed7aa"/>
+        <ellipse cx="268" cy="123" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <ellipse cx="282" cy="123" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <circle cx="266.5" cy="121" r="1.5" fill="#ffffff"/>
+        <circle cx="280.5" cy="121" r="1.5" fill="#ffffff"/>
+        <ellipse cx="264" cy="132" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <ellipse cx="286" cy="132" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M271 135 Q275 142 279 135" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="250" y="155" width="50" height="75" rx="12" fill="#10b981"/>
+        <rect x="255" y="230" width="18" height="65" rx="8" fill="#1e293b"/>
+        <rect x="277" y="230" width="18" height="65" rx="8" fill="#1e293b"/>
+        <path d="M250 170 L195 240" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Anak Merapikan &amp; Melipat Selimut Rapi ★</text>
+    `;
+  }
+  // 2. BERIBADAH & BERSYUKUR
+  else if (id === 'bi_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <circle cx="200" cy="160" r="110" fill="url(#gGoldHalo)" opacity="0.35" filter="url(#glow)"/>
+      <!-- Chibi Boy Praying hands together -->
+      <g filter="url(#sh)">
+        <path d="M170 120 Q200 85 230 120" fill="#451a03"/>
+        <circle cx="200" cy="140" r="32" fill="#fed7aa"/>
+        <!-- Peaceful curved praying eyes -->
+        <path d="M188 138 Q194 144 200 138 M204 138 Q210 144 216 138" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="186" cy="146" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <ellipse cx="214" cy="146" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M196 150 Q200 155 204 150" stroke="#b91c1c" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <rect x="175" y="175" width="50" height="65" rx="14" fill="#0284c7"/>
+        <!-- Hands pressed in prayer -->
+        <path d="M175 195 Q195 185 200 175 Q205 185 225 195" stroke="#fed7aa" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <circle cx="200" cy="182" r="8" fill="#fed7aa"/>
+      </g>
+      <!-- Lotus below -->
+      <g filter="url(#sh)">
+        <ellipse cx="200" cy="290" rx="80" ry="20" fill="#10b981" opacity="0.8"/>
+        <path d="M200 230 Q170 270 200 290 Q230 270 200 230 Z" fill="#f43f5e"/>
+        <path d="M170 250 Q155 275 190 290 Q185 265 170 250 Z" fill="#fb7185"/>
+        <path d="M230 250 Q245 275 210 290 Q215 265 230 250 Z" fill="#fb7185"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Anak Berdoa Khusyuk dengan Tangan Berkatup ★</text>
+    `;
+  } else if (id === 'bi_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <!-- Sajadah Hijau Bermotif -->
+      <g filter="url(#sh)">
+        <polygon points="120,220 280,220 330,340 70,340" fill="#059669" stroke="#34d399" stroke-width="3"/>
+        <polygon points="140,230 260,230 290,320 110,320" fill="#047857"/>
+        <circle cx="200" cy="275" r="18" fill="#fde047" opacity="0.7"/>
+      </g>
+      <!-- Siswi Mukena Berdoa -->
+      <g filter="url(#sh)">
+        <path d="M165 120 Q200 80 235 120 L245 200 Q200 215 155 200 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <ellipse cx="200" cy="150" rx="20" ry="22" fill="#fed7aa"/>
+        <path d="M190 148 Q195 153 200 148 M202 148 Q207 153 212 148" stroke="#0f172a" stroke-width="2.5" fill="none"/>
+        <ellipse cx="188" cy="155" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/><ellipse cx="214" cy="155" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+        <!-- Cupped hands in prayer -->
+        <path d="M190 190 Q200 180 210 190" stroke="#fed7aa" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <path d="M160 200 L150 260 L250 260 L240 200 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Siswi Berhijab Berdoa di Sajadah Suci ★</text>
+    `;
+  } else if (id === 'bi_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gMint)"/>
+      <circle cx="200" cy="170" r="110" fill="url(#gGoldHalo)" opacity="0.35" filter="url(#glow)"/>
+      <!-- Bunga Teratai Mekar Agung -->
+      <g filter="url(#sh)">
+        <ellipse cx="200" cy="270" rx="120" ry="28" fill="#059669"/>
+        <path d="M200 150 Q150 230 200 270 Q250 230 200 150 Z" fill="#f43f5e"/>
+        <path d="M150 190 Q130 240 180 270 Q175 220 150 190 Z" fill="#fb7185"/>
+        <path d="M250 190 Q270 240 220 270 Q225 220 250 190 Z" fill="#fb7185"/>
+        <circle cx="200" cy="225" r="16" fill="#fde047"/>
+      </g>
+      <!-- Hati Kasih Gan En -->
+      <path d="M200 90 A18 18 0 0,0 170 115 L200 145 L230 115 A18 18 0 0,0 200 90 Z" fill="#ef4444" filter="url(#sh)"/>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">★ Bunga Teratai Suci &amp; Cahaya Kasih Gan En ★</text>
+    `;
+  } else if (id === 'bi_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <rect x="50" y="240" width="300" height="100" rx="14" fill="url(#gWood)" filter="url(#sh)"/>
+      <!-- Cangkir Teh Hangat Steaming -->
+      <g filter="url(#sh)">
+        <rect x="180" y="210" width="40" height="35" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <path d="M220 220 Q230 227 220 235" stroke="#cbd5e1" stroke-width="3" fill="none"/>
+        <path d="M192 195 Q196 185 200 195 Q204 205 208 195" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+      </g>
+      <!-- Anak Berbakti Membungkuk Santun -->
+      <g filter="url(#sh)">
+        <path d="M170 100 Q200 65 230 100" fill="#451a03"/>
+        <circle cx="200" cy="120" r="28" fill="#fed7aa"/>
+        <path d="M190 120 Q195 125 200 120 M202 120 Q207 125 212 120" stroke="#0f172a" stroke-width="2.5" fill="none"/>
+        <ellipse cx="188" cy="126" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/><ellipse cx="212" cy="126" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+        <path d="M195 130 Q200 135 205 130" stroke="#b91c1c" stroke-width="2" fill="none"/>
+        <rect x="175" y="150" width="50" height="65" rx="12" fill="#4338ca"/>
+        <!-- Tangan memegang cangkir -->
+        <path d="M175 170 L185 220 M225 170 L215 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">★ Anak Berbakti Menyajikan Teh kepada Orang Tua ★</text>
+    `;
+  }
+  // 3. OLAHRAGA
+  else if (id === 'or_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPark)"/>
+      <circle cx="330" cy="70" r="35" fill="url(#gSun)" filter="url(#sh)"/>
+      <!-- Lintasan Lari -->
+      <path d="M0 270 Q200 240 400 270 L400 400 L0 400 Z" fill="#ef4444"/>
+      <path d="M0 310 Q200 280 400 310" stroke="#ffffff" stroke-width="4" stroke-dasharray="15,10" fill="none"/>
+      <!-- Anak Lari Ceria -->
+      <g filter="url(#sh)">
+        <path d="M185 100 Q215 65 245 100" fill="#451a03"/>
+        <rect x="190" y="112" width="50" height="12" rx="4" fill="#ef4444"/>
+        <circle cx="215" cy="130" r="28" fill="#fed7aa"/>
+        <ellipse cx="207" cy="128" rx="4" ry="6" fill="#0f172a"/><ellipse cx="223" cy="128" rx="4" ry="6" fill="#0f172a"/>
+        <circle cx="205.5" cy="126" r="1.8" fill="#ffffff"/><circle cx="221.5" cy="126" r="1.8" fill="#ffffff"/>
+        <ellipse cx="204" cy="136" rx="5" ry="3" fill="#fb7185" opacity="0.6"/><ellipse cx="226" cy="136" rx="5" ry="3" fill="#fb7185" opacity="0.6"/>
+        <path d="M211 138 Q215 146 219 138" stroke="#b91c1c" stroke-width="3" fill="#f43f5e"/>
+        <rect x="195" y="160" width="45" height="55" rx="12" fill="#0284c7"/>
+        <path d="M195 175 L165 195" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+        <path d="M240 175 L265 160" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+        <!-- Kaki Lari -->
+        <rect x="195" y="215" width="16" height="50" rx="8" fill="#1e293b" transform="rotate(-25 195 215)"/>
+        <rect x="220" y="215" width="16" height="50" rx="8" fill="#1e293b" transform="rotate(30 220 215)"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">★ Lari Pagi Ceria di Lapangan Hijau ★</text>
+    `;
+  } else if (id === 'or_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPark)"/>
+      <circle cx="70" cy="70" r="30" fill="url(#gSun)"/>
+      <path d="M0 270 Q200 250 400 270 L400 400 L0 400 Z" fill="#22c55e"/>
+      <!-- Bola Sepak Melayang -->
+      <g filter="url(#sh)">
+        <circle cx="280" cy="180" r="30" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+        <polygon points="280,165 292,175 287,190 273,190 268,175" fill="#0f172a"/>
+      </g>
+      <!-- Anak Menendang Bola -->
+      <g filter="url(#sh)">
+        <path d="M140 110 Q165 75 190 110" fill="#451a03"/>
+        <circle cx="165" cy="130" r="26" fill="#fed7aa"/>
+        <ellipse cx="158" cy="128" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="172" cy="128" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="156.5" cy="126" r="1.5" fill="#ffffff"/><circle cx="170.5" cy="126" r="1.5" fill="#ffffff"/>
+        <ellipse cx="155" cy="135" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="175" cy="135" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M161 138 Q165 145 169 138" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="145" y="160" width="45" height="50" rx="10" fill="#ea580c"/>
+        <!-- Kaki menendang ke depan -->
+        <path d="M170 210 L230 200" stroke="#fed7aa" stroke-width="12" stroke-linecap="round"/>
+        <path d="M155 210 L150 270" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#c2410c" text-anchor="middle">★ Bermain Sepak Bola di Bawah Mentari ★</text>
+    `;
+  } else if (id === 'or_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <path d="M0 260 Q200 240 400 260 L400 400 L0 400 Z" fill="#10b981"/>
+      <!-- Siswi Senam Ceria -->
+      <g filter="url(#sh)">
+        <circle cx="175" cy="120" r="12" fill="#451a03"/><circle cx="225" cy="120" r="12" fill="#451a03"/>
+        <circle cx="200" cy="135" r="28" fill="#fed7aa"/>
+        <ellipse cx="193" cy="133" rx="4" ry="6" fill="#0f172a"/><ellipse cx="207" cy="133" rx="4" ry="6" fill="#0f172a"/>
+        <circle cx="191.5" cy="131" r="1.8" fill="#ffffff"/><circle cx="205.5" cy="131" r="1.8" fill="#ffffff"/>
+        <ellipse cx="189" cy="141" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="211" cy="141" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M196 144 Q200 152 204 144" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="180" y="165" width="45" height="55" rx="12" fill="#f59e0b"/>
+        <!-- Kedua tangan rentang atas senam -->
+        <path d="M180 180 L140 135" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+        <path d="M225 180 L265 135" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+        <rect x="185" y="220" width="15" height="60" rx="7" fill="#1e293b"/>
+        <rect x="205" y="220" width="15" height="60" rx="7" fill="#1e293b"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">★ Senam Pagi Anak Indonesia Bugar ★</text>
+    `;
+  } else if (id === 'or_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPark)"/>
+      <!-- Sepeda Ceria -->
+      <g filter="url(#sh)">
+        <circle cx="130" cy="280" r="35" fill="none" stroke="#0f172a" stroke-width="5"/>
+        <circle cx="270" cy="280" r="35" fill="none" stroke="#0f172a" stroke-width="5"/>
+        <path d="M130 280 L180 230 L240 230 L270 280 M180 230 L210 280 L270 280" stroke="#ef4444" stroke-width="5" fill="none"/>
+        <rect x="160" y="215" width="35" height="15" rx="6" fill="#1e293b"/>
+      </g>
+      <!-- Anak Memakai Helm Bersepeda -->
+      <g filter="url(#sh)">
+        <path d="M175 110 Q205 75 235 110" fill="#3b82f6"/>
+        <circle cx="205" cy="135" r="26" fill="#fed7aa"/>
+        <ellipse cx="198" cy="133" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="212" cy="133" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="196.5" cy="131" r="1.5" fill="#ffffff"/><circle cx="210.5" cy="131" r="1.5" fill="#ffffff"/>
+        <ellipse cx="195" cy="141" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="215" cy="141" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M201 144 Q205 150 209 144" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="185" y="165" width="45" height="55" rx="10" fill="#10b981"/>
+        <path d="M225 180 L245 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Bersepeda Santai di Taman Sekolah ★</text>
+    `;
+  }
+  // 4. MAKAN SEHAT BERGIZI
+  else if (id === 'ms_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <rect x="0" y="240" width="400" height="160" fill="#fbbf24"/>
+      <!-- Piring Besar Putih -->
+      <ellipse cx="200" cy="250" rx="130" ry="65" fill="#ffffff" stroke="#cbd5e1" stroke-width="4" filter="url(#sh)"/>
+      <circle cx="160" cy="245" r="22" fill="#22c55e"/><circle cx="180" cy="235" r="24" fill="#16a34a"/>
+      <!-- Wortel -->
+      <polygon points="215,230 250,255 240,260" fill="#ea580c"/>
+      <!-- Apel Merah -->
+      <circle cx="235" cy="240" r="22" fill="#ef4444"/>
+      <!-- Siswi Ceria Senyum di Belakang Meja -->
+      <g filter="url(#sh)">
+        <circle cx="175" cy="90" r="12" fill="#451a03"/><circle cx="225" cy="90" r="12" fill="#451a03"/>
+        <circle cx="200" cy="110" r="28" fill="#fed7aa"/>
+        <ellipse cx="193" cy="108" rx="4" ry="6" fill="#0f172a"/><ellipse cx="207" cy="108" rx="4" ry="6" fill="#0f172a"/>
+        <circle cx="191.5" cy="106" r="1.8" fill="#ffffff"/><circle cx="205.5" cy="106" r="1.8" fill="#ffffff"/>
+        <ellipse cx="189" cy="116" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="211" cy="116" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M196 119 Q200 127 204 119" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="180" y="140" width="45" height="60" rx="12" fill="#ec4899"/>
+        <!-- Garpu di tangan -->
+        <path d="M225 155 L245 190" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+        <line x1="245" y1="180" x2="245" y2="200" stroke="#94a3b8" stroke-width="3"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">★ Piring Sayur Brokoli, Wortel &amp; Apel Merah ★</text>
+    `;
+  } else if (id === 'ms_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <rect x="0" y="240" width="400" height="160" fill="#fde68a"/>
+      <!-- Gelas Susu Tinggi -->
+      <g filter="url(#sh)">
+        <rect x="250" y="180" width="45" height="80" rx="8" fill="#e2e8f0"/>
+        <rect x="253" y="195" width="39" height="62" rx="6" fill="#ffffff"/>
+      </g>
+      <!-- Buah Pisang & Jeruk -->
+      <circle cx="150" cy="250" r="25" fill="#f97316" filter="url(#sh)"/>
+      <path d="M110 240 Q130 270 170 250" stroke="#facc15" stroke-width="16" stroke-linecap="round" fill="none" filter="url(#sh)"/>
+      <!-- Anak Minum Susu -->
+      <g filter="url(#sh)">
+        <path d="M185 85 Q215 50 245 85" fill="#451a03"/>
+        <circle cx="215" cy="110" r="28" fill="#fed7aa"/>
+        <ellipse cx="207" cy="108" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="223" cy="108" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="205.5" cy="106" r="1.5" fill="#ffffff"/><circle cx="221.5" cy="106" r="1.5" fill="#ffffff"/>
+        <!-- Kumis Susu Putih Lucu -->
+        <ellipse cx="215" cy="116" rx="8" ry="3" fill="#ffffff" opacity="0.9"/>
+        <path d="M211 119 Q215 125 219 119" stroke="#b91c1c" stroke-width="2" fill="#f43f5e"/>
+        <rect x="195" y="140" width="45" height="60" rx="12" fill="#0284c7"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Gelas Susu Segar &amp; Mangkuk Buah Bersih ★</text>
+    `;
+  } else if (id === 'ms_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPinkRoom)"/>
+      <rect x="30" y="240" width="340" height="130" rx="16" fill="url(#gWood)" filter="url(#sh)"/>
+      <!-- Mangkuk Sup Hangat -->
+      <g filter="url(#sh)">
+        <ellipse cx="200" cy="245" rx="55" ry="25" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+        <ellipse cx="200" cy="243" rx="45" ry="18" fill="#f59e0b"/>
+      </g>
+      <!-- Siswa Duduk Rapi Santun -->
+      <g filter="url(#sh)">
+        <path d="M170 80 Q200 45 230 80" fill="#451a03"/>
+        <circle cx="200" cy="105" r="28" fill="#fed7aa"/>
+        <ellipse cx="193" cy="103" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="207" cy="103" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="191.5" cy="101" r="1.5" fill="#ffffff"/><circle cx="205.5" cy="101" r="1.5" fill="#ffffff"/>
+        <ellipse cx="189" cy="111" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="211" cy="111" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M196 114 Q200 121 204 114" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="180" y="135" width="45" height="65" rx="12" fill="#10b981"/>
+        <path d="M180 155 L160 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+        <path d="M225 155 L240 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Anak Duduk Santun Makan dengan Baik ★</text>
+    `;
+  } else if (id === 'ms_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <rect x="40" y="190" width="320" height="150" rx="20" fill="#f43f5e" stroke="#ffffff" stroke-width="5" filter="url(#sh)"/>
+      <!-- Isi Bento Lucu: Onigiri Senyum -->
+      <g filter="url(#sh)">
+        <polygon points="120,220 160,280 80,280" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="105" y="260" width="30" height="20" rx="3" fill="#0f172a"/>
+        <circle cx="112" cy="245" r="2" fill="#0f172a"/><circle cx="128" cy="245" r="2" fill="#0f172a"/>
+      </g>
+      <circle cx="200" cy="245" r="20" fill="#fde047" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="250" cy="240" r="18" fill="#22c55e"/><circle cx="280" cy="245" r="18" fill="#ef4444"/>
+      <!-- Anak Acungkan Jempol -->
+      <g filter="url(#sh)">
+        <path d="M175 60 Q205 25 235 60" fill="#451a03"/>
+        <circle cx="205" cy="85" r="28" fill="#fed7aa"/>
+        <ellipse cx="198" cy="83" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="212" cy="83" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="196.5" cy="81" r="1.5" fill="#ffffff"/><circle cx="210.5" cy="81" r="1.5" fill="#ffffff"/>
+        <ellipse cx="194" cy="91" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="216" cy="91" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M201 94 Q205 101 209 94" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="185" y="115" width="45" height="50" rx="10" fill="#3b82f6"/>
+        <!-- Jempol jempolan -->
+        <circle cx="250" cy="130" r="10" fill="#fed7aa"/>
+        <rect x="246" y="115" width="8" height="18" rx="4" fill="#fed7aa"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">★ Kotak Bekal 4 Sehat 5 Sempurna ★</text>
+    `;
+  }
+  // 5. GEMAR BELAJAR & MEMBACA
+  else if (id === 'gb_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gLavender)"/>
+      <circle cx="200" cy="180" r="120" fill="#ffffff" opacity="0.4"/>
+      <!-- Buku Terbuka Berkilau -->
+      <g filter="url(#sh)">
+        <path d="M120 230 Q200 215 280 230 L275 295 Q200 280 125 295 Z" fill="#ffffff" stroke="#8b5cf6" stroke-width="3"/>
+        <line x1="200" y1="220" x2="200" y2="290" stroke="#8b5cf6" stroke-width="3"/>
+      </g>
+      <text x="150" y="255" font-size="20">⭐</text><text x="235" y="255" font-size="20">✨</text>
+      <!-- Siswi Membaca Dongeng Khusyuk -->
+      <g filter="url(#sh)">
+        <path d="M170 85 Q200 50 230 85" fill="#451a03"/>
+        <circle cx="200" cy="110" r="28" fill="#fed7aa"/>
+        <ellipse cx="193" cy="108" rx="4" ry="6" fill="#0f172a"/><ellipse cx="207" cy="108" rx="4" ry="6" fill="#0f172a"/>
+        <circle cx="191.5" cy="106" r="1.8" fill="#ffffff"/><circle cx="205.5" cy="106" r="1.8" fill="#ffffff"/>
+        <ellipse cx="189" cy="116" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="211" cy="116" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M196 119 Q200 127 204 119" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="175" y="140" width="50" height="65" rx="12" fill="#6d28d9"/>
+        <path d="M175 160 L140 230 M225 160 L260 230" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#581c87" text-anchor="middle">★ Membaca Buku Dongeng Cerita Bergambar ★</text>
+    `;
+  } else if (id === 'gb_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <!-- Rak Buku Perpustakaan -->
+      <rect x="40" y="50" width="220" height="260" rx="14" fill="url(#gWood)" filter="url(#sh)"/>
+      <rect x="55" y="65" width="20" height="65" rx="3" fill="#ef4444"/><rect x="80" y="65" width="24" height="65" rx="3" fill="#3b82f6"/>
+      <rect x="110" y="65" width="22" height="65" rx="3" fill="#10b981"/><rect x="140" y="65" width="26" height="65" rx="3" fill="#f59e0b"/>
+      <rect x="175" y="65" width="22" height="65" rx="3" fill="#8b5cf6"/><rect x="205" y="65" width="24" height="65" rx="3" fill="#ec4899"/>
+      <rect x="55" y="150" width="22" height="65" rx="3" fill="#3b82f6"/><rect x="85" y="150" width="24" height="65" rx="3" fill="#10b981"/>
+      <rect x="115" y="150" width="26" height="65" rx="3" fill="#f43f5e"/><rect x="150" y="150" width="20" height="65" rx="3" fill="#06b6d4"/>
+      <!-- Siswa Mengambil Buku di Rak -->
+      <g filter="url(#sh)">
+        <path d="M265 110 Q295 75 325 110" fill="#451a03"/>
+        <circle cx="295" cy="130" r="26" fill="#fed7aa"/>
+        <ellipse cx="288" cy="128" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="302" cy="128" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="286.5" cy="126" r="1.5" fill="#ffffff"/><circle cx="300.5" cy="126" r="1.5" fill="#ffffff"/>
+        <ellipse cx="285" cy="136" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="305" cy="136" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M291 139 Q295 146 299 139" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="275" y="160" width="45" height="70" rx="12" fill="#0284c7"/>
+        <!-- Tangan menggapai buku -->
+        <path d="M275 175 L210 160" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Rak Buku Perpustakaan Warna-Warni ★</text>
+    `;
+  } else if (id === 'gb_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <rect x="30" y="230" width="340" height="130" rx="16" fill="url(#gWood)" filter="url(#sh)"/>
+      <!-- Lampu Belajar Kuning Menyala -->
+      <g filter="url(#sh)">
+        <rect x="60" y="210" width="30" height="20" rx="5" fill="#1e293b"/>
+        <path d="M75 210 Q65 140 100 120" stroke="#1e293b" stroke-width="6" fill="none"/>
+        <path d="M100 110 L135 130 L115 145 Z" fill="#facc15"/>
+        <polygon points="120,135 180,240 80,240" fill="#fef08a" opacity="0.35"/>
+      </g>
+      <!-- Buku Tulis & Pensil -->
+      <rect x="140" y="240" width="80" height="50" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="145" y1="255" x2="215" y2="255" stroke="#94a3b8" stroke-width="2"/>
+      <line x1="145" y1="270" x2="205" y2="270" stroke="#94a3b8" stroke-width="2"/>
+      <!-- Siswa Menulis Cermat -->
+      <g filter="url(#sh)">
+        <path d="M225 100 Q255 65 285 100" fill="#451a03"/>
+        <circle cx="255" cy="120" r="28" fill="#fed7aa"/>
+        <ellipse cx="248" cy="118" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="262" cy="118" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="246.5" cy="116" r="1.5" fill="#ffffff"/><circle cx="260.5" cy="116" r="1.5" fill="#ffffff"/>
+        <ellipse cx="245" cy="126" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="265" cy="126" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M251 129 Q255 136 259 129" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="235" y="150" width="50" height="65" rx="12" fill="#10b981"/>
+        <path d="M235 170 L195 240" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Meja Belajar Rapi dengan Lampu Belajar ★</text>
+    `;
+  } else if (id === 'gb_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <rect x="30" y="240" width="340" height="120" rx="16" fill="#1e293b" filter="url(#sh)"/>
+      <!-- Laptop Layar Coding -->
+      <g filter="url(#sh)">
+        <rect x="140" y="170" width="120" height="75" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="148" y="178" width="104" height="58" rx="4" fill="#0284c7"/>
+        <rect x="155" y="185" width="40" height="8" rx="2" fill="#facc15"/>
+        <rect x="155" y="198" width="60" height="8" rx="2" fill="#4ade80"/>
+        <rect x="155" y="211" width="50" height="8" rx="2" fill="#f43f5e"/>
+        <polygon points="120,245 280,245 290,260 110,260" fill="#334155"/>
+      </g>
+      <!-- Sahabat Robot Cilik -->
+      <g filter="url(#sh)">
+        <rect x="50" y="140" width="50" height="50" rx="12" fill="#ffffff" stroke="#38bdf8" stroke-width="3"/>
+        <circle cx="65" cy="165" r="5" fill="#0284c7"/><circle cx="85" cy="165" r="5" fill="#0284c7"/>
+        <path d="M70 178 Q75 183 80 178" stroke="#0284c7" stroke-width="2" fill="none"/>
+        <line x1="75" y1="140" x2="75" y2="125" stroke="#38bdf8" stroke-width="3"/>
+        <circle cx="75" cy="122" r="5" fill="#facc15"/>
+      </g>
+      <!-- Siswa Coding Ceria -->
+      <g filter="url(#sh)">
+        <path d="M285 110 Q315 75 345 110" fill="#451a03"/>
+        <circle cx="315" cy="130" r="26" fill="#fed7aa"/>
+        <ellipse cx="308" cy="128" rx="4" ry="5.5" fill="#0f172a"/><ellipse cx="322" cy="128" rx="4" ry="5.5" fill="#0f172a"/>
+        <circle cx="306.5" cy="126" r="1.5" fill="#ffffff"/><circle cx="320.5" cy="126" r="1.5" fill="#ffffff"/>
+        <ellipse cx="305" cy="136" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/><ellipse cx="325" cy="136" rx="5" ry="3" fill="#f43f5e" opacity="0.6"/>
+        <path d="M311 139 Q315 146 319 139" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="295" y="160" width="45" height="60" rx="12" fill="#8b5cf6"/>
+        <path d="M295 180 L260 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0284c7" text-anchor="middle">★ Belajar Koding Komputer Bersama Robot ★</text>
+    `;
+  }
+  // 6. BERMASYARAKAT & HIDUP RUKUN
+  else if (id === 'rk_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPark)"/>
+      <circle cx="200" cy="80" r="70" fill="#ffffff" opacity="0.3"/>
+      <!-- Bangku Taman Kayu -->
+      <rect x="40" y="240" width="320" height="30" rx="8" fill="url(#gWood)" filter="url(#sh)"/>
+      <rect x="70" y="270" width="16" height="60" fill="#78350f"/><rect x="314" y="270" width="16" height="60" fill="#78350f"/>
+      <!-- Dua Sahabat Berbagi Makanan -->
+      <g filter="url(#sh)">
+        <!-- Sahabat 1 (Kiri) -->
+        <circle cx="140" cy="140" r="26" fill="#fed7aa"/>
+        <path d="M115 125 Q140 90 165 125" fill="#451a03"/>
+        <ellipse cx="134" cy="138" rx="3.5" ry="5.5" fill="#0f172a"/><ellipse cx="148" cy="138" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <circle cx="132.5" cy="136" r="1.5" fill="#ffffff"/><circle cx="146.5" cy="136" r="1.5" fill="#ffffff"/>
+        <ellipse cx="131" cy="146" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/><ellipse cx="151" cy="146" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+        <path d="M137 149 Q141 155 145 149" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="120" y="170" width="45" height="60" rx="12" fill="#0284c7"/>
+        <path d="M150 190 L185 200" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+        <!-- Sahabat 2 (Kanan) -->
+        <circle cx="260" cy="140" r="26" fill="#fed7aa"/>
+        <circle cx="235" cy="120" r="11" fill="#451a03"/><circle cx="285" cy="120" r="11" fill="#451a03"/>
+        <ellipse cx="252" cy="138" rx="3.5" ry="5.5" fill="#0f172a"/><ellipse cx="266" cy="138" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <circle cx="250.5" cy="136" r="1.5" fill="#ffffff"/><circle cx="264.5" cy="136" r="1.5" fill="#ffffff"/>
+        <ellipse cx="249" cy="146" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/><ellipse cx="269" cy="146" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+        <path d="M255 149 Q259 155 263 149" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="235" y="170" width="45" height="60" rx="12" fill="#ec4899"/>
+        <path d="M245 190 L215 200" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <!-- Kue & Apel di Tengah Berbagi -->
+      <circle cx="200" cy="200" r="14" fill="#ef4444" filter="url(#sh)"/>
+      <path d="M200 90 A14 14 0 0,0 175 110 L200 135 L225 110 A14 14 0 0,0 200 90 Z" fill="#f43f5e"/>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">★ Dua Sahabat Berbagi Bekal Kue &amp; Buah ★</text>
+    `;
+  } else if (id === 'rk_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <rect x="0" y="260" width="400" height="140" fill="#f1f5f9"/>
+      <!-- Murid 1 Menyapu Bersih -->
+      <g filter="url(#sh)">
+        <path d="M95 105 Q125 70 155 105" fill="#451a03"/>
+        <circle cx="125" cy="125" r="26" fill="#fed7aa"/>
+        <ellipse cx="118" cy="123" rx="3.5" ry="5.5" fill="#0f172a"/><ellipse cx="132" cy="123" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <circle cx="116.5" cy="121" r="1.5" fill="#ffffff"/><circle cx="130.5" cy="121" r="1.5" fill="#ffffff"/>
+        <ellipse cx="115" cy="131" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/><ellipse cx="135" cy="131" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+        <path d="M121 134 Q125 140 129 134" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="105" y="155" width="45" height="60" rx="10" fill="#10b981"/>
+        <!-- Sapu lidi / ijuk -->
+        <line x1="135" y1="175" x2="160" y2="280" stroke="#78350f" stroke-width="5"/>
+        <polygon points="145,280 175,280 160,260" fill="#d97706"/>
+      </g>
+      <!-- Murid 2 Memegang Pengki Serokan -->
+      <g filter="url(#sh)">
+        <path d="M245 105 Q275 70 305 105" fill="#451a03"/>
+        <circle cx="275" cy="125" r="26" fill="#fed7aa"/>
+        <ellipse cx="268" cy="123" rx="3.5" ry="5.5" fill="#0f172a"/><ellipse cx="282" cy="123" rx="3.5" ry="5.5" fill="#0f172a"/>
+        <circle cx="266.5" cy="121" r="1.5" fill="#ffffff"/><circle cx="280.5" cy="121" r="1.5" fill="#ffffff"/>
+        <ellipse cx="265" cy="131" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/><ellipse cx="285" cy="131" rx="4" ry="2.5" fill="#f43f5e" opacity="0.6"/>
+        <path d="M271 134 Q275 140 279 134" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="255" y="155" width="45" height="60" rx="10" fill="#3b82f6"/>
+        <!-- Pengki biru -->
+        <rect x="210" y="260" width="35" height="25" rx="4" fill="#0284c7"/>
+        <line x1="227" y1="260" x2="255" y2="185" stroke="#0284c7" stroke-width="4"/>
+      </g>
+      <text x="180" y="240" font-size="20">✨</text><text x="320" y="220" font-size="20">✨</text>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Gotong Royong Membersihkan Kelas Bersama ★</text>
+    `;
+  } else if (id === 'rk_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gWarmRoom)"/>
+      <!-- Dua Siswa Saling Menunduk Santun Gan En -->
+      <g filter="url(#sh)">
+        <circle cx="140" cy="130" r="26" fill="#fed7aa"/>
+        <path d="M115 110 Q140 75 165 110" fill="#451a03"/>
+        <ellipse cx="134" cy="128" rx="3.5" ry="5" fill="#0f172a"/><ellipse cx="148" cy="128" rx="3.5" ry="5" fill="#0f172a"/>
+        <path d="M137 136 Q141 142 145 136" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="120" y="160" width="45" height="65" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="125" y="225" width="35" height="50" rx="6" fill="#ef4444"/>
+        <path d="M140 180 L160 195" stroke="#fed7aa" stroke-width="8" stroke-linecap="round"/>
+      </g>
+      <g filter="url(#sh)">
+        <circle cx="260" cy="130" r="26" fill="#fed7aa"/>
+        <path d="M235 110 Q260 75 285 110" fill="#451a03"/>
+        <ellipse cx="252" cy="128" rx="3.5" ry="5" fill="#0f172a"/><ellipse cx="266" cy="128" rx="3.5" ry="5" fill="#0f172a"/>
+        <path d="M255 136 Q259 142 263 136" stroke="#b91c1c" stroke-width="2.5" fill="#f43f5e"/>
+        <rect x="235" y="160" width="45" height="65" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="240" y="225" width="35" height="50" rx="6" fill="#ef4444"/>
+        <path d="M260 180 L240 195" stroke="#fed7aa" stroke-width="8" stroke-linecap="round"/>
+      </g>
+      <!-- Hati Senyum di Tengah -->
+      <circle cx="200" cy="160" r="18" fill="#fde047" filter="url(#sh)"/>
+      <path d="M200 135 L204 144 L214 144 L206 150 L209 160 L200 154 L191 160 L194 150 L186 144 L196 144 Z" fill="#ea580c"/>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">★ Saling Menyapa Santun &amp; Senyum Ramah ★</text>
+    `;
+  } else if (id === 'rk_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gPark)"/>
+      <path d="M50 160 Q200 80 350 160" stroke="#f43f5e" stroke-width="6" fill="none" opacity="0.4"/>
+      <path d="M50 168 Q200 88 350 168" stroke="#fde047" stroke-width="6" fill="none" opacity="0.4"/>
+      <path d="M50 176 Q200 96 350 176" stroke="#38bdf8" stroke-width="6" fill="none" opacity="0.4"/>
+      <!-- Tiga Sahabat Bergandengan Tangan -->
+      <g filter="url(#sh)">
+        <!-- Sahabat Kiri -->
+        <circle cx="100" cy="180" r="24" fill="#fed7aa"/>
+        <circle cx="100" cy="180" r="4" fill="#0f172a"/>
+        <rect x="80" y="210" width="40" height="50" rx="10" fill="#0284c7"/>
+        <!-- Sahabat Tengah (Hijab) -->
+        <path d="M175 140 Q200 110 225 140 L235 200 Q200 215 165 200 Z" fill="#e9d5ff"/>
+        <circle cx="200" cy="165" r="22" fill="#fed7aa"/>
+        <rect x="180" y="200" width="45" height="55" rx="10" fill="#c084fc"/>
+        <!-- Sahabat Kanan -->
+        <circle cx="300" cy="180" r="24" fill="#fed7aa"/>
+        <rect x="280" y="210" width="40" height="50" rx="10" fill="#f43f5e"/>
+        <!-- Tangan Bergandengan -->
+        <path d="M120 225 L180 220 M225 220 L280 225" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">★ Lingkaran Sahabat Bergandengan Tangan ★</text>
+    `;
+  }
+  // 7. TIDUR TEPAT WAKTU
+  else if (id === 'tt_1') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gNight)"/>
+      <g filter="url(#sh)">
+        <rect x="40" y="45" width="110" height="140" rx="14" fill="#020617" stroke="#475569" stroke-width="5"/>
+        <circle cx="95" cy="105" r="28" fill="#fde047"/>
+        <circle cx="107" cy="98" r="24" fill="#020617"/>
+        <text x="65" y="85" font-size="14" fill="#ffffff">✨</text>
+        <text x="125" y="160" font-size="14" fill="#ffffff">⭐</text>
+      </g>
+      <g filter="url(#sh)">
+        <circle cx="330" cy="95" r="30" fill="#f8fafc" stroke="#1e293b" stroke-width="3"/>
+        <path d="M330 95 L318 102 M330 95 L330 115" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <!-- Kasur & Anak Tidur Pulas -->
+      <rect x="120" y="180" width="250" height="80" rx="14" fill="#312e81" filter="url(#sh)"/>
+      <rect x="140" y="160" width="85" height="40" rx="14" fill="#ffffff"/>
+      <circle cx="190" cy="165" r="24" fill="#fed7aa"/>
+      <path d="M175 155 Q190 140 205 155" fill="#1e1b4b"/>
+      <path d="M182 168 Q187 172 192 168 M196 168 Q201 172 206 168" stroke="#0f172a" stroke-width="2.5" fill="none"/>
+      <!-- z Z Z -->
+      <text x="225" y="140" font-family="Fredoka, sans-serif" font-size="16" font-weight="900" fill="#a5b4fc">z</text>
+      <text x="240" y="125" font-family="Fredoka, sans-serif" font-size="20" font-weight="900" fill="#c7d2fe">Z</text>
+      <text x="258" y="110" font-family="Fredoka, sans-serif" font-size="24" font-weight="900" fill="#e0e7ff">Z</text>
+      <!-- Selimut Bintang Malam -->
+      <g filter="url(#sh)">
+        <path d="M120 200 Q240 185 350 200 L350 340 Q240 360 120 340 Z" fill="#3730a3"/>
+        <text x="160" y="250" font-size="18">⭐</text><text x="230" y="270" font-size="22">🌙</text><text x="300" y="250" font-size="18">⭐</text>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">★ Tidur Pulas di Bawah Selimut Bintang ★</text>
+    `;
+  } else if (id === 'tt_2') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gNight)"/>
+      <!-- Jendela Malam Senyum -->
+      <g filter="url(#sh)">
+        <rect x="80" y="50" width="240" height="240" rx="24" fill="#090d16" stroke="#475569" stroke-width="8"/>
+        <!-- Bulan Sabit Tersenyum Hangat -->
+        <circle cx="200" cy="150" r="60" fill="#fde047" filter="url(#glow)"/>
+        <circle cx="225" cy="135" r="52" fill="#090d16"/>
+        <circle cx="185" cy="148" r="4" fill="#0f172a"/>
+        <path d="M178 160 Q188 170 196 160" stroke="#b91c1c" stroke-width="3" fill="none"/>
+      </g>
+      <text x="110" y="100" font-size="20">✨</text><text x="280" y="110" font-size="24">⭐</text><text x="120" y="230" font-size="24">⭐</text><text x="270" y="240" font-size="20">✨</text>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#e0e7ff" text-anchor="middle">★ Jendela Malam Tenang &amp; Bulan Sabit Senyum ★</text>
+    `;
+  } else if (id === 'tt_3') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gNight)"/>
+      <!-- Jam Dinding 20:30 -->
+      <g filter="url(#sh)">
+        <circle cx="200" cy="130" r="75" fill="#f8fafc" stroke="#cbd5e1" stroke-width="6"/>
+        <line x1="200" y1="130" x2="160" y2="155" stroke="#0f172a" stroke-width="6" stroke-linecap="round"/>
+        <line x1="200" y1="130" x2="200" y2="185" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="200" cy="130" r="6" fill="#0f172a"/>
+      </g>
+      <rect x="120" y="215" width="160" height="36" rx="10" fill="#ffffff" filter="url(#sh)"/>
+      <text x="200" y="240" font-family="Fredoka, sans-serif" font-size="18" font-weight="900" fill="#4338ca" text-anchor="middle">20 : 30 MALAM</text>
+      <!-- Anak Menguap Siap Tidur -->
+      <g filter="url(#sh)">
+        <circle cx="200" cy="290" r="28" fill="#fed7aa"/>
+        <path d="M175 270 Q200 240 225 270" fill="#1e1b4b"/>
+        <!-- Menguap Bulat -->
+        <circle cx="200" cy="298" r="8" fill="#b91c1c"/>
+      </g>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#818cf8" text-anchor="middle">★ Jam Dinding Pukul 20:30 (Tidak Begadang) ★</text>
+    `;
+  } else if (id === 'tt_4') {
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gNight)"/>
+      <!-- Lampu Tidur Meja Temaram -->
+      <g filter="url(#sh)">
+        <polygon points="70,180 130,180 115,130 85,130" fill="#fde047" filter="url(#glow)"/>
+        <rect x="96" y="180" width="8" height="40" fill="#d97706"/>
+        <rect x="85" y="220" width="30" height="15" rx="4" fill="#78350f"/>
+        <circle cx="100" cy="155" r="50" fill="#fef08a" opacity="0.25"/>
+      </g>
+      <!-- Kasur & Boneka Beruang Peluk -->
+      <rect x="130" y="180" width="240" height="100" rx="16" fill="#312e81" filter="url(#sh)"/>
+      <circle cx="200" cy="170" r="26" fill="#fed7aa"/>
+      <path d="M185 160 Q200 145 215 160" fill="#1e1b4b"/>
+      <path d="M192 172 Q197 176 202 172 M206 172 Q211 176 216 172" stroke="#0f172a" stroke-width="2.5" fill="none"/>
+      <!-- Boneka Teddy Bear Coklat -->
+      <circle cx="245" cy="185" r="20" fill="#b45309" filter="url(#sh)"/>
+      <circle cx="235" cy="170" r="7" fill="#78350f"/><circle cx="255" cy="170" r="7" fill="#78350f"/>
+      <circle cx="245" cy="188" r="8" fill="#fed7aa"/>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#fde047" text-anchor="middle">★ Lampu Tidur Temaram Hangat &amp; Damai ★</text>
+    `;
+  } else {
+    // Default Fallback Vektor Bersih
+    body = `
+      <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
+      <circle cx="200" cy="160" r="80" fill="#ffffff" opacity="0.8" filter="url(#sh)"/>
+      <text x="200" y="180" font-size="64" text-anchor="middle">🎨</text>
+      <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">★ Ilustrasi Kartun Edukasi Sopan ★</text>
+    `;
+  }
+
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+      ${defs}
+      ${body}
+    </svg>
+  `;
 }
 
-function dropP2ItemTo(targetWadah) {
-  if (!state.p2SelectedItem) {
-    showToast('Pilih salah satu komponen di sebelah kiri terlebih dahulu!', 'info');
+// DAPATKAN DATA URL KARTUN DENGAN KUALITAS VEKTOR TAJAM
+function dapatkanDataUrlKartun(item) {
+  if (item.dataUrl) return item.dataUrl;
+  const svgStr = buatSvgKartunKatalog(item.id, item.title, item.habitKey);
+  item.dataUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgStr);
+  return item.dataUrl;
+}
+
+// PENCARIAN ONLINE LIVE WIKIMEDIA COMMONS & KOLEKSI ILUSTRASI ARTIS
+let liveOnlineResultsCache = {};
+let isSearchingOnline = false;
+
+// Kamus Diksi Cerdas (Indonesian to English) Khusus Ilustrasi Kartun Karakter Anak
+const DIKSI_TERJEMAHAN_WIKIMEDIA = {
+  'semua': 'children storybook cartoon illustration',
+  'anak': 'cute elementary student cartoon',
+  'siswa': 'school children cartoon illustration',
+  'bangun pagi': 'child waking up bed cartoon',
+  'bangun': 'child wake up morning cartoon',
+  'tidur': 'child sleeping bed cartoon',
+  'tidur tepat': 'child sleeping peaceful cartoon',
+  'tidur cepat': 'child bedtime sleeping cartoon',
+  'weker': 'alarm clock morning cartoon',
+  'beribadah': 'meditating cartoon kid OR child praying cartoon',
+  'doa': 'child praying cartoon illustration',
+  'sholat': 'child praying cartoon illustration',
+  'syukur': 'child gratitude praying cartoon',
+  'gan en': 'meditating cartoon kid',
+  'olahraga': 'children sports running cartoon',
+  'lari': 'boy running exercise cartoon',
+  'bola': 'boy playing soccer football cartoon',
+  'senam': 'girl exercise stretching cartoon',
+  'sepeda': 'child riding bicycle cartoon',
+  'makan': 'child eating food cartoon',
+  'makan sehat': 'child eating fruits vegetables cartoon',
+  'sayur': 'vegetables fruits food cartoon',
+  'buah': 'fresh fruit cartoon',
+  'susu': 'child drinking milk cartoon',
+  'bekal': 'lunch box bento cartoon',
+  'belajar': 'child reading book cartoon',
+  'gemar belajar': 'child reading book cartoon',
+  'membaca': 'child reading storybook cartoon',
+  'buku': 'child reading book cartoon',
+  'perpustakaan': 'library books cartoon',
+  'koding': 'child using computer laptop cartoon',
+  'komputer': 'child using computer laptop cartoon',
+  'robot': 'cute friendly helper robot cartoon',
+  'rukun': 'children friendship cartoon',
+  'hidup rukun': 'children hugging friends cartoon',
+  'rukun berbagi': 'children sharing friends cartoon',
+  'berbagi': 'children sharing cartoon',
+  'teman': 'children friends cartoon',
+  'sahabat': 'children friendship cartoon',
+  'gotong royong': 'children cleaning classroom cartoon',
+  'sapu': 'broom cleaning cartoon',
+  'sekolah': 'elementary school children cartoon'
+};
+
+function dapatkanItemKartunById(kartunId) {
+  let item = KATALOG_KARTUN_7KEBIASAAN.find(k => k.id === kartunId);
+  if (!item && liveOnlineResultsCache) {
+    for (const key in liveOnlineResultsCache) {
+      const found = liveOnlineResultsCache[key]?.find(k => k.id === kartunId);
+      if (found) { item = found; break; }
+    }
+  }
+  return item;
+}
+
+async function cariKartunOnlineLive(query) {
+  if (!query || query.trim().length < 2) return [];
+  const cleanQ = query.trim().toLowerCase();
+  if (liveOnlineResultsCache[cleanQ]) return liveOnlineResultsCache[cleanQ];
+
+  // Cari terjemahan cerdas untuk query
+  let searchKeyword = DIKSI_TERJEMAHAN_WIKIMEDIA[cleanQ];
+  if (!searchKeyword) {
+    for (const k in DIKSI_TERJEMAHAN_WIKIMEDIA) {
+      if (cleanQ.includes(k)) {
+        searchKeyword = DIKSI_TERJEMAHAN_WIKIMEDIA[k];
+        break;
+      }
+    }
+  }
+  if (!searchKeyword) {
+    searchKeyword = `cartoon children ${cleanQ}`;
+  }
+
+  isSearchingOnline = true;
+  try {
+    const endpoint = `https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch=filetype:bitmap|svg+${encodeURIComponent(searchKeyword)}&gsrnamespace=6&prop=imageinfo&iiprop=url|thumbnail&iiurlwidth=400&gsrlimit=20&origin=*`;
+    const resp = await fetch(endpoint);
+    const data = await resp.json();
+    if (!data.query || !data.query.pages) return [];
+    const pages = Object.values(data.query.pages);
+    const results = pages.filter(p => p.imageinfo && p.imageinfo[0]).map(p => {
+      const info = p.imageinfo[0];
+      const titleClean = p.title.replace(/^File:/i, '').replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+      return {
+        id: 'online_' + p.pageid,
+        title: titleClean,
+        habitKey: 'online',
+        category: 'Ilustrasi Artis Asli',
+        source: 'Koleksi Artis Web',
+        badgeClass: 'bg-indigo-100 text-indigo-800',
+        tags: [cleanQ, searchKeyword],
+        icon: 'fa-paintbrush',
+        dataUrl: info.thumburl || info.url,
+        fullUrl: info.url
+      };
+    });
+    liveOnlineResultsCache[cleanQ] = results;
+    return results;
+  } catch (e) {
+    console.warn('Gagal mencari gambar online:', e);
+    return [];
+  } finally {
+    isSearchingOnline = false;
+  }
+}
+window.cariKartunOnlineLive = cariKartunOnlineLive;
+
+// GANTI SUMBER KARTUN: ILUSTRASI ARTIS ASLI VS VEKTOR EDUKASI HD
+function setSumberKartun(mode, isModal = false) {
+  CARTOON_SEARCH_STATE.sumberMode = mode;
+  playSound('click');
+
+  const btnArtis = document.getElementById(isModal ? 'modal-btn-source-artis' : 'btn-source-artis');
+  const btnVektor = document.getElementById(isModal ? 'modal-btn-source-vektor' : 'btn-source-vektor');
+
+  const activeCls = 'px-3.5 py-1.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer';
+  const inactiveCls = 'px-3.5 py-1.5 rounded-xl font-bold text-xs bg-transparent text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer';
+
+  if (btnArtis) btnArtis.className = (mode === 'artis') ? activeCls : inactiveCls;
+  if (btnVektor) btnVektor.className = (mode === 'vektor') ? activeCls : inactiveCls;
+
+  if (mode === 'artis') {
+    lakukanPencarianWebOnline(isModal);
+    showToast('Mode Ilustrasi Artis Asli Aktif: Menampilkan karya ilustrator manusia profesional! 🎨', 'success');
+  } else {
+    if (isModal) {
+      cariKoleksiKartunModal(CARTOON_SEARCH_STATE.currentQuery);
+    } else {
+      cariKoleksiKartun(CARTOON_SEARCH_STATE.currentQuery);
+    }
+    showToast('Mode Vektor Edukasi HD Aktif: Bebas kuota & instan! 🌟', 'info');
+  }
+}
+window.setSumberKartun = setSumberKartun;
+
+// TRIGGER PENCARIAN WEB ONLINE LANGSUNG DARI UI
+async function lakukanPencarianWebOnline(isModal = false) {
+  const inputId = isModal ? 'modal-search-kartun-input' : 'ai-search-input';
+  const gridId = isModal ? 'modal-search-grid' : 'ai-search-grid';
+  const countId = isModal ? 'modal-search-count-label' : 'ai-search-count-label';
+  const inputEl = document.getElementById(inputId);
+  let userText = inputEl ? inputEl.value.trim() : '';
+
+  let query = userText;
+  if (!query) {
+    const cat = CARTOON_SEARCH_STATE.activeCategory;
+    if (cat === 'bangun_pagi') query = 'bangun pagi';
+    else if (cat === 'beribadah') query = 'beribadah';
+    else if (cat === 'olahraga') query = 'olahraga';
+    else if (cat === 'makan_sehat') query = 'makan sehat';
+    else if (cat === 'belajar_membaca') query = 'belajar membaca';
+    else if (cat === 'rukun_berbagi') query = 'rukun berbagi';
+    else if (cat === 'tidur_tepat') query = 'tidur tepat';
+    else query = 'anak sekolah kartun';
+  }
+
+  const gridEl = document.getElementById(gridId);
+  const countEl = document.getElementById(countId);
+
+  if (gridEl) {
+    gridEl.innerHTML = `
+      <div class="col-span-full py-12 px-4 text-center space-y-3 bg-white rounded-3xl border border-slate-200">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-600"></i>
+        <h5 class="font-title font-bold text-slate-800 text-sm">Sedang memuat gambar kartun karakter asli karya ilustrator...</h5>
+        <p class="text-xs text-slate-400">Mencari karya terbuka untuk tema: <b>"${query}"</b></p>
+      </div>
+    `;
+  }
+  if (countEl) countEl.innerText = 'Memuat karya artis...';
+
+  const results = await cariKartunOnlineLive(query);
+
+  if (results && results.length > 0) {
+    if (countEl) countEl.innerText = `${results.length} Ilustrasi Karakter Artis Asli`;
+    renderPencariKartunGrid(gridId, results, isModal);
+  } else {
+    // Jika koneksi web lambat / kosong, tampilkan koleksi terkurasi lokal
+    const fallbackList = filterDaftarKartun(userText, CARTOON_SEARCH_STATE.activeCategory);
+    if (countEl) countEl.innerText = `${fallbackList.length} Ilustrasi Terkurasi`;
+    renderPencariKartunGrid(gridId, fallbackList, isModal);
+  }
+}
+window.lakukanPencarianWebOnline = lakukanPencarianWebOnline;
+
+// INISIALISASI MESIN PENCARI KARTUN (100% TERKURASI & RAMAH ANAK)
+function initPencariKartun() {
+  CARTOON_SEARCH_STATE.sumberMode = 'vektor';
+  renderPencariKartunPills('ai-search-filter-pills', CARTOON_SEARCH_STATE.activeCategory, false);
+  cariKoleksiKartun(CARTOON_SEARCH_STATE.currentQuery);
+}
+window.initPencariKartun = initPencariKartun;
+
+function renderPencariKartunPills(containerId, activeCat, isModal = false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const categories = [
+    { key: 'semua', label: 'Semua (30+)', icon: 'fa-layer-group' },
+    { key: 'bangun_pagi', label: '🌅 Bangun Pagi (6)', icon: 'fa-sun' },
+    { key: 'beribadah', label: '🙏 Beribadah (4)', icon: 'fa-hands-praying' },
+    { key: 'olahraga', label: '⚽ Olahraga (4)', icon: 'fa-futbol' },
+    { key: 'makan_sehat', label: '🥗 Makan Sehat (4)', icon: 'fa-apple-whole' },
+    { key: 'belajar_membaca', label: '📖 Gemar Belajar (4)', icon: 'fa-book-open' },
+    { key: 'rukun_berbagi', label: '🤝 Hidup Rukun (4)', icon: 'fa-users' },
+    { key: 'tidur_tepat', label: '🌙 Tidur Cepat (4)', icon: 'fa-moon' }
+  ];
+
+  container.innerHTML = categories.map(cat => {
+    const isActive = cat.key === activeCat;
+    const activeCls = isActive
+      ? 'bg-indigo-600 text-white font-black shadow-xs'
+      : 'bg-white hover:bg-indigo-50 text-slate-700 font-bold border border-slate-200';
+    return `
+      <button type="button" onclick="pilihKategoriKartun('${cat.key}', ${isModal})" class="px-3 py-1.5 rounded-xl text-xs whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 shrink-0 ${activeCls}">
+        <span>${cat.label}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function filterDaftarKartun(query, category) {
+  const q = (query || '').toLowerCase().trim();
+  return KATALOG_KARTUN_7KEBIASAAN.filter(item => {
+    if (category && category !== 'semua') {
+      if (item.habitKey !== category) return false;
+    }
+    if (!q) return true;
+    if (item.title.toLowerCase().includes(q)) return true;
+    if (item.category.toLowerCase().includes(q)) return true;
+    if (item.source.toLowerCase().includes(q)) return true;
+    if (item.tags.some(t => t.toLowerCase().includes(q))) return true;
+    return false;
+  });
+}
+
+function cariKoleksiKartun(query) {
+  CARTOON_SEARCH_STATE.currentQuery = query || '';
+  const filtered = filterDaftarKartun(CARTOON_SEARCH_STATE.currentQuery, CARTOON_SEARCH_STATE.activeCategory);
+
+  const countLabel = document.getElementById('ai-search-count-label');
+  if (countLabel) {
+    countLabel.innerText = `Menampilkan ${filtered.length} gambar kartun sopan`;
+  }
+
+  renderPencariKartunGrid('ai-search-grid', filtered, false);
+}
+window.cariKoleksiKartun = cariKoleksiKartun;
+
+function cariKoleksiKartunModal(query) {
+  CARTOON_SEARCH_STATE.currentQuery = query || '';
+  const filtered = filterDaftarKartun(CARTOON_SEARCH_STATE.currentQuery, CARTOON_SEARCH_STATE.activeCategory);
+
+  const countLabel = document.getElementById('modal-search-count-label');
+  if (countLabel) {
+    countLabel.innerText = `${filtered.length} Gambar Siap Pakai`;
+  }
+
+  renderPencariKartunGrid('modal-search-grid', filtered, true);
+}
+window.cariKoleksiKartunModal = cariKoleksiKartunModal;
+
+function pilihKategoriKartun(catKey, isModal = false) {
+  playSound('click');
+  CARTOON_SEARCH_STATE.activeCategory = catKey;
+  if (isModal) {
+    renderPencariKartunPills('modal-search-filter-pills', catKey, true);
+    const input = document.getElementById('modal-search-kartun-input');
+    cariKoleksiKartunModal(input ? input.value : '');
+  } else {
+    renderPencariKartunPills('ai-search-filter-pills', catKey, false);
+    const input = document.getElementById('ai-search-input');
+    cariKoleksiKartun(input ? input.value : '');
+  }
+}
+window.pilihKategoriKartun = pilihKategoriKartun;
+
+function renderPencariKartunGrid(containerId, list, isModal = false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-12 px-4 text-center space-y-3 bg-white rounded-3xl border border-slate-200">
+        <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center text-2xl mx-auto">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <h5 class="font-title font-bold text-slate-700 text-sm">Tidak ada kartun yang cocok dengan "${CARTOON_SEARCH_STATE.currentQuery}"</h5>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">Coba cari dengan kata kunci: <i>bangun, selimut, tidur, sholat, lari, sayur, buku, bekal</i>.</p>
+        <div class="flex items-center justify-center gap-2 flex-wrap pt-2">
+          <button type="button" onclick="bukaGeminiAIPencari()" class="px-4 py-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat di Gemini AI 🤖
+          </button>
+          <button type="button" onclick="${isModal ? 'cariKoleksiKartunModal(\'\')' : 'cariKoleksiKartun(\'\')'}; pilihKategoriKartun('semua', ${isModal});" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
+            Tampilkan Semua Kartun
+          </button>
+        </div>
+      </div>
+    `;
     return;
   }
 
-  const { id, type } = state.p2SelectedItem;
-  const isCorrect = (type === targetWadah);
+  container.innerHTML = list.map(item => {
+    const fallbackSvg = dapatkanDataUrlKartun(item);
+    const dataUrl = item.dataUrl || fallbackSvg;
+    return `
+      <div class="group bg-white rounded-2xl border-2 border-slate-200/90 hover:border-indigo-400 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-200 flex flex-col justify-between transform hover:-translate-y-1">
+        <!-- Area Gambar Thumbnail -->
+        <div class="relative w-full aspect-square bg-slate-50 overflow-hidden cursor-pointer" onclick="pasangKartunKeWord('${item.id}')" title="Klik untuk pasang ke poster Word!">
+          <img src="${dataUrl}" referrerpolicy="no-referrer" alt="${item.title}" onerror="this.onerror=null; this.src='${fallbackSvg}';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+          
+          <!-- Badge Sumber -->
+          <div class="absolute top-2 left-2 pointer-events-none">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${item.badgeClass} shadow-xs border border-white/40">
+              ${item.source}
+            </span>
+          </div>
 
-  if (isCorrect) {
-    playSound('success');
-    // Pindahkan item ke wadah
-    const itemEl = document.getElementById(id);
-    if (itemEl) itemEl.remove();
+          <!-- Overlay Cepat Pasang ke Word saat Hover -->
+          <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-2 text-white">
+            <span class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-base shadow-lg animate-bounce">
+              <i class="fa-solid fa-file-word"></i>
+            </span>
+            <span class="text-[11px] font-title font-black text-center text-white drop-shadow">Pasang ke Word 📄</span>
+          </div>
+        </div>
 
-    const slotContainer = document.getElementById(`p2-slot-${targetWadah}`);
-    const placeholder = slotContainer.querySelector('.placeholder-text');
-    if (placeholder) placeholder.remove();
+        <!-- Keterangan Judul & Aksi -->
+        <div class="p-2.5 space-y-1.5 flex flex-col justify-between flex-1 border-t border-slate-100">
+          <div>
+            <h6 class="font-title font-bold text-xs text-slate-800 line-clamp-2 leading-tight group-hover:text-indigo-600 transition" title="${item.title}">
+              ${item.title}
+            </h6>
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium mt-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span class="truncate">${item.category}</span>
+            </div>
+          </div>
 
-    const placedDiv = document.createElement('div');
-    placedDiv.className = 'p-2 bg-white rounded-xl shadow-xs border border-slate-200 font-semibold';
-    placedDiv.innerText = state.p2Items[id].label;
-    slotContainer.appendChild(placedDiv);
+          <!-- Tombol Aksi Cepat Bawah -->
+          <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-100">
+            <button type="button" onclick="pasangKartunKeWord('${item.id}')" class="py-1.5 px-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer" title="Pasang ke lembar Word">
+              <i class="fa-solid fa-file-word text-[9px]"></i> Word
+            </button>
+            <button type="button" onclick="simpanKartunItemKeDrive('${item.id}')" class="py-1.5 px-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer" title="Simpan ke Slot Drive 7 Kebiasaan">
+              <i class="fa-solid fa-folder-plus text-[9px]"></i> Drive
+            </button>
+            <button type="button" onclick="unduhKartunItem('${item.id}')" class="py-1.5 px-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Unduh gambar PNG">
+              <i class="fa-solid fa-download text-[9px]"></i> Unduh
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-    state.p2PlacedCount++;
-    const remaining = 4 - state.p2PlacedCount;
-    document.getElementById('p2-remaining-count').innerText = `${remaining} tersisa`;
+function pasangKartunKeWord(kartunId) {
+  const item = dapatkanItemKartunById(kartunId);
+  if (!item) return;
 
-    state.p2SelectedItem = null;
-    document.getElementById('p2-selected-info').innerText = 'Bagus! Silakan pilih komponen berikutnya.';
+  const dataUrl = item.dataUrl || dapatkanDataUrlKartun(item);
+  sisipkanGambarLuarKeWord(dataUrl, item.title);
 
-    if (state.p2PlacedCount === 4) {
-      tambahPoin(30);
-      document.getElementById('p2-feedback-box').classList.remove('hidden');
-      playSound('fanfare');
+  // Jika di modal, tutup modal
+  tutupModalMesinPencariKartun();
+
+  // Beralih ke tab msword agar siswa langsung melihat hasilnya
+  switchTab('msword');
+  tambahPoin(20);
+  playSound('fanfare');
+  showToast(`Gambar kartun "${item.title}" berhasil dipasang ke Lab Word! 🎨 (+20 Bintang)`, 'success');
+}
+window.pasangKartunKeWord = pasangKartunKeWord;
+
+function unduhKartunItem(kartunId) {
+  const item = dapatkanItemKartunById(kartunId);
+  if (!item) return;
+
+  const dataUrl = item.dataUrl || dapatkanDataUrlKartun(item);
+  const link = document.createElement('a');
+  link.download = `Kartun_${item.title.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+  link.href = dataUrl;
+  link.target = '_blank';
+  link.click();
+  playSound('success');
+  showToast(`Gambar "${item.title}" berhasil diunduh ke komputermu! 💾`, 'success');
+}
+window.unduhKartunItem = unduhKartunItem;
+
+function bukaZoomKartunItem(kartunId) {
+  const item = dapatkanItemKartunById(kartunId);
+  if (!item) return;
+  const dataUrl = item.dataUrl || dapatkanDataUrlKartun(item);
+  if (typeof bukaModalGambarMateri === 'function') {
+    bukaModalGambarMateri(dataUrl, `Gambar Kartun: ${item.title}`);
+  }
+}
+window.bukaZoomKartunItem = bukaZoomKartunItem;
+
+function bukaModalMesinPencariKartun() {
+  playSound('click');
+  CARTOON_SEARCH_STATE.sumberMode = 'vektor';
+  const modal = document.getElementById('modal-mesin-pencari-kartun');
+  if (modal) {
+    modal.classList.remove('hidden');
+    renderPencariKartunPills('modal-search-filter-pills', CARTOON_SEARCH_STATE.activeCategory, true);
+    cariKoleksiKartunModal(CARTOON_SEARCH_STATE.currentQuery);
+  }
+}
+window.bukaModalMesinPencariKartun = bukaModalMesinPencariKartun;
+
+function tutupModalMesinPencariKartun() {
+  const modal = document.getElementById('modal-mesin-pencari-kartun');
+  if (modal) modal.classList.add('hidden');
+}
+window.tutupModalMesinPencariKartun = tutupModalMesinPencariKartun;
+
+function bukaGoogleSafeSearchKartun() {
+  const q = CARTOON_SEARCH_STATE.currentQuery || 'bangun pagi anak';
+  const url = `https://www.google.com/search?tbm=isch&safe=active&q=${encodeURIComponent('gambar kartun ' + q + ' sopan canva png')}`;
+  window.open(url, '_blank');
+}
+window.bukaGoogleSafeSearchKartun = bukaGoogleSafeSearchKartun;
+
+function bukaGeminiAIPencari() {
+  playSound('fanfare');
+  const searchInput = document.getElementById('ai-search-input') || document.getElementById('modal-search-kartun-input');
+  const query = searchInput ? searchInput.value.trim() : (typeof CARTOON_SEARCH_STATE !== 'undefined' ? CARTOON_SEARCH_STATE.currentQuery : '');
+
+  let targetHabit = 'bangun_pagi';
+  const qLower = (query || '').toLowerCase();
+  if (qLower.includes('bangun') || qLower.includes('tidur pagi') || qLower.includes('weker')) targetHabit = 'bangun_pagi';
+  else if (qLower.includes('ibadah') || qLower.includes('doa') || qLower.includes('sholat') || qLower.includes('syukur')) targetHabit = 'beribadah';
+  else if (qLower.includes('olahraga') || qLower.includes('lari') || qLower.includes('senam') || qLower.includes('sepeda') || qLower.includes('bola')) targetHabit = 'olahraga';
+  else if (qLower.includes('makan') || qLower.includes('sehat') || qLower.includes('sayur') || qLower.includes('buah') || qLower.includes('bekal')) targetHabit = 'makan_sehat';
+  else if (qLower.includes('belajar') || qLower.includes('baca') || qLower.includes('buku') || qLower.includes('sekolah')) targetHabit = 'belajar_membaca';
+  else if (qLower.includes('rukun') || qLower.includes('teman') || qLower.includes('gotong') || qLower.includes('bagi')) targetHabit = 'rukun_berbagi';
+  else if (qLower.includes('tidur') || qLower.includes('malam') || qLower.includes('istirahat')) targetHabit = 'tidur_tepat';
+  else if (typeof CARTOON_SEARCH_STATE !== 'undefined' && CARTOON_SEARCH_STATE.activeCategory && CARTOON_SEARCH_STATE.activeCategory !== 'semua') {
+    targetHabit = CARTOON_SEARCH_STATE.activeCategory;
+  }
+
+  // Jika modal pencari sedang terbuka, tutup modal
+  if (typeof tutupModalMesinPencariKartun === 'function') {
+    tutupModalMesinPencariKartun();
+  }
+
+  // Pastikan berada di tab Praktik TP 2
+  if (typeof switchTab === 'function') {
+    switchTab('praktik');
+  }
+  if (typeof setPraktikSubtab === 'function') {
+    setPraktikSubtab('praktik-tp2');
+  }
+
+  // Beralih ke subtab 3. Studio Gambar AI
+  if (typeof setModeAIStudio === 'function') {
+    setModeAIStudio('generator');
+  }
+
+  const select = document.getElementById('ai-select-kebiasaan');
+  if (select) {
+    select.value = targetHabit;
+  }
+  if (typeof perbaruiPromptOtomatisAI === 'function') {
+    perbaruiPromptOtomatisAI(true);
+  }
+
+  if (query) {
+    const customPromptEl = document.getElementById('ai-custom-prompt');
+    if (customPromptEl) {
+      customPromptEl.value = `Gambar kartun edukasi anak sopan tema: ${query}, gaya kartun ramah anak Canva, berkarakter budi pekerti Indonesia, rapi dan ceria`;
     }
-  } else {
-    playSound('error');
-    showToast(`Kurang tepat! Komponen tersebut bukan untuk wadah ${targetWadah}. Ingat Dekomposisi!`, 'error');
+  }
+
+  showToast(`Membuka Studio Gemini AI untuk membuat gambar kartun! 🤖✨`, 'success');
+}
+window.bukaGeminiAIPencari = bukaGeminiAIPencari;
+
+// INTEGRASI PINTEREST SAFESEARCH & TEMPEL LINK GAMBAR PINTEREST
+function bukaPinterestSafeSearch(query) {
+  const q = query || CARTOON_SEARCH_STATE.currentQuery || 'bangun pagi anak';
+  const safeQuery = `${q} kartun anak sopan aesthetic buku cerita canva`;
+  const url = `https://id.pinterest.com/search/pins/?q=${encodeURIComponent(safeQuery)}`;
+  window.open(url, '_blank');
+  playSound('click');
+  showToast('Membuka Pinterest dengan kata kunci kartun anak aman & sopan... 📌', 'info');
+}
+window.bukaPinterestSafeSearch = bukaPinterestSafeSearch;
+
+function tempelGambarPinterestPrompt() {
+  playSound('click');
+  const petunjuk = 
+    '📌 CARA MEMASUKKAN GAMBAR DARI PINTEREST:\n\n' +
+    '1. Cari gambar kartun yang kamu sukai di Pinterest (atau tab Pinterest yang terbuka).\n' +
+    '2. KLIK KANAN pada gambar tersebut -> pilih "Salin Alamat Gambar" (Copy Image Address / Copy Image Link).\n' +
+    '3. Tempel (Paste / Ctrl+V) link gambar tersebut di kotak bawah ini:\n\n' +
+    '(Contoh link gambar: https://i.pinimg.com/...jpg atau .png)';
+
+  const inputUrl = prompt(petunjuk);
+  if (!inputUrl || !inputUrl.trim()) return;
+
+  let urlBersih = inputUrl.trim();
+
+  // Validasi format link
+  if (!urlBersih.startsWith('http://') && !urlBersih.startsWith('https://') && !urlBersih.startsWith('data:image')) {
+    alert('Format URL tidak valid. Pastikan link diawali dengan https:// atau salin langsung alamat gambarnya (Copy Image Address).');
+    return;
+  }
+
+  // Masukkan langsung ke lembar Lab Word
+  sisipkanGambarLuarKeWord(urlBersih, 'Ilustrasi Pinterest');
+  tutupModalMesinPencariKartun();
+  switchTab('msword');
+  tambahPoin(20);
+  playSound('fanfare');
+  showToast('Gambar kartun dari Pinterest berhasil dipasang ke poster Word! 📌✨ (+20 Bintang)', 'success');
+}
+window.tempelGambarPinterestPrompt = tempelGambarPinterestPrompt;
+
+// ==========================================
+// DRIVE KOLEKSI 7 KEBIASAAN ANAK INDONESIA HEBAT (TP 2.1)
+// ==========================================
+const DRIVE_7KEBIASAAN_CONFIG = [
+  {
+    key: 'bangun_pagi',
+    slotNumber: 1,
+    title: '1. Bangun Pagi',
+    cleanTitle: 'Bangun Pagi',
+    emoji: '🌅',
+    icon: 'fa-sun',
+    colorText: 'text-amber-500',
+    colorBg: 'bg-amber-50',
+    colorBorder: 'border-amber-300',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    slogan: 'Bangun pagi dengan semangat dan senyum ceria menyongsong hari baru.',
+    vectorId: 'bp_1',
+    pinterestQuery: 'bangun pagi anak'
+  },
+  {
+    key: 'beribadah',
+    slotNumber: 2,
+    title: '2. Beribadah & Berdoa',
+    cleanTitle: 'Beribadah & Berdoa',
+    emoji: '🙏',
+    icon: 'fa-hands-praying',
+    colorText: 'text-blue-500',
+    colorBg: 'bg-blue-50',
+    colorBorder: 'border-blue-300',
+    badgeClass: 'bg-blue-100 text-blue-800',
+    slogan: 'Berdoa khusyuk dan bersyukur atas berkah hari ini.',
+    vectorId: 'bi_1',
+    pinterestQuery: 'doa anak kartun'
+  },
+  {
+    key: 'olahraga',
+    slotNumber: 3,
+    title: '3. Berolahraga',
+    cleanTitle: 'Berolahraga',
+    emoji: '🏃',
+    icon: 'fa-person-running',
+    colorText: 'text-emerald-500',
+    colorBg: 'bg-emerald-50',
+    colorBorder: 'border-emerald-300',
+    badgeClass: 'bg-emerald-100 text-emerald-800',
+    slogan: 'Olahraga teratur agar tubuh tetap bugar, lincah, dan sehat.',
+    vectorId: 'or_1',
+    pinterestQuery: 'senam olahraga anak kartun'
+  },
+  {
+    key: 'makan_sehat',
+    slotNumber: 4,
+    title: '4. Makan Sehat & Bergizi',
+    cleanTitle: 'Makan Sehat & Bergizi',
+    emoji: '🥗',
+    icon: 'fa-apple-whole',
+    colorText: 'text-green-600',
+    colorBg: 'bg-green-50',
+    colorBorder: 'border-green-300',
+    badgeClass: 'bg-green-100 text-green-800',
+    slogan: 'Makan sayur, buah, dan lauk seimbang setiap hari.',
+    vectorId: 'ms_1',
+    pinterestQuery: 'makan buah sayur anak kartun'
+  },
+  {
+    key: 'belajar_membaca',
+    slotNumber: 5,
+    title: '5. Gemar Belajar & Membaca',
+    cleanTitle: 'Gemar Belajar & Membaca',
+    emoji: '📖',
+    icon: 'fa-book-open',
+    colorText: 'text-purple-500',
+    colorBg: 'bg-purple-50',
+    colorBorder: 'border-purple-300',
+    badgeClass: 'bg-purple-100 text-purple-800',
+    slogan: 'Membaca buku dan antusias mempelajari hal baru.',
+    vectorId: 'gb_1',
+    pinterestQuery: 'anak membaca buku kartun'
+  },
+  {
+    key: 'rukun_berbagi',
+    slotNumber: 6,
+    title: '6. Bermasyarakat & Hidup Rukun',
+    cleanTitle: 'Bermasyarakat & Hidup Rukun',
+    emoji: '🤝',
+    icon: 'fa-users',
+    colorText: 'text-teal-600',
+    colorBg: 'bg-teal-50',
+    colorBorder: 'border-teal-300',
+    badgeClass: 'bg-teal-100 text-teal-800',
+    slogan: 'Bermain rukun, tolong-menolong, dan berbagi bekal.',
+    vectorId: 'rk_1',
+    pinterestQuery: 'anak berteman rukun berbagi kartun'
+  },
+  {
+    key: 'tidur_tepat',
+    slotNumber: 7,
+    title: '7. Tidur Tepat Waktu',
+    cleanTitle: 'Tidur Tepat Waktu',
+    emoji: '🌙',
+    icon: 'fa-moon',
+    colorText: 'text-indigo-600',
+    colorBg: 'bg-indigo-50',
+    colorBorder: 'border-indigo-300',
+    badgeClass: 'bg-indigo-100 text-indigo-800',
+    slogan: 'Tidur tepat waktu tidak begadang agar tubuh prima.',
+    vectorId: 'tt_1',
+    pinterestQuery: 'anak tidur malam kartun'
+  }
+];
+
+let currentSlotHabitKey = null;
+
+function getDriveStorageKey() {
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const idKey = activeStudent ? (activeStudent.nis || activeStudent.id || activeStudent.nama) : 'global';
+  return `educode_drive_7kebiasaan_${idKey}`;
+}
+
+function muatDrive7Kebiasaan() {
+  const key = getDriveStorageKey();
+  let raw = localStorage.getItem(key);
+  if (!raw && key !== 'educode_drive_7kebiasaan_global') {
+    raw = localStorage.getItem('educode_drive_7kebiasaan_global');
+  }
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) || {};
+  } catch (e) {
+    return {};
   }
 }
 
-function resetPraktik2() {
-  playSound('click');
-  state.p2PlacedCount = 0;
-  state.p2SelectedItem = null;
-
-  document.getElementById('p2-remaining-count').innerText = '4 tersisa';
-  document.getElementById('p2-feedback-box').classList.add('hidden');
-  document.getElementById('p2-selected-info').innerText =
-    'Klik salah satu komponen di atas, lalu klik kotak wadah tujuannya di sebelah kanan!';
-
-  // Reset Wadah
-  document.getElementById('p2-slot-teks').innerHTML =
-    '<p class="text-blue-400 italic text-[11px] placeholder-text">Belum ada teks dimasukkan...</p>';
-  document.getElementById('p2-slot-gambar').innerHTML =
-    '<p class="text-emerald-400 italic text-[11px] placeholder-text">Belum ada gambar dimasukkan...</p>';
-
-  // Re-populate bank
-  const bank = document.getElementById('p2-items-bank');
-  bank.innerHTML = `
-    <div id="p2-item-1" onclick="selectP2Item('p2-item-1', 'teks')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-blue-400 flex items-center justify-between shadow-sm">
-      <span>"HEMAT ENERGI LISTRIK"</span>
-      <span class="text-[10px] text-slate-400">Pilih</span>
-    </div>
-    <div id="p2-item-2" onclick="selectP2Item('p2-item-2', 'gambar')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-emerald-400 flex items-center justify-between shadow-sm">
-      <span>💡 [Ikon Lampu Bohlam Hemat]</span>
-      <span class="text-[10px] text-slate-400">Pilih</span>
-    </div>
-    <div id="p2-item-3" onclick="selectP2Item('p2-item-3', 'teks')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-purple-400 flex items-center justify-between shadow-sm">
-      <span>"Matikan saklar saat tidak dipakai untuk cegah boros listrik."</span>
-      <span class="text-[10px] text-slate-400">Pilih</span>
-    </div>
-    <div id="p2-item-4" onclick="selectP2Item('p2-item-4', 'gambar')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-emerald-400 flex items-center justify-between shadow-sm">
-      <span>🔌 [Ikon Cabut Colokan Kabel]</span>
-      <span class="text-[10px] text-slate-400">Pilih</span>
-    </div>
-  `;
+function simpanDrive7Kebiasaan(data) {
+  const key = getDriveStorageKey();
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem('educode_drive_7kebiasaan_global', JSON.stringify(data));
+  } catch (e) {
+    console.warn('Gagal menyimpan Drive 7 Kebiasaan:', e);
+  }
 }
+
+// ==========================================
+// SISTEM PENILAIAN PENAMAAN FILE BAKU SISWA
+// Format: Kelas_Nama Siswa_Nama file
+// Contoh: 4A_Darningsih_Bangun Tidur
+// ==========================================
+function periksaFormatNamaFile(namaFile) {
+  if (!namaFile || typeof namaFile !== 'string') {
+    return {
+      valid: false,
+      skor: 0,
+      pesan: 'Format belum baku. Gunakan format: Kelas_Nama Siswa_Nama file (Contoh: 4A_Darningsih_Bangun Tidur)'
+    };
+  }
+
+  // Bersihkan ekstensi file jika ada (.png, .docx, .jpg, dll) dan spasi tepi
+  let clean = namaFile.trim().replace(/\.[a-zA-Z0-9]{2,5}$/, '').trim();
+
+  // Pisahkan berdasarkan karakter underscore '_'
+  const parts = clean.split('_');
+
+  if (parts.length < 3) {
+    let petunjuk = 'Format belum baku. Pisahkan dengan tanda garis bawah (_) menjadi 3 bagian: Kelas_Nama Siswa_Nama file.';
+    if (clean.includes('-') && !clean.includes('_')) {
+      petunjuk = 'Format penamaan menggunakan tanda strip (-). Harap ganti dengan garis bawah (_) sesuai contoh: 4A_Darningsih_Bangun Tidur';
+    } else if (clean.includes(' ') && !clean.includes('_')) {
+      petunjuk = 'Format belum dipisahkan garis bawah (_). Contoh baku: 4A_Darningsih_Bangun Tidur';
+    }
+    return {
+      valid: false,
+      skor: 0,
+      pesan: petunjuk
+    };
+  }
+
+  const kelas = parts[0].trim();
+  const nama = parts[1].trim();
+  const judul = parts.slice(2).join('_').trim();
+
+  if (kelas.length < 1) {
+    return { valid: false, skor: 0, pesan: 'Bagian Kelas tidak boleh kosong (contoh: 4A).' };
+  }
+  if (nama.length < 2) {
+    return { valid: false, skor: 0, pesan: 'Bagian Nama Siswa terlalu pendek (minimal 2 huruf).' };
+  }
+  if (judul.length < 2) {
+    return { valid: false, skor: 0, pesan: 'Bagian Nama File/Kebiasaan belum diisi dengan jelas.' };
+  }
+
+  return {
+    valid: true,
+    skor: 20,
+    kelas: kelas,
+    nama: nama,
+    judul: judul,
+    pesan: `Format penamaan baku sesuai standar! Kelas: ${kelas}, Siswa: ${nama}, File: ${judul} (+20 Poin ⭐)`
+  };
+}
+window.periksaFormatNamaFile = periksaFormatNamaFile;
+
+function buatSaranNamaFileBaku(keterangan = 'Bangun Tidur') {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  let kelas = '4A';
+  if (profile && (profile.kelas || profile.rombel)) {
+    kelas = String(profile.kelas || profile.rombel).replace(/^kelas\s*/i, '').replace(/\s+/g, '').toUpperCase();
+    if (!kelas) kelas = '4A';
+  }
+  let nama = 'Darningsih';
+  if (profile && profile.nama) {
+    nama = String(profile.nama).trim().replace(/[_]/g, ' ');
+  }
+  let cleanKet = String(keterangan || 'File').trim().replace(/[_]/g, ' ').replace(/\.[a-zA-Z0-9]+$/, '');
+  return `${kelas}_${nama}_${cleanKet}`;
+}
+window.buatSaranNamaFileBaku = buatSaranNamaFileBaku;
+
+function ubahNamaFileSlotDrive(habitKey) {
+  playSound('click');
+  const drive = muatDrive7Kebiasaan();
+  const item = drive[habitKey];
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+  if (!item) return;
+
+  const defaultSaran = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : habitKey);
+  const namaLama = item.fileName || defaultSaran;
+
+  const promptMsg =
+    `📁 ATUR PENAMAAN FILE SLOT [${cfg ? cfg.cleanTitle : habitKey}]:\n\n` +
+    `Format Baku yang dinilai:\n` +
+    `Kelas_Nama Siswa_Nama file\n\n` +
+    `Contoh:\n` +
+    `4A_Darningsih_Bangun Tidur\n\n` +
+    `⭐ Gunakan format baku di atas untuk mendapatkan +20 Poin Bintang!`;
+
+  const inputNama = prompt(promptMsg, namaLama);
+  if (inputNama === null) return;
+  const namaBaru = inputNama.trim();
+  if (!namaBaru) {
+    showToast('Nama file tidak boleh kosong!', 'warning');
+    return;
+  }
+
+  const check = periksaFormatNamaFile(namaBaru);
+  item.fileName = namaBaru;
+  simpanDrive7Kebiasaan(drive);
+  renderDrive7KebiasaanGrid();
+
+  if (check.valid) {
+    playSound('fanfare');
+    tambahPoin(20);
+    alert(
+      `🎉 HEBAT! PENAMAAN FILE BAKU TERPENUHI!\n\n` +
+      `Nama File: "${namaBaru}"\n` +
+      `• Kelas: ${check.kelas}\n` +
+      `• Nama Siswa: ${check.nama}\n` +
+      `• Nama File: ${check.judul}\n\n` +
+      `⭐ Selamat! Kerapian digitalmu mendapatkan +20 Poin Bintang!`
+    );
+    showToast(`Penamaan file baku berhasil! (+20 Bintang) ⭐`, 'success');
+  } else {
+    playSound('click');
+    alert(
+      `⚠️ PERHATIAN FORMAT PENAMAAN FILE:\n\n` +
+      `Nama file tersimpan: "${namaBaru}"\n\n` +
+      `Namun belum sesuai format baku:\n` +
+      `Kelas_Nama Siswa_Nama file (gunakan pemisah garis bawah _)\n` +
+      `Contoh: 4A_Darningsih_Bangun Tidur\n\n` +
+      `Silakan klik tombol "Ubah" kapan saja untuk memperbaikinya dan mendapatkan poin!`
+    );
+    showToast(`Format nama file belum baku.`, 'warning');
+  }
+}
+window.ubahNamaFileSlotDrive = ubahNamaFileSlotDrive;
+
+function renderDrive7KebiasaanGrid() {
+  const grid = document.getElementById('drive-7kebiasaan-grid');
+  if (!grid) return;
+
+  const drive = muatDrive7Kebiasaan();
+  const filledCount = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
+  const totalCount = DRIVE_7KEBIASAAN_CONFIG.length;
+  const percent = Math.round((filledCount / totalCount) * 100);
+
+  // Update Header Bar Status
+  const titleEl = document.getElementById('drive-progress-title');
+  const barEl = document.getElementById('drive-progress-bar');
+  const kkmBadge = document.getElementById('drive-koleksi-kkm-badge');
+  const nilaiBadge = document.getElementById('drive-nilai-angka-badge');
+  const hintEl = document.getElementById('drive-progress-hint');
+  const quickLabel = document.getElementById('drive-quick-status-label');
+  const penamaanBadge = document.getElementById('drive-penamaan-badge');
+
+  if (titleEl) titleEl.innerText = `Progres Koleksi: ${filledCount} dari ${totalCount} Gambar Terkumpul`;
+  if (barEl) barEl.style.width = `${percent}%`;
+  if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${percent}`;
+
+  // Hitung jumlah penamaan file baku
+  const validNamesCount = Object.keys(drive).filter(k => {
+    const it = drive[k];
+    return it && it.fileName && periksaFormatNamaFile(it.fileName).valid;
+  }).length;
+
+  if (penamaanBadge) {
+    if (validNamesCount >= totalCount) {
+      penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs flex items-center gap-1';
+      penamaanBadge.innerHTML = `<i class="fa-solid fa-star text-amber-500"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b> (+${validNamesCount * 20} Poin)`;
+    } else {
+      penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 shadow-xs flex items-center gap-1';
+      penamaanBadge.innerHTML = `<i class="fa-solid fa-pen-ruler text-blue-600"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b>`;
+    }
+  }
+
+  if (kkmBadge) {
+    if (filledCount >= totalCount) {
+      kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs';
+      kkmBadge.innerHTML = '🎉 TUNTAS: Nilai 100 (Sangat Baik)';
+      if (hintEl) hintEl.innerHTML = '✨ <b>Hebat sekali!</b> Semua 7 kebiasaan sudah terkumpul lengkap! Nilai TP 2.1 terpenuhi 100.';
+      if (quickLabel) quickLabel.innerHTML = '🎉 <b>Drive Lengkap 7/7!</b> Nilai TP 2.1: 100 (Tuntas)';
+    } else {
+      kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
+      kkmBadge.innerText = `Belum Lengkap (${filledCount}/${totalCount})`;
+      if (hintEl) hintEl.innerText = `Kumpulkan sisa ${totalCount - filledCount} gambar lagi untuk mendapatkan Nilai 100 (Tuntas) pada TP 2.1!`;
+      if (quickLabel) quickLabel.innerText = `📁 Kumpulkan ${totalCount - filledCount} gambar lagi untuk nilai 100!`;
+    }
+  }
+
+  // Render 7 Cards
+  grid.innerHTML = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
+    const item = drive[cfg.key];
+    const isFilled = !!(item && item.imageSrc);
+
+    if (isFilled) {
+      const fileName = item.fileName || buatSaranNamaFileBaku(cfg.cleanTitle);
+      const checkName = periksaFormatNamaFile(fileName);
+
+      return `
+        <div class="bg-white rounded-3xl border-2 border-emerald-300 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between">
+          <!-- Header Slot -->
+          <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center">${cfg.slotNumber}</span>
+              <h5 class="font-title font-bold text-xs text-slate-800 truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</h5>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+              <i class="fa-solid fa-check"></i> Terkumpul
+            </span>
+          </div>
+
+          <!-- Preview Gambar -->
+          <div class="relative w-full aspect-square bg-slate-50 overflow-hidden group cursor-pointer" onclick="pasangSlotDriveKeWord('${cfg.key}')" title="Klik untuk pasang gambar ini ke lembar Word">
+            <img src="${item.imageSrc}" referrerpolicy="no-referrer" alt="${cfg.cleanTitle}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            
+            <!-- Sumber Badge Top-Left -->
+            <div class="absolute top-2 left-2 pointer-events-none">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-900/80 text-white shadow-xs backdrop-blur-xs">
+                ${item.sourceBadge || 'Gambar'}
+              </span>
+            </div>
+
+            <!-- Overlay Hover -->
+            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-2 text-white">
+              <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shadow-md">
+                <i class="fa-solid fa-file-word"></i>
+              </span>
+              <span class="text-[11px] font-title font-bold text-center">Pasang ke Word 📄</span>
+            </div>
+          </div>
+
+          <!-- Nama File & Validasi Format Baku -->
+          <div class="px-3 py-1.5 bg-slate-50 border-t border-slate-100 flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <div class="flex items-center gap-1.5 overflow-hidden min-w-0" title="${fileName}">
+                <i class="fa-regular fa-file-image ${checkName.valid ? 'text-emerald-600' : 'text-amber-500'} text-xs shrink-0"></i>
+                <span class="text-[11px] font-mono font-bold text-slate-700 truncate">${fileName}</span>
+              </div>
+              <button type="button" onclick="ubahNamaFileSlotDrive('${cfg.key}')" class="px-1.5 py-0.5 text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition shrink-0 cursor-pointer" title="Ubah Nama File">
+                <i class="fa-solid fa-pen-to-square"></i> Ubah
+              </button>
+            </div>
+            <div>
+              ${checkName.valid
+                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin ⭐)</span>'
+                : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded cursor-pointer" onclick="ubahNamaFileSlotDrive(\'' + cfg.key + '\')"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Format Belum Baku (Klik Ubah)</span>'}
+            </div>
+          </div>
+
+          <!-- Keterangan & Tombol Aksi -->
+          <div class="p-3 bg-white space-y-2 border-t border-slate-100">
+            <p class="text-[10px] text-slate-500 line-clamp-1 italic font-medium">"${cfg.slogan}"</p>
+            <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-100">
+              <button type="button" onclick="pasangSlotDriveKeWord('${cfg.key}')" class="py-1.5 px-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Pasang ke Word">
+                <i class="fa-solid fa-file-word text-[9px]"></i> Word
+              </button>
+              <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="py-1.5 px-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Ganti gambar ini">
+                <i class="fa-solid fa-rotate text-[9px]"></i> Ganti
+              </button>
+              <button type="button" onclick="hapusGambarDariSlotDrive('${cfg.key}')" class="py-1.5 px-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Kosongkan slot ini">
+                <i class="fa-solid fa-trash-can text-[9px]"></i> Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Slot Kosong
+      return `
+        <div class="bg-slate-50/80 rounded-3xl border-2 border-dashed border-slate-300 hover:border-purple-400 transition-all p-4 flex flex-col justify-between space-y-3">
+          <!-- Header Slot Kosong -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">${cfg.slotNumber}</span>
+              <h5 class="font-title font-bold text-xs text-slate-700">${cfg.cleanTitle}</h5>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
+              Kosong
+            </span>
+          </div>
+
+          <!-- Placeholder Area -->
+          <div class="w-full aspect-square rounded-2xl bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-3 cursor-pointer group hover:bg-purple-50/50 transition" onclick="bukaModalPilihSumberSlot('${cfg.key}')" title="Klik untuk menambah gambar">
+            <div class="w-12 h-12 rounded-2xl bg-purple-50 group-hover:bg-purple-100 text-purple-600 flex items-center justify-center text-2xl mb-2 transition transform group-hover:scale-110">
+              <i class="fa-solid ${cfg.icon}"></i>
+            </div>
+            <span class="text-xs font-bold text-slate-700 font-title group-hover:text-purple-700 transition">+ Tambah Gambar</span>
+            <p class="text-[10px] text-slate-400 mt-1 max-w-[160px] leading-tight">File Komputer, Paint, Kartun Edukasi, atau Gemini AI</p>
+          </div>
+
+          <!-- Tombol Aksi Bawah -->
+          <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-plus text-[10px]"></i> Pilih Gambar
+          </button>
+        </div>
+      `;
+    }
+  }).join('');
+}
+window.renderDrive7KebiasaanGrid = renderDrive7KebiasaanGrid;
+
+function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun', sourceBadge = '🎨 Kartun', customFileName = null) {
+  if (!habitKey || !imageSrc) return;
+  const drive = muatDrive7Kebiasaan();
+  const wasCompleteBefore = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length >= 7;
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+  const defaultFileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : habitKey);
+  const finalFileName = customFileName || (drive[habitKey] && drive[habitKey].fileName) || defaultFileName;
+
+  drive[habitKey] = {
+    imageSrc: imageSrc,
+    sourceName: sourceName,
+    sourceBadge: sourceBadge,
+    fileName: finalFileName,
+    dateAdded: new Date().toLocaleDateString('id-ID')
+  };
+  simpanDrive7Kebiasaan(drive);
+  renderDrive7KebiasaanGrid();
+  playSound('fanfare');
+
+  const check = periksaFormatNamaFile(finalFileName);
+  if (check.valid) {
+    tambahPoin(20);
+  }
+
+  const title = cfg ? cfg.cleanTitle : habitKey;
+  showToast(`Slot "${title}" tersimpan dengan nama: ${finalFileName} 📁✨ (+20 Bintang)`, 'success');
+
+  // Cek apakah baru saja melengkapi 7/7
+  const nowCount = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
+  if (nowCount >= 7 && !wasCompleteBefore) {
+    selesaikanMisiTP2_1();
+  }
+}
+window.simpanGambarKeSlotDrive = simpanGambarKeSlotDrive;
+
+function hapusGambarDariSlotDrive(habitKey) {
+  playSound('click');
+  const drive = muatDrive7Kebiasaan();
+  if (drive[habitKey]) {
+    delete drive[habitKey];
+    simpanDrive7Kebiasaan(drive);
+    renderDrive7KebiasaanGrid();
+    showToast('Gambar pada slot tersebut telah dihapus.', 'info');
+  }
+}
+window.hapusGambarDariSlotDrive = hapusGambarDariSlotDrive;
+
+function resetDrive7Kebiasaan() {
+  if (!confirm('Apakah kamu yakin ingin mengosongkan seluruh isi Drive 7 Kebiasaan?')) return;
+  playSound('click');
+  simpanDrive7Kebiasaan({});
+  renderDrive7KebiasaanGrid();
+  showToast('Drive 7 Kebiasaan berhasil dikosongkan.', 'info');
+}
+window.resetDrive7Kebiasaan = resetDrive7Kebiasaan;
+
+function isiOtomatisVektorEdukasiLengkap() {
+  playSound('click');
+  const drive = muatDrive7Kebiasaan();
+  DRIVE_7KEBIASAAN_CONFIG.forEach(cfg => {
+    if (!drive[cfg.key]) {
+      const item = KATALOG_KARTUN_7KEBIASAAN.find(k => k.id === cfg.vectorId);
+      const dataUrl = item ? (item.dataUrl || dapatkanDataUrlKartun(item)) : null;
+      if (dataUrl) {
+        const fileName = buatSaranNamaFileBaku(cfg.cleanTitle);
+        drive[cfg.key] = {
+          imageSrc: dataUrl,
+          sourceName: item.title,
+          sourceBadge: '🌟 Vektor HD',
+          fileName: fileName,
+          dateAdded: new Date().toLocaleDateString('id-ID')
+        };
+        tambahPoin(20);
+      }
+    }
+  });
+  simpanDrive7Kebiasaan(drive);
+  renderDrive7KebiasaanGrid();
+  selesaikanMisiTP2_1();
+  showToast('Semua 7 slot dilengkapi dengan Vektor Edukasi HD & nama file baku! Nilai TP 2.1: 100 🎉', 'success');
+}
+window.isiOtomatisVektorEdukasiLengkap = isiOtomatisVektorEdukasiLengkap;
+
+function pasangSlotDriveKeWord(habitKey) {
+  const drive = muatDrive7Kebiasaan();
+  const item = drive[habitKey];
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+  if (!item || !item.imageSrc) return;
+
+  sisipkanGambarLuarKeWord(item.imageSrc, cfg ? cfg.cleanTitle : habitKey);
+  switchTab('msword');
+  tambahPoin(15);
+  playSound('fanfare');
+  showToast(`Gambar "${cfg ? cfg.cleanTitle : habitKey}" berhasil dipasang ke poster Word! 📄 (+15 Bintang)`, 'success');
+}
+window.pasangSlotDriveKeWord = pasangSlotDriveKeWord;
+
+function kirimSemuaDriveKePosterWord() {
+  playSound('fanfare');
+  const drive = muatDrive7Kebiasaan();
+  const keys = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k));
+  if (keys.length === 0) {
+    showToast('Drive masih kosong. Isi minimal 1 gambar terlebih dahulu!', 'warning');
+    return;
+  }
+
+  // Beralih ke preset poster indonesia_hebat
+  loadPresetPosterLingkungan('indonesia_hebat');
+
+  // Sisipkan gambar yang ada di drive ke dalam lembar kerja Word
+  keys.forEach((k, idx) => {
+    const item = drive[k];
+    const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === k);
+    const title = cfg ? cfg.cleanTitle : k;
+    if (item && item.imageSrc) {
+      wordElements.push({
+        id: 'wd_drive_' + Date.now() + '_' + idx,
+        type: 'gambar_luar',
+        src: item.imageSrc,
+        name: title,
+        width: 100,
+        x: (idx % 4) * 115 + 25,
+        y: Math.floor(idx / 4) * 130 + 170,
+        zIndex: 5 + idx
+      });
+    }
+  });
+
+  renderWordElements();
+  switchTab('msword');
+  tambahPoin(35);
+  showToast(`${keys.length} gambar dari Drive berhasil dirangkai ke lembar poster Word! 📄✨ (+35 Bintang)`, 'success');
+}
+window.kirimSemuaDriveKePosterWord = kirimSemuaDriveKePosterWord;
+
+function selesaikanMisiTP2_1() {
+  playSound('fanfare');
+  tambahPoin(100);
+
+  // Simpan nilai 100 untuk TP 2.1
+  try {
+    localStorage.setItem('educode_tp2_1_score', '100');
+    localStorage.setItem('educode_tp2_1_status', 'Tuntas');
+    
+    // Perbarui profil siswa aktif jika ada
+    const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (activeStudent) {
+      if (!activeStudent.tpSelesai) activeStudent.tpSelesai = [];
+      if (!activeStudent.tpSelesai.includes('TP 2.1')) {
+        activeStudent.tpSelesai.push('TP 2.1');
+      }
+      activeStudent.nilaiTP2_1 = 100;
+      saveActiveStudentSession(activeStudent);
+    }
+  } catch (e) {}
+
+  setTimeout(() => {
+    alert(
+      '🎉 SELAMAT! MISI CAPAIAN TP 2.1 TUNTAS TERPENUHI! 🎉\n\n' +
+      'Kamu telah berhasil mengumpulkan lengkap 7 Gambar Kebiasaan Anak Indonesia Hebat ke dalam Drive-mu!\n\n' +
+      '⭐ Nilai Capaian TP 2.1: 100 (SANGAT BAIK / TUNTAS)\n' +
+      '⭐ Bonus Poin: +100 Bintang Kreator Cilik!\n\n' +
+      'Sekarang kamu bisa klik tombol "Buat Poster di Word" untuk langsung menaruh semua gambar ini ke lembar poster Lab Word!'
+    );
+  }, 400);
+}
+window.selesaikanMisiTP2_1 = selesaikanMisiTP2_1;
+
+function bukaModalPilihSumberSlot(habitKey) {
+  playSound('click');
+  currentSlotHabitKey = habitKey;
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+  const titleEl = document.getElementById('modal-pilih-slot-title');
+  if (titleEl && cfg) {
+    titleEl.innerText = `Pilih Gambar: [${cfg.title}]`;
+  }
+  const modal = document.getElementById('modal-pilih-sumber-drive');
+  if (modal) modal.classList.remove('hidden');
+}
+window.bukaModalPilihSumberSlot = bukaModalPilihSumberSlot;
+
+function tutupModalPilihSumberSlot() {
+  const modal = document.getElementById('modal-pilih-sumber-drive');
+  if (modal) modal.classList.add('hidden');
+}
+window.tutupModalPilihSumberSlot = tutupModalPilihSumberSlot;
+
+function aksiPilihSumberSlot(sumberType) {
+  const habitKey = currentSlotHabitKey;
+  tutupModalPilihSumberSlot();
+  if (!habitKey) return;
+
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+
+  if (sumberType === 'search') {
+    // Buka mode pencarian kartun dengan filter kategori terkait
+    setModeAIStudio('search');
+    pilihKategoriKartun(habitKey, false);
+    showToast(`Membuka pencarian kartun untuk tema: ${cfg.cleanTitle} 🎨`, 'info');
+  } else if (sumberType === 'pinterest') {
+    // Pinterest SafeSearch & prompt
+    bukaPinterestSafeSearch(cfg.pinterestQuery);
+    setTimeout(() => {
+      tempelPinterestKeSlot(habitKey);
+    }, 600);
+  } else if (sumberType === 'ai') {
+    // Buka generator AI dengan prompt kebiasaan tersebut
+    setModeAIStudio('generator');
+    const select = document.getElementById('ai-select-kebiasaan');
+    if (select) {
+      select.value = habitKey;
+      perbaruiPromptOtomatisAI(false);
+    }
+    showToast(`Studio AI disiapkan untuk kebiasaan: ${cfg.cleanTitle} 🤖`, 'info');
+  } else if (sumberType === 'paint') {
+    // Ambil dari Aplikasi Paint Terbaru
+    const hasDrawing = (typeof paintApp !== 'undefined' && paintApp.canvas && paintApp.history && paintApp.history.length > 0);
+    if (hasDrawing) {
+      const pakai = confirm(
+        `🎨 Ditemukan lukisan di Aplikasi Paint Terbaru!\n\n` +
+        `• Klik [OK] untuk langsung memasang lukisan tersebut ke Slot [${cfg ? cfg.cleanTitle : habitKey}].\n` +
+        `• Klik [BATAL] jika ingin membuka Paint untuk menggambar lukisan baru.`
+      );
+      if (pakai) {
+        const dataUrl = paintApp.canvas.toDataURL('image/png');
+        simpanGambarKeSlotDrive(habitKey, dataUrl, `Lukisan Paint: ${cfg ? cfg.cleanTitle : 'Paint'}`, '🎨 Paint Terbaru');
+        return;
+      }
+    }
+    // Buka Aplikasi Paint Terbaru untuk menggambar
+    switchTab('praktik');
+    setPraktikSubtab('praktik-tp1');
+    setModePraktik1('gambar');
+    showToast(`Membuka Aplikasi Paint Terbaru! Silakan gambar untuk "${cfg ? cfg.cleanTitle : 'slot'}", lalu klik tombol "Simpan ke Drive 📁"! 🎨`, 'info');
+  } else if (sumberType === 'upload') {
+    // Trigger input file
+    const fileInput = document.getElementById('drive-slot-upload-input');
+    if (fileInput) {
+      fileInput.setAttribute('data-target-habit', habitKey);
+      fileInput.click();
+    }
+  } else if (sumberType === 'vektor_instan') {
+    // Pasang vektor bawaan
+    const item = KATALOG_KARTUN_7KEBIASAAN.find(k => k.id === cfg.vectorId);
+    const dataUrl = item ? (item.dataUrl || dapatkanDataUrlKartun(item)) : null;
+    if (dataUrl) {
+      simpanGambarKeSlotDrive(habitKey, dataUrl, item.title, '🌟 Vektor HD');
+    }
+  }
+}
+window.aksiPilihSumberSlot = aksiPilihSumberSlot;
+
+function handleDriveSlotUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  const habitKey = event.target.getAttribute('data-target-habit') || currentSlotHabitKey;
+  if (!file || !habitKey) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+    const cleanUploadName = file.name.replace(/\.[^/.]+$/, '');
+    const checkUpload = periksaFormatNamaFile(cleanUploadName);
+    const chosenName = checkUpload.valid ? cleanUploadName : buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Upload');
+    simpanGambarKeSlotDrive(habitKey, dataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), '📤 File Komputer', chosenName);
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+window.handleDriveSlotUpload = handleDriveSlotUpload;
+
+function tempelPinterestKeSlot(habitKey) {
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+  const promptText = 
+    `📌 MASUKKAN GAMBAR PINTEREST UNTUK SLOT [${cfg ? cfg.cleanTitle : ''}]:\n\n` +
+    `1. Cari gambar di tab Pinterest yang baru terbuka.\n` +
+    `2. Klik kanan gambar -> pilih "Salin Alamat Gambar" (Copy Image Address).\n` +
+    `3. Tempel link (Ctrl+V) di bawah ini:`;
+
+  const inputUrl = prompt(promptText);
+  if (!inputUrl || !inputUrl.trim()) return;
+
+  const urlBersih = inputUrl.trim();
+  if (!urlBersih.startsWith('http://') && !urlBersih.startsWith('https://') && !urlBersih.startsWith('data:image')) {
+    alert('URL tidak valid. Pastikan link diawali dengan https:// atau salin langsung alamat gambarnya.');
+    return;
+  }
+
+  const fileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Pinterest');
+  simpanGambarKeSlotDrive(habitKey, urlBersih, `Pinterest: ${cfg ? cfg.cleanTitle : ''}`, '📌 Pinterest', fileName);
+}
+window.tempelPinterestKeSlot = tempelPinterestKeSlot;
+
+function simpanKartunItemKeDrive(kartunId) {
+  const item = dapatkanItemKartunById(kartunId);
+  if (!item) return;
+
+  // Tentukan habitKey
+  let targetKey = item.habitKey;
+  if (!targetKey || targetKey === 'online' || !DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === targetKey)) {
+    const t = (item.title + ' ' + (item.tags || []).join(' ')).toLowerCase();
+    if (t.includes('bangun') || t.includes('tidur pagi')) targetKey = 'bangun_pagi';
+    else if (t.includes('ibadah') || t.includes('doa') || t.includes('sholat')) targetKey = 'beribadah';
+    else if (t.includes('olahraga') || t.includes('lari') || t.includes('senam') || t.includes('sepeda')) targetKey = 'olahraga';
+    else if (t.includes('makan') || t.includes('sayur') || t.includes('buah') || t.includes('susu')) targetKey = 'makan_sehat';
+    else if (t.includes('baca') || t.includes('buku') || t.includes('belajar')) targetKey = 'belajar_membaca';
+    else if (t.includes('rukun') || t.includes('teman') || t.includes('gotong') || t.includes('bagi')) targetKey = 'rukun_berbagi';
+    else if (t.includes('tidur') || t.includes('malam') || t.includes('istirahat')) targetKey = 'tidur_tepat';
+    else targetKey = 'bangun_pagi';
+  }
+
+  const dataUrl = item.dataUrl || dapatkanDataUrlKartun(item);
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === targetKey);
+  const fileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : item.title);
+  simpanGambarKeSlotDrive(targetKey, dataUrl, item.title, item.source || '🎨 Kartun', fileName);
+  setModeAIStudio('drive');
+}
+window.simpanKartunItemKeDrive = simpanKartunItemKeDrive;
+
+function simpanGambarAIKeDrive() {
+  playSound('fanfare');
+  const habitKey = AI_STUDIO_STATE.currentHabit || 'bangun_pagi';
+  const habit = AI_HABITS_DATA[habitKey] || AI_HABITS_DATA.bangun_pagi;
+  const resultImg = document.getElementById('ai-result-image');
+
+  let imageSrc = AI_STUDIO_STATE.currentDataUrl;
+  if (resultImg && !resultImg.classList.contains('hidden') && resultImg.src && !resultImg.src.includes('error')) {
+    imageSrc = resultImg.src;
+  }
+  if (!imageSrc) {
+    renderFallbackArtwork(habitKey);
+    imageSrc = AI_STUDIO_STATE.currentDataUrl;
+  }
+
+  const fileName = buatSaranNamaFileBaku(habit.title);
+  simpanGambarKeSlotDrive(habitKey, imageSrc, `Gambar AI: ${habit.title}`, '🤖 AI Generatif', fileName);
+  setModeAIStudio('drive');
+  showToast(`Gambar AI "${habit.title}" berhasil disimpan ke Drive 7 Kebiasaan! 📁✨`, 'success');
+}
+window.simpanGambarAIKeDrive = simpanGambarAIKeDrive;
+
+function initAIStudioPraktik2() {
+  setModeAIStudio('drive');
+  renderDrive7KebiasaanGrid();
+  perbaruiPromptOtomatisAI(false);
+  if (!AI_STUDIO_STATE.currentImageUrl && !AI_STUDIO_STATE.currentDataUrl) {
+    updateDisplayHabitInfo('bangun_pagi');
+    renderFallbackArtwork('bangun_pagi');
+  }
+}
+
+function setModeAIStudio(mode) {
+  playSound('click');
+  const panelDrive = document.getElementById('ai-panel-drive');
+  const panelSearch = document.getElementById('ai-panel-search');
+  const panelGen = document.getElementById('ai-panel-generator');
+  const panelGal = document.getElementById('ai-panel-galeri');
+
+  const btnDrive = document.getElementById('btn-mode-ai-drive');
+  const btnSearch = document.getElementById('btn-mode-ai-search');
+  const btnGen = document.getElementById('btn-mode-ai-generator');
+  const btnGal = document.getElementById('btn-mode-ai-galeri');
+
+  const activeBtnCls = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-purple-600 text-white shadow-md transition flex items-center gap-2 cursor-pointer';
+  const inactiveBtnCls = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center gap-2 cursor-pointer';
+
+  if (panelDrive) panelDrive.classList.add('hidden');
+  if (panelSearch) panelSearch.classList.add('hidden');
+  if (panelGen) panelGen.classList.add('hidden');
+  if (panelGal) panelGal.classList.add('hidden');
+
+  if (btnDrive) btnDrive.className = inactiveBtnCls;
+  if (btnSearch) btnSearch.className = inactiveBtnCls;
+  if (btnGen) btnGen.className = inactiveBtnCls;
+  if (btnGal) btnGal.className = inactiveBtnCls;
+
+  if (mode === 'search') {
+    if (panelSearch) panelSearch.classList.remove('hidden');
+    if (btnSearch) btnSearch.className = activeBtnCls;
+    initPencariKartun();
+  } else if (mode === 'generator') {
+    if (panelGen) panelGen.classList.remove('hidden');
+    if (btnGen) btnGen.className = activeBtnCls;
+  } else if (mode === 'galeri') {
+    if (panelGal) panelGal.classList.remove('hidden');
+    if (btnGal) btnGal.className = activeBtnCls;
+  } else {
+    // Mode Default: Drive Koleksi 7 Kebiasaan (Misi TP 2.1)
+    if (panelDrive) panelDrive.classList.remove('hidden');
+    if (btnDrive) btnDrive.className = activeBtnCls;
+    renderDrive7KebiasaanGrid();
+  }
+}
+window.setModeAIStudio = setModeAIStudio;
+
+function perbaruiPromptOtomatisAI(resetManual = false) {
+  const habitSelect = document.getElementById('ai-select-kebiasaan');
+  const habitKey = habitSelect ? habitSelect.value : AI_STUDIO_STATE.currentHabit;
+  AI_STUDIO_STATE.currentHabit = habitKey;
+
+  const charInput = document.querySelector('input[name="ai-karakter"]:checked');
+  const charVal = charInput ? charInput.value : AI_STUDIO_STATE.currentKarakter;
+  AI_STUDIO_STATE.currentKarakter = charVal;
+
+  const styleInput = document.querySelector('input[name="ai-style"]:checked');
+  const styleVal = styleInput ? styleInput.value : AI_STUDIO_STATE.currentStyle;
+  AI_STUDIO_STATE.currentStyle = styleVal;
+
+  updateDisplayHabitInfo(habitKey);
+
+  const habit = AI_HABITS_DATA[habitKey] || AI_HABITS_DATA.bangun_pagi;
+
+  const charLabels = {
+    siswa_laki: 'siswa laki-laki ceria berambut rapi dan berpakaian sopan santun',
+    siswi_perempuan: 'siswi perempuan manis berambut rapi dan berpakaian sopan santun',
+    bersama_robo: 'anak pintar bersama sahabat robot pintar Robo yang ramah dan sopan',
+    sahabat_sekolah: 'rombongan sahabat cilik sekolah dasar yang kompak, sopan, dan riang'
+  };
+
+  const styleLabels = {
+    kartun_canva: 'gaya gambar kartun edukasi anak Canva yang sopan, rapi, dan bersih',
+    storybook: 'gaya ilustrasi buku cerita dongeng anak bergambar yang ramah dan santun',
+    pixar3d: 'gaya kartun animasi 3D ceria Disney Pixar yang berpakaian rapi dan santun',
+    anime_ceria: 'gaya kartun anime ceria Studio Ghibli yang bersih, sopan, dan mendidik'
+  };
+
+  const generatedPrompt = `${habit.promptBaseId}, menampilkan ${charLabels[charVal] || 'anak SD sopan'}, ${styleLabels[styleVal] || 'gaya kartun edukasi anak Canva yang sopan'}, bernuansa budaya budi pekerti Indonesia, berpakaian santun lengkap, penuh senyum kebaikan`;
+
+  const promptInput = document.getElementById('ai-custom-prompt');
+  if (promptInput) {
+    if (resetManual || !promptInput.value.trim() || promptInput.dataset.autoGenerated === 'true' || resetManual === false) {
+      promptInput.value = generatedPrompt;
+      promptInput.dataset.autoGenerated = 'true';
+    }
+  }
+}
+
+function updateDisplayHabitInfo(habitKey) {
+  const habit = AI_HABITS_DATA[habitKey] || AI_HABITS_DATA.bangun_pagi;
+  const titleDisplay = document.getElementById('ai-display-title');
+  const habitSub = document.getElementById('ai-habit-title-sub');
+  const habitDesc = document.getElementById('ai-habit-desc');
+  const styleBadge = document.getElementById('ai-display-style-badge');
+
+  if (titleDisplay) titleDisplay.innerText = `${habit.emoji} ${habit.title}`;
+  if (habitSub) habitSub.innerText = `Pesan Karakter: ${habit.title}`;
+  if (habitDesc) habitDesc.innerText = habit.desc;
+
+  const styleInput = document.querySelector('input[name="ai-style"]:checked');
+  const styleNames = {
+    kartun_canva: '🎨 Gaya: Kartun Edukasi Sopan',
+    storybook: '📖 Gaya: Buku Dongeng Anak',
+    pixar3d: '🌟 Gaya: Animasi 3D Ceria',
+    anime_ceria: '✨ Gaya: Kartun Ramah Anak'
+  };
+  if (styleBadge && styleInput) {
+    styleBadge.innerText = styleNames[styleInput.value] || '🎨 Gaya: Kartun Edukasi Sopan';
+  }
+}
+
+function acakPromptAI7Kebiasaan() {
+  playSound('click');
+  const habitKeys = Object.keys(AI_HABITS_DATA);
+  const randomHabit = habitKeys[Math.floor(Math.random() * habitKeys.length)];
+  const habitSelect = document.getElementById('ai-select-kebiasaan');
+  if (habitSelect) habitSelect.value = randomHabit;
+
+  const charKeys = ['siswa_laki', 'siswi_perempuan', 'bersama_robo', 'sahabat_sekolah'];
+  const randomChar = charKeys[Math.floor(Math.random() * charKeys.length)];
+  const charRadio = document.querySelector(`input[name="ai-karakter"][value="${randomChar}"]`);
+  if (charRadio) charRadio.checked = true;
+
+  const styleKeys = ['kartun_canva', 'storybook', 'pixar3d', 'anime_ceria'];
+  const randomStyle = styleKeys[Math.floor(Math.random() * styleKeys.length)];
+  const styleRadio = document.querySelector(`input[name="ai-style"][value="${randomStyle}"]`);
+  if (styleRadio) styleRadio.checked = true;
+
+  perbaruiPromptOtomatisAI(true);
+  showToast('🎲 Ide prompt kartun sopan berhasil diacak! Klik "Buat Gambar dengan AI" untuk melihat hasilnya.', 'info');
+}
+
+function pilihKebiasaanGaleri(habitKey) {
+  playSound('click');
+  const habitSelect = document.getElementById('ai-select-kebiasaan');
+  if (habitSelect) habitSelect.value = habitKey;
+
+  setModeAIStudio('generator');
+  perbaruiPromptOtomatisAI(true);
+  generateGambarAI7Kebiasaan();
+}
+
+function generateGambarAI7Kebiasaan() {
+  if (AI_STUDIO_STATE.isGenerating) return;
+  playSound('fanfare');
+
+  const habitKey = document.getElementById('ai-select-kebiasaan')?.value || AI_STUDIO_STATE.currentHabit;
+  const habit = AI_HABITS_DATA[habitKey] || AI_HABITS_DATA.bangun_pagi;
+  AI_STUDIO_STATE.currentHabit = habitKey;
+
+  const charInput = document.querySelector('input[name="ai-karakter"]:checked');
+  const charVal = charInput ? charInput.value : 'siswa_laki';
+  AI_STUDIO_STATE.currentKarakter = charVal;
+
+  const styleInput = document.querySelector('input[name="ai-style"]:checked');
+  const styleVal = styleInput ? styleInput.value : 'kartun_canva';
+  AI_STUDIO_STATE.currentStyle = styleVal;
+
+  const engineSelect = document.getElementById('ai-select-engine');
+  const engineVal = engineSelect ? engineSelect.value : (AI_STUDIO_STATE.currentEngine || 'local_cartoon');
+  AI_STUDIO_STATE.currentEngine = engineVal;
+
+  AI_STUDIO_STATE.claimedPoints = false;
+
+  const loadingOverlay = document.getElementById('ai-loading-overlay');
+  const loadingStep = document.getElementById('ai-loading-step');
+  const resultImg = document.getElementById('ai-result-image');
+  const fallbackBox = document.getElementById('ai-svg-fallback');
+  const btnGenText = document.getElementById('btn-generate-ai-text');
+
+  // MODE 1: STUDIO KARTUN EDUKASI CERDAS (LOKAL, BEBAS LIMIT, 100% INSTAN)
+  if (engineVal === 'local_cartoon') {
+    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+    if (loadingStep) loadingStep.innerText = `Menyusun kartun edukasi sopan: "${habit.title}"`;
+    if (btnGenText) btnGenText.innerText = 'Menyusun Kartun... 🎨';
+
+    setTimeout(() => {
+      renderFallbackArtwork(habitKey, styleVal);
+      if (resultImg) {
+        resultImg.src = AI_STUDIO_STATE.currentDataUrl;
+        resultImg.classList.remove('hidden');
+      }
+      if (fallbackBox) fallbackBox.classList.add('hidden');
+      selesaikanGenerasiGambarAI(false);
+      showToast('✨ Gambar kartun edukasi sopan berhasil dibuat (Bebas Limit Kuota)!', 'success');
+    }, 350);
+    return;
+  }
+
+  // MODE 2: GENERATOR ONLINE POLLINATIONS DENGAN DETEKSI LIMIT OTOMATIS
+  const charEn = {
+    siswa_laki: 'cute polite Indonesian elementary school boy, neat hair, wearing modest clean clothing, well-mannered joyful smile',
+    siswi_perempuan: 'cute polite Indonesian elementary school girl, neat hair, wearing modest clean clothing, sweet polite smile',
+    bersama_robo: 'cute polite Indonesian elementary student together with friendly cute white robot friend Robo, heartwarming well-mannered friendship',
+    sahabat_sekolah: 'group of cheerful polite Indonesian elementary school children, respectful, modest uniforms and friendly smiles'
+  }[charVal] || 'cute polite Indonesian elementary student';
+
+  const styleEn = {
+    kartun_canva: 'clean polite 2D cartoon illustration for children, Canva educational vector art style, charming smooth lines, modest attire, child-friendly wholesome design',
+    storybook: 'delightful children book cartoon illustration, sweet picture book art, warm gentle colors, polite and cute storybook character, clean and modest, heartwarming atmosphere',
+    pixar3d: 'charming cute 3D cartoon animation style, Disney Pixar inspired, polite and well-mannered character, warm soft lighting, very clean and modest attire, delightful wholesome render',
+    anime_ceria: 'cute modest anime cartoon for kids, Studio Ghibli inspired, very polite and cheerful, clean modest attire, bright sunny wholesome atmosphere'
+  }[styleVal] || 'clean polite 2D cartoon illustration for children';
+
+  const politeEnforcement = 'strictly polite, modest and decent clothing, positive educational cartoon, cheerful innocent expressions, safe for elementary school students, no inappropriate content, beautiful colors, masterpiece';
+  const finalPromptEn = `${habit.promptBaseEn}, ${charEn}, ${styleEn}, ${politeEnforcement}`;
+
+  AI_STUDIO_STATE.isGenerating = true;
+
+  if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+  if (loadingStep) loadingStep.innerText = `Menyusun kartun online: "${habit.title}"`;
+  if (btnGenText) btnGenText.innerText = 'AI Sedang Melukis... 🎨';
+
+  // Render client-side fallback visual kartun edukasi langsung agar dataUrl selalu terisi
+  renderFallbackArtwork(habitKey, styleVal);
+
+  const encodedPrompt = encodeURIComponent(finalPromptEn);
+  const seed = Math.floor(Math.random() * 999999);
+  const aiImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=600&height=600&nologo=true&seed=${seed}`;
+
+  AI_STUDIO_STATE.currentImageUrl = aiImageUrl;
+
+  if (resultImg) {
+    resultImg.crossOrigin = 'anonymous';
+    resultImg.src = aiImageUrl;
+  }
+
+  // Timer keselamatan: jika koneksi lambat dalam 7 detik, fallback langsung ditampilkan
+  setTimeout(() => {
+    if (AI_STUDIO_STATE.isGenerating) {
+      selesaikanGenerasiGambarAI(true);
+    }
+  }, 7000);
+}
+
+function onGambarAIBerhasilDimuat() {
+  const resultImg = document.getElementById('ai-result-image');
+  // Deteksi kartu error limit pollinations jika ada
+  if (resultImg && resultImg.src && resultImg.src.includes('pollinations')) {
+    try {
+      const isLimitCard = cekApakahGambarLimitPollinations(resultImg);
+      if (isLimitCard) {
+        console.warn('Terdeteksi kartu Free Limit Pollinations. Beralih ke Kartun Edukasi Bebas Limit.');
+        aktifkanKartunEdukasiBebasLimit();
+        return;
+      }
+    } catch(e) {}
+  }
+  selesaikanGenerasiGambarAI(false);
+}
+
+function onGambarAIGagalDimuat() {
+  selesaikanGenerasiGambarAI(true);
+}
+
+function cekApakahGambarLimitPollinations(imgElem) {
+  try {
+    const testCanvas = document.createElement('canvas');
+    testCanvas.width = 16;
+    testCanvas.height = 16;
+    const testCtx = testCanvas.getContext('2d');
+    testCtx.drawImage(imgElem, 0, 0, 16, 16);
+    const pixelData = testCtx.getImageData(0, 0, 16, 16).data;
+    let yellowCount = 0;
+    for (let i = 0; i < pixelData.length; i += 4) {
+      const r = pixelData[i];
+      const g = pixelData[i + 1];
+      const b = pixelData[i + 2];
+      // Kartu limit pollinations memiliki warna background kuning mustard khas: R>220, G>180, B<120
+      if (r > 220 && g > 180 && b < 120) {
+        yellowCount++;
+      }
+    }
+    return (yellowCount / (16 * 16)) > 0.55;
+  } catch (e) {
+    return false;
+  }
+}
+
+function selesaikanGenerasiGambarAI(useFallback = false) {
+  AI_STUDIO_STATE.isGenerating = false;
+  const loadingOverlay = document.getElementById('ai-loading-overlay');
+  const resultImg = document.getElementById('ai-result-image');
+  const fallbackBox = document.getElementById('ai-svg-fallback');
+  const btnGenText = document.getElementById('btn-generate-ai-text');
+
+  if (loadingOverlay) loadingOverlay.classList.add('hidden');
+  if (btnGenText) btnGenText.innerText = 'Buat Gambar dengan AI 🚀';
+
+  if (useFallback) {
+    if (resultImg) {
+      if (AI_STUDIO_STATE.currentDataUrl) {
+        resultImg.src = AI_STUDIO_STATE.currentDataUrl;
+        resultImg.classList.remove('hidden');
+        if (fallbackBox) fallbackBox.classList.add('hidden');
+      } else {
+        resultImg.classList.add('hidden');
+        if (fallbackBox) fallbackBox.classList.remove('hidden');
+      }
+    }
+    showToast('✨ Ilustrasi kartun sopan 7 Kebiasaan Anak Indonesia Hebat berhasil ditampilkan!', 'success');
+  } else {
+    if (resultImg) resultImg.classList.remove('hidden');
+    if (fallbackBox) fallbackBox.classList.add('hidden');
+    showToast('🎨 Gambar kartun AI yang sopan & baik berhasil digenerate sempurna!', 'success');
+  }
+}
+
+// RENDER KARTUN EDUKASI SOPAN & BAIK DI CANVAS UNTUK SEMUA 7 KEBIASAAN
+function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
+  const habit = AI_HABITS_DATA[habitKey] || AI_HABITS_DATA.bangun_pagi;
+  const fallbackBadge = document.getElementById('fallback-badge');
+  const fallbackEmoji = document.getElementById('fallback-emoji');
+  const fallbackHabitName = document.getElementById('fallback-habit-name');
+  const fallbackHabitQuote = document.getElementById('fallback-habit-quote');
+
+  if (fallbackBadge) fallbackBadge.innerText = `Kartun Edukasi #${habit.id} • Karakter Sopan & Baik`;
+  if (fallbackEmoji) fallbackEmoji.innerText = habit.emoji;
+  if (fallbackHabitName) fallbackHabitName.innerText = habit.title;
+  if (fallbackHabitQuote) fallbackHabitQuote.innerText = habit.quote;
+
+  // Render lukisan kartun edukasi anak lengkap ke Canvas (600x600 px)
+  const canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 600;
+  const ctx = canvas.getContext('2d');
+
+  // Background Kamar / Ruangan Berdasarkan Tema Kebiasaan
+  if (habitKey === 'bangun_pagi') {
+    // 1. BANGUN PAGI CERIA: Kamar cerah mentari pagi
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#e0f2fe'); // Langit biru pastel
+    grad.addColorStop(0.65, '#fef3c7'); // Dinding hangat
+    grad.addColorStop(0.65, '#fde68a'); // Lantai kayu
+    grad.addColorStop(1, '#d97706'); // Kayu hangat
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Jendela Kamar dengan Sinar Mentari Pagi
+    ctx.fillStyle = '#bae6fd';
+    ctx.beginPath();
+    ctx.roundRect(50, 70, 130, 160, [20, 20, 5, 5]);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // Matahari Senyum
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(115, 130, 32, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath();
+    ctx.arc(106, 124, 3, 0, Math.PI * 2);
+    ctx.arc(124, 124, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(115, 134, 10, 0.2, Math.PI - 0.2);
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Kusen Jendela
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(115, 70); ctx.lineTo(115, 230);
+    ctx.moveTo(50, 150); ctx.lineTo(180, 150);
+    ctx.stroke();
+
+    // Tempat Tidur Kayu Rapi
+    ctx.fillStyle = '#b45309';
+    ctx.beginPath();
+    ctx.roundRect(170, 240, 270, 90, [16, 16, 0, 0]);
+    ctx.fill();
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.roundRect(180, 290, 250, 130, [12, 12, 0, 0]);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.roundRect(230, 275, 150, 45, 16);
+    ctx.fill();
+
+    // Anak bangun tidur ceria merentang tangan (Piyama sopan)
+    ctx.fillStyle = '#60a5fa';
+    ctx.beginPath();
+    ctx.roundRect(270, 260, 70, 80, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(274, 280); ctx.lineTo(336, 280);
+    ctx.moveTo(274, 300); ctx.lineTo(336, 300);
+    ctx.moveTo(274, 320); ctx.lineTo(336, 320);
+    ctx.stroke();
+
+    // Kepala & Wajah
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(305, 230, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#451a03';
+    ctx.beginPath();
+    ctx.arc(305, 218, 38, Math.PI, 0, false);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(295, 210, 18, 0, Math.PI);
+    ctx.arc(315, 210, 16, 0, Math.PI);
+    ctx.fill();
+
+    // Mata senyum & pipi pink
+    ctx.strokeStyle = '#451a03';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(294, 232, 6, Math.PI, 0);
+    ctx.arc(316, 232, 6, Math.PI, 0);
+    ctx.stroke();
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.arc(285, 242, 6, 0, Math.PI * 2);
+    ctx.arc(325, 242, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(305, 244, 10, 0.2, Math.PI - 0.2);
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
+
+    // Tangan merentang riang
+    ctx.strokeStyle = '#fed7aa';
+    ctx.lineWidth = 12;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(272, 280); ctx.lineTo(240, 230);
+    ctx.moveTo(338, 280); ctx.lineTo(370, 230);
+    ctx.stroke();
+
+    // Selimut bintang
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath();
+    ctx.roundRect(190, 330, 230, 95, [14, 14, 0, 0]);
+    ctx.fill();
+    ctx.fillStyle = '#d97706';
+    ctx.font = '22px sans-serif';
+    ctx.fillText('⭐', 220, 370);
+    ctx.fillText('⭐', 290, 390);
+    ctx.fillText('⭐', 370, 370);
+
+    // Meja & Jam Weker 05:00
+    ctx.fillStyle = '#92400e';
+    ctx.beginPath();
+    ctx.roundRect(435, 310, 90, 115, 8);
+    ctx.fill();
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(480, 290, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(480, 290, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(480, 290); ctx.lineTo(480, 278);
+    ctx.moveTo(480, 290); ctx.lineTo(490, 298);
+    ctx.stroke();
+
+  } else if (habitKey === 'beribadah') {
+    // 2. BERIBADAH & BERSYUKUR: Cahaya keemasan damai & cinta kasih
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#fef3c7'); // Kuning keemasan hangat
+    grad.addColorStop(0.5, '#ede9fe'); // Lavender suci
+    grad.addColorStop(1, '#e0e7ff'); // Biru lembut
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Lingkaran Aura Cahaya Keemasan
+    ctx.fillStyle = 'rgba(254, 240, 138, 0.45)';
+    ctx.beginPath();
+    ctx.arc(300, 250, 150, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ornamen Daun Teratai / Bunga Simbol Gan En
+    ctx.fillStyle = '#ec4899';
+    for (let a = 0; a < 6; a++) {
+      const rad = (a * Math.PI) / 3;
+      ctx.beginPath();
+      ctx.ellipse(300 + Math.cos(rad) * 45, 410 + Math.sin(rad) * 15, 22, 10, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(300, 410, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Badan & Seragam Rapi Bersih
+    ctx.fillStyle = '#3b82f6';
+    ctx.beginPath();
+    ctx.roundRect(255, 270, 90, 110, 20);
+    ctx.fill();
+    // Kerah Putih Sopan
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(280, 270); ctx.lineTo(300, 295); ctx.lineTo(320, 270);
+    ctx.fill();
+
+    // Kepala & Wajah Khusyuk
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(300, 215, 40, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1e1b4b';
+    ctx.beginPath();
+    ctx.arc(300, 200, 42, Math.PI, 0, false);
+    ctx.fill();
+
+    // Mata terpejam khusyuk damai
+    ctx.strokeStyle = '#312e81';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(288, 220, 6, 0.2, Math.PI - 0.2);
+    ctx.arc(312, 220, 6, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Pipi pink merona & senyum tulus
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.arc(280, 230, 6, 0, Math.PI * 2);
+    ctx.arc(320, 230, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(300, 235, 8, 0.2, Math.PI - 0.2);
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Kedua tangan terkatup di dada (Berdoa Gan En)
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.ellipse(300, 315, 16, 24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+  } else if (habitKey === 'olahraga') {
+    // 3. RAJIN BEROLAHRAGA: Lapangan hijau cerah & bola sepak
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#38bdf8'); // Langit biru
+    grad.addColorStop(0.55, '#bae6fd'); // Cakrawala
+    grad.addColorStop(0.55, '#22c55e'); // Rumput hijau
+    grad.addColorStop(1, '#15803d'); // Rumput segar
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Matahari & Awan
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(90, 110, 35, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.beginPath();
+    ctx.arc(450, 120, 25, 0, Math.PI * 2);
+    ctx.arc(480, 110, 32, 0, Math.PI * 2);
+    ctx.arc(510, 120, 24, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pohon rindang di latar belakang
+    ctx.fillStyle = '#854d0e';
+    ctx.fillRect(490, 240, 24, 90);
+    ctx.fillStyle = '#16a34a';
+    ctx.beginPath();
+    ctx.arc(502, 230, 50, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Anak berolahraga senam / lari (Kaos olahraga santun & celana training)
+    ctx.fillStyle = '#ea580c'; // Baju olahraga oranye
+    ctx.beginPath();
+    ctx.roundRect(260, 240, 80, 85, 16);
+    ctx.fill();
+
+    // Celana training biru tua sopan
+    ctx.fillStyle = '#1e3a8a';
+    ctx.beginPath();
+    ctx.roundRect(265, 325, 70, 70, 10);
+    ctx.fill();
+
+    // Kepala ceria
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(300, 195, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#3f2e18';
+    ctx.beginPath();
+    ctx.arc(300, 185, 38, Math.PI, 0, false);
+    ctx.fill();
+
+    // Mata riang & senyum lebar bugar
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(288, 198, 5, 0, Math.PI * 2);
+    ctx.arc(312, 198, 5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#f43f5e';
+    ctx.beginPath();
+    ctx.arc(280, 206, 5, 0, Math.PI * 2);
+    ctx.arc(320, 206, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(300, 208, 10, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Tangan senam / lari
+    ctx.strokeStyle = '#fed7aa';
+    ctx.lineWidth = 12;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(260, 260); ctx.lineTo(225, 290);
+    ctx.moveTo(340, 260); ctx.lineTo(375, 230);
+    ctx.stroke();
+
+    // Bola Sepak di Rumput
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(200, 395, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(200, 395, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+  } else if (habitKey === 'makan_sehat') {
+    // 4. MAKAN SEHAT BERGIZI: Meja makan higienis, piring buah, sayur & susu
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#fef08a'); // Kuning ceria dapur
+    grad.addColorStop(0.6, '#ecfdf5'); // Mint bersih
+    grad.addColorStop(1, '#a7f3d0'); // Hijau segar
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Meja Makan Bersih
+    ctx.fillStyle = '#b45309';
+    ctx.beginPath();
+    ctx.roundRect(80, 310, 440, 130, [20, 20, 0, 0]);
+    ctx.fill();
+    // Taplak meja kotak-kotak pastel
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.roundRect(100, 325, 400, 105, 14);
+    ctx.fill();
+
+    // Piring Makan Besar Putih
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(300, 375, 55, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Sayur Brokoli Hijau di Piring
+    ctx.fillStyle = '#22c55e';
+    ctx.beginPath();
+    ctx.arc(280, 365, 15, 0, Math.PI * 2);
+    ctx.arc(295, 355, 16, 0, Math.PI * 2);
+    ctx.arc(310, 365, 14, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Apel Merah Segar
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(305, 385, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#15803d';
+    ctx.fillRect(303, 367, 3, 6);
+
+    // Gelas Susu Segar di Kanan
+    ctx.fillStyle = '#e2e8f0';
+    ctx.beginPath();
+    ctx.roundRect(400, 340, 35, 55, 6);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.roundRect(403, 348, 29, 44, 4);
+    ctx.fill();
+
+    // Anak Duduk Santun di Belakang Meja
+    ctx.fillStyle = '#0d9488';
+    ctx.beginPath();
+    ctx.roundRect(260, 220, 80, 95, 18);
+    ctx.fill();
+
+    // Kepala & Senyum Manis
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(300, 180, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#451a03';
+    ctx.beginPath();
+    ctx.arc(300, 170, 38, Math.PI, 0, false);
+    ctx.fill();
+
+    // Mata senyum riang
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(288, 182, 5, Math.PI, 0);
+    ctx.arc(312, 182, 5, Math.PI, 0);
+    ctx.stroke();
+    ctx.fillStyle = '#fb7185';
+    ctx.beginPath();
+    ctx.arc(280, 192, 5, 0, Math.PI * 2);
+    ctx.arc(320, 192, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(300, 194, 9, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+  } else if (habitKey === 'belajar_membaca') {
+    // 5. GEMAR BELAJAR & MEMBACA: Perpustakaan kayu, buku cerita terbuka & bintang
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#f5f3ff'); // Ungu pastel
+    grad.addColorStop(0.55, '#ddd6fe');
+    grad.addColorStop(1, '#c4b5fd');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Rak Buku Kayu di Belakang
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath();
+    ctx.roundRect(60, 80, 480, 110, 12);
+    ctx.fill();
+    // Deretan Buku Warna-warni di Rak
+    const bookColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+    bookColors.forEach((col, bIdx) => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.roundRect(85 + bIdx * 52, 95, 38, 85, 4);
+      ctx.fill();
+    });
+
+    // Meja Belajar
+    ctx.fillStyle = '#92400e';
+    ctx.beginPath();
+    ctx.roundRect(90, 310, 420, 130, [18, 18, 0, 0]);
+    ctx.fill();
+
+    // Buku Cerita Bergambar Terbuka di Meja
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.roundRect(220, 325, 160, 60, 6);
+    ctx.fill();
+    ctx.strokeStyle = '#8b5cf6';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    // Garis tengah buku & teks
+    ctx.beginPath();
+    ctx.moveTo(300, 325); ctx.lineTo(300, 385);
+    ctx.stroke();
+    ctx.fillStyle = '#a855f7';
+    ctx.font = '16px sans-serif';
+    ctx.fillText('⭐', 250, 355);
+    ctx.fillText('📖', 340, 355);
+
+    // Anak Membaca Buku dengan Senyum Manis
+    ctx.fillStyle = '#6d28d9';
+    ctx.beginPath();
+    ctx.roundRect(260, 230, 80, 90, 18);
+    ctx.fill();
+
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(300, 190, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1e1b4b';
+    ctx.beginPath();
+    ctx.arc(300, 180, 38, Math.PI, 0, false);
+    ctx.fill();
+
+    // Mata cerdas berbinar & senyum
+    ctx.fillStyle = '#1e1b4b';
+    ctx.beginPath();
+    ctx.arc(288, 190, 6, 0, Math.PI * 2);
+    ctx.arc(312, 190, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(286, 188, 2, 0, Math.PI * 2);
+    ctx.arc(310, 188, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.arc(280, 202, 5, 0, Math.PI * 2);
+    ctx.arc(320, 202, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(300, 204, 9, 0.2, Math.PI - 0.2);
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+  } else if (habitKey === 'rukun_berbagi') {
+    // 6. HIDUP RUKUN & TOLONG MENOLONG: Dua sahabat berbagi bekal di taman
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#f0fdf4');
+    grad.addColorStop(0.5, '#dcfce7');
+    grad.addColorStop(1, '#86efac');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Bunga-bunga di Taman Sekolah
+    const flowerX = [80, 150, 450, 520];
+    flowerX.forEach(fx => {
+      ctx.fillStyle = '#ec4899';
+      ctx.beginPath();
+      ctx.arc(fx, 390, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(fx, 390, 6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Karakter 1 (Siswa Laki-laki di Kiri)
+    ctx.fillStyle = '#2563eb';
+    ctx.beginPath();
+    ctx.roundRect(190, 240, 70, 95, 16);
+    ctx.fill();
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(225, 195, 34, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#451a03';
+    ctx.beginPath();
+    ctx.arc(225, 185, 36, Math.PI, 0, false);
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(215, 198, 4, 0, Math.PI * 2);
+    ctx.arc(235, 198, 4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(225, 205, 7, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Karakter 2 (Siswi Perempuan di Kanan)
+    ctx.fillStyle = '#db2777';
+    ctx.beginPath();
+    ctx.roundRect(340, 240, 70, 95, 16);
+    ctx.fill();
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(375, 195, 34, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1e1b4b';
+    ctx.beginPath();
+    ctx.arc(375, 185, 36, Math.PI, 0, false);
+    ctx.fill();
+    // Kuncir Rambut Pita Pink
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.arc(345, 180, 8, 0, Math.PI * 2);
+    ctx.arc(405, 180, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(365, 198, 4, 0, Math.PI * 2);
+    ctx.arc(385, 198, 4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(375, 205, 7, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Kotak Bekal Makanan Bersama di Tengah
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.roundRect(275, 290, 50, 35, 8);
+    ctx.fill();
+    ctx.fillStyle = '#ef4444';
+    ctx.font = '22px sans-serif';
+    ctx.fillText('🍎', 288, 315);
+
+    // Simbol Hati Cinta Kasih (Hu Ai) Melayang di Atas
+    ctx.fillStyle = '#f43f5e';
+    ctx.beginPath();
+    ctx.arc(290, 140, 14, 0, Math.PI * 2);
+    ctx.arc(310, 140, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(277, 145); ctx.lineTo(300, 170); ctx.lineTo(323, 145);
+    ctx.fill();
+
+  } else {
+    // 7. TIDUR TEPAT WAKTU: Kamar malam tenang berbintang & jam 20:30
+    const grad = ctx.createLinearGradient(0, 0, 0, 600);
+    grad.addColorStop(0, '#0f172a'); // Biru malam berbintang
+    grad.addColorStop(0.65, '#1e1b4b'); // Kamar malam tenang
+    grad.addColorStop(1, '#312e81');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Jendela Kamar Malam Berbintang
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.roundRect(50, 70, 130, 160, [20, 20, 5, 5]);
+    ctx.fill();
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+
+    // Bulan Sabit Kuning Senyum di Jendela
+    ctx.fillStyle = '#fde047';
+    ctx.beginPath();
+    ctx.arc(120, 125, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.arc(130, 120, 24, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Bintang-bintang berkilau
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('✨', 75, 105);
+    ctx.fillText('⭐', 140, 190);
+    ctx.fillText('✨', 80, 195);
+
+    // Jam Dinding Pukul 20:30
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.arc(480, 130, 26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    // Jarum jam ke 8 & 6 (20:30)
+    ctx.beginPath();
+    ctx.moveTo(480, 130); ctx.lineTo(468, 138); // jarum pendek ke 8
+    ctx.moveTo(480, 130); ctx.lineTo(480, 150); // jarum panjang ke 6
+    ctx.stroke();
+
+    // Tempat Tidur & Selimut Hangat
+    ctx.fillStyle = '#475569';
+    ctx.beginPath();
+    ctx.roundRect(170, 250, 270, 90, [16, 16, 0, 0]);
+    ctx.fill();
+
+    ctx.fillStyle = '#312e81';
+    ctx.beginPath();
+    ctx.roundRect(180, 290, 250, 130, [12, 12, 0, 0]);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.roundRect(230, 275, 150, 45, 16);
+    ctx.fill();
+
+    // Anak Tidur Pulas Nyenyak (Wajah & Piyama)
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(305, 285, 32, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#312e81';
+    ctx.beginPath();
+    ctx.arc(305, 275, 34, Math.PI, 0, false);
+    ctx.fill();
+
+    // Mata terpejam nyenyak
+    ctx.strokeStyle = '#1e1b4b';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(295, 288, 5, 0.2, Math.PI - 0.2);
+    ctx.arc(315, 288, 5, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(305, 294, 7, 0.2, Math.PI - 0.2);
+    ctx.strokeStyle = '#e11d48';
+    ctx.stroke();
+
+    // Huruf Zzz tidur pulas
+    ctx.fillStyle = '#a5b4fc';
+    ctx.font = 'bold 20px Fredoka, sans-serif';
+    ctx.fillText('z', 345, 255);
+    ctx.fillText('Z', 360, 240);
+    ctx.fillText('Z', 375, 222);
+
+    // Selimut hangat motif bulan bintang
+    ctx.fillStyle = '#4f46e5';
+    ctx.beginPath();
+    ctx.roundRect(190, 315, 230, 110, [16, 16, 0, 0]);
+    ctx.fill();
+    ctx.fillStyle = '#fde047';
+    ctx.font = '20px sans-serif';
+    ctx.fillText('⭐', 220, 360);
+    ctx.fillText('🌙', 290, 380);
+    ctx.fillText('⭐', 370, 360);
+  }
+
+  // Bingkai Luar Putih
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 14;
+  ctx.strokeRect(12, 12, 576, 576);
+
+  // Header Badge Kartun
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.roundRect(70, 25, 460, 42, 21);
+  ctx.fill();
+  ctx.shadowColor = 'rgba(0,0,0,0.12)';
+  ctx.shadowBlur = 8;
+  ctx.fillStyle = '#7c3aed';
+  ctx.font = 'bold 20px Fredoka, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`★ KARTUN EDUKASI: ${habit.title.toUpperCase()} ★`, 300, 53);
+  ctx.shadowBlur = 0;
+
+  // Footer Pesan Budi Pekerti
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+  ctx.beginPath();
+  ctx.roundRect(40, 480, 520, 80, 24);
+  ctx.fill();
+  ctx.fillStyle = '#0f172a';
+  ctx.font = '900 20px Fredoka, sans-serif';
+  ctx.fillText(`Kebiasaan Baik #${habit.id}: ${habit.title}`, 300, 512);
+
+  ctx.fillStyle = '#475569';
+  ctx.font = 'bold 13px Fredoka, sans-serif';
+  ctx.fillText(habit.quote.replace(/\"/g, ''), 300, 538);
+
+  AI_STUDIO_STATE.currentDataUrl = canvas.toDataURL('image/png');
+}
+
+function kirimGambarAIKeWord() {
+  playSound('fanfare');
+  const habit = AI_HABITS_DATA[AI_STUDIO_STATE.currentHabit] || AI_HABITS_DATA.belajar_membaca;
+  const resultImg = document.getElementById('ai-result-image');
+  const fallbackBox = document.getElementById('ai-svg-fallback');
+
+  let imageSrc = AI_STUDIO_STATE.currentDataUrl;
+
+  // Jika gambar AI online aktif dan tidak hidden, gunakan gambarnya
+  if (resultImg && !resultImg.classList.contains('hidden') && resultImg.src && !resultImg.src.includes('error')) {
+    imageSrc = resultImg.src;
+  }
+
+  if (!imageSrc) {
+    renderFallbackArtwork(AI_STUDIO_STATE.currentHabit);
+    imageSrc = AI_STUDIO_STATE.currentDataUrl;
+  }
+
+  const imageName = `Gambar AI: ${habit.title}`;
+  sisipkanGambarLuarKeWord(imageSrc, imageName);
+  switchTab('msword');
+
+  tambahPoin(30);
+  showToast(`Gambar AI "${habit.title}" berhasil disisipkan ke Lab Ms. Word! 📄 (+30 Bintang)`, 'success');
+}
+
+function unduhGambarAIHasil() {
+  playSound('success');
+  const habit = AI_HABITS_DATA[AI_STUDIO_STATE.currentHabit] || AI_HABITS_DATA.belajar_membaca;
+  const link = document.createElement('a');
+  link.download = `Gambar_AI_7Kebiasaan_${habit.title.replace(/\s+/g, '_')}_Kelas4.png`;
+
+  const resultImg = document.getElementById('ai-result-image');
+  if (resultImg && !resultImg.classList.contains('hidden') && resultImg.src) {
+    link.href = resultImg.src;
+  } else {
+    if (!AI_STUDIO_STATE.currentDataUrl) {
+      renderFallbackArtwork(AI_STUDIO_STATE.currentHabit);
+    }
+    link.href = AI_STUDIO_STATE.currentDataUrl;
+  }
+
+  link.click();
+  tambahPoin(10);
+  showToast(`Gambar AI "${habit.title}" berhasil diunduh ke komputer! 💾`, 'success');
+}
+
+function klaimBintangGambarAI() {
+  if (AI_STUDIO_STATE.claimedPoints) {
+    showToast('Kamu sudah mengambil bintang untuk gambar ini! Coba buat gambar kebiasaan lainnya ya! ⭐', 'info');
+    return;
+  }
+  playSound('fanfare');
+  AI_STUDIO_STATE.claimedPoints = true;
+  tambahPoin(30);
+  showToast('Luar biasa! +30 Bintang berhasil didapatkan dari karya gambar AI! ⭐', 'success');
+}
+
+function bukaZoomGambarAI() {
+  const habit = AI_HABITS_DATA[AI_STUDIO_STATE.currentHabit] || AI_HABITS_DATA.belajar_membaca;
+  const resultImg = document.getElementById('ai-result-image');
+  let src = AI_STUDIO_STATE.currentDataUrl;
+
+  if (resultImg && !resultImg.classList.contains('hidden') && resultImg.src) {
+    src = resultImg.src;
+  } else if (!src) {
+    renderFallbackArtwork(AI_STUDIO_STATE.currentHabit);
+    src = AI_STUDIO_STATE.currentDataUrl;
+  }
+
+  if (typeof bukaModalGambarMateri === 'function') {
+    bukaModalGambarMateri(src, `Ilustrasi AI: ${habit.title} (7 Kebiasaan Anak Indonesia Hebat)`);
+  }
+}
+
+// Backward Compatibility Stubs
+function selectP2Item(itemId, itemType) {
+  showToast('Fitur telah ditingkatkan menjadi Studio Gambar AI 7 Kebiasaan Anak Indonesia Hebat! 🎨', 'info');
+}
+function dropP2ItemTo(targetWadah) {}
+function resetPraktik2() {}
+
+window.initAIStudioPraktik2 = initAIStudioPraktik2;
+window.setModeAIStudio = setModeAIStudio;
+window.perbaruiPromptOtomatisAI = perbaruiPromptOtomatisAI;
+window.acakPromptAI7Kebiasaan = acakPromptAI7Kebiasaan;
+window.pilihKebiasaanGaleri = pilihKebiasaanGaleri;
+window.generateGambarAI7Kebiasaan = generateGambarAI7Kebiasaan;
+window.onGambarAIBerhasilDimuat = onGambarAIBerhasilDimuat;
+window.onGambarAIGagalDimuat = onGambarAIGagalDimuat;
+window.kirimGambarAIKeWord = kirimGambarAIKeWord;
+window.unduhGambarAIHasil = unduhGambarAIHasil;
+window.klaimBintangGambarAI = klaimBintangGambarAI;
+window.bukaZoomGambarAI = bukaZoomGambarAI;
+window.selectP2Item = selectP2Item;
+window.dropP2ItemTo = dropP2ItemTo;
+window.resetPraktik2 = resetPraktik2;
+window.initPencariKartun = initPencariKartun;
+window.cariKoleksiKartun = cariKoleksiKartun;
+window.cariKoleksiKartunModal = cariKoleksiKartunModal;
+window.pilihKategoriKartun = pilihKategoriKartun;
+window.pasangKartunKeWord = pasangKartunKeWord;
+window.unduhKartunItem = unduhKartunItem;
+window.bukaZoomKartunItem = bukaZoomKartunItem;
+window.bukaModalMesinPencariKartun = bukaModalMesinPencariKartun;
+window.tutupModalMesinPencariKartun = tutupModalMesinPencariKartun;
+window.bukaGoogleSafeSearchKartun = bukaGoogleSafeSearchKartun;
 
 // ==========================================
 // 9. PRAKTIK 3: STUDIO POSTER KREATIF (TP 2.3)
@@ -2740,7 +7117,7 @@ const quizQuestionsSem2 = [
   },
   {
     tp: 'TP 2.6 (Logika Perulangan / Loops)',
-    question: 'Jika kamu ingin karakter robot Robo-Tzu Chi melangkah maju sebanyak 10 kali secara otomatis, balok cerdas apa yang paling ringkas digunakan?',
+    question: 'Jika kamu ingin karakter robot Robo melangkah maju sebanyak 10 kali secara otomatis, balok cerdas apa yang paling ringkas digunakan?',
     options: [
       'Balok Perulangan (Ulangi 10 Kali / Repeat 10)',
       'Balok Ganti Latar Belakang Kertas',
@@ -2974,8 +7351,102 @@ function bukaWordBackstage(tab = 'save') {
   playSound('click');
   const backstage = document.getElementById('word-backstage-view');
   if (backstage) backstage.classList.remove('hidden');
+
+  // Auto-fill saran nama dokumen baku jika input masih kosong atau nilai default
+  const inputEl = document.getElementById('word-doc-name-input');
+  if (inputEl) {
+    if (!inputEl.value || inputEl.value === 'Poster_7_Kebiasaan_Anak_Indonesia_Hebat' || inputEl.value === 'Poster_Lingkungan_Hidup_Kelas4' || inputEl.value === 'Poster_Lingkungan_Hidup_Baru') {
+      inputEl.value = buatSaranNamaFileBaku('Poster 7 Kebiasaan');
+    }
+    periksaNamaDokumenWordLive(inputEl.value);
+  }
+
   setWordBackstageTab(tab);
 }
+
+function periksaNamaDokumenWordLive(val) {
+  const feedbackEl = document.getElementById('word-doc-name-feedback');
+  if (!feedbackEl) return;
+  const cleanVal = (val || '').trim();
+  if (!cleanVal) {
+    feedbackEl.className = 'mt-2 p-2.5 rounded-xl text-xs bg-slate-50 text-slate-500 border border-slate-200 flex items-center justify-between';
+    feedbackEl.innerHTML = `<span>Format baku yang dinilai: <b>Kelas_Nama Siswa_Nama file</b> (contoh: 4A_Darningsih_Poster 7 Kebiasaan)</span>`;
+    return;
+  }
+
+  const check = periksaFormatNamaFile(cleanVal);
+  if (check.valid) {
+    feedbackEl.className = 'mt-2 p-2.5 rounded-xl text-xs bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-xs flex items-center justify-between animate-fadeIn';
+    feedbackEl.innerHTML = `
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-600 text-base shrink-0"></i>
+        <div>
+          <p class="font-bold text-emerald-900">Format Penamaan Baku Sempurna! ⭐</p>
+          <p class="text-[11px] text-emerald-700">Kelas: <b>${check.kelas}</b> • Siswa: <b>${check.nama}</b> • Judul: <b>${check.judul}</b></p>
+        </div>
+      </div>
+      <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px] shrink-0 shadow-xs">+20 Poin Nilai ⭐</span>
+    `;
+  } else {
+    feedbackEl.className = 'mt-2 p-2.5 rounded-xl text-xs bg-amber-50 text-amber-800 border border-amber-300 flex items-center justify-between animate-fadeIn';
+    feedbackEl.innerHTML = `
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base shrink-0"></i>
+        <div>
+          <p class="font-bold text-amber-900">Format Belum Baku</p>
+          <p class="text-[11px] text-amber-700">${check.pesan}</p>
+        </div>
+      </div>
+      <button type="button" onclick="terapkanSaranNamaDokumenWord()" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[10px] shrink-0 transition cursor-pointer shadow-xs">
+        🪄 Format Baku
+      </button>
+    `;
+  }
+}
+window.periksaNamaDokumenWordLive = periksaNamaDokumenWordLive;
+
+function terapkanSaranNamaDokumenWord() {
+  playSound('click');
+  const inputEl = document.getElementById('word-doc-name-input');
+  if (!inputEl) return;
+  const saran = buatSaranNamaFileBaku('Poster 7 Kebiasaan');
+  inputEl.value = saran;
+  periksaNamaDokumenWordLive(saran);
+  showToast('Format nama dokumen baku berhasil diterapkan! ✨', 'success');
+}
+window.terapkanSaranNamaDokumenWord = terapkanSaranNamaDokumenWord;
+
+function simpanPaintKeDrivePrompt() {
+  playSound('click');
+  if (typeof paintApp === 'undefined' || !paintApp.canvas) {
+    showToast('Kanvas Paint belum siap!', 'warning');
+    return;
+  }
+  const dataUrl = paintApp.canvas.toDataURL('image/png');
+  const daftarSlot = DRIVE_7KEBIASAAN_CONFIG.map(c => `${c.slotNumber}. ${c.cleanTitle}`).join('\n');
+  const inputNomor = prompt(
+    `🎨 SIMPAN GAMBAR PAINT KE DRIVE 7 KEBIASAAN:\n\n` +
+    `Pilih nomor kebiasaan untuk gambar lukisanmu (1-7):\n` +
+    `${daftarSlot}\n\n` +
+    `Ketik nomor 1 sampai 7:`,
+    '1'
+  );
+  if (!inputNomor) return;
+  const num = parseInt(inputNomor.trim());
+  const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.slotNumber === num);
+  if (!cfg) {
+    alert('Nomor kebiasaan tidak valid. Masukkan angka antara 1 sampai 7.');
+    return;
+  }
+
+  const fileName = buatSaranNamaFileBaku(cfg.cleanTitle);
+  simpanGambarKeSlotDrive(cfg.key, dataUrl, `Lukisan Paint: ${cfg.cleanTitle}`, '🖌️ Gambar Sendiri', fileName);
+  switchTab('praktik');
+  if (typeof setPraktikSubtab === 'function') setPraktikSubtab('praktik-tp2');
+  setModeAIStudio('drive');
+  showToast(`Lukisanmu berhasil disimpan ke slot "${cfg.cleanTitle}" di Drive! 📁🎨`, 'success');
+}
+window.simpanPaintKeDrivePrompt = simpanPaintKeDrivePrompt;
 
 function tutupWordBackstage() {
   playSound('click');
@@ -3009,11 +7480,23 @@ function simpanDokumenCepatWord() {
   bukaWordBackstage('save');
 }
 
-function simpanDokumenKeBrowser() {
+async function simpanDokumenKeBrowser() {
   playSound('success');
   const inputEl = document.getElementById('word-doc-name-input');
   const title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : 'Poster_Lingkungan_Hidup_Kelas4';
   currentWordDocTitle = title;
+
+  // Nilai format penamaan file baku
+  const checkNaming = periksaFormatNamaFile(title);
+  if (checkNaming.valid) {
+    tambahPoin(20);
+    showToast(`Bonus +20 Bintang: Format nama file baku "${title}" terpenuhi! ⭐`, 'success');
+  }
+
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const authorName = (activeStudent && activeStudent.nama) ? activeStudent.nama : '';
+  const authorClass = (activeStudent && (activeStudent.kelas || activeStudent.rombel)) ? (activeStudent.kelas || activeStudent.rombel) : '';
+  const authorLabel = authorName ? `${authorName} (${authorClass || 'Kelas 4'})` : 'Karya Siswa Kelas 4 SD';
 
   const docData = {
     id: 'doc_' + Date.now(),
@@ -3021,11 +7504,14 @@ function simpanDokumenKeBrowser() {
     savedAt: new Date().toISOString(),
     elements: JSON.parse(JSON.stringify(wordElements)),
     pageBgColor: wordPageBgColor,
-    pageBorderStyle: wordPageBorderStyle
+    pageBorderStyle: wordPageBorderStyle,
+    author: authorLabel,
+    studentClass: authorClass || 'Kelas 4'
   };
 
   try {
-    let savedDocs = JSON.parse(localStorage.getItem('kreator_cilik_word_docs') || '[]');
+    const docsKey = getActiveStudentStorageKey('kreator_cilik_word_docs');
+    let savedDocs = JSON.parse(localStorage.getItem(docsKey) || '[]');
     const existingIndex = savedDocs.findIndex(d => d.title.toLowerCase() === title.toLowerCase());
     if (existingIndex >= 0) {
       savedDocs[existingIndex] = docData;
@@ -3033,21 +7519,49 @@ function simpanDokumenKeBrowser() {
       savedDocs.unshift(docData);
     }
     if (savedDocs.length > 15) savedDocs = savedDocs.slice(0, 15);
-    localStorage.setItem('kreator_cilik_word_docs', JSON.stringify(savedDocs));
+    localStorage.setItem(docsKey, JSON.stringify(savedDocs));
 
     const titleDisplay = document.getElementById('word-doc-title-display');
     if (titleDisplay) titleDisplay.innerText = `${title}.docx - Microsoft Word`;
 
     // Sinkronkan juga ke Galeri Poster Siswa (Praktik 1)
-    simpanPosterKeGaleriWord(null);
+    await simpanPosterKeGaleriWord(null);
 
     tambahPoin(20);
-    showToast(`Dokumen "${title}" berhasil disimpan di browser & Galeri Praktik 1! 💾`, 'success');
     tutupWordBackstage();
+
+    // Jika sedang dalam mode layar penuh (fullscreen Word), pulihkan ke mode normal
+    if (typeof isWordMaximized !== 'undefined' && isWordMaximized) {
+      toggleMaximizeWordWindow(false);
+    }
+
+    // Otomatis arahkan siswa ke Studio Praktik / Galeri Karya Siswa
+    switchTab('praktik');
+    if (typeof setPraktikSubtab === 'function') {
+      setPraktikSubtab('praktik-tp1');
+    }
+    if (typeof setModePraktik1 === 'function') {
+      setModePraktik1('word');
+    }
+    if (typeof renderGaleriPosterWord === 'function') {
+      renderGaleriPosterWord();
+    }
+
+    // Scroll halus langsung ke wadah galeri poster karya siswa
+    setTimeout(() => {
+      const galleryEl = document.getElementById('p1-word-poster-gallery');
+      if (galleryEl) {
+        galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 250);
+
+    showToast(`Dokumen "${title}" berhasil disimpan di browser & otomatis masuk ke Studio Praktik / Galeri! 🎨⭐`, 'success');
   } catch (e) {
+    console.error('Error simpanDokumenKeBrowser:', e);
     showToast('Gagal menyimpan dokumen.', 'error');
   }
 }
+window.simpanDokumenKeBrowser = simpanDokumenKeBrowser;
 
 // Helper Escape XML untuk OpenXML Word
 function escapeXml(unsafe) {
@@ -3070,6 +7584,13 @@ async function unduhDokumenWorddoc() {
   let title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : 'Poster_Lingkungan_Hidup_Kelas4';
   title = title.replace(/\.docx$/i, ''); // hilangkan ekstensi ganda jika ada
   currentWordDocTitle = title;
+
+  // Nilai format penamaan file baku
+  const checkNaming = periksaFormatNamaFile(title);
+  if (checkNaming.valid) {
+    tambahPoin(20);
+    showToast(`Bonus +20 Bintang: Format nama file baku "${title}" terpenuhi! ⭐`, 'success');
+  }
 
   const docData = {
     fileType: 'MS_WORD_POSTER_KELAS4',
@@ -3392,18 +7913,21 @@ function muatRiwayatDokumenWord() {
   const listEl = document.getElementById('word-recent-docs-list');
   if (!listEl) return;
 
+  const docsKey = getActiveStudentStorageKey('kreator_cilik_word_docs');
   let savedDocs = [];
   try {
-    savedDocs = JSON.parse(localStorage.getItem('kreator_cilik_word_docs') || '[]');
+    savedDocs = JSON.parse(localStorage.getItem(docsKey) || '[]');
   } catch (e) {
     savedDocs = [];
   }
 
   if (savedDocs.length === 0) {
+    const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    const nameLabel = profile && profile.nama ? profile.nama : 'siswa ini';
     listEl.innerHTML = `
       <div class="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-center text-slate-400 text-xs">
         <i class="fa-solid fa-clock-rotate-left text-2xl mb-1 text-slate-300"></i>
-        <p>Belum ada dokumen tersimpan di browser ini.</p>
+        <p>Belum ada riwayat dokumen tersimpan untuk ${nameLabel}.</p>
         <p class="text-[10px] text-slate-400 mt-0.5">Bikin poster dan klik "Simpan Dokumen" sekarang!</p>
       </div>
     `;
@@ -3437,7 +7961,8 @@ function muatRiwayatDokumenWord() {
 
 function bukaDokumenDariRiwayat(docId) {
   try {
-    const savedDocs = JSON.parse(localStorage.getItem('kreator_cilik_word_docs') || '[]');
+    const docsKey = getActiveStudentStorageKey('kreator_cilik_word_docs');
+    const savedDocs = JSON.parse(localStorage.getItem(docsKey) || '[]');
     const targetDoc = savedDocs.find(d => d.id === docId);
     if (targetDoc) {
       terapkanDokumenWord(targetDoc);
@@ -3453,9 +7978,10 @@ function hapusDokumenDariRiwayat(docId) {
   playSound('click');
   if (confirm('Hapus dokumen ini dari riwayat browser?')) {
     try {
-      let savedDocs = JSON.parse(localStorage.getItem('kreator_cilik_word_docs') || '[]');
+      const docsKey = getActiveStudentStorageKey('kreator_cilik_word_docs');
+      let savedDocs = JSON.parse(localStorage.getItem(docsKey) || '[]');
       savedDocs = savedDocs.filter(d => d.id !== docId);
-      localStorage.setItem('kreator_cilik_word_docs', JSON.stringify(savedDocs));
+      localStorage.setItem(docsKey, JSON.stringify(savedDocs));
       muatRiwayatDokumenWord();
       showToast('Dokumen dihapus dari riwayat.');
     } catch (e) {}
@@ -4007,7 +8533,7 @@ function renderWordElements() {
       const gWidth = item.width || 140;
       el.innerHTML = `
         <div class="p-1 flex items-center justify-center select-none pointer-events-none">
-          <img src="${item.src}" alt="${item.name}" class="rounded-lg shadow-md border border-slate-300 pointer-events-none select-none object-contain bg-white/60 p-0.5" style="width: ${gWidth}px;">
+          <img src="${item.src}" referrerpolicy="no-referrer" alt="${item.name}" class="rounded-lg shadow-md border border-slate-300 pointer-events-none select-none object-contain bg-white/60 p-0.5" style="width: ${gWidth}px;">
         </div>
         <!-- Handle Putar (Rotate) Khas MS Word -->
         <div class="word-rotate-connector"></div>
@@ -4917,8 +9443,7 @@ async function generatePosterDataUrl(customDocData = null) {
           eCtx.fillText(item.text || '', rx, ry + 24);
         }
       } else if (item.type === 'gambar') {
-        const imgData = WORD_IMAGES[item.key];
-        const emojiChar = imgData ? imgData.emoji : '🌱';
+        const imgData = WORD_IMAGES[item.key] || {};
         const curSize = (item.width || item.size || 75);
         const fontSize = Math.round(curSize * scale * 0.85);
 
@@ -4928,9 +9453,25 @@ async function generatePosterDataUrl(customDocData = null) {
           eCtx.translate(-(rx + fontSize / 2), -(ry + fontSize / 2));
         }
 
-        eCtx.font = `${fontSize}px sans-serif`;
-        eCtx.textAlign = 'left';
-        eCtx.fillText(emojiChar, rx, ry + fontSize);
+        if (item.key === 'indonesia' || item.icon === 'fa-flag') {
+          // Gambar Bendera Merah Putih berkibar di Canvas (mencegah teks "ID" di Windows)
+          const fW = fontSize * 1.1;
+          const fH = fontSize * 0.72;
+          eCtx.fillStyle = '#64748b';
+          eCtx.fillRect(rx, ry, 3.5, fH * 1.25);
+          eCtx.fillStyle = '#dc2626';
+          eCtx.fillRect(rx + 3.5, ry, fW, fH / 2);
+          eCtx.fillStyle = '#ffffff';
+          eCtx.fillRect(rx + 3.5, ry + fH / 2, fW, fH / 2);
+          eCtx.strokeStyle = '#cbd5e1';
+          eCtx.lineWidth = 1;
+          eCtx.strokeRect(rx + 3.5, ry, fW, fH);
+        } else {
+          const emojiChar = imgData.emoji || '🌱';
+          eCtx.font = `${fontSize}px sans-serif`;
+          eCtx.textAlign = 'left';
+          eCtx.fillText(emojiChar, rx, ry + fontSize);
+        }
       } else if (item.type === 'gambar_luar' && item.src) {
         try {
           const imgObj = await new Promise((resolve) => {
@@ -5017,7 +9558,7 @@ function getPosterPresetElements(key = 'lingkungan') {
   ];
 }
 
-// Simpan poster ke galeri koleksi siswa di Praktik 1
+// Simpan poster ke galeri koleksi siswa di Praktik 1 (Terisolasi Khusus Akun Siswa Aktif)
 async function simpanPosterKeGaleriWord(previewDataUrl = null) {
   try {
     const inputEl = document.getElementById('word-doc-name-input');
@@ -5033,22 +9574,37 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       previewDataUrl = await generatePosterDataUrl();
     }
 
+    // Ambil identitas siswa aktif (Kelas 4 / yang sedang login)
+    const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    const authorName = (activeStudent && activeStudent.nama) ? activeStudent.nama : '';
+    const authorClass = (activeStudent && (activeStudent.kelas || activeStudent.rombel)) ? (activeStudent.kelas || activeStudent.rombel) : '';
+    const authorNis = (activeStudent && activeStudent.nis) ? activeStudent.nis : '';
+    const authorLabel = authorName ? `${authorName} (${authorClass || 'Kelas 4'})` : 'Karya Siswa Kelas 4 SD';
+
     const posterItem = {
       id: 'poster_' + Date.now(),
       title: title,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now(),
       image: previewDataUrl,
+      author: authorLabel,
+      studentName: authorName,
+      studentClass: authorClass || 'Kelas 4',
+      studentNis: authorNis,
       elementsCount: wordElements.length,
       docData: {
         title: title,
         elements: JSON.parse(JSON.stringify(wordElements)),
         pageBgColor: wordPageBgColor,
-        pageBorderStyle: wordPageBorderStyle
+        pageBorderStyle: wordPageBorderStyle,
+        author: authorLabel,
+        studentClass: authorClass || 'Kelas 4',
+        studentNis: authorNis
       }
     };
 
-    let list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
     // Jika sudah ada judul yang sama, ganti dengan versi terbaru
     const existIdx = list.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
     if (existIdx >= 0) {
@@ -5056,8 +9612,8 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     } else {
       list.unshift(posterItem);
     }
-    if (list.length > 12) list = list.slice(0, 12);
-    localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(list));
+    if (list.length > 20) list = list.slice(0, 20);
+    localStorage.setItem(storageKey, JSON.stringify(list));
 
     // Refresh galeri jika sedang dibuka
     renderGaleriPosterWord();
@@ -5070,13 +9626,52 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     console.warn('Gagal menyimpan poster ke galeri:', e);
   }
 }
+window.simpanPosterKeGaleriWord = simpanPosterKeGaleriWord;
 
-// Render Galeri Poster Siswa di Tab Praktik 1
+// Render Galeri Poster Siswa di Tab Praktik 1 (Tampilan Khusus & Mandiri Sesuai Siswa yang Login)
 function renderGaleriPosterWord() {
   const container = document.getElementById('p1-word-poster-gallery');
   if (!container) return;
 
-  const rawStorage = localStorage.getItem('kreator_cilik_word_posters');
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+
+  // Perbarui Banner Header Galeri agar jelas menampilkan nama siswa yang sedang aktif
+  const badgeEl = document.getElementById('galeri-badge-siswa');
+  const titleEl = document.getElementById('galeri-title-siswa');
+  const descEl = document.getElementById('galeri-desc-siswa');
+
+  if (profile && profile.nama) {
+    if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-id-badge text-amber-300"></i> Portofolio Digital: <b>${profile.nama}</b> (${profile.kelas} • NIS: ${profile.nis || '-'})`;
+    if (titleEl) titleEl.innerText = `Lemari Karya Poster: ${profile.nama}`;
+    if (descEl) descEl.innerHTML = `Setiap poster yang dibuat dan disimpan oleh <b>${profile.nama}</b> di Lab Ms. Word tersimpan khusus di sini sebagai portofolio karya digital pribadimu!`;
+  } else {
+    if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-user-clock text-amber-300"></i> Mode Tamu (Belum Login Siswa)`;
+    if (titleEl) titleEl.innerText = `Galeri & Lemari Penyimpanan Poster Microsoft Word`;
+    if (descEl) descEl.innerHTML = `Setiap poster yang dibuat dan disimpan di <b>Lab Ms. Word</b> otomatis tersimpan di sini. <i>Masuk dengan NIS untuk menyimpan ke rapor & portofolio akunmu!</i>`;
+  }
+
+  let rawStorage = localStorage.getItem(storageKey);
+
+  // MIGRASI CERDAS SATU KALI:
+  // Jika akun siswa ini baru pertama kali membuka lemari dan masih null,
+  // cek apakah ada karya yang pernah disimpan di kunci global lama (misal karya terakhir sebelum pemisahan akun)
+  if (rawStorage === null) {
+    const legacy = localStorage.getItem('kreator_cilik_word_posters');
+    if (legacy) {
+      try {
+        const parsedLegacy = JSON.parse(legacy);
+        if (Array.isArray(parsedLegacy) && parsedLegacy.length > 0) {
+          // Salin karya legacy ke akun aktif ini agar karya yang baru dibuat tidak hilang
+          localStorage.setItem(storageKey, legacy);
+          rawStorage = legacy;
+          // Hapus kunci legacy agar siswa lain yang login baru tidak mewarisi karya ini
+          localStorage.removeItem('kreator_cilik_word_posters');
+        }
+      } catch (e) {}
+    }
+  }
+
   let posters = [];
   if (rawStorage !== null) {
     try {
@@ -5106,64 +9701,29 @@ function renderGaleriPosterWord() {
     });
   }
 
-  // Cek apakah galeri sudah pernah diinisialisasi
-  const hasInitialized = localStorage.getItem('kreator_cilik_word_posters_initialized');
-
-  // Hanya buat starter pada kunjungan pertama kali (rawStorage === null). Jika siswa sudah menghapus semua, jangan paksa buat ulang!
-  if (rawStorage === null && !hasInitialized) {
-    const starter1 = {
-      id: 'poster_' + Date.now(),
-      title: 'Poster_Lingkungan_Hidup_Kelas4',
-      date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      timestamp: Date.now(),
-      elementsCount: 8,
-      docData: {
-        title: 'Poster_Lingkungan_Hidup_Kelas4',
-        elements: getPosterPresetElements('lingkungan'),
-        pageBgColor: '#ecfdf5',
-        pageBorderStyle: 'solid'
-      }
-    };
-    const starter2 = {
-      id: 'poster_' + (Date.now() - 1000),
-      title: 'Poster_7_Kebiasaan_Anak_Indonesia_Hebat',
-      date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      timestamp: Date.now() - 1000,
-      elementsCount: 8,
-      docData: {
-        title: 'Poster_7_Kebiasaan_Anak_Indonesia_Hebat',
-        elements: getPosterPresetElements('hebat'),
-        pageBgColor: '#ffffff',
-        pageBorderStyle: 'solid'
-      }
-    };
-    posters = [starter1, starter2];
-    localStorage.setItem('kreator_cilik_word_posters_initialized', 'true');
-    needReSave = true;
-  }
-
   if (needReSave) {
     try {
-      localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(posters));
+      localStorage.setItem(storageKey, JSON.stringify(posters));
     } catch(e) {}
   }
 
-  // Tampilan jika galeri kosong (setelah siswa menghapus dokumen)
+  // Tampilan jika galeri kosong (setelah siswa menghapus dokumen atau bagi siswa baru)
   if (posters.length === 0) {
+    const studentName = (profile && profile.nama) ? profile.nama : 'Kamu';
     container.innerHTML = `
       <div class="col-span-full py-12 px-6 bg-slate-50 border-2 border-dashed border-slate-300 rounded-3xl text-center space-y-4">
         <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-sm">
           <i class="fa-solid fa-file-word"></i>
         </div>
         <div>
-          <h4 class="font-title font-bold text-slate-800 text-lg">Belum Ada Dokumen Poster di Galeri</h4>
+          <h4 class="font-title font-bold text-slate-800 text-lg">Belum Ada Karya Poster Milik ${studentName}</h4>
           <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">
-            Semua dokumen poster telah dihapus. Kamu bisa membuat poster baru di Lab Microsoft Word atau memasang kembali contoh template!
+            ${profile ? `Halo <b>${studentName}</b>! Lemari portofoliomu masih kosong. Ayo buat karya poster di <b>Lab Ms. Word</b> lalu klik <i>File &rarr; Simpan Ke Browser</i> untuk memajangnya di sini!` : 'Belum ada dokumen poster di galeri ini. Silakan Login Siswa dengan NIS dan mulai berkreasi di Lab Microsoft Word!'}
           </p>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
           <button onclick="switchTab('msword')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-2">
-            <i class="fa-solid fa-plus-circle"></i> Buat Poster Baru di Word
+            <i class="fa-solid fa-plus-circle"></i> Mulai Buat Poster di Lab Word
           </button>
           <button onclick="pasangContohPosterGaleri()" class="px-4 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-title font-bold text-xs transition flex items-center gap-2">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Pasang Contoh Poster
@@ -5187,99 +9747,87 @@ function renderGaleriPosterWord() {
       ? 'border-4 border-emerald-600'
       : (pageBorder === 'dashed' ? 'border-4 border-dashed border-emerald-500' : 'border border-slate-300');
 
-    // Ambil elemen-elemen penting
-    const judulElem = docElems.find(el => el.type === 'teks' && (el.subtype === 'judul' || el.text)) || { text: p.title || 'POSTER SISWA', color: '#047857' };
-    const gambarElems = docElems.filter(el => el.type === 'gambar' || el.type === 'gambar_luar');
-    const sloganElems = docElems.filter(el => el.type === 'teks' && el.subtype !== 'judul' && el.subtype !== 'pembuat');
-    const pembuatElem = docElems.find(el => el.type === 'teks' && el.subtype === 'pembuat');
+    // Render miniatur lembar kerja dokumen Word presisi (True Replica sesuai posisi & tampilan Lab MS Word)
+    const miniElementsHtml = docElems.map(item => {
+      // Koordinat persen proporsional terhadap kertas A4 Word (480px x 650px)
+      const leftPct = Math.max(0, Math.min(92, ((item.x || 0) / 480) * 100)).toFixed(1);
+      const topPct = Math.max(0, Math.min(94, ((item.y || 0) / 650) * 100)).toFixed(1);
+      const rot = item.rotation || 0;
+      const rotStyle = rot !== 0 ? `transform: rotate(${rot}deg); transform-origin: center center;` : '';
 
-    // Bangun tampilan visual gambar / ikon tengah
-    let imagesHtml = '';
-    if (gambarElems.length > 0) {
-      imagesHtml = gambarElems.slice(0, 3).map((g, gIdx) => {
-        if (g.type === 'gambar_luar' && g.src) {
-          return `<img src="${g.src}" class="max-h-16 max-w-[80px] object-contain rounded-lg shadow-xs border border-emerald-200 bg-white p-0.5" alt="Gambar">`;
+      if (item.type === 'teks') {
+        const isJudul = item.subtype === 'judul';
+        const isBanner = item.subtype === 'banner';
+        const fontFamily = item.fontFamily || (isBanner ? 'Fredoka, sans-serif' : 'Aptos, sans-serif');
+        const origSize = item.fontSizePx || (isJudul ? 28 : (isBanner ? 22 : 16));
+        // Skala proporsional font menggunakan unit cqw (container query width)
+        const fontSizeCqw = Math.max(2.4, Math.min(7.2, (origSize / 480) * 100)).toFixed(2);
+        const isBold = item.isBold !== undefined ? item.isBold : (isJudul || isBanner);
+        const isItalic = !!item.isItalic;
+        const isUnderline = !!item.isUnderline;
+        const color = item.color || (isBanner ? '#ffffff' : '#0f172a');
+        const textDec = isUnderline ? 'underline' : 'none';
+
+        if (isBanner) {
+          return `
+            <div style="position: absolute; left: ${leftPct}%; top: ${topPct}%; ${rotStyle} z-index: ${item.zIndex || 1};" class="pointer-events-none select-none">
+              <div class="px-2 py-0.5 rounded bg-emerald-600 text-white font-black shadow-xs whitespace-nowrap" style="font-family: ${fontFamily}; font-size: ${fontSizeCqw}cqw;">
+                ${escapeXml(item.text)}
+              </div>
+            </div>
+          `;
         }
-        const imgDef = WORD_IMAGES[g.key] || {};
-        const emoji = imgDef.emoji || '🌱';
-        const iconClass = g.icon || imgDef.icon || 'fa-seedling';
-        const iconColor = g.color || imgDef.color || '#059669';
-        const isMain = (gIdx === 0 || (g.size && g.size > 70));
-        const badgeSize = isMain ? 'w-14 h-14 text-3xl' : 'w-11 h-11 text-2xl';
+
         return `
-          <div class="${badgeSize} rounded-2xl bg-white/95 border-2 border-emerald-200/90 shadow-xs flex items-center justify-center drop-shadow-xs transition transform hover:scale-105" title="${g.name || 'Ikon'}">
-            ${emoji !== '🌱' ? emoji : `<i class="fa-solid ${iconClass}" style="color:${iconColor};"></i>`}
+          <div style="position: absolute; left: ${leftPct}%; top: ${topPct}%; ${rotStyle} z-index: ${item.zIndex || 1}; max-width: 95%;" class="pointer-events-none select-none">
+            <span style="font-family: ${fontFamily}; font-size: ${fontSizeCqw}cqw; font-weight: ${isBold ? '800' : '500'}; font-style: ${isItalic ? 'italic' : 'normal'}; text-decoration: ${textDec}; color: ${color};" class="block leading-tight drop-shadow-2xs">
+              ${escapeXml(item.text)}
+            </span>
           </div>
         `;
-      }).join('');
-    } else {
-      imagesHtml = `
-        <div class="w-14 h-14 rounded-2xl bg-white/95 border-2 border-emerald-300 shadow-xs flex items-center justify-center text-3xl">🌍</div>
-        <div class="w-11 h-11 rounded-2xl bg-white/95 border-2 border-emerald-200 shadow-xs flex items-center justify-center text-2xl">🌱</div>
-        <div class="w-11 h-11 rounded-2xl bg-white/95 border-2 border-emerald-200 shadow-xs flex items-center justify-center text-2xl">♻️</div>
-      `;
-    }
+      } else if (item.type === 'gambar') {
+        const imgDef = WORD_IMAGES[item.key] || {};
+        const iconClass = item.icon || imgDef.icon || 'fa-seedling';
+        const iconColor = item.color || imgDef.color || '#059669';
+        const origWidth = item.width || item.size || 75;
+        const iconSizeCqw = Math.max(5.5, Math.min(22, (origWidth / 480) * 100)).toFixed(2);
 
-    // Bangun tampilan slogan
-    let slogansHtml = '';
-    if (sloganElems.length > 0) {
-      slogansHtml = sloganElems.slice(0, 2).map(s => `
-        <div class="bg-white/90 backdrop-blur-xs border border-emerald-200/80 rounded-lg px-2.5 py-1 shadow-2xs">
-          <p class="text-[10px] font-bold truncate leading-tight" style="color: ${s.color || '#1e3a8a'};">
-            ${s.text}
-          </p>
-        </div>
-      `).join('');
-    } else {
-      slogansHtml = `
-        <div class="bg-white/90 border border-emerald-200 rounded-lg px-2.5 py-1 text-[10px] font-bold text-emerald-900 truncate">
-          🌱 Lestarikan Bumi • Jaga Kebersihan Lingkungan
-        </div>
-      `;
-    }
+        return `
+          <div style="position: absolute; left: ${leftPct}%; top: ${topPct}%; ${rotStyle} z-index: ${item.zIndex || 1};" class="pointer-events-none select-none flex items-center justify-center">
+            <i class="fa-solid ${iconClass} drop-shadow-xs" style="color: ${iconColor}; font-size: ${iconSizeCqw}cqw;"></i>
+          </div>
+        `;
+      } else if (item.type === 'gambar_luar' && item.src) {
+        const origWidth = item.width || 140;
+        const imgWidthCqw = Math.max(12, Math.min(55, (origWidth / 480) * 100)).toFixed(2);
+
+        return `
+          <div style="position: absolute; left: ${leftPct}%; top: ${topPct}%; ${rotStyle} z-index: ${item.zIndex || 1};" class="pointer-events-none select-none">
+            <img src="${item.src}" alt="${item.name || 'Gambar'}" class="rounded shadow-xs border border-slate-300 object-contain bg-white/70" style="width: ${imgWidthCqw}cqw;">
+          </div>
+        `;
+      }
+      return '';
+    }).join('');
 
     return `
       <div class="bg-white rounded-2xl border border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col group">
         <!-- Thumbnail Poster (Miniatur Lembar Dokumen Word Otentik) -->
-        <div class="relative bg-slate-200/80 aspect-[3/4] overflow-hidden flex items-center justify-center border-b border-slate-100 p-3 select-none">
+        <div class="relative bg-slate-200/80 aspect-[480/650] overflow-hidden flex items-center justify-center border-b border-slate-100 p-2.5 sm:p-3 select-none">
           
-          <!-- Lembar Kertas Word Mini -->
-          <div class="w-full h-full rounded-xl shadow-md p-3 sm:p-4 flex flex-col justify-between items-center text-center transition group-hover:scale-[1.02] duration-300 relative overflow-hidden select-none ${borderStyleClass}" style="background-color: ${pageBg};">
-            
-            <!-- Judul Poster & Pita Ms. Word -->
-            <div class="w-full pt-0.5 space-y-1">
-              <div class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-emerald-300 text-[8px] font-black uppercase tracking-wider text-emerald-800 shadow-2xs">
-                <i class="fa-solid fa-file-word text-blue-600"></i> Dokumen Ms. Word 2026
-              </div>
-              <h6 class="font-title font-black text-xs sm:text-sm leading-snug line-clamp-2 drop-shadow-2xs px-1" style="color: ${judulElem.color || '#047857'};">
-                ${judulElem.text || p.title}
-              </h6>
-            </div>
-
-            <!-- Ikon & Karakter Visual -->
-            <div class="my-auto py-1 flex items-center justify-center gap-2 flex-wrap">
-              ${imagesHtml}
-            </div>
-
-            <!-- Slogan & Identitas Kreator -->
-            <div class="w-full space-y-1.5 pb-0.5 border-t border-slate-200/80 pt-1.5">
-              ${slogansHtml}
-              <div class="flex items-center justify-between text-[8px] font-bold text-slate-500 pt-0.5 px-0.5">
-                <span class="truncate">👤 ${pembuatElem ? pembuatElem.text : 'Karya Siswa Kelas 4 SD'}</span>
-                <span class="shrink-0 text-emerald-800 bg-emerald-100/90 font-black px-1.5 py-0.5 rounded shadow-2xs">Tzu Chi 🌸</span>
-              </div>
-            </div>
-
+          <!-- Lembar Kertas Word Mini (True Replica) -->
+          <div class="w-full h-full rounded-xl shadow-md relative overflow-hidden select-none pointer-events-none ${borderStyleClass}" style="background-color: ${pageBg}; container-type: inline-size;">
+            ${miniElementsHtml}
           </div>
 
           ${isNewest ? `
-            <span class="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
+            <span class="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md flex items-center gap-1 z-20">
               <i class="fa-solid fa-star text-amber-300"></i> Karya Terbaru
             </span>
           ` : ''}
 
           <!-- Tombol Aksi Cepat di Pojok Kanan Atas Thumbnail (Salin & Hapus) -->
-          <div class="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          <div class="absolute top-3 right-3 z-20 flex items-center gap-1.5">
             <button onclick="event.stopPropagation(); salinPosterWordDariGaleri('${p.id}')" class="px-2 py-1 bg-white/95 hover:bg-indigo-600 text-indigo-700 hover:text-white rounded-lg shadow-md border border-indigo-200 text-[11px] font-bold transition flex items-center gap-1" title="Salin / Copy Dokumen Ini">
               <i class="fa-regular fa-copy"></i>
               <span class="text-[10px]">Salin</span>
@@ -5300,7 +9848,12 @@ function renderGaleriPosterWord() {
                 Word
               </span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+            <div class="mt-1 flex items-center justify-between">
+              ${(typeof periksaFormatNamaFile === 'function' && periksaFormatNamaFile(p.title).valid)
+                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin ⭐)</span>'
+                : '<span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Belum Baku</span>'}
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
               <i class="fa-regular fa-clock"></i> ${p.date || 'Tersimpan'}
             </p>
           </div>
@@ -5329,9 +9882,10 @@ function renderGaleriPosterWord() {
 // Perbaiki dan Segarkan Tampilan Galeri Poster
 function perbaikiGaleriPosterWord() {
   playSound('success');
+  const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
   let list = [];
   try {
-    list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    list = JSON.parse(localStorage.getItem(storageKey) || '[]');
   } catch(e) { list = []; }
 
   // Bersihkan dan perbaiki setiap item
@@ -5354,7 +9908,7 @@ function perbaikiGaleriPosterWord() {
     return;
   }
 
-  localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(list));
+  localStorage.setItem(storageKey, JSON.stringify(list));
   renderGaleriPosterWord();
   showToast('Galeri poster Microsoft Word berhasil disegarkan & diperbarui! 🌟', 'success');
 }
@@ -5362,7 +9916,8 @@ function perbaikiGaleriPosterWord() {
 // Buka Poster dari Galeri kembali ke Simulator MS Word untuk diedit
 function bukaPosterWordDariGaleri(posterId) {
   try {
-    const list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const target = list.find(p => p.id === posterId);
     if (target && target.docData) {
       terapkanDokumenWord(target.docData);
@@ -5377,7 +9932,8 @@ function bukaPosterWordDariGaleri(posterId) {
 // Unduh file PNG dari item galeri
 async function unduhPosterWordDariGaleri(posterId) {
   try {
-    const list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const target = list.find(p => p.id === posterId);
     if (!target) return;
 
@@ -5387,7 +9943,7 @@ async function unduhPosterWordDariGaleri(posterId) {
       imgUrl = await generatePosterDataUrl(target.docData);
       if (imgUrl) {
         target.image = imgUrl;
-        localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(list));
+        localStorage.setItem(storageKey, JSON.stringify(list));
       }
     }
 
@@ -5411,7 +9967,8 @@ async function unduhPosterWordDariGaleri(posterId) {
 function salinPosterWordDariGaleri(posterId) {
   playSound('click');
   try {
-    let list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const target = list.find(p => p.id === posterId);
     if (!target) return;
 
@@ -5455,8 +10012,7 @@ function salinPosterWordDariGaleri(posterId) {
 
     list.unshift(newPoster);
     if (list.length > 20) list = list.slice(0, 20);
-    localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(list));
-    localStorage.setItem('kreator_cilik_word_posters_initialized', 'true');
+    localStorage.setItem(storageKey, JSON.stringify(list));
 
     renderGaleriPosterWord();
     playSound('success');
@@ -5474,9 +10030,10 @@ let pendingHapusPosterId = null;
 function bukaModalHapusPoster(posterId) {
   playSound('click');
   pendingHapusPosterId = posterId;
+  const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
   let list = [];
   try {
-    list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    list = JSON.parse(localStorage.getItem(storageKey) || '[]');
   } catch (e) {}
   const target = list.find(p => p.id === posterId);
   const targetTitle = target ? target.title : 'Dokumen Poster';
@@ -5508,13 +10065,13 @@ function tutupModalHapusPoster() {
 function konfirmasiEksekusiHapusPoster() {
   if (!pendingHapusPosterId) return;
   try {
-    let list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const target = list.find(p => p.id === pendingHapusPosterId);
     const targetTitle = target ? target.title : 'Dokumen Poster';
 
     list = list.filter(p => p.id !== pendingHapusPosterId);
-    localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(list));
-    localStorage.setItem('kreator_cilik_word_posters_initialized', 'true');
+    localStorage.setItem(storageKey, JSON.stringify(list));
 
     tutupModalHapusPoster();
     renderGaleriPosterWord();
@@ -5535,9 +10092,10 @@ function hapusPosterWordDariGaleri(posterId) {
 // Buka Modal Konfirmasi Hapus Semua Poster
 function bukaModalHapusSemuaPoster() {
   playSound('click');
+  const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
   let list = [];
   try {
-    list = JSON.parse(localStorage.getItem('kreator_cilik_word_posters') || '[]');
+    list = JSON.parse(localStorage.getItem(storageKey) || '[]');
   } catch (e) {}
 
   if (list.length === 0) {
@@ -5564,12 +10122,12 @@ function tutupModalHapusSemuaPoster() {
 // Eksekusi Hapus Semua Poster
 function konfirmasiEksekusiHapusSemuaPoster() {
   try {
-    localStorage.setItem('kreator_cilik_word_posters', '[]');
-    localStorage.setItem('kreator_cilik_word_posters_initialized', 'true');
+    const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    localStorage.setItem(storageKey, '[]');
     tutupModalHapusSemuaPoster();
     renderGaleriPosterWord();
     playSound('success');
-    showToast('Semua dokumen poster berhasil dihapus bersih! 🗑️', 'info');
+    showToast('Semua dokumen poster di galerimu berhasil dihapus bersih! 🗑️', 'info');
   } catch (e) {
     console.error('konfirmasiEksekusiHapusSemuaPoster error:', e);
     tutupModalHapusSemuaPoster();
@@ -10072,7 +14630,7 @@ function playRoboChime() {
 
 let roboJawabanIndex = 0;
 const daftarJawabanRobo = [
-  "Halo teman pintar! Aku Robo-Tzu Chi! Senang sekali kamu menyapaku! Ayo kita belajar coding dan MS Word dengan gembira!",
+  "Halo teman pintar! Aku Robo! Senang sekali kamu menyapaku! Ayo kita belajar coding dan MS Word dengan gembira!",
   "Bip bop! Halo sobat cilik! Aku siap menemanimu belajar teknologi, logika, dan budi pekerti hari ini di SDS Cinta Kasih Tzu Chi!",
   "Halo kawan hebat! Semangat belajarnya ya! Klik tombol Semester 1 atau Semester 2 untuk mulai petualangan seru kita!",
   "Halo! Aku robot asisten belajarmu. Ayo raih bintang sebanyak-banyaknya di Lab MS Word dan MS Excel!"
@@ -10124,9 +14682,9 @@ function sapaRobotHalo(customGreetingOrEvent) {
   // Tambahkan poin bintang siswa
   tambahPoin(5);
   if (typeof customGreetingOrEvent === 'string' && customGreetingOrEvent.trim().length > 0) {
-    showToast('Robo-Tzu Chi menjawab pertanyaanmu! 🤖✨ (+5 Bintang)', 'success');
+    showToast('Robo menjawab pertanyaanmu! 🤖✨ (+5 Bintang)', 'success');
   } else {
-    showToast('Robo-Tzu Chi: "Halo sobat cilik!" 🤖✨ (+5 Bintang)', 'success');
+    showToast('Robo: "Halo sobat cilik!" 🤖✨ (+5 Bintang)', 'success');
   }
 
   const isEnglish = (state && state.currentLang === 'en');
@@ -10193,7 +14751,7 @@ function sapaRobotHalo(customGreetingOrEvent) {
       if (modalSpeaking) modalSpeaking.classList.add('hidden');
       const bubbleBadge = document.getElementById('speech-bubble-badge');
       if (bubbleBadge) {
-        bubbleBadge.innerText = 'Robo-Tzu Chi';
+        bubbleBadge.innerText = 'Robo';
         bubbleBadge.className = 'text-[11px] font-title font-black text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200';
       }
     };
@@ -10203,7 +14761,7 @@ function sapaRobotHalo(customGreetingOrEvent) {
       if (modalSpeaking) modalSpeaking.classList.add('hidden');
       const bubbleBadge = document.getElementById('speech-bubble-badge');
       if (bubbleBadge) {
-        bubbleBadge.innerText = 'Robo-Tzu Chi';
+        bubbleBadge.innerText = 'Robo';
         bubbleBadge.className = 'text-[11px] font-title font-black text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200';
       }
     };
@@ -10216,7 +14774,7 @@ function sapaRobotHalo(customGreetingOrEvent) {
       if (modalSpeaking) modalSpeaking.classList.add('hidden');
       const bubbleBadge = document.getElementById('speech-bubble-badge');
       if (bubbleBadge) {
-        bubbleBadge.innerText = 'Robo-Tzu Chi';
+        bubbleBadge.innerText = 'Robo';
         bubbleBadge.className = 'text-[11px] font-title font-black text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200';
       }
     }, 3500);
@@ -10229,7 +14787,7 @@ function sapaRobotLucu() {
 }
 
 // ========================================================
-// 16. MESIN KECERDASAN TANYA-JAWAB ROBO-TZU CHI (AI TUTOR KELAS 4 SD)
+// 16. MESIN KECERDASAN TANYA-JAWAB ROBO (AI TUTOR KELAS 4 SD)
 // Menjawab Pertanyaan Apapun dari Siswa (Teks & Suara Mikrofon)
 // ========================================================
 
@@ -10522,7 +15080,7 @@ function prosesPertanyaanKeRobo(rawQuestion) {
   }
   // 7. Sapaan Ramah & Percakapan dengan Karakter Robo
   else if (q.includes('siapa kamu') || q.includes('nama kamu') || q.includes('siapa namamu')) {
-    jawaban = 'Aku adalah Robo-Tzu Chi, maskot robot cerdas SDS Cinta Kasih Tzu Chi! Aku diciptakan untuk menjadi sahabat setiamu dalam belajar coding, AI, dan teknologi!';
+    jawaban = 'Aku adalah Robo, maskot robot cerdas SDS Cinta Kasih Tzu Chi! Aku diciptakan untuk menjadi sahabat setiamu dalam belajar coding, AI, dan teknologi!';
   } else if (q.includes('kabar') || q.includes('apa kabar')) {
     jawaban = 'Kabarku sangat luar biasa dan sistem bateraiku terisi penuh 100%! Aku siap menjawab pertanyaan dan belajar bersamamu!';
   } else if (q.includes('terima kasih') || q.includes('makasih')) {
@@ -10563,7 +15121,7 @@ function prosesPertanyaanKeRobo(rawQuestion) {
       else if (op === '/' || op === 'bagi' || op === 'dibagi') { hasil = num2 !== 0 ? (num1 / num2) : 'infinity'; namaOpEn = 'divided by'; }
       jawaban = `Beep boop! The calculation result of ${num1} ${namaOpEn} ${num2} equals ${hasil}! You are a true math champ!`;
     } else if (q.includes('who are you') || q.includes('what is your name')) {
-      jawaban = 'I am Robo-Tzu Chi, the smart mascot of SDS Cinta Kasih Tzu Chi! I am here to help you learn coding, AI, and good character!';
+      jawaban = 'I am Robo, the smart mascot of SDS Cinta Kasih Tzu Chi! I am here to help you learn coding, AI, and good character!';
     } else if (q.includes('how are you')) {
       jawaban = 'I am feeling great and my batteries are at 100%! Ready to explore science and coding with you!';
     } else if (q.includes('thank')) {
@@ -10606,7 +15164,7 @@ function prosesPertanyaanKeRobo(rawQuestion) {
 // Global Recognition Instance untuk kontrol buka/tutup
 let roboActiveRecognition = null;
 let isRoboListening = false;
-window._jawabanTerakhirRobo = "Halo sobat cilik! Aku Robo-Tzu Chi! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara 🎙️ jika mau bertanya padaku!";
+window._jawabanTerakhirRobo = "Halo sobat cilik! Aku Robo! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara 🎙️ jika mau bertanya padaku!";
 
 // Fungsi Utama: Siswa Menekan Tombol "Bicara 🎙️" untuk Bertanya ke Robo
 function bukaModalBicaraRobo(event) {
@@ -10704,7 +15262,7 @@ function mulaiBicaraKeRobo(event) {
         micBtn.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse', 'bg-rose-500', 'text-white');
       }
       if (bubbleBadge) {
-        bubbleBadge.innerText = 'Robo-Tzu Chi';
+        bubbleBadge.innerText = 'Robo';
         bubbleBadge.className = 'text-[11px] font-title font-black text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200';
       }
 
@@ -12167,6 +16725,7 @@ async function loginDenganNis() {
 
     muatProfilSiswa();
     setHeaderNavMode('sem1');
+    renderGaleriPosterWord();
     tutupModalProfilSiswa();
     switchTab('modul');
     showToast(`Selamat datang, ${student.nama}! (Kelas ${student.kelas} • NIS: ${student.nis}) 🎉`, 'success');
@@ -12245,6 +16804,7 @@ function eksekusiLogoutSiswa() {
   // Muat ulang tampilan ke mode Belum Masuk / Tamu
   muatProfilSiswa();
   setHeaderNavMode('utama');
+  renderGaleriPosterWord();
   switchTab('beranda');
 
   showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info');
@@ -12306,6 +16866,7 @@ function pilihSiswaDariDropdown(studentId) {
 
   muatProfilSiswa();
   setHeaderNavMode('sem1');
+  renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab('modul');
   showToast(`Berhasil masuk sebagai ${student.nama} (${student.kelas} • NIS: ${student.nis})! 🎉`, 'success');
@@ -12369,6 +16930,7 @@ function simpanProfilSiswa() {
 
   muatProfilSiswa();
   setHeaderNavMode('sem1');
+  renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab('modul');
   showToast(`Halo ${nama}! Profilmu (${kelas} • NIS: ${nis}) berhasil disimpan & aktif 🎉`, 'success');

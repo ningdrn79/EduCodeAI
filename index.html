@@ -815,7 +815,7 @@
                   <div class="flex items-center gap-2">
                     <span class="text-2xl animate-bounce">🤖</span>
                     <span id="speech-bubble-badge" data-i18n="roboBadge" class="text-xs font-title font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                      Jawaban Robo-Tzu Chi
+                      Jawaban Robo
                     </span>
                   </div>
                   <button onclick="event.stopPropagation(); ulangiSuaraJawabanTerakhir();" class="text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 flex items-center gap-1.5 transition active:scale-95 shadow-xs" title="Dengarkan Ulang Suara Robo">
@@ -833,7 +833,7 @@
                 <div class="flex items-start gap-2.5 pt-0.5 max-h-[210px] overflow-y-auto pr-1.5 custom-scroll">
                   <span class="text-sm text-sky-500 font-bold shrink-0 mt-0.5">💬</span>
                   <p id="robot-speech-text" class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">
-                    Halo teman pintar! Aku Robo-Tzu Chi. Klik tombol <strong>"Bicara ke Robo 🎙️"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! ✨
+                    Halo teman pintar! Aku Robo. Klik tombol <strong>"Bicara ke Robo 🎙️"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! ✨
                   </p>
                 </div>
 
@@ -865,7 +865,7 @@
 
                   <!-- Gambar Robot Maskot Lucu (Ukuran Lebih Besar & Jelas: max-h 290px - 310px) -->
                   <div class="relative flex items-center justify-center p-2 rounded-2xl bg-white/75 border border-sky-100 shadow-inner overflow-hidden">
-                    <img id="robot-mascot-img" src="robot_mascot.png" alt="Maskot Robot Lucu Robo-Tzu Chi" class="max-h-[280px] sm:max-h-[310px] w-auto object-contain drop-shadow-md pointer-events-none transform group-hover:scale-105 transition-transform duration-300">
+                    <img id="robot-mascot-img" src="robot_mascot.png" alt="Maskot Robot Lucu Robo" class="max-h-[280px] sm:max-h-[310px] w-auto object-contain drop-shadow-md pointer-events-none transform group-hover:scale-105 transition-transform duration-300">
                   </div>
 
                   <!-- Tombol Aksi di Bawah Maskot: Sapa & Bicara -->
@@ -1434,9 +1434,14 @@
                   <td class="p-3 border border-slate-300">
                     <div class="flex items-start justify-between gap-2">
                       <span><b>TP 2.1:</b> Membuat satu konten digital sederhana dalam bentuk teks atau gambar.</span>
-                      <button onclick="bukaModulDetail('tp2_1')" class="shrink-0 text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-md transition" title="Buka Modul TP 2.1">
-                        Buka Modul 📖
-                      </button>
+                      <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                        <button onclick="bukaModulDetail('tp2_1')" class="text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-md transition cursor-pointer" title="Buka Modul TP 2.1">
+                          Buka Modul 📖
+                        </button>
+                        <button onclick="switchTab('praktik'); setPraktikSubtab('praktik-tp2')" class="text-[10px] font-bold text-white bg-purple-600 hover:bg-purple-700 px-2.5 py-1 rounded-md shadow-xs transition flex items-center gap-1 cursor-pointer transform hover:scale-105 active:scale-95" title="Buka Drive 7 Kebiasaan TP 2.1">
+                          <i class="fa-solid fa-folder-open"></i> Drive 7 Kebiasaan 📁
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td class="p-3 border border-slate-300 text-center font-bold text-slate-800">6 JP</td>
@@ -1447,9 +1452,17 @@
                   <td class="p-3 border border-slate-300">
                     <div class="flex items-start justify-between gap-2">
                       <span><b>TP 2.2:</b> Menyusun beberapa konten digital (teks dan gambar) secara terpisah.</span>
-                      <button onclick="bukaModulDetail('tp2_2')" class="shrink-0 text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-md transition" title="Buka Modul TP 2.2">
-                        Buka Modul 📖
-                      </button>
+                      <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                        <button onclick="bukaModulDetail('tp2_2')" class="text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-md transition cursor-pointer flex items-center gap-1" title="Buka Modul TP 2.2 (Petualangan Menyenangkan di Ms. Word)">
+                          <span>Buka Modul</span> 📖
+                        </button>
+                        <button onclick="bukaModalGambarMateri('Pengenalan Ms. Word-Kelas 4.jpg', 'Petualangan Menyenangkan di Ms. Word - Kelas 4 SD')" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-md transition cursor-pointer flex items-center gap-1" title="Lihat Poster Pengenalan Ms. Word Ukuran Penuh">
+                          <i class="fa-solid fa-image text-emerald-600"></i> Poster Word 🔍
+                        </button>
+                        <button onclick="bukaAplikasiPaintTerbaru()" class="text-[10px] font-bold text-white bg-pink-600 hover:bg-pink-700 px-2.5 py-1 rounded-md shadow-xs transition flex items-center gap-1 cursor-pointer transform hover:scale-105 active:scale-95" title="Buka Aplikasi Paint Terbaru untuk Menggambar Konten Terpisah (TP 2.2)">
+                          <i class="fa-solid fa-palette"></i> Aplikasi Paint Terbaru 🎨
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td class="p-3 border border-slate-300 text-center font-bold text-slate-800">4 JP</td>
@@ -1460,9 +1473,14 @@
                   <td class="p-3 border border-slate-300">
                     <div class="flex items-start justify-between gap-2">
                       <span><b>TP 2.3:</b> Mengkombinasikan teks dan gambar secara logis untuk menghasilkan konten digital yang informatif dan menarik.</span>
-                      <button onclick="bukaModulDetail('tp2_3')" class="shrink-0 text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-md transition" title="Buka Modul TP 2.3">
-                        Buka Modul 📖
-                      </button>
+                      <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                        <button onclick="bukaModulDetail('tp2_3')" class="text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-md transition cursor-pointer" title="Buka Modul TP 2.3">
+                          Buka Modul 📖
+                        </button>
+                        <button onclick="bukaPraktikWordTP2_2()" class="text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-700 px-2.5 py-1 rounded-md shadow-xs transition flex items-center gap-1 cursor-pointer transform hover:scale-105 active:scale-95" title="Praktik Rancang &amp; Kombinasikan Poster di Lab Microsoft Word (TP 2.3)">
+                          <i class="fa-solid fa-file-word"></i> Praktik Lab Word 📄
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td class="p-3 border border-slate-300 text-center font-bold text-slate-800">4 JP</td>
@@ -1473,9 +1491,14 @@
                   <td class="p-3 border border-slate-300">
                     <div class="flex items-start justify-between gap-2">
                       <span><b>TP 2.4:</b> Merancang strategi diseminasi konten digital yang efektif dan mengevaluasi dampaknya terhadap audiens.</span>
-                      <button onclick="bukaModulDetail('tp2_4')" class="shrink-0 text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-md transition" title="Buka Modul TP 2.4">
-                        Buka Modul 📖
-                      </button>
+                      <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                        <button onclick="bukaModulDetail('tp2_4')" class="text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-md transition cursor-pointer" title="Buka Modul TP 2.4">
+                          Buka Modul 📖
+                        </button>
+                        <button onclick="bukaGaleriHasilPosterSiswa()" class="text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 rounded-md shadow-xs transition flex items-center gap-1 cursor-pointer transform hover:scale-105 active:scale-95" title="Buka Lemari Galeri Hasil Poster Siswa (TP 2.4)">
+                          <i class="fa-solid fa-images"></i> Hasil Poster Siswa 🖼️
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td class="p-3 border border-slate-300 text-center font-bold text-slate-800">6 JP</td>
@@ -3251,12 +3274,74 @@
           </button>
         </div>
 
+        <!-- Poster Infografis TP 2.2: Petualangan Menyenangkan di Ms. Word -->
+        <div class="bg-gradient-to-br from-blue-50 via-white to-sky-50 rounded-2xl border-2 border-blue-300 p-4 sm:p-5 shadow-md space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-blue-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                <i class="fa-solid fa-image"></i>
+              </span>
+              <div>
+                <h4 class="font-title font-bold text-slate-800 text-sm sm:text-base leading-tight">
+                  Poster Infografis: Petualangan Menyenangkan di Ms. Word!
+                </h4>
+                <span class="text-[11px] text-blue-700 font-medium">Panduan Siswa: Memasukkan Gambar, Ukuran, Posisi (Wrap Text) &amp; Gaya Teks • Kelas 4 SD</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <a href="Pengenalan Ms. Word-Kelas 4.jpg" download="Pengenalan_Ms_Word_Kelas_4.jpg" class="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-800 border border-blue-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-download"></i> Unduh Poster
+              </a>
+              <button onclick="bukaModalGambarMateri('Pengenalan Ms. Word-Kelas 4.jpg', 'Petualangan Menyenangkan di Ms. Word - Kelas 4 SD')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Perbesar Gambar 🔍
+              </button>
+            </div>
+          </div>
+          <div class="relative group rounded-xl overflow-hidden border border-blue-200 bg-blue-950/5 flex justify-center cursor-zoom-in" onclick="bukaModalGambarMateri('Pengenalan Ms. Word-Kelas 4.jpg', 'Petualangan Menyenangkan di Ms. Word - Kelas 4 SD')" title="Klik untuk memperbesar poster">
+            <img src="Pengenalan Ms. Word-Kelas 4.jpg" alt="Poster Petualangan Menyenangkan di Ms. Word Kelas 4 SD" class="max-h-[620px] w-auto object-contain rounded-lg transition-transform duration-300 group-hover:scale-[1.01]" loading="eager">
+            <div class="absolute inset-0 bg-slate-900/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="bg-black/75 text-white text-xs font-bold px-3.5 py-2 rounded-full backdrop-blur-xs flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> Klik untuk Melihat Ukuran Penuh 🔍
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div id="tp2-text" class="prose max-w-none text-slate-700 space-y-4 text-sm sm:text-base leading-relaxed">
           <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
             <h4 class="font-title font-bold text-blue-900 text-base mb-1">🧩 Mengapa Perlu Disusun Secara Terpisah?</h4>
             <p class="text-sm text-blue-950">
               Sebelum mencampurkan semua tulisan dan gambar ke dalam satu halaman, seorang desainer cilik yang cerdas harus mempersiapkan dan mengelompokkan bahan-bahannya secara terpisah. Ini disebut teknik <b>Dekomposisi</b> dalam Berpikir Komputasional!
             </p>
+          </div>
+
+          <!-- 4 Jurus Petualangan Menyenangkan di Ms Word Sesuai Poster -->
+          <div class="space-y-3 pt-2">
+            <h4 class="font-title font-bold text-slate-800 text-base flex items-center gap-2">
+              <i class="fa-solid fa-rocket text-blue-600"></i> 4 Langkah Mudah Mengolah Konten di Microsoft Word (Sesuai Poster):
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div class="p-3.5 bg-sky-50 rounded-2xl border border-sky-200 space-y-1">
+                <div class="w-7 h-7 rounded-lg bg-sky-600 text-white font-black flex items-center justify-center text-xs">1</div>
+                <b class="text-sky-900 block text-xs font-title">Memasukkan Gambar</b>
+                <p class="text-slate-600 leading-relaxed">Klik tab <b>"Insert"</b> di atas layar ribbon, lalu pilih menu <b>"Pictures"</b> untuk menyisipkan gambar dari komputer.</p>
+              </div>
+              <div class="p-3.5 bg-blue-50 rounded-2xl border border-blue-200 space-y-1">
+                <div class="w-7 h-7 rounded-lg bg-blue-600 text-white font-black flex items-center justify-center text-xs">2</div>
+                <b class="text-blue-900 block text-xs font-title">Mengubah Ukuran Gambar</b>
+                <p class="text-slate-600 leading-relaxed">Klik gambar hingga muncul titik-titik sudut, lalu <b>tarik sudutnya</b> untuk membesarkan (large) atau mengecilkan (small) gambar secara proporsional.</p>
+              </div>
+              <div class="p-3.5 bg-indigo-50 rounded-2xl border border-indigo-200 space-y-1">
+                <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-black flex items-center justify-center text-xs">3</div>
+                <b class="text-indigo-900 block text-xs font-title">Mengatur Posisi Gambar</b>
+                <p class="text-slate-600 leading-relaxed">Gunakan fitur <b>"Wrap Text"</b> (pilih <i>In Line with Text</i>, <i>Square</i>, atau <i>Tight</i>) agar gambar dapat digeser bebas dan teks mengalir rapi di sekitarnya.</p>
+              </div>
+              <div class="p-3.5 bg-purple-50 rounded-2xl border border-purple-200 space-y-1">
+                <div class="w-7 h-7 rounded-lg bg-purple-600 text-white font-black flex items-center justify-center text-xs">4</div>
+                <b class="text-purple-900 block text-xs font-title">Mengubah Gaya Teks</b>
+                <p class="text-slate-600 leading-relaxed">Atur <b>A. Jenis Huruf</b> (Arial, Comic Sans), <b>B. Ukuran Huruf</b> (10, 14, 24), dan <b>C. Warna Huruf</b> agar teks poster terlihat seru dan menarik!</p>
+              </div>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4">
@@ -3285,15 +3370,44 @@
               Jika salah satu bagian ingin diganti (misal ganti warna gambar atau memperbaiki salah ketik pada judul), kita tidak perlu mengulang membuat seluruh karya dari nol!
             </p>
           </div>
+
+          <!-- Banner Praktik Poster TP 2.2 Langsung ke Paint & Lab Word -->
+          <div class="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white p-4 sm:p-5 rounded-2xl shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider text-pink-100">
+                <i class="fa-solid fa-palette text-amber-300"></i> Praktik Konten Terpisah TP 2.2
+              </span>
+              <h4 class="font-title font-bold text-base sm:text-lg">Gambar Konten di Paint atau Susun di Lab Word!</h4>
+              <p class="text-xs text-pink-100 leading-relaxed max-w-xl">
+                Terapkan teknik dekomposisi: buat lukisan gambar satu per satu di <b>Aplikasi Paint Terbaru</b>, lalu simpan ke Drive dan susun teks judul beserta slogan di <b>Lab Microsoft Word</b>!
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button onclick="bukaAplikasiPaintTerbaru()" class="px-3.5 py-2.5 bg-white hover:bg-pink-50 text-pink-800 rounded-xl font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105 active:scale-95">
+                <i class="fa-solid fa-palette text-pink-600"></i> Aplikasi Paint 🎨
+              </button>
+              <button onclick="bukaPraktikWordTP2_2()" class="px-3.5 py-2.5 bg-white/20 hover:bg-white/30 text-white border border-white/40 rounded-xl font-title font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105 active:scale-95">
+                <i class="fa-solid fa-file-word text-blue-200"></i> Lab Word 📄
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="pt-4 border-t flex flex-wrap gap-3 justify-end">
-          <button onclick="switchTab('demo'); setDemoTab('demo-tp2')" class="bg-blue-600 hover:bg-blue-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Coba Demonstrasi TP 2.2
+        <div class="pt-4 border-t flex flex-wrap gap-3 justify-between items-center">
+          <button onclick="switchTab('praktik'); setPraktikSubtab('praktik-tp2')" class="text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 px-3.5 py-2.5 rounded-xl border border-purple-200 flex items-center gap-2 transition cursor-pointer">
+            <i class="fa-solid fa-folder-open text-purple-600"></i> Buka Drive 7 Kebiasaan (TP 2.1)
           </button>
-          <button onclick="switchTab('praktik'); setPraktikSubtab('praktik-tp2')" class="bg-blue-500 hover:bg-blue-600 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-            <i class="fa-solid fa-cubes-stacked"></i> Praktik Pilah Komponen
-          </button>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="switchTab('demo'); setDemoTab('demo-tp2')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-title text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Demonstrasi
+            </button>
+            <button onclick="bukaAplikasiPaintTerbaru()" class="bg-pink-600 hover:bg-pink-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer transform hover:scale-105 active:scale-95">
+              <i class="fa-solid fa-palette"></i> Aplikasi Paint Terbaru 🎨
+            </button>
+            <button onclick="bukaPraktikWordTP2_2()" class="bg-blue-600 hover:bg-blue-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer transform hover:scale-105 active:scale-95">
+              <i class="fa-solid fa-file-word"></i> Lab Ms. Word 📄
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3407,11 +3521,11 @@
         </div>
 
         <div class="pt-4 border-t flex flex-wrap gap-3 justify-end">
-          <button onclick="switchTab('demo'); setDemoTab('demo-tp4')" class="bg-blue-600 hover:bg-blue-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+          <button onclick="switchTab('demo'); setDemoTab('demo-tp4')" class="bg-blue-600 hover:bg-blue-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Coba Demonstrasi TP 2.4
           </button>
-          <button onclick="switchTab('praktik'); setPraktikSubtab('praktik-tp4')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
-            <i class="fa-solid fa-paper-plane"></i> Praktik Simulasi Diseminasi
+          <button onclick="bukaGaleriHasilPosterSiswa()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-images"></i> Lihat Hasil Poster Siswa 🖼️
           </button>
         </div>
       </div>
@@ -3748,11 +3862,21 @@
 
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs max-w-lg space-y-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Dokumen Word:</label>
-                  <div class="flex items-center gap-2">
-                    <input type="text" id="word-doc-name-input" value="Poster_Lingkungan_Hidup_Kelas4" class="flex-1 px-3.5 py-2 text-sm font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
-                    <span class="text-xs font-bold text-slate-400">.docx</span>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-xs font-bold text-slate-700">Nama Dokumen Word:</label>
+                    <span class="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                      Aturan: Kelas_Nama Siswa_Nama file
+                    </span>
                   </div>
+                  <div class="flex items-center gap-2">
+                    <input type="text" id="word-doc-name-input" oninput="periksaNamaDokumenWordLive(this.value)" value="4A_Darningsih_Poster 7 Kebiasaan" placeholder="Contoh: 4A_Darningsih_Bangun Tidur" class="flex-1 px-3.5 py-2 text-sm font-semibold rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <span class="text-xs font-bold text-slate-400">.docx</span>
+                    <button type="button" onclick="terapkanSaranNamaDokumenWord()" class="px-2.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-xs font-bold border border-purple-200 transition shrink-0" title="Format Baku Otomatis Sesuai Profil Siswa">
+                      🪄 Format Baku
+                    </button>
+                  </div>
+                  <!-- Feedback Real-Time Format Penamaan -->
+                  <div id="word-doc-name-feedback" class="mt-1.5 text-xs font-medium"></div>
                 </div>
 
                 <div class="p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs text-blue-900 space-y-1">
@@ -4760,6 +4884,12 @@
               </div>
               <p class="text-[11px] text-slate-500 leading-tight">Pilih ikon visual 7 kebiasaan atau ambil gambar hasil download dari komputer:</p>
 
+              <!-- TOMBOL UTAMA: MESIN PENCARI GAMBAR KARTUN 7 KEBIASAAN -->
+              <button type="button" onclick="bukaModalMesinPencariKartun()" class="w-full py-2.5 px-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-2xl font-title font-black text-xs shadow-md shadow-indigo-600/25 transition flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:scale-95">
+                <i class="fa-solid fa-magnifying-glass text-amber-300 text-sm"></i>
+                <span>Mesin Pencari Gambar Kartun 🎨 (30+ Pilihan)</span>
+              </button>
+
               <!-- TOMBOL AMBIL GAMBAR DARI LUAR / DOWNLOAD INTERNET -->
               <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-dashed border-emerald-400 p-3 rounded-2xl space-y-2">
                 <div class="flex items-center justify-between">
@@ -4771,11 +4901,14 @@
                 <p class="text-[11px] text-emerald-800 leading-tight">
                   Punya gambar infografis atau foto hasil download? Klik tombol untuk menaruhnya ke lembar Word:
                 </p>
-                <div class="flex gap-2">
-                  <button type="button" onclick="triggerUploadGambarWord()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-title text-xs font-bold py-2 px-2.5 rounded-xl shadow transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-folder-open"></i> Upload Gambar (File Komputer)
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                  <button type="button" onclick="triggerUploadGambarWord()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-title text-xs font-bold py-2 px-2 rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-folder-open"></i> File Komputer
                   </button>
-                  <button type="button" onclick="tambahGambarUrlPrompt()" title="Tempel URL Gambar Web" class="bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 font-title text-xs font-bold py-2 px-2.5 rounded-xl transition flex items-center justify-center gap-1">
+                  <button type="button" onclick="tempelGambarPinterestPrompt()" class="bg-rose-600 hover:bg-rose-700 text-white font-title text-xs font-bold py-2 px-2 rounded-xl shadow transition flex items-center justify-center gap-1.5" title="Tempel Gambar dari Pinterest">
+                    <i class="fa-brands fa-pinterest"></i> Pinterest
+                  </button>
+                  <button type="button" onclick="tambahGambarUrlPrompt()" title="Tempel URL Gambar Web" class="bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 font-title text-xs font-bold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1">
                     <i class="fa-solid fa-link"></i> Link Web
                   </button>
                 </div>
@@ -6837,10 +6970,10 @@
           <p class="text-sm text-slate-500">Pilih praktik untuk mencoba langsung membuat konten, memilah elemen, menyusun poster, dan mendiseminasikan!</p>
         </div>
         <div class="flex flex-wrap gap-2">
-          <button onclick="setPraktikSubtab('praktik-tp1')" id="btn-praktik-tp1" class="praktik-sub-btn active-praktik-sub px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold">Praktik 1: Editor Satuan</button>
-          <button onclick="setPraktikSubtab('praktik-tp2')" id="btn-praktik-tp2" class="praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600">Praktik 2: Pilah Elemen</button>
-          <button onclick="setPraktikSubtab('praktik-tp3')" id="btn-praktik-tp3" class="praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600">Praktik 3: Poster Studio</button>
-          <button onclick="setPraktikSubtab('praktik-tp4')" id="btn-praktik-tp4" class="praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600">Praktik 4: Diseminasi</button>
+          <button onclick="bukaPaintDariPraktik1()" id="btn-praktik-tp1" class="praktik-sub-btn active-praktik-sub px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold">Praktik 1: Aplikasi Paint Terbaru</button>
+          <button onclick="setPraktikSubtab('praktik-tp2')" id="btn-praktik-tp2" class="praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 flex items-center gap-1.5"><i class="fa-solid fa-folder-open text-purple-600"></i> Praktik 2: Drive 7 Kebiasaan (TP 2.1)</button>
+          <button onclick="bukaLabWordDariPraktik3()" id="btn-praktik-tp3" class="praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">Praktik 3: Lab Ms. Word</button>
+          <button onclick="bukaHasilPosterSiswaDariPraktik4()" id="btn-praktik-tp4" class="praktik-sub-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">Praktik 4: Hasil Poster Siswa</button>
         </div>
       </div>
 
@@ -6848,21 +6981,21 @@
       <div id="praktik-tp1" class="praktik-panel bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-4">
           <div>
-            <h3 class="font-title text-xl font-bold text-slate-800">Praktik 1: Membuat Satu Konten Digital Sederhana (TP 2.1)</h3>
-            <p class="text-xs text-slate-500">Pilih salah satu: lihat & kelola <b>Hasil Karya Poster (Ms. Word)</b> yang telah kamu simpan, atau buka <b>Aplikasi Paint Terbaru</b> untuk menggambar!</p>
+            <h3 class="font-title text-xl font-bold text-slate-800">Praktik 1: Aplikasi Paint Terbaru - Konten Digital Gambar (TP 2.1)</h3>
+            <p class="text-xs text-slate-500">Buat gambar digital mandiri menggunakan <b>Aplikasi Paint Terbaru</b>, simpan ke komputer (.PNG) atau kirim ke <b>Drive 7 Kebiasaan</b>!</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="setModePraktik1('word')" id="btn-mode-teks" class="px-3.5 py-2 rounded-xl font-bold text-xs bg-blue-600 text-white shadow-md transition flex items-center gap-1.5">
-              <i class="fa-solid fa-file-word text-white"></i> Hasil Poster Siswa (Ms. Word) 📄
+            <button onclick="setModePraktik1('gambar')" id="btn-mode-gambar" class="px-3.5 py-2 rounded-xl font-bold text-xs bg-pink-500 text-white shadow-md transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-palette text-white"></i> Aplikasi Paint Terbaru 🎨
             </button>
-            <button onclick="setModePraktik1('gambar')" id="btn-mode-gambar" class="px-3.5 py-2 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 shadow-sm transition flex items-center gap-1.5">
-              <i class="fa-solid fa-palette text-pink-500"></i> Aplikasi Paint Terbaru (Bisa Disimpan) 🎨
+            <button onclick="bukaHasilPosterSiswaDariPraktik4()" id="btn-mode-teks" class="px-3.5 py-2 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-file-word text-blue-600"></i> Hasil Poster Siswa (Ms. Word) 📄
             </button>
           </div>
         </div>
 
         <!-- Mode Galeri Hasil Karya Poster Siswa (Ms. Word) Praktik 1 -->
-        <div id="p1-area-teks" class="space-y-6 animate-fadeIn">
+        <div id="p1-area-teks" class="hidden space-y-6 animate-fadeIn">
           <!-- Banner Pengantar Galeri Word -->
           <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-600 rounded-2xl p-5 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -6870,11 +7003,11 @@
                 <i class="fa-solid fa-award text-amber-300"></i>
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-blue-100 text-[11px] font-bold mb-1">
+                <div id="galeri-badge-siswa" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-blue-100 text-[11px] font-bold mb-1">
                   <i class="fa-solid fa-circle-check text-emerald-300"></i> Portofolio Karya Digital Siswa
                 </div>
-                <h4 class="font-title text-lg sm:text-xl font-black">Galeri & Lemari Penyimpanan Poster Microsoft Word</h4>
-                <p class="text-xs text-blue-100 max-w-xl">Setiap poster yang dibuat dan disimpan di <b>Lab Ms. Word</b> otomatis tersimpan dan dipajang di sini sebagai bukti karya praktikum digitalmu!</p>
+                <h4 id="galeri-title-siswa" class="font-title text-lg sm:text-xl font-black">Galeri & Lemari Penyimpanan Poster Microsoft Word</h4>
+                <p id="galeri-desc-siswa" class="text-xs text-blue-100 max-w-xl">Setiap poster yang dibuat dan disimpan di <b>Lab Ms. Word</b> otomatis tersimpan dan dipajang di sini sebagai bukti karya praktikum digitalmu!</p>
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0">
@@ -6900,7 +7033,7 @@
         </div>
 
         <!-- Mode Gambar Canvas Praktik 1 (APLIKASI PAINT TERBARU) -->
-        <div id="p1-area-gambar" class="hidden space-y-4 animate-fadeIn">
+        <div id="p1-area-gambar" class="space-y-4 animate-fadeIn">
           
           <!-- FRAME APLIKASI PAINT MODERN (Windows 11 Edition) -->
           <div class="bg-slate-800 rounded-3xl shadow-2xl border-4 border-slate-700 overflow-hidden">
@@ -6920,16 +7053,22 @@
                   <button type="button" onclick="clearPaintCanvas()" title="Lembar Baru (Bersihkan Kanvas)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded-lg text-rose-300 font-bold transition flex items-center gap-1">
                     <i class="fa-solid fa-trash-can"></i> Bersihkan
                   </button>
+                  <button type="button" id="paint-btn-commit" onclick="commitActivePaintObject()" title="Selesai & Kunci Posisi Objek" class="hidden bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1.5 rounded-lg text-white font-bold transition flex items-center gap-1 shadow-sm text-xs cursor-pointer animate-pulse">
+                    <i class="fa-solid fa-circle-check"></i> Tempel Objek ✔
+                  </button>
                 </div>
               </div>
 
-              <!-- Tombol Aksi Utama: SIMPAN & KIRIM KE WORD -->
+              <!-- Tombol Aksi Utama: SIMPAN KE DRIVE, KIRIM KE WORD & DOWNLOAD PNG -->
               <div class="flex items-center gap-2">
-                <button type="button" onclick="kirimPaintKeWord()" class="bg-blue-600 hover:bg-blue-700 text-white font-title font-bold px-3.5 py-1.5 rounded-xl shadow transition flex items-center gap-1.5 text-xs">
+                <button type="button" onclick="simpanPaintKeDrivePrompt()" class="bg-purple-600 hover:bg-purple-700 text-white font-title font-bold px-3.5 py-1.5 rounded-xl shadow transition flex items-center gap-1.5 text-xs cursor-pointer" title="Simpan lukisan ini ke salah satu Slot Drive 7 Kebiasaan">
+                  <i class="fa-solid fa-folder-plus text-amber-300"></i> Simpan ke Drive 📁
+                </button>
+                <button type="button" onclick="kirimPaintKeWord()" class="bg-blue-600 hover:bg-blue-700 text-white font-title font-bold px-3.5 py-1.5 rounded-xl shadow transition flex items-center gap-1.5 text-xs cursor-pointer">
                   <i class="fa-solid fa-file-word"></i> Kirim ke MS Word
                 </button>
-                <button type="button" onclick="downloadPaintCanvas()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-title font-bold px-4 py-1.5 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2 text-xs">
-                  <i class="fa-solid fa-floppy-disk text-sm"></i> Simpan Gambar (.PNG) 💾
+                <button type="button" onclick="downloadPaintCanvas()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-title font-bold px-4 py-1.5 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2 text-xs cursor-pointer">
+                  <i class="fa-solid fa-floppy-disk text-sm"></i> Simpan (.PNG) 💾
                 </button>
               </div>
             </div>
@@ -6954,6 +7093,9 @@
                 </button>
                 <button type="button" onclick="tambahTeksKePaintPrompt()" id="paint-tool-text" class="paint-tool-btn px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200" title="Tulis Teks di Lukisan">
                   <i class="fa-solid fa-font text-purple-500"></i> Teks
+                </button>
+                <button type="button" onclick="setPaintTool('select')" id="paint-tool-select" class="paint-tool-btn px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 cursor-pointer" title="Pilih & Geser Area / Objek (Select & Move)">
+                  <i class="fa-solid fa-up-down-left-right text-indigo-600"></i> Geser ✥
                 </button>
               </div>
 
@@ -7028,6 +7170,7 @@
                   <span>Alat: <b id="paint-status-tool" class="text-pink-400">Kuas</b></span>
                   <span>•</span>
                   <span>Ukuran: <b id="paint-status-size">6px</b></span>
+                  <span id="paint-status-obj-info" class="hidden text-amber-300 font-bold">• ✥ Mode Geser Objek Aktif (Gunakan Mouse / Tombol Panah ⬅️➡️⬆️⬇️)</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Siap Digambar</span>
@@ -7048,111 +7191,586 @@
                 <p class="text-slate-600 text-[11px]">Gunakan kuas, pensil, bentuk, atau warna untuk menggambar. Klik <b>"Simpan Gambar (.PNG)"</b> untuk mengunduhnya ke laptop/komputer!</p>
               </div>
             </div>
-            <button onclick="downloadPaintCanvas()" class="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white font-title font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-1.5">
-              <i class="fa-solid fa-download"></i> Simpan Gambar & Ambil Bintang! ⭐
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="simpanPaintKeDrivePrompt()" class="shrink-0 bg-purple-600 hover:bg-purple-700 text-white font-title font-bold px-3.5 py-2 rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer" title="Simpan lukisan ini ke Drive 7 Kebiasaan">
+                <i class="fa-solid fa-folder-plus text-amber-300"></i> Simpan ke Drive 📁
+              </button>
+              <button onclick="downloadPaintCanvas()" class="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white font-title font-bold px-3.5 py-2 rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-download"></i> Unduh (.PNG) ⭐
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PRAKTIK 2: DRIVE KOLEKSI 7 KEBIASAAN ANAK INDONESIA HEBAT (TP 2.1) -->
+      <div id="praktik-tp2" class="praktik-panel hidden bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        
+        <!-- Header Banner Praktik 2: Drive Koleksi 7 Kebiasaan -->
+        <div class="bg-gradient-to-r from-purple-700 via-indigo-700 to-sky-600 rounded-3xl p-5 sm:p-6 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-inner">
+              <i class="fa-solid fa-folder-open text-amber-300"></i>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/20 text-purple-100 text-xs font-bold mb-1 border border-white/20">
+                <i class="fa-solid fa-award text-yellow-300"></i> Misi Capaian TP 2.1 • 7 Kebiasaan Anak Indonesia Hebat
+              </div>
+              <h3 class="font-title text-xl sm:text-2xl font-black">Drive Koleksi 7 Kebiasaan Anak Indonesia Hebat</h3>
+              <p class="text-xs text-purple-100 max-w-xl mt-0.5">
+                Kumpulkan 7 gambar (1 untuk setiap kebiasaan) dari AI, Pencarian Kartun, Pinterest, Gambar Manual (Paint), atau File Komputer. Lengkapi 7/7 untuk memenuhi <b>Nilai TP 2.1 (100 Tuntas)</b>!
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button onclick="kirimSemuaDriveKePosterWord()" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center gap-2 cursor-pointer" title="Buat poster di Lab Word dengan 7 gambar ini">
+              <i class="fa-solid fa-file-word text-blue-900"></i> Buat Poster di Word
+            </button>
+            <button onclick="switchTab('msword')" class="px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-arrow-right"></i> Ke Lab Word
+            </button>
+          </div>
+        </div>
+
+        <!-- Tombol Pilihan Mode di Praktik 2: 1. Drive Koleksi, 2. Mesin Pencari Kartun, 3. Generator AI, 4. Panduan Poster -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setModeAIStudio('drive')" id="btn-mode-ai-drive" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-purple-600 text-white shadow-md transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-folder-open text-amber-300"></i> 1. Drive 7 Kebiasaan (Misi TP 2.1)
+            </button>
+            <button onclick="setModeAIStudio('search')" id="btn-mode-ai-search" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-magnifying-glass text-indigo-600"></i> 2. Mesin Pencari Kartun
+            </button>
+            <button onclick="setModeAIStudio('generator')" id="btn-mode-ai-generator" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i> 3. Studio Gambar AI
+            </button>
+            <button onclick="setModeAIStudio('galeri')" id="btn-mode-ai-galeri" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-images text-teal-600"></i> 4. Panduan Poster TP 2.1
+            </button>
+          </div>
+          <span class="text-xs text-slate-500 font-medium hidden sm:inline" id="drive-quick-status-label">
+            📁 Kumpulkan 7 gambar untuk memenuhi nilai TP 2.1!
+          </span>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 1: DRIVE KOLEKSI 7 KEBIASAAN (DASHBOARD SLOT KELENGKAPAN TP 2.1) -->
+        <!-- ======================================================== -->
+        <div id="ai-panel-drive" class="space-y-5">
+          
+          <!-- Banner Status Ketuntasan & Penilaian TP 2.1 -->
+          <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-sky-50 p-4 sm:p-5 rounded-3xl border-2 border-indigo-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-clipboard-check"></i> Status Capaian TP 2.1
+                </span>
+                <span id="drive-koleksi-kkm-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                  Belum Lengkap (0/7)
+                </span>
+                <span id="drive-nilai-angka-badge" class="text-xs font-black px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                  Nilai: 0
+                </span>
+                <span id="drive-penamaan-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-900 border border-purple-300" title="Standar Penamaan File Baku: Kelas_Nama Siswa_Nama file">
+                  <i class="fa-solid fa-file-signature text-purple-600"></i> Penamaan File: 0/7 Baku
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-slate-800 text-base" id="drive-progress-title">
+                Progres Koleksi: 0 dari 7 Gambar Terkumpul
+              </h4>
+              <div class="w-full bg-slate-200 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-300">
+                <div id="drive-progress-bar" class="bg-gradient-to-r from-amber-400 via-indigo-500 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <p class="text-xs text-slate-500 font-medium" id="drive-progress-hint">
+                Lengkapi 7 gambar kebiasaan di bawah ini. Ketika 7/7 gambar terpenuhi, nilaimu otomatis 100 (Tuntas)! 🎉
+              </p>
+            </div>
+            <div class="flex flex-wrap sm:flex-col gap-2 shrink-0">
+              <button type="button" onclick="kirimSemuaDriveKePosterWord()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-file-word"></i> Buat Poster di Word
+              </button>
+              <button type="button" onclick="isiOtomatisVektorEdukasiLengkap()" class="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer" title="Lengkapi semua 7 slot dengan Vektor Edukasi HD resmi">
+                <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i> Lengkapi Cepat (Vektor HD)
+              </button>
+              <button type="button" onclick="resetDrive7Kebiasaan()" class="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer" title="Kosongkan semua slot di Drive">
+                <i class="fa-solid fa-rotate-left"></i> Reset Drive
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid 7 Slot Kebiasaan Anak Indonesia Hebat -->
+          <div id="drive-7kebiasaan-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <!-- Diisi secara dinamis oleh renderDrive7KebiasaanGrid() -->
+          </div>
+
+          <!-- Hidden Input untuk Upload Gambar ke Slot Tertentu -->
+          <input type="file" id="drive-slot-upload-input" accept="image/*" class="hidden" onchange="handleDriveSlotUpload(event)">
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 0: MESIN PENCARI GAMBAR KARTUN CILIK (GAYA GOOGLE IMAGES & CANVA) -->
+        <!-- ======================================================== -->
+        <div id="ai-panel-search" class="space-y-4">
+          
+          <!-- Bar Pencarian Cerdas & Filter Kategori -->
+          <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-sky-50 p-4 sm:p-5 rounded-3xl border-2 border-indigo-200 shadow-sm space-y-3.5">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <div>
+                  <h4 class="font-title font-bold text-slate-800 text-base">Pencarian Gambar Kartun Edukasi</h4>
+                  <p class="text-xs text-slate-500">Koleksi 30+ ilustrasi kartun sopan 7 Kebiasaan Anak Indonesia Hebat. 1-klik pasang ke Word!</p>
+                </div>
+              </div>
+
+              <!-- Input Search Box Real-Time -->
+              <div class="relative w-full sm:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="ai-search-input" oninput="cariKoleksiKartun(this.value)" placeholder="Cari kartun (misal: bangun pagi, tidur, buku, olahraga, bekal)..." class="w-full pl-9 pr-8 py-2.5 rounded-2xl text-xs font-bold border-2 border-indigo-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs">
+                <button type="button" onclick="document.getElementById('ai-search-input').value=''; cariKoleksiKartun('');" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
+                  <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Kategori Tombol Pil Cepat -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scroll" id="ai-search-filter-pills">
+              <!-- Diisi via renderPencariKartunPills() -->
+            </div>
+          </div>
+
+          <!-- Status Hasil, Pilihan Sumber Gambar & Pintasan Web Luar SafeSearch -->
+          <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2.5 px-1 text-xs text-slate-600">
+            <div class="flex items-center gap-3 flex-wrap">
+              <!-- Badge Keamanan Koleksi Kartun Terkurasi -->
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs shadow-2xs">
+                <i class="fa-solid fa-shield-halved text-emerald-600"></i> Koleksi 100% Ramah &amp; Aman untuk Anak
+              </div>
+
+              <div class="flex items-center gap-1.5 text-slate-500 font-medium text-xs">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="ai-search-count-label" class="font-bold text-slate-700">Memuat koleksi ilustrasi...</span>
+              </div>
+            </div>
+
+            <!-- Tombol Pintasan Gemini AI & Google Images SafeSearch -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="bukaGeminiAIPencari()" class="px-3.5 py-1.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl font-bold text-xs transition flex items-center gap-1.5 shadow-xs cursor-pointer transform hover:scale-105 active:scale-95" title="Buat gambar kartun otomatis dengan Google Gemini AI">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Gemini AI 🤖
+              </button>
+              <button type="button" onclick="bukaGoogleSafeSearchKartun()" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold text-xs transition flex items-center gap-1.5 shadow-2xs cursor-pointer" title="Cari di Google Images dengan SafeSearch Anak Aktif">
+                <i class="fa-brands fa-google text-blue-600"></i> Google Images
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid Kartun Miniatur (Mirip Screenshot Google Images) -->
+          <div id="ai-search-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+            <!-- Di-generate otomatis oleh renderPencariKartunGrid() -->
+          </div>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 1: GENERATOR GAMBAR AI INTERAKTIF -->
+        <!-- ======================================================== -->
+        <div id="ai-panel-generator" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Panel Kontrol Prompt (Kiri - 5 Kolom) -->
+          <div class="lg:col-span-5 space-y-4 bg-slate-50 p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs">
+            
+            <div class="border-b border-slate-200 pb-2">
+              <h4 class="font-title font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-purple-600"></i> Racik Perintah Prompt AI:
+              </h4>
+              <p class="text-[11px] text-slate-500">Pilih kombinasi di bawah atau ketik ide ceritamu sendiri.</p>
+            </div>
+
+            <!-- Pilihan Sumber Mesin AI -->
+            <div class="p-3 bg-purple-50/90 rounded-2xl border-2 border-purple-200 space-y-1.5 shadow-2xs">
+              <label class="block text-xs font-black text-purple-950 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-server text-purple-600"></i> Pilihan Mesin AI:
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Bebas Limit 🌟</span>
+              </label>
+              <select id="ai-select-engine" onchange="gantiMesinAI(this.value)" class="w-full px-3 py-2 rounded-xl border-2 border-purple-300 text-xs font-bold text-slate-900 bg-white focus:ring-2 focus:ring-purple-400 outline-none shadow-xs" style="color: #0f172a !important; background-color: #ffffff !important;">
+                <option value="local_cartoon" selected style="color: #0f172a !important;">🌟 Studio Kartun Edukasi Cerdas (Instan & Bebas Limit Kuota)</option>
+                <option value="pollinations" style="color: #0f172a !important;">🤖 Generator AI Online (Pollinations.ai)</option>
+              </select>
+              <p class="text-[10px] text-purple-900 leading-snug font-medium">
+                Pilih <b>Studio Kartun Edukasi Cerdas</b> untuk menghindari batasan waktu 45 detik.
+              </p>
+            </div>
+
+            <!-- 1. Pilihan 7 Kebiasaan -->
+            <div>
+              <label class="block text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1.5" style="color: #1e293b !important;">
+                <span class="w-4 h-4 rounded-full bg-purple-600 text-white text-[10px] flex items-center justify-center font-bold">1</span>
+                Pilih Kebiasaan Anak Indonesia Hebat:
+              </label>
+              <select id="ai-select-kebiasaan" onchange="perbaruiPromptOtomatisAI()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 text-xs font-bold text-slate-900 bg-white shadow-xs focus:ring-2 focus:ring-purple-400 outline-none" style="color: #0f172a !important; background-color: #ffffff !important;">
+                <option value="bangun_pagi" style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">🌅 1. Bangun Pagi Ceria (Tersenyum & Rapikan Tempat Tidur)</option>
+                <option value="beribadah" style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">🙏 2. Beribadah & Bersyukur / Gan En (Berdoa Tepat Waktu)</option>
+                <option value="olahraga" style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">⚽ 3. Berolahraga Bugar (Senam Pagi & Lari di Lapangan)</option>
+                <option value="makan_sehat" style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">🥗 4. Makan Sehat Bergizi (Sayur, Buah Segar & Susu)</option>
+                <option value="belajar_membaca" selected style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">📚 5. Gemar Belajar & Membaca (Buku Cerita di Perpustakaan)</option>
+                <option value="rukun_berbagi" style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">🤝 6. Hidup Rukun & Tolong-Menolong (Berbagi dengan Teman)</option>
+                <option value="tidur_tepat" style="color: #0f172a !important; background: #fff;" class="text-slate-900 font-bold">🌙 7. Tidur Tepat Waktu (Istirahat Cukup & Lampu Temaram)</option>
+              </select>
+            </div>
+
+            <!-- 2. Pilihan Karakter -->
+            <div>
+              <label class="block text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1.5" style="color: #1e293b !important;">
+                <span class="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">2</span>
+                Pilih Karakter Anak:
+              </label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-karakter" value="siswa_laki" onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">👦 Siswa Laki-laki</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-karakter" value="siswi_perempuan" checked onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">👧 Siswi Perempuan</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-karakter" value="bersama_robo" onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">🤖 Bersama Robo</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-karakter" value="sahabat_sekolah" onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">👫 Sahabat Sekolah</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 3. Pilihan Gaya Seni Visual AI -->
+            <div>
+              <label class="block text-xs font-bold text-slate-800 mb-1.5 flex items-center gap-1.5" style="color: #1e293b !important;">
+                <span class="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">3</span>
+                Pilih Gaya Visual Seni AI:
+              </label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-style" value="kartun_canva" checked onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">🎨 Kartun Edukasi Sopan</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-style" value="storybook" onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">📖 Buku Dongeng Anak</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-style" value="pixar3d" onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">🌟 Animasi 3D Ceria</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 font-bold shadow-2xs transition" style="color: #0f172a !important; background-color: #ffffff !important;">
+                  <input type="radio" name="ai-style" value="anime_ceria" onchange="perbaruiPromptOtomatisAI()" class="w-4 h-4 text-purple-600">
+                  <span class="text-slate-900 font-bold" style="color: #0f172a !important;">✨ Kartun Ramah Anak</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 4. Kotak Teks Prompt Cerdas -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-bold text-slate-800" style="color: #1e293b !important;">Teks Perintah Prompt AI:</label>
+                <button type="button" onclick="perbaruiPromptOtomatisAI(true)" class="text-[11px] text-purple-700 hover:text-purple-900 font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-rotate-right"></i> Reset Prompt
+                </button>
+              </div>
+              <textarea id="ai-custom-prompt" rows="3" class="w-full p-3 bg-white border-2 border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-purple-400 outline-none leading-relaxed shadow-xs" style="color: #0f172a !important; background-color: #ffffff !important;" placeholder="Prompt AI akan terisi otomatis..."></textarea>
+              <p class="text-[10px] text-slate-500 font-medium mt-1">Kamu boleh menambahkan tulisan sendiri di atas, misalnya: <i>"latar taman bunga cerah"</i> atau <i>"tersenyum manis"</i>.</p>
+            </div>
+
+            <!-- Tombol Generate AI -->
+            <div class="pt-1 flex flex-col gap-2">
+              <button onclick="generateGambarAI7Kebiasaan()" id="btn-generate-ai" class="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 active:scale-95 text-white font-title font-bold py-3 px-4 rounded-2xl shadow-lg shadow-purple-600/30 transition flex items-center justify-center gap-2 text-sm cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                <span id="btn-generate-ai-text">Buat Gambar dengan AI 🚀</span>
+              </button>
+            </div>
+
+            <!-- Opsi Pintasan Aplikasi AI Luar (Canva, Bing, Craiyon) -->
+            <div class="pt-3 border-t border-slate-200/90 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-black text-slate-800 flex items-center gap-1.5">
+                  <i class="fa-solid fa-cloud-arrow-up text-indigo-600"></i> Mau Pakai Aplikasi AI Lain?
+                </span>
+                <button type="button" onclick="salinPromptAI()" class="text-[10px] font-black text-indigo-700 hover:text-indigo-900 bg-indigo-100/80 hover:bg-indigo-200 px-2.5 py-1 rounded-lg border border-indigo-300 transition flex items-center gap-1 cursor-pointer" title="Salin Prompt untuk Canva / Bing">
+                  <i class="fa-regular fa-copy"></i> Salin Prompt
+                </button>
+              </div>
+
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <!-- Canva Magic Media -->
+                <a href="https://www.canva.com/your-apps/magic-media" target="_blank" rel="noopener" class="p-2 rounded-xl bg-white hover:bg-blue-50 border-2 border-slate-200 hover:border-blue-400 transition flex flex-col items-center justify-center gap-1 shadow-2xs group" title="Buka Canva Magic Media (AI Gambar)">
+                  <span class="text-base group-hover:scale-110 transition">🎨</span>
+                  <span class="text-[10px] font-bold text-slate-800">Canva AI</span>
+                </a>
+                <!-- Bing Image Creator (DALL-E 3) -->
+                <a href="https://www.bing.com/images/create" target="_blank" rel="noopener" class="p-2 rounded-xl bg-white hover:bg-sky-50 border-2 border-slate-200 hover:border-sky-400 transition flex flex-col items-center justify-center gap-1 shadow-2xs group" title="Buka Microsoft Designer / Bing Image Creator (DALL-E 3)">
+                  <span class="text-base group-hover:scale-110 transition">✨</span>
+                  <span class="text-[10px] font-bold text-slate-800">Bing DALL-E</span>
+                </a>
+                <!-- Craiyon AI -->
+                <a href="https://www.craiyon.com/" target="_blank" rel="noopener" class="p-2 rounded-xl bg-white hover:bg-orange-50 border-2 border-slate-200 hover:border-orange-400 transition flex flex-col items-center justify-center gap-1 shadow-2xs group" title="Buka Craiyon AI Generator">
+                  <span class="text-base group-hover:scale-110 transition">🖍️</span>
+                  <span class="text-[10px] font-bold text-slate-800">Craiyon AI</span>
+                </a>
+              </div>
+              <p class="text-[10px] text-slate-500 leading-tight">
+                💡 <b>Cara Mudah:</b> Klik <i>"Salin Prompt"</i>, tempel di Canva / Bing, simpan gambarnya, lalu masukkan ke <b>Lab Word</b> lewat tombol <i>Upload Gambar</i>!
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Pratinjau Kanvas Gambar AI (Kanan - 7 Kolom) -->
+          <div class="lg:col-span-7 flex flex-col items-center space-y-4 bg-slate-100 p-5 sm:p-7 rounded-3xl border-2 border-slate-200">
+            
+            <div class="w-full flex items-center justify-between border-b border-slate-200 pb-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-100 px-2.5 py-0.5 rounded-full">Pratinjau Hasil AI</span>
+                <h4 id="ai-display-title" class="font-title font-bold text-slate-800 text-base mt-0.5">Gemar Belajar & Membaca Buku</h4>
+              </div>
+              <span id="ai-display-style-badge" class="text-xs bg-white text-slate-600 border border-slate-200 px-3 py-1 rounded-full font-semibold shadow-2xs">
+                🎨 Gaya: Kartun 3D
+              </span>
+            </div>
+
+            <!-- Frame Pratinjau Gambar -->
+            <div class="relative w-full max-w-md aspect-square bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-white flex items-center justify-center group">
+              
+              <!-- Indikator Loading AI -->
+              <div id="ai-loading-overlay" class="hidden absolute inset-0 z-20 bg-slate-900/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
+                <div class="relative w-20 h-20 mb-4 flex items-center justify-center">
+                  <div class="absolute inset-0 rounded-full border-4 border-purple-500/30 border-t-purple-400 animate-spin"></div>
+                  <span class="text-3xl animate-bounce">🤖</span>
+                </div>
+                <h5 class="font-title font-bold text-lg text-purple-200">AI Sedang Melukis Karyamu...</h5>
+                <p id="ai-loading-step" class="text-xs text-slate-300 max-w-xs mt-1 animate-pulse">
+                  Menyusun karakter & suasana 7 Kebiasaan Anak Indonesia Hebat
+                </p>
+              </div>
+
+              <!-- Gambar AI Nyata -->
+              <img id="ai-result-image" src="" alt="Gambar AI 7 Kebiasaan Anak Indonesia Hebat" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onload="onGambarAIBerhasilDimuat()" onerror="onGambarAIGagalDimuat()">
+
+              <!-- Fallback Ilustrasi SVG Cerdas (Jika Offline / Sedang Inisialisasi) -->
+              <div id="ai-svg-fallback" class="w-full h-full p-6 flex flex-col items-center justify-between text-center bg-gradient-to-br from-indigo-50 via-sky-50 to-purple-50 select-none">
+                <div class="pt-2">
+                  <span id="fallback-badge" class="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">Kebiasaan #5</span>
+                </div>
+                <div id="fallback-art-box" class="my-auto py-2">
+                  <div class="w-32 h-32 mx-auto rounded-3xl bg-gradient-to-tr from-purple-500 to-indigo-600 text-white flex items-center justify-center text-6xl shadow-xl transform group-hover:rotate-6 transition">
+                    <span id="fallback-emoji">📚</span>
+                  </div>
+                </div>
+                <div class="pb-2">
+                  <h5 id="fallback-habit-name" class="font-title font-extrabold text-slate-800 text-base sm:text-lg">Gemar Belajar & Membaca</h5>
+                  <p id="fallback-habit-quote" class="text-xs text-slate-600 mt-1 max-w-xs">
+                    "Membaca membuka jendela ilmu dunia dan melatih kecerdasan setiap hari."
+                  </p>
+                </div>
+              </div>
+
+              <!-- Tombol Zoom di Hover -->
+              <button onclick="bukaZoomGambarAI()" class="absolute bottom-3 right-3 bg-slate-900/75 hover:bg-slate-900 text-white p-2.5 rounded-xl opacity-0 group-hover:opacity-100 transition shadow-lg text-xs" title="Lihat Ukuran Penuh">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+            </div>
+
+            <!-- Solusi Pemulihan Bebas Limit Cepat -->
+            <div id="ai-limit-recovery-banner" class="w-full p-3 bg-amber-50 rounded-2xl border-2 border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-amber-950 shadow-2xs">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">💡</span>
+                <span class="text-[11px] leading-tight font-bold">Muncul pesan <b>Free limit reached</b> di atas?</span>
+              </div>
+              <button type="button" onclick="aktifkanKartunEdukasiBebasLimit()" class="shrink-0 px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-title font-black text-xs transition shadow-sm cursor-pointer flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Ganti ke Kartun Bebas Limit ✨
+              </button>
+            </div>
+
+            <!-- Ringkasan Teks Nilai Karakter -->
+            <div class="w-full bg-white p-4 rounded-2xl border border-slate-200 text-xs text-slate-700">
+              <div class="flex items-center gap-2 text-purple-800 font-bold mb-1">
+                <i class="fa-solid fa-heart text-rose-500"></i>
+                <span id="ai-habit-title-sub">Pesan Karakter Kebiasaan:</span>
+              </div>
+              <p id="ai-habit-desc" class="text-slate-600 leading-relaxed font-medium">
+                Membiasakan diri membaca buku 15 menit sehari menumbuhkan wawasan luas, ketelitian, dan rasa ingin tahu yang tinggi.
+              </p>
+            </div>
+
+            <!-- Tombol Aksi Lengkap: SIMPAN KE DRIVE, KIRIM KE LAB MS WORD, UNDUH & AMBIL BINTANG -->
+            <div class="w-full flex flex-col sm:flex-row items-center gap-2.5 pt-1">
+              <button onclick="simpanGambarAIKeDrive()" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-title font-bold py-2.5 px-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-1.5 text-xs cursor-pointer" title="Simpan ke Slot Drive 7 Kebiasaan">
+                <i class="fa-solid fa-folder-plus text-amber-300"></i> Simpan ke Drive 📁
+              </button>
+              <button onclick="kirimGambarAIKeWord()" class="flex-1 w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-title font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fa-solid fa-file-word"></i> Pasang ke Lab Ms. Word 📄
+              </button>
+              <button onclick="unduhGambarAIHasil()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-title font-bold py-2.5 px-3.5 rounded-xl shadow transition flex items-center justify-center gap-1.5 text-xs">
+                <i class="fa-solid fa-download"></i> Unduh
+              </button>
+              <button onclick="klaimBintangGambarAI()" class="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-slate-900 font-title font-bold py-2.5 px-3.5 rounded-xl shadow transition flex items-center justify-center gap-1.5 text-xs">
+                <i class="fa-solid fa-star text-amber-900"></i> +30 Bintang
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 2: GALERI 7 KARTU KEBIASAAN SIAP PAKAI -->
+        <!-- ======================================================== -->
+        <div id="ai-panel-galeri" class="hidden space-y-4">
+          
+          <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2.5 text-indigo-900 font-medium">
+              <span class="text-xl">🌟</span>
+              <span>Klik kartu kebiasaan di bawah untuk langsung memuat ilustrasi AI dan memasangnya ke poster Word-mu!</span>
+            </div>
+            <button onclick="setModeAIStudio('generator')" class="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl transition">
+              Kembali ke Generator AI &gt;
             </button>
           </div>
 
-        </div>
-      </div>
-
-      <!-- PRAKTIK 2: MENYUSUN TERPISAH (TP 2.2) - Puzzle Dekomposisi Komponen -->
-      <div id="praktik-tp2" class="praktik-panel hidden bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-        <div>
-          <h3 class="font-title text-xl font-bold text-slate-800">Praktik 2: Memilah Elemen Konten Digital Secara Terpisah (TP 2.2)</h3>
-          <p class="text-xs text-slate-500 mt-1">Gunakan kemampuan Berpikir Komputasional (Dekomposisi & Pengelompokan). Klik atau kelompokkan setiap kotak teks & gambar ke dalam wadah yang sesuai!</p>
-        </div>
-
-        <!-- Wadah Tantangan Pilah -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Kotak Bank Komponen -->
-          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 md:col-span-1">
-            <h4 class="font-title font-bold text-slate-700 text-sm mb-2 flex items-center justify-between">
-              <span>Daftar Komponen Acak:</span>
-              <span id="p2-remaining-count" class="text-xs bg-slate-200 px-2 py-0.5 rounded-full font-bold">4 tersisa</span>
-            </h4>
-            <div id="p2-items-bank" class="space-y-2">
-              <!-- Item 1 -->
-              <div id="p2-item-1" onclick="selectP2Item('p2-item-1', 'judul')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-blue-400 flex items-center justify-between shadow-sm">
-                <span>"HEMAT ENERGI LISTRIK"</span>
-                <span class="text-[10px] text-slate-400">Pilih</span>
-              </div>
-              <!-- Item 2 -->
-              <div id="p2-item-2" onclick="selectP2Item('p2-item-2', 'gambar')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-emerald-400 flex items-center justify-between shadow-sm">
-                <span>💡 [Ikon Lampu Bohlam Hemat]</span>
-                <span class="text-[10px] text-slate-400">Pilih</span>
-              </div>
-              <!-- Item 3 -->
-              <div id="p2-item-3" onclick="selectP2Item('p2-item-3', 'isi')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-purple-400 flex items-center justify-between shadow-sm">
-                <span>"Matikan saklar saat tidak dipakai untuk cegah boros listrik."</span>
-                <span class="text-[10px] text-slate-400">Pilih</span>
-              </div>
-              <!-- Item 4 -->
-              <div id="p2-item-4" onclick="selectP2Item('p2-item-4', 'gambar')" class="p2-draggable p-2.5 bg-white rounded-xl border border-slate-300 text-xs font-bold cursor-pointer hover:border-emerald-400 flex items-center justify-between shadow-sm">
-                <span>🔌 [Ikon Cabut Colokan Kabel]</span>
-                <span class="text-[10px] text-slate-400">Pilih</span>
-              </div>
-            </div>
-            <p id="p2-selected-info" class="text-xs text-blue-600 mt-3 font-semibold italic">
-              Klik salah satu komponen di atas, lalu klik kotak wadah tujuannya di sebelah kanan!
-            </p>
-          </div>
-
-          <!-- Wadah Kategori Tujuan -->
-          <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Wadah Teks: Judul & Isi -->
-            <div onclick="dropP2ItemTo('teks')" class="bg-blue-50/70 border-2 border-dashed border-blue-400 rounded-2xl p-4 flex flex-col justify-between hover:bg-blue-100/50 cursor-pointer transition min-h-[160px]">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            
+            <!-- Kartu 1: Bangun Pagi -->
+            <div onclick="pilihKebiasaanGaleri('bangun_pagi')" class="bg-white hover:bg-amber-50/40 p-4 rounded-2xl border-2 border-slate-200 hover:border-amber-400 cursor-pointer shadow-xs hover:shadow-md transition flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <h5 class="font-title font-bold text-blue-900 text-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-file-lines text-blue-600"></i> Wadah Kelompok Teks
-                  </h5>
-                  <span class="text-[10px] bg-blue-200 text-blue-800 font-bold px-2 py-0.5 rounded-full">Klik untuk letakkan</span>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">Kebiasaan 1</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">🌅</span>
                 </div>
-                <div id="p2-slot-teks" class="space-y-1.5 text-xs text-blue-900">
-                  <p class="text-blue-400 italic text-[11px] placeholder-text">Belum ada teks dimasukkan...</p>
-                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Bangun Pagi Ceria</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Menyambut mentari pagi dengan senyum, berterima kasih, dan merapikan kamar sendiri.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
               </div>
             </div>
 
-            <!-- Wadah Gambar / Ikon Grafis -->
-            <div onclick="dropP2ItemTo('gambar')" class="bg-emerald-50/70 border-2 border-dashed border-emerald-400 rounded-2xl p-4 flex flex-col justify-between hover:bg-emerald-100/50 cursor-pointer transition min-h-[160px]">
+            <!-- Kartu 2: Beribadah -->
+            <div onclick="pilihKebiasaanGaleri('beribadah')" class="bg-white hover:bg-emerald-50/40 p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-400 cursor-pointer shadow-xs hover:shadow-md transition flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-2">
-                  <h5 class="font-title font-bold text-emerald-900 text-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-images text-emerald-600"></i> Wadah Kelompok Gambar / Ikon
-                  </h5>
-                  <span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Klik untuk letakkan</span>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">Kebiasaan 2</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">🙏</span>
                 </div>
-                <div id="p2-slot-gambar" class="space-y-1.5 text-xs text-emerald-900">
-                  <p class="text-emerald-400 italic text-[11px] placeholder-text">Belum ada gambar dimasukkan...</p>
-                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Beribadah & Bersyukur</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Menjalankan doa ibadah tepat waktu dan bersyukur (*Gan En*) atas berkah hidup.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
               </div>
             </div>
+
+            <!-- Kartu 3: Berolahraga -->
+            <div onclick="pilihKebiasaanGaleri('olahraga')" class="bg-white hover:bg-sky-50/40 p-4 rounded-2xl border-2 border-slate-200 hover:border-sky-400 cursor-pointer shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-sky-700 bg-sky-100 px-2 py-0.5 rounded-md">Kebiasaan 3</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">⚽</span>
+                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Rajin Berolahraga</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Senam pagi, lari riang, dan menjaga tubuh tetap bugar, lincah, dan kuat.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-sky-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Kartu 4: Makan Sehat -->
+            <div onclick="pilihKebiasaanGaleri('makan_sehat')" class="bg-white hover:bg-green-50/40 p-4 rounded-2xl border-2 border-slate-200 hover:border-green-400 cursor-pointer shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-green-700 bg-green-100 px-2 py-0.5 rounded-md">Kebiasaan 4</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">🥗</span>
+                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Makan Sehat Bergizi</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Memilih makanan bernutrisi seimbang, sayur segar, buah, dan air putih bersih.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-green-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Kartu 5: Gemar Belajar -->
+            <div onclick="pilihKebiasaanGaleri('belajar_membaca')" class="bg-white hover:bg-purple-50/40 p-4 rounded-2xl border-2 border-purple-300 ring-2 ring-purple-100 cursor-pointer shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-md">Kebiasaan 5</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">📚</span>
+                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Gemar Belajar & Membaca</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Rutin membaca buku, melatih logika koding, dan bersemangat mengejar cita-cita.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Kartu 6: Bermasyarakat & Rukun -->
+            <div onclick="pilihKebiasaanGaleri('rukun_berbagi')" class="bg-white hover:bg-rose-50/40 p-4 rounded-2xl border-2 border-slate-200 hover:border-rose-400 cursor-pointer shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">Kebiasaan 6</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">🤝</span>
+                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Bermasyarakat & Berbagi</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Menghargai keberagaman suku dan agama (*Hu Ai*), tidak mengejek, dan saling tolong.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-rose-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+
+            <!-- Kartu 7: Tidur Tepat Waktu -->
+            <div onclick="pilihKebiasaanGaleri('tidur_tepat')" class="bg-white hover:bg-indigo-50/40 p-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-400 cursor-pointer shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-md">Kebiasaan 7</span>
+                  <span class="text-2xl group-hover:scale-125 transition transform">🌙</span>
+                </div>
+                <h5 class="font-title font-bold text-slate-800 text-sm">Tidur Tepat Waktu</h5>
+                <p class="text-xs text-slate-500 mt-1 leading-snug">Tidur lebih awal tanpa gawai/HP larut malam agar otak segar dan daya ingat tajam.</p>
+              </div>
+              <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-700">
+                <span>Pilih Ilustrasi AI</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+
           </div>
+
         </div>
 
-        <div id="p2-feedback-box" class="hidden p-4 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-900 text-sm flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-2xl text-emerald-600"></i>
-            <div>
-              <b class="font-title text-base">Luar Biasa! Dekomposisi Berhasil 100%!</b>
-              <p class="text-xs">Kamu berhasil memisahkan komponen teks dan visual secara sistematis.</p>
-            </div>
-          </div>
-          <button onclick="resetPraktik2()" class="text-xs bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl hover:bg-emerald-700">Ulangi</button>
-        </div>
       </div>
 
-      <!-- PRAKTIK 3: MINI CANVA / STUDIO POSTER KOMBINASI LENGKAP (TP 2.3) -->
+      <!-- PRAKTIK 3: LAB MS. WORD (TP 2.3) -->
       <div id="praktik-tp3" class="praktik-panel hidden bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-4">
           <div>
-            <h3 class="font-title text-xl font-bold text-slate-800">Praktik 3: Studio Kreator Poster Digital (TP 2.3)</h3>
-            <p class="text-xs text-slate-500">Kombinasikan teks judul, isi, warna, dan stiker ilustrasi secara logis menjadi poster digital yang menarik!</p>
+            <h3 class="font-title text-xl font-bold text-slate-800">Lab Ms. Word: Membuat Poster Digital (TP 2.3)</h3>
+            <p class="text-xs text-slate-500">Kombinasikan teks judul, isi, dan gambar dari Drive 7 Kebiasaan langsung di aplikasi Lab Ms. Word!</p>
           </div>
-          <button onclick="unduhPosterKarya()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2">
-            <i class="fa-solid fa-download"></i> Unduh Poster Gambar
+          <button onclick="switchTab('msword')" class="bg-blue-600 hover:bg-blue-700 text-white font-title text-xs sm:text-sm font-bold px-4 py-2 rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-file-word"></i> Buka Lembar Lab Ms. Word 📄
           </button>
         </div>
 
@@ -7259,11 +7877,16 @@
         </div>
       </div>
 
-      <!-- PRAKTIK 4: SIMULASI DISEMINASI & EVALUASI (TP 2.4) -->
+      <!-- PRAKTIK 4: HASIL POSTER SISWA & DISEMINASI (TP 2.4) -->
       <div id="praktik-tp4" class="praktik-panel hidden bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-        <div>
-          <h3 class="font-title text-xl font-bold text-slate-800">Praktik 4: Merancang Diseminasi & Analisis Tanggapan (TP 2.4)</h3>
-          <p class="text-xs text-slate-500 mt-1">Rencanakan cara membagikan poster buatanmu ke orang lain secara cerdas, patuhi netiket, dan perhatikan evaluasi dampaknya!</p>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <h3 class="font-title text-xl font-bold text-slate-800">Praktik 4: Hasil Poster Siswa &amp; Diseminasi (TP 2.4)</h3>
+            <p class="text-xs text-slate-500 mt-1">Lihat seluruh karya poster yang telah dibuat siswa, lalu rencanakan cara diseminasi dan evaluasi dampaknya!</p>
+          </div>
+          <button onclick="bukaHasilPosterSiswaDariPraktik4()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-title text-xs sm:text-sm font-bold rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-images"></i> Buka Galeri Hasil Poster 🖼️
+          </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -7352,7 +7975,7 @@
         <div id="misi-tp5" class="misi-panel bg-white rounded-3xl p-6 sm:p-8 border border-purple-200 shadow-sm space-y-6">
           <div class="border-b pb-4">
             <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full font-title">Misi TP 2.5</span>
-            <h3 class="font-title text-xl font-bold text-slate-800 mt-2">Misi 1: Memandu Robo-Tzu Chi Membersihkan Taman Sekolah</h3>
+            <h3 class="font-title text-xl font-bold text-slate-800 mt-2">Misi 1: Memandu Robo Membersihkan Taman Sekolah</h3>
             <p class="text-xs text-slate-500">Urutkan balok langkah secara tepat dari atas ke bawah agar robot berhasil mengambil botol dan membuangnya ke wadah daur ulang!</p>
           </div>
 
@@ -8365,6 +8988,8 @@
     </div>
   </div>
 
+
+
   <!-- ======================================================== -->
   <!-- MODAL BICARA LANGSUNG DENGAN ROBO (DISEMBUNYIKAN / MINIMALIS DI BALON ATAS MASKOT) -->
   <!-- ======================================================== -->
@@ -8382,7 +9007,7 @@
             🤖
           </div>
           <div>
-            <h3 class="font-title font-bold text-lg text-white">Bicara dengan Robo-Tzu Chi</h3>
+            <h3 class="font-title font-bold text-lg text-white">Bicara dengan Robo</h3>
             <p class="text-xs text-sky-300">Tanya lewat mikrofon & dengar suara robot menjawab</p>
           </div>
         </div>
@@ -8435,13 +9060,13 @@
           <span class="text-xl">🤖</span>
           <div class="flex-1">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Jawaban Robo-Tzu Chi:</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Jawaban Robo:</span>
               <button onclick="ulangiSuaraJawabanTerakhir()" class="text-[11px] font-bold text-amber-300 hover:text-amber-200 flex items-center gap-1 transition" title="Dengarkan Ulang Suara Robo">
                 <i class="fa-solid fa-volume-high"></i> Ulangi Suara
               </button>
             </div>
             <p id="voice-robo-answer" class="text-xs sm:text-sm font-medium text-sky-100 mt-1 leading-relaxed">
-              "Halo teman pintar! Aku Robo-Tzu Chi! Senang sekali bisa mengobrol denganmu! Tanyakan apa saja padaku ya!"
+              "Halo teman pintar! Aku Robo! Senang sekali bisa mengobrol denganmu! Tanyakan apa saja padaku ya!"
             </p>
           </div>
         </div>
@@ -8509,6 +9134,8 @@
     </div>
   </div>
 
+
+
   <!-- Modal Konfirmasi Hapus Satu Poster Word -->
   <div id="modal-konfirmasi-hapus-poster" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4 transform transition-all scale-100">
@@ -8536,6 +9163,8 @@
     </div>
   </div>
 
+
+
   <!-- Modal Konfirmasi Hapus Semua Poster Word -->
   <div id="modal-konfirmasi-hapus-semua-poster" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4 transform transition-all scale-100">
@@ -8562,6 +9191,8 @@
     </div>
   </div>
 
+
+
   <!-- Modal Pratinjau Gambar Infografis / Poster Pembelajaran TP 1.1 -->
   <div id="modal-gambar-materi" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalGambarMateri()">
     <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-700/20">
@@ -8586,6 +9217,154 @@
       </div>
       <div class="p-2 sm:p-4 bg-slate-950 flex-1 overflow-auto flex items-center justify-center min-h-[300px]">
         <img id="modal-gambar-materi-img" src="" alt="Pratinjau Materi" class="max-h-[78vh] w-auto object-contain rounded-lg shadow-lg">
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ======================================================== -->
+  <!-- MODAL: MESIN PENCARI GAMBAR KARTUN 7 KEBIASAAN (POPUP CEPAT UNTUK LAB WORD) -->
+  <!-- ======================================================== -->
+  <div id="modal-mesin-pencari-kartun" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalMesinPencariKartun()">
+    <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      
+      <!-- Header Modal -->
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-purple-700 via-indigo-700 to-sky-700 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl shadow-inner shrink-0">
+            🎨
+          </span>
+          <div>
+            <h4 class="font-title font-bold text-base sm:text-lg leading-tight">Mesin Pencari Gambar Kartun Edukasi</h4>
+            <p class="text-xs text-purple-100">Pilih gambar kartun sopan yang kamu sukai, 1-klik langsung masuk ke poster Lab Word!</p>
+          </div>
+        </div>
+        <button onclick="tutupModalMesinPencariKartun()" class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-sm transition cursor-pointer" title="Tutup Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Kontrol Pencarian & Filter di Modal -->
+      <div class="p-3.5 sm:p-4 bg-slate-50 border-b border-slate-200 shrink-0 space-y-3">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <!-- Badge Keamanan Koleksi Kartun di Modal -->
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs shadow-2xs shrink-0">
+            <i class="fa-solid fa-shield-halved text-emerald-600"></i> 100% Ramah Anak
+          </div>
+
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="modal-search-kartun-input" oninput="cariKoleksiKartunModal(this.value)" placeholder="Ketik pencarian (misal: bangun pagi, tidur, sholat, lari, sayur, buku, bekal)..." class="w-full pl-9 pr-8 py-2 rounded-xl text-xs font-bold border-2 border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs">
+            <button type="button" onclick="document.getElementById('modal-search-kartun-input').value=''; cariKoleksiKartunModal('');" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+          </div>
+          <button type="button" onclick="bukaGeminiAIPencari()" class="px-3 py-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0 shadow-xs cursor-pointer" title="Buat gambar kartun otomatis dengan Google Gemini AI">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Gemini AI 🤖
+          </button>
+          <span id="modal-search-count-label" class="text-xs font-bold text-slate-600 shrink-0 px-1 hidden md:inline">30 Gambar Siap Pakai</span>
+        </div>
+
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 custom-scroll" id="modal-search-filter-pills">
+          <!-- Pil filter modal di-generate oleh JS -->
+        </div>
+      </div>
+
+      <!-- Body Grid Gambar Kartun Modal -->
+      <div class="p-4 sm:p-5 flex-1 overflow-y-auto custom-scroll bg-slate-100">
+        <div id="modal-search-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          <!-- Diisi via renderPencariKartunGrid() -->
+        </div>
+      </div>
+
+      <!-- Footer Modal Info -->
+      <div class="p-3 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 shrink-0">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i>
+          <span>Klik salah satu gambar kartun untuk langsung memasangnya ke lembar kerja Word!</span>
+        </div>
+        <button onclick="tutupModalMesinPencariKartun()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition cursor-pointer">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: PILIH SUMBER GAMBAR UNTUK SLOT DRIVE 7 KEBIASAAN -->
+  <!-- ======================================================== -->
+  <div id="modal-pilih-sumber-drive" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn flex flex-col max-h-[90vh]">
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-purple-700 via-indigo-700 to-sky-700 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl shrink-0">
+            📁
+          </span>
+          <div>
+            <h4 class="font-title font-bold text-base sm:text-lg" id="modal-pilih-slot-title">Pilih Gambar untuk Slot</h4>
+            <p class="text-xs text-purple-100">Bebas pilih: File Komputer, Aplikasi Paint, Gemini AI, atau Kartun Edukasi!</p>
+          </div>
+        </div>
+        <button onclick="tutupModalPilihSumberSlot()" class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-sm transition cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-3 bg-slate-50">
+        <p class="text-xs text-slate-600 font-medium">Pilih salah satu cara di bawah ini untuk mengisi slot kebiasaan ini:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- 1. Upload File Komputer -->
+          <button type="button" onclick="aksiPilihSumberSlot('upload')" class="p-3.5 bg-white hover:bg-emerald-50 border-2 border-emerald-300 hover:border-emerald-500 rounded-2xl transition flex items-start gap-3 text-left group cursor-pointer shadow-xs">
+            <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition"><i class="fa-solid fa-laptop text-emerald-600"></i></span>
+            <div>
+              <div class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded mb-0.5">💻 Dari Komputer</div>
+              <h5 class="font-title font-bold text-xs text-slate-800">1. Upload Gambar dari Komputer</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5">Pilih foto/gambar (PNG, JPG) dari laptop atau PC komputermu.</p>
+            </div>
+          </button>
+          <!-- 2. Ambil dari Aplikasi Paint Terbaru -->
+          <button type="button" onclick="aksiPilihSumberSlot('paint')" class="p-3.5 bg-white hover:bg-pink-50 border-2 border-pink-300 hover:border-pink-500 rounded-2xl transition flex items-start gap-3 text-left group cursor-pointer shadow-xs">
+            <span class="w-10 h-10 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition"><i class="fa-solid fa-palette text-pink-500"></i></span>
+            <div>
+              <div class="inline-flex items-center gap-1 text-[10px] font-black text-pink-700 bg-pink-100 px-1.5 py-0.5 rounded mb-0.5">🎨 Paint Terbaru</div>
+              <h5 class="font-title font-bold text-xs text-slate-800">2. Gambar dari Aplikasi Paint</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5">Gunakan lukisan karyamu dari Aplikasi Paint Terbaru.</p>
+            </div>
+          </button>
+          <!-- 3. Studio Gambar Gemini AI -->
+          <button type="button" onclick="aksiPilihSumberSlot('ai')" class="p-3.5 bg-white hover:bg-purple-50 border-2 border-slate-200 hover:border-purple-400 rounded-2xl transition flex items-start gap-3 text-left group cursor-pointer shadow-2xs">
+            <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition"><i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i></span>
+            <div>
+              <div class="inline-flex items-center gap-1 text-[10px] font-black text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded mb-0.5">🤖 Gemini AI</div>
+              <h5 class="font-title font-bold text-xs text-slate-800">3. Buat dengan Gemini AI</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5">Buat gambar kartun otomatis dengan kecerdasan buatan.</p>
+            </div>
+          </button>
+          <!-- 4. Mesin Pencari Kartun Edukasi -->
+          <button type="button" onclick="aksiPilihSumberSlot('search')" class="p-3.5 bg-white hover:bg-indigo-50 border-2 border-slate-200 hover:border-indigo-400 rounded-2xl transition flex items-start gap-3 text-left group cursor-pointer shadow-2xs">
+            <span class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition"><i class="fa-solid fa-magnifying-glass text-indigo-600"></i></span>
+            <div>
+              <div class="inline-flex items-center gap-1 text-[10px] font-black text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded mb-0.5">🔍 Terkurasi Aman</div>
+              <h5 class="font-title font-bold text-xs text-slate-800">4. Mesin Pencari Kartun</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5">Pilih dari 30+ koleksi kartun edukasi sopan siap pakai.</p>
+            </div>
+          </button>
+          <!-- 5. Vektor Edukasi HD Instan -->
+          <button type="button" onclick="aksiPilihSumberSlot('vektor_instan')" class="p-3.5 bg-white hover:bg-amber-50 border-2 border-slate-200 hover:border-amber-400 rounded-2xl transition flex items-start gap-3 text-left group cursor-pointer shadow-2xs col-span-1 sm:col-span-2">
+            <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg shrink-0 group-hover:scale-110 transition"><i class="fa-solid fa-vector-square text-amber-600"></i></span>
+            <div>
+              <div class="inline-flex items-center gap-1 text-[10px] font-black text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded mb-0.5">⭐ Kilat 1-Klik</div>
+              <h5 class="font-title font-bold text-xs text-slate-800">5. Pasang Vektor Edukasi Instan</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5">Pasang ilustrasi resmi vektor HD langsung sesuai tema kebiasaan ini.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="p-3.5 bg-white border-t border-slate-200 flex justify-end">
+        <button onclick="tutupModalPilihSumberSlot()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition cursor-pointer">
+          Batal
+        </button>
       </div>
     </div>
   </div>
@@ -8649,6 +9428,8 @@
       </div>
     </div>
   </div>
+
+
 
   <!-- ======================================================== -->
   <!-- MODAL: UBAH PIN AKSES DASBOR GURU -->
@@ -8716,6 +9497,8 @@
       </div>
     </div>
   </div>
+
+
 
   <!-- ======================================================== -->
   <!-- MODAL: KARTU PELAJAR & RAPOR DIGITAL SISWA (PROFIL SISWA) -->
@@ -8895,6 +9678,8 @@
     </div>
   </div>
 
+
+
   <!-- ======================================================== -->
   <!-- MODAL: KONFIRMASI SIGN OUT SISWA -->
   <!-- ======================================================== -->
@@ -8923,6 +9708,8 @@
       </div>
     </div>
   </div>
+
+
 
   <!-- ======================================================== -->
   <!-- MODAL: EDIT DATA SISWA, NILAI, & CATATAN GURU -->
@@ -9094,6 +9881,8 @@
     </div>
   </div>
 
+
+
   <!-- ======================================================== -->
   <!-- MODAL: TAMBAH SISWA MANUAL -->
   <!-- ======================================================== -->
@@ -9169,6 +9958,8 @@
       </div>
     </div>
   </div>
+
+
 
   <!-- ======================================================== -->
   <!-- MODAL: PANDUAN ASPEK RUBRIK PENILAIAN OTOMATIS SISTEM -->
@@ -9305,6 +10096,8 @@
     </div>
   </div>
 
+
+
   <!-- ======================================================== -->
   <!-- FLOATING SCROLL NAVIGATION (TOMBOL GULIR KE ATAS & BAWAH) -->
   <!-- ======================================================== -->
@@ -9337,6 +10130,6 @@
   <!-- Canvas Hidden Helper untuk Export Download Poster -->
   <canvas id="export-canvas" width="600" height="750" class="hidden"></canvas>
 
-  <script src="app.js?v=20261021_embedded_official_sheet"></script>
+  <script src="app.js?v=20261027_modul_tp2_2_poster"></script>
 </body>
 </html>
