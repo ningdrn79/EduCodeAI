@@ -742,6 +742,7 @@ function updateSemesterAccessUI() {
     document.querySelectorAll('.sem2-content').forEach(el => el.classList.add('hidden'));
   }
 
+  updateNavSemesterVisibility();
   updateLabelSemesterSiswa();
   renderPanelPengaturanSemesterGuru();
 }
@@ -808,21 +809,89 @@ function updateNavSemesterVisibility() {
   const mNavExcel = document.getElementById('m-nav-msexcel');
   const navDemo = document.getElementById('nav-demo');
   const mNavDemo = document.getElementById('m-nav-demo');
+  const navLabirin = document.getElementById('nav-labirin');
+  const mNavLabirin = document.getElementById('m-nav-labirin');
+  const navKetik = document.getElementById('nav-ketik');
+  const mNavKetik = document.getElementById('m-nav-ketik');
 
   if (state.currentSemester === 2 && isSemester2Unlocked()) {
+    // ==========================================
+    // TAMPILAN KHUSUS SEMESTER 2 (Coding & Robot)
+    // ==========================================
     if (navExcel) navExcel.classList.add('hidden');
     if (mNavExcel) mNavExcel.classList.add('hidden');
-    // RoboMind Tampil di Semester 2
     if (navDemo) navDemo.classList.remove('hidden');
     if (mNavDemo) mNavDemo.classList.remove('hidden');
+
+    // 🎮 GAME ROBO HANYA MUNCUL DI SEMESTER 2
+    if (navLabirin) navLabirin.classList.remove('hidden');
+    if (mNavLabirin) mNavLabirin.classList.remove('hidden');
+
+    // ⌨️ GAME KETIK CEPAT DISEMBUNYIKAN DI SEMESTER 2
+    if (navKetik) navKetik.classList.add('hidden');
+    if (mNavKetik) mNavKetik.classList.add('hidden');
   } else {
-    // Semester 1: Excel tampil, RoboMind disembunyikan
+    // ==========================================
+    // TAMPILAN KHUSUS SEMESTER 1 (MS Word & Excel)
+    // ==========================================
     if (navExcel) navExcel.classList.remove('hidden');
     if (mNavExcel) mNavExcel.classList.remove('hidden');
     if (navDemo) navDemo.classList.add('hidden');
     if (mNavDemo) mNavDemo.classList.add('hidden');
+
+    // 🎮 GAME ROBO DISEMBUNYIKAN DI SEMESTER 1
+    if (navLabirin) navLabirin.classList.add('hidden');
+    if (mNavLabirin) mNavLabirin.classList.add('hidden');
+
+    // ⌨️ GAME KETIK CEPAT HANYA MUNCUL DI SEMESTER 1
+    if (navKetik) navKetik.classList.remove('hidden');
+    if (mNavKetik) mNavKetik.classList.remove('hidden');
   }
 }
+window.updateNavSemesterVisibility = updateNavSemesterVisibility;
+
+function pilihSemester(semNumber) {
+  if (semNumber === 2 && !isSemester2Unlocked()) {
+    playSound('warning');
+    showToast('Semester 2 akan dibuka oleh Guru pada Januari 2027. Saat ini fokus di Semester 1 ya! 📘✨', 'info');
+    return;
+  }
+  state.currentSemester = semNumber;
+  try {
+    localStorage.setItem('educode_student_active_sem_v1', String(semNumber));
+    sessionStorage.setItem('educode_student_active_sem_v1', String(semNumber));
+  } catch (e) {}
+
+  const navLabText = document.getElementById('nav-lab-text');
+  const navLabIcon = document.getElementById('nav-lab-icon');
+  const mNavLabText = document.getElementById('m-nav-lab-text');
+  const mNavLabIcon = document.getElementById('m-nav-lab-icon');
+
+  if (semNumber === 2) {
+    if (navLabText) navLabText.innerText = 'Lab Scratch';
+    if (navLabIcon) navLabIcon.className = 'fa-solid fa-code text-purple-400 icon-3d-glow';
+    if (mNavLabText) mNavLabText.innerText = 'Scratch';
+    if (mNavLabIcon) mNavLabIcon.className = 'fa-solid fa-code text-lg text-purple-400';
+
+    document.querySelectorAll('.sem1-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.sem2-content').forEach(el => el.classList.remove('hidden'));
+  } else {
+    if (navLabText) navLabText.innerText = 'Lab MS Word';
+    if (navLabIcon) navLabIcon.className = 'fa-solid fa-file-word text-blue-400 icon-3d-glow';
+    if (mNavLabText) mNavLabText.innerText = 'Lab Word';
+    if (mNavLabIcon) mNavLabIcon.className = 'fa-solid fa-file-word text-lg text-blue-400';
+
+    document.querySelectorAll('.sem1-content').forEach(el => el.classList.remove('hidden'));
+    document.querySelectorAll('.sem2-content').forEach(el => el.classList.add('hidden'));
+  }
+
+  updateNavSemesterVisibility();
+  updateLabelSemesterSiswa();
+  if (typeof terapkanBahasa === 'function') {
+    terapkanBahasa();
+  }
+}
+window.pilihSemester = pilihSemester;
 
 function toggleSemesterSiswa() {
   if (!isSemester2Unlocked()) {
@@ -896,7 +965,7 @@ function switchTab(tabId) {
   }
 
   // Daftar semua tab
-  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru'];
+  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik'];
   tabs.forEach(tab => {
     const section = document.getElementById(`tab-${tab}`);
     if (section) {
@@ -932,6 +1001,22 @@ function switchTab(tabId) {
 
   if (tabId === 'guru') {
     renderDasborGuru();
+  }
+
+  if (tabId === 'labirin') {
+    if (typeof window.renderRoboMazeGrid === 'function') {
+      setTimeout(function() { window.renderRoboMazeGrid(); }, 50);
+    }
+  }
+
+  if (tabId === 'ketik') {
+    if (typeof window.initTypingHeroGame === 'function') {
+      setTimeout(function() { window.initTypingHeroGame(); }, 50);
+    }
+  } else {
+    if (typeof window.pauseTypingHeroGame === 'function') {
+      window.pauseTypingHeroGame();
+    }
   }
 
   // Pastikan mode fullscreen dinonaktifkan jika berpindah tab
@@ -2121,7 +2206,7 @@ function addP1Emoji(emoji) {
 }
 
 // ==========================================
-// ENGINE APLIKASI PAINT TERBARU (MODERN EDITION DENGAN FITUR GESER OBJEK)
+// ENGINE APLIKASI PAINT TERBARU (MODERN EDITION DENGAN FITUR GESER OBJEK & RAGAM BRUSHES)
 // ==========================================
 let paintApp = {
   canvas: null,
@@ -2130,11 +2215,14 @@ let paintApp = {
   color: '#000000',
   size: 6,
   tool: 'brush', // brush, pencil, eraser, bucket, text, select
-  shape: 'none', // none, line, rect, circle, star, heart
+  brushType: 'brush', // brush, calligraphy1, calligraphy2, airbrush, oil, crayon, marker, natural_pencil, watercolor
+  shape: 'none', // none, line, rect, circle, triangle, diamond, arrow, bubble, star, heart
   isDrawing: false,
   isMovingObject: false,
   startX: 0,
   startY: 0,
+  lastX: 0,
+  lastY: 0,
   snapshot: null,
   history: [],
   redoList: [],
@@ -2171,6 +2259,17 @@ function initPaintApp() {
       e.preventDefault();
       endPaintDraw(e);
     }, { passive: false });
+
+    // Listener Klik di Luar Popover Brushes untuk Otomatis Menutup Menu
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('paint-brushes-menu');
+      const btn = document.getElementById('paint-tool-brush');
+      if (menu && !menu.classList.contains('hidden')) {
+        if (!menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
+          menu.classList.add('hidden');
+        }
+      }
+    });
 
     // Keyboard Arrow Keys Listener untuk menggeser objek aktif dengan presisi
     window.addEventListener('keydown', (e) => {
@@ -2286,6 +2385,14 @@ function renderActivePaintObject() {
       ctx.moveTo(obj.x, obj.y);
       ctx.lineTo(obj.x + obj.w, obj.y + obj.h);
       ctx.stroke();
+    } else if (obj.shape === 'triangle') {
+      drawPaintTriangle(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    } else if (obj.shape === 'diamond') {
+      drawPaintDiamond(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    } else if (obj.shape === 'arrow') {
+      drawPaintArrow(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    } else if (obj.shape === 'bubble') {
+      drawPaintBubble(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
     } else if (obj.shape === 'star') {
       drawPaintStar(obj.x + obj.w / 2, obj.y + obj.h / 2, obj.x + obj.w / 2, obj.y);
     } else if (obj.shape === 'heart') {
@@ -2376,6 +2483,14 @@ function commitActivePaintObject() {
       ctx.moveTo(obj.x, obj.y);
       ctx.lineTo(obj.x + obj.w, obj.y + obj.h);
       ctx.stroke();
+    } else if (obj.shape === 'triangle') {
+      drawPaintTriangle(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    } else if (obj.shape === 'diamond') {
+      drawPaintDiamond(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    } else if (obj.shape === 'arrow') {
+      drawPaintArrow(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
+    } else if (obj.shape === 'bubble') {
+      drawPaintBubble(obj.x, obj.y, obj.x + obj.w, obj.y + obj.h);
     } else if (obj.shape === 'star') {
       drawPaintStar(obj.x + obj.w / 2, obj.y + obj.h / 2, obj.x + obj.w / 2, obj.y);
     } else if (obj.shape === 'heart') {
@@ -2438,19 +2553,14 @@ function startPaintDraw(e) {
   paintApp.isDrawing = true;
   paintApp.startX = pos.x;
   paintApp.startY = pos.y;
+  paintApp.lastX = pos.x;
+  paintApp.lastY = pos.y;
   paintApp.snapshot = paintApp.ctx.getImageData(0, 0, paintApp.canvas.width, paintApp.canvas.height);
 
   if (paintApp.shape === 'none') {
-    // Mode goresan bebas (kuas, pensil, eraser)
-    paintApp.ctx.beginPath();
-    paintApp.ctx.moveTo(pos.x, pos.y);
-    paintApp.ctx.strokeStyle = (paintApp.tool === 'eraser') ? '#ffffff' : paintApp.color;
-    paintApp.ctx.fillStyle = paintApp.color;
-    paintApp.ctx.lineWidth = (paintApp.tool === 'pencil') ? 2 : ((paintApp.tool === 'eraser') ? paintApp.size * 2 : paintApp.size);
-    paintApp.ctx.lineCap = 'round';
-    paintApp.ctx.lineJoin = 'round';
-    paintApp.ctx.lineTo(pos.x, pos.y);
-    paintApp.ctx.stroke();
+    // Mode goresan bebas (ragam kuas, pensil, eraser)
+    const brushToUse = (paintApp.tool === 'eraser') ? 'eraser' : (paintApp.tool === 'pencil' ? 'natural_pencil' : paintApp.brushType);
+    drawCustomBrushStroke(pos.x, pos.y, pos.x, pos.y, brushToUse);
   }
 }
 
@@ -2494,16 +2604,16 @@ function onPaintDrawMove(e) {
     return;
   }
 
-  // C2. Mode Goresan Bebas
+  // C2. Mode Goresan Bebas dengan Engine Brushes Berinterpolasi Mulus
   if (paintApp.shape === 'none') {
-    paintApp.ctx.strokeStyle = (paintApp.tool === 'eraser') ? '#ffffff' : paintApp.color;
-    paintApp.ctx.lineWidth = (paintApp.tool === 'pencil') ? 2 : ((paintApp.tool === 'eraser') ? paintApp.size * 2 : paintApp.size);
-    paintApp.ctx.lineTo(pos.x, pos.y);
-    paintApp.ctx.stroke();
+    const brushToUse = (paintApp.tool === 'eraser') ? 'eraser' : (paintApp.tool === 'pencil' ? 'natural_pencil' : paintApp.brushType);
+    drawCustomBrushStroke(paintApp.lastX, paintApp.lastY, pos.x, pos.y, brushToUse);
+    paintApp.lastX = pos.x;
+    paintApp.lastY = pos.y;
     return;
   }
 
-  // C3. Mode Gambar Bentuk (Rectangle, Circle, Star, Heart, Line)
+  // C3. Mode Gambar Bentuk (Rectangle, Circle, Triangle, Diamond, Arrow, Bubble, Star, Heart, Line)
   paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
   paintApp.ctx.strokeStyle = paintApp.color;
   paintApp.ctx.lineWidth = paintApp.size;
@@ -2530,6 +2640,14 @@ function onPaintDrawMove(e) {
     const cy = (sy + ey) / 2;
     paintApp.ctx.arc(cx, cy, Math.max(2, radius), 0, 2 * Math.PI);
     paintApp.ctx.stroke();
+  } else if (paintApp.shape === 'triangle') {
+    drawPaintTriangle(sx, sy, ex, ey);
+  } else if (paintApp.shape === 'diamond') {
+    drawPaintDiamond(sx, sy, ex, ey);
+  } else if (paintApp.shape === 'arrow') {
+    drawPaintArrow(sx, sy, ex, ey);
+  } else if (paintApp.shape === 'bubble') {
+    drawPaintBubble(sx, sy, ex, ey);
   } else if (paintApp.shape === 'star') {
     drawPaintStar(sx, sy, ex, ey);
   } else if (paintApp.shape === 'heart') {
@@ -2683,6 +2801,365 @@ function drawPaintHeart(sx, sy, ex, ey) {
   paintApp.ctx.stroke();
 }
 
+// Menggambar Bentuk Segitiga (Triangle)
+function drawPaintTriangle(sx, sy, ex, ey) {
+  const minX = Math.min(sx, ex);
+  const maxX = Math.max(sx, ex);
+  const minY = Math.min(sy, ey);
+  const maxY = Math.max(sy, ey);
+  paintApp.ctx.beginPath();
+  paintApp.ctx.moveTo((minX + maxX) / 2, minY);
+  paintApp.ctx.lineTo(maxX, maxY);
+  paintApp.ctx.lineTo(minX, maxY);
+  paintApp.ctx.closePath();
+  paintApp.ctx.stroke();
+}
+window.drawPaintTriangle = drawPaintTriangle;
+
+// Menggambar Bentuk Belah Ketupat (Diamond)
+function drawPaintDiamond(sx, sy, ex, ey) {
+  const minX = Math.min(sx, ex);
+  const maxX = Math.max(sx, ex);
+  const minY = Math.min(sy, ey);
+  const maxY = Math.max(sy, ey);
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  paintApp.ctx.beginPath();
+  paintApp.ctx.moveTo(cx, minY);
+  paintApp.ctx.lineTo(maxX, cy);
+  paintApp.ctx.lineTo(cx, maxY);
+  paintApp.ctx.lineTo(minX, cy);
+  paintApp.ctx.closePath();
+  paintApp.ctx.stroke();
+}
+window.drawPaintDiamond = drawPaintDiamond;
+
+// Menggambar Bentuk Panah Kanan (Right Arrow)
+function drawPaintArrow(sx, sy, ex, ey) {
+  const minX = Math.min(sx, ex);
+  const maxX = Math.max(sx, ex);
+  const minY = Math.min(sy, ey);
+  const maxY = Math.max(sy, ey);
+  const w = maxX - minX;
+  const h = maxY - minY;
+  if (w < 6 || h < 6) return;
+
+  const stemTop = minY + h * 0.3;
+  const stemBottom = minY + h * 0.7;
+  const headStart = minX + w * 0.6;
+
+  paintApp.ctx.beginPath();
+  paintApp.ctx.moveTo(minX, stemTop);
+  paintApp.ctx.lineTo(headStart, stemTop);
+  paintApp.ctx.lineTo(headStart, minY);
+  paintApp.ctx.lineTo(maxX, minY + h * 0.5);
+  paintApp.ctx.lineTo(headStart, maxY);
+  paintApp.ctx.lineTo(headStart, stemBottom);
+  paintApp.ctx.lineTo(minX, stemBottom);
+  paintApp.ctx.closePath();
+  paintApp.ctx.stroke();
+}
+window.drawPaintArrow = drawPaintArrow;
+
+// Menggambar Bentuk Balon Percakapan (Speech Bubble / Callout)
+function drawPaintBubble(sx, sy, ex, ey) {
+  const minX = Math.min(sx, ex);
+  const maxX = Math.max(sx, ex);
+  const minY = Math.min(sy, ey);
+  const maxY = Math.max(sy, ey);
+  const w = maxX - minX;
+  const h = maxY - minY;
+  if (w < 8 || h < 8) return;
+
+  const bodyH = h * 0.72;
+  const bottomBodyY = minY + bodyH;
+  const r = Math.min(14, w * 0.2, bodyH * 0.3);
+
+  paintApp.ctx.beginPath();
+  paintApp.ctx.moveTo(minX + r, minY);
+  paintApp.ctx.lineTo(maxX - r, minY);
+  paintApp.ctx.quadraticCurveTo(maxX, minY, maxX, minY + r);
+  paintApp.ctx.lineTo(maxX, bottomBodyY - r);
+  paintApp.ctx.quadraticCurveTo(maxX, bottomBodyY, maxX - r, bottomBodyY);
+  // Pointer tail ke bawah kiri
+  paintApp.ctx.lineTo(minX + w * 0.45, bottomBodyY);
+  paintApp.ctx.lineTo(minX + w * 0.15, maxY);
+  paintApp.ctx.lineTo(minX + w * 0.25, bottomBodyY);
+  paintApp.ctx.lineTo(minX + r, bottomBodyY);
+  paintApp.ctx.quadraticCurveTo(minX, bottomBodyY, minX, bottomBodyY - r);
+  paintApp.ctx.lineTo(minX, minY + r);
+  paintApp.ctx.quadraticCurveTo(minX, minY, minX + r, minY);
+  paintApp.ctx.closePath();
+  paintApp.ctx.stroke();
+}
+window.drawPaintBubble = drawPaintBubble;
+
+// ========================================================
+// RAGAM BRUSHES CANVAS RENDERING ENGINE (9 JENIS KUAS RESMI)
+// ========================================================
+function drawCustomBrushStroke(fromX, fromY, toX, toY, brushType) {
+  const ctx = paintApp.ctx;
+  if (!ctx) return;
+
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  const dist = Math.hypot(dx, dy);
+  const color = (brushType === 'eraser' || paintApp.tool === 'eraser') ? '#ffffff' : paintApp.color;
+  const baseSize = (brushType === 'eraser' || paintApp.tool === 'eraser') 
+    ? paintApp.size * 2 
+    : (paintApp.tool === 'pencil' ? Math.max(2, Math.round(paintApp.size / 3)) : paintApp.size);
+
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+
+  // 1. KUAS STANDAR (Brush) - Solid smooth round line
+  if (brushType === 'brush' || brushType === 'eraser') {
+    ctx.lineWidth = baseSize;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+  }
+  // 2. KUAS KALIGRAFI 1 (Calligraphy Brush) - 45° angled ribbon
+  else if (brushType === 'calligraphy1') {
+    const steps = Math.max(1, Math.ceil(dist / 2));
+    const ribbonHalf = baseSize * 0.9;
+    const cos45 = Math.SQRT1_2;
+    const sin45 = Math.SQRT1_2;
+    const offX = ribbonHalf * cos45;
+    const offY = -ribbonHalf * sin45;
+
+    ctx.lineWidth = 2.5;
+    for (let i = 0; i <= steps; i++) {
+      const t = steps === 0 ? 0 : i / steps;
+      const curX = fromX + dx * t;
+      const curY = fromY + dy * t;
+      ctx.beginPath();
+      ctx.moveTo(curX - offX, curY - offY);
+      ctx.lineTo(curX + offX, curY + offY);
+      ctx.stroke();
+    }
+  }
+  // 3. PENA KALIGRAFI 2 (Calligraphy Pen) - -45° blade angle
+  else if (brushType === 'calligraphy2') {
+    const steps = Math.max(1, Math.ceil(dist / 2));
+    const ribbonHalf = baseSize * 0.85;
+    const cosM45 = Math.SQRT1_2;
+    const sinM45 = -Math.SQRT1_2;
+    const offX = ribbonHalf * cosM45;
+    const offY = -ribbonHalf * sinM45;
+
+    ctx.lineWidth = 2;
+    for (let i = 0; i <= steps; i++) {
+      const t = steps === 0 ? 0 : i / steps;
+      const curX = fromX + dx * t;
+      const curY = fromY + dy * t;
+      ctx.beginPath();
+      ctx.moveTo(curX - offX, curY - offY);
+      ctx.lineTo(curX + offX, curY + offY);
+      ctx.stroke();
+    }
+  }
+  // 4. CAT SEMPROT (Airbrush) - Aerosol speckle dispersion
+  else if (brushType === 'airbrush') {
+    const radius = Math.max(8, baseSize * 1.5);
+    const density = Math.max(6, Math.floor(baseSize * 1.6));
+    const steps = Math.max(1, Math.ceil(dist / 4));
+
+    ctx.globalAlpha = 0.35;
+    for (let s = 0; s <= steps; s++) {
+      const t = steps === 0 ? 0 : s / steps;
+      const curX = fromX + dx * t;
+      const curY = fromY + dy * t;
+      for (let i = 0; i < density; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.random() * radius;
+        const dotX = curX + Math.cos(angle) * r;
+        const dotY = curY + Math.sin(angle) * r;
+        const dotSize = Math.random() * 1.8 + 0.8;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+  // 5. KUAS CAT MINYAK (Oil Brush) - Multi-bristle textured stroke
+  else if (brushType === 'oil') {
+    const steps = Math.max(1, Math.ceil(dist / 3));
+    const bristles = [-0.8, -0.4, 0, 0.4, 0.8];
+    const bristleSize = Math.max(1.8, baseSize * 0.35);
+
+    let nx = 0, ny = 0;
+    if (dist > 0.001) {
+      nx = -dy / dist;
+      ny = dx / dist;
+    } else {
+      nx = 0;
+      ny = 1;
+    }
+
+    for (let i = 0; i <= steps; i++) {
+      const t = steps === 0 ? 0 : i / steps;
+      const curX = fromX + dx * t;
+      const curY = fromY + dy * t;
+
+      bristles.forEach((bOffset, bIdx) => {
+        const jitter = (Math.random() - 0.5) * 1.5;
+        const spread = (baseSize * 0.7 * bOffset) + jitter;
+        const bx = curX + nx * spread;
+        const by = curY + ny * spread;
+        ctx.globalAlpha = 0.55 + ((bIdx % 2) * 0.25);
+        ctx.beginPath();
+        ctx.arc(bx, by, bristleSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+  }
+  // 6. KRAYON LILIN (Crayon) - Wax textured porous stroke
+  else if (brushType === 'crayon') {
+    const steps = Math.max(1, Math.ceil(dist / 2.5));
+    const crayonRadius = Math.max(3, baseSize * 0.65);
+
+    for (let i = 0; i <= steps; i++) {
+      const t = steps === 0 ? 0 : i / steps;
+      const curX = fromX + dx * t;
+      const curY = fromY + dy * t;
+
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath();
+      ctx.arc(curX, curY, crayonRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = 0.8;
+      const flecks = Math.max(3, Math.floor(baseSize * 0.8));
+      for (let f = 0; f < flecks; f++) {
+        const fx = curX + (Math.random() - 0.5) * crayonRadius * 2;
+        const fy = curY + (Math.random() - 0.5) * crayonRadius * 2;
+        ctx.fillRect(fx, fy, 1.6, 1.6);
+      }
+    }
+  }
+  // 7. SPIDOL / STABILO (Marker) - Flat broad translucent nib
+  else if (brushType === 'marker') {
+    ctx.globalAlpha = 0.42;
+    ctx.lineWidth = Math.max(8, baseSize * 1.5);
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+  }
+  // 8. PENSIL ALAMI (Natural Pencil) - Fine granular graphite sketch
+  else if (brushType === 'natural_pencil') {
+    const pencilWidth = Math.max(1.5, Math.min(4, baseSize * 0.35));
+    ctx.globalAlpha = 0.75;
+    ctx.lineWidth = pencilWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+
+    if (dist > 1) {
+      const steps = Math.max(1, Math.ceil(dist / 3));
+      ctx.globalAlpha = 0.45;
+      for (let i = 0; i <= steps; i++) {
+        const t = steps === 0 ? 0 : i / steps;
+        const gx = fromX + dx * t + (Math.random() - 0.5) * 2;
+        const gy = fromY + dy * t + (Math.random() - 0.5) * 2;
+        ctx.fillRect(gx, gy, 1, 1);
+      }
+    }
+  }
+  // 9. KUAS CAT AIR (Watercolour Brush) - Soft translucent feather wash
+  else if (brushType === 'watercolor') {
+    const steps = Math.max(1, Math.ceil(dist / 3.5));
+    const washRadius = Math.max(6, baseSize * 1.3);
+
+    for (let i = 0; i <= steps; i++) {
+      const t = steps === 0 ? 0 : i / steps;
+      const curX = fromX + dx * t;
+      const curY = fromY + dy * t;
+
+      ctx.globalAlpha = 0.12;
+      ctx.beginPath();
+      ctx.arc(curX, curY, washRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = 0.16;
+      ctx.beginPath();
+      ctx.arc(curX + (Math.random() - 0.5) * 2, curY + (Math.random() - 0.5) * 2, washRadius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  ctx.restore();
+}
+window.drawCustomBrushStroke = drawCustomBrushStroke;
+
+// Toggle Popover Ragam Kuas
+function togglePaintBrushesMenu(e) {
+  if (e) e.stopPropagation();
+  playSound('click');
+  const menu = document.getElementById('paint-brushes-menu');
+  if (!menu) return;
+  menu.classList.toggle('hidden');
+}
+window.togglePaintBrushesMenu = togglePaintBrushesMenu;
+
+// Memilih Salah Satu dari 9 Ragam Kuas
+function selectPaintBrush(brushType) {
+  playSound('click');
+  paintApp.brushType = brushType;
+  setPaintTool('brush');
+
+  // Tutup dropdown menu popover
+  const menu = document.getElementById('paint-brushes-menu');
+  if (menu) menu.classList.add('hidden');
+
+  // Metadata visual untuk 9 Kuas Windows 11 Paint
+  const brushMeta = {
+    brush: { label: 'Kuas', icon: 'fa-paintbrush', color: 'text-pink-500' },
+    calligraphy1: { label: 'Kaligrafi 1', icon: 'fa-pen-nib', color: 'text-indigo-600' },
+    calligraphy2: { label: 'Kaligrafi 2', icon: 'fa-feather-pointed', color: 'text-violet-600' },
+    airbrush: { label: 'Airbrush', icon: 'fa-spray-can', color: 'text-emerald-600' },
+    oil: { label: 'Cat Minyak', icon: 'fa-brush', color: 'text-amber-700' },
+    crayon: { label: 'Krayon', icon: 'fa-pencil', color: 'text-orange-600' },
+    marker: { label: 'Spidol', icon: 'fa-highlighter', color: 'text-yellow-600' },
+    natural_pencil: { label: 'Pensil Alami', icon: 'fa-pen', color: 'text-blue-600' },
+    watercolor: { label: 'Cat Air', icon: 'fa-droplet', color: 'text-sky-500' }
+  };
+
+  const meta = brushMeta[brushType] || brushMeta.brush;
+  const iconEl = document.getElementById('paint-brush-icon');
+  const labelEl = document.getElementById('paint-brush-label');
+  const statusEl = document.getElementById('paint-status-tool');
+
+  if (iconEl) iconEl.className = `fa-solid ${meta.icon} ${meta.color}`;
+  if (labelEl) labelEl.innerText = meta.label;
+  if (statusEl) statusEl.innerText = meta.label;
+
+  // Berikan highlight aktif pada item yang dipilih di dalam dropdown
+  const brushKeys = ['brush', 'calligraphy1', 'calligraphy2', 'airbrush', 'oil', 'crayon', 'marker', 'natural_pencil', 'watercolor'];
+  brushKeys.forEach(k => {
+    const optBtn = document.getElementById(`paint-brush-opt-${k}`);
+    if (optBtn) {
+      if (k === brushType) {
+        optBtn.className = 'w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between transition border cursor-pointer bg-pink-100/70 border-pink-300';
+      } else {
+        optBtn.className = 'w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-slate-100 transition border border-transparent hover:border-slate-200 cursor-pointer';
+      }
+    }
+  });
+
+  showToast(`Kuas diubah ke: ${meta.label} 🎨`, 'info');
+}
+window.selectPaintBrush = selectPaintBrush;
+
 // Pengaturan Tool, Shape, Size, dan Color Paint
 function setPaintTool(toolName) {
   playSound('click');
@@ -2712,7 +3189,24 @@ function setPaintTool(toolName) {
 
   const toolLabels = { brush: 'Kuas', pencil: 'Pensil', eraser: 'Penghapus', bucket: 'Cat Tumpah', text: 'Teks', select: 'Geser / Seleksi ✥' };
   const labelEl = document.getElementById('paint-status-tool');
-  if (labelEl) labelEl.innerText = toolLabels[toolName] || toolName;
+  if (labelEl) {
+    if (toolName === 'brush') {
+      const brushLabels = {
+        brush: 'Kuas',
+        calligraphy1: 'Kaligrafi 1',
+        calligraphy2: 'Kaligrafi 2',
+        airbrush: 'Airbrush',
+        oil: 'Cat Minyak',
+        crayon: 'Krayon',
+        marker: 'Spidol',
+        natural_pencil: 'Pensil Alami',
+        watercolor: 'Cat Air'
+      };
+      labelEl.innerText = brushLabels[paintApp.brushType] || 'Kuas';
+    } else {
+      labelEl.innerText = toolLabels[toolName] || toolName;
+    }
+  }
 
   if (toolName === 'eraser') {
     paintApp.canvas.style.cursor = 'cell';
@@ -2739,7 +3233,7 @@ function setPaintShape(shapeName) {
     setPaintTool('brush');
   }
 
-  const shapes = ['none', 'line', 'rect', 'circle', 'star', 'heart'];
+  const shapes = ['none', 'line', 'rect', 'circle', 'triangle', 'diamond', 'arrow', 'bubble', 'star', 'heart'];
   shapes.forEach(s => {
     const btn = document.getElementById(`paint-shape-${s}`);
     if (btn) {
@@ -2792,6 +3286,18 @@ function setPaintColor(colorHex) {
     renderActivePaintObject();
   }
 }
+
+window.setPaintTool = setPaintTool;
+window.setPaintShape = setPaintShape;
+window.setPaintSize = setPaintSize;
+window.setPaintColor = setPaintColor;
+window.selectPaintBrush = selectPaintBrush;
+window.togglePaintBrushesMenu = togglePaintBrushesMenu;
+window.drawCustomBrushStroke = drawCustomBrushStroke;
+window.drawPaintTriangle = drawPaintTriangle;
+window.drawPaintDiamond = drawPaintDiamond;
+window.drawPaintArrow = drawPaintArrow;
+window.drawPaintBubble = drawPaintBubble;
 
 // Undo, Redo, Clear
 function savePaintState() {
@@ -5876,6 +6382,8 @@ function generateGambarAI7Kebiasaan() {
 
   if (resultImg) {
     resultImg.crossOrigin = 'anonymous';
+    resultImg.onload = onGambarAIBerhasilDimuat;
+    resultImg.onerror = onGambarAIGagalDimuat;
     resultImg.src = aiImageUrl;
   }
 
@@ -5902,10 +6410,12 @@ function onGambarAIBerhasilDimuat() {
   }
   selesaikanGenerasiGambarAI(false);
 }
+window.onGambarAIBerhasilDimuat = onGambarAIBerhasilDimuat;
 
 function onGambarAIGagalDimuat() {
   selesaikanGenerasiGambarAI(true);
 }
+window.onGambarAIGagalDimuat = onGambarAIGagalDimuat;
 
 function cekApakahGambarLimitPollinations(imgElem) {
   try {
@@ -19740,5 +20250,16 @@ window.addEventListener('scroll', updateScrollNavVisibility, { passive: true });
 window.addEventListener('resize', updateScrollNavVisibility, { passive: true });
 document.addEventListener('DOMContentLoaded', updateScrollNavVisibility);
 setTimeout(updateScrollNavVisibility, 300);
+
+// ========================================================
+// GAME EDUKASI: LABIRIN LOGIKA ROBOT ROBO (BLOCK CODING)
+// Catatan: Seluruh logika game Robo Maze, state pergerakan, dan rendering petak
+// telah terpusat dan berjalan mandiri di inline script index.html (#engine-robo-maze-core).
+// Hal ini menjamin respon instan tombol kendali tanpa risiko konflik variabel module.
+// ========================================================
+
+
+
+
 
 

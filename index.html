@@ -476,6 +476,14 @@
           <button onclick="switchTab('kuis')" id="nav-kuis" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white shrink-0">
             <i class="fa-solid fa-trophy text-amber-400 icon-3d-glow"></i> <span data-i18n="kuis">Kuis</span>
           </button>
+          <!-- 7. Game Labirin Logika Robo (Semester 2) -->
+          <button onclick="switchTab('labirin')" id="nav-labirin" class="hidden nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-purple-300 hover:text-white shrink-0" title="Game Edukasi: Labirin Logika Robot Robo (Semester 2)">
+            <i class="fa-solid fa-gamepad text-purple-400 icon-3d-glow"></i> <span>Game Robo 🎮</span>
+          </button>
+          <!-- 8. Game Pahlawan Mengetik Cepat (Keyboard Hero - Semester 1) -->
+          <button onclick="switchTab('ketik')" id="nav-ketik" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-amber-300 hover:text-white shrink-0" title="Game Edukasi: Pahlawan Mengetik Cepat & Shortcut Word (Semester 1)">
+            <i class="fa-solid fa-keyboard text-amber-400 icon-3d-glow"></i> <span>Ketik Cepat ⌨️</span>
+          </button>
           <!-- Sound Orb -->
           <button onclick="toggleAudioNarration()" title="Suara Narator" class="btn-sound-3d shrink-0" id="btn-sound-sem1-wrap">
             <i id="tts-icon-sem1" class="fa-solid fa-volume-high text-xs"></i>
@@ -603,6 +611,14 @@
       <button onclick="switchTab('kuis')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-kuis">
         <i class="fa-solid fa-trophy text-lg"></i>
         <span>Kuis</span>
+      </button>
+      <button onclick="switchTab('labirin')" class="hidden nav-btn-mobile flex flex-col items-center text-xs font-semibold text-purple-400" id="m-nav-labirin" title="Game Robo (Semester 2)">
+        <i class="fa-solid fa-gamepad text-lg text-purple-400"></i>
+        <span>Game</span>
+      </button>
+      <button onclick="switchTab('ketik')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-amber-400" id="m-nav-ketik" title="Ketik Cepat (Semester 1)">
+        <i class="fa-solid fa-keyboard text-lg text-amber-400"></i>
+        <span>Ketik</span>
       </button>
     </div>
 
@@ -1136,12 +1152,68 @@
                   <img src="robot_mascot.png" alt="Demo Robot AI" class="max-h-24 w-auto object-contain drop-shadow-md transform hover:scale-110 transition">
                 </div>
               </div>
+
+              <!-- Item Game Semester 1: Pahlawan Mengetik Cepat -->
+              <div id="card-sem1-typing-wrap" class="sem1-content bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100/60 hover:to-orange-100/60 rounded-2xl p-4 border-2 border-amber-300 transition flex items-center justify-between gap-3 shadow-sm">
+                <div class="space-y-1.5 max-w-[170px]">
+                  <span class="bg-blue-600 text-white text-[10px] font-title font-black px-2.5 py-0.5 rounded-full shadow-xs">
+                    ⭐ Game Semester 1
+                  </span>
+                  <p class="text-xs text-slate-800 font-bold leading-snug">
+                    Pahlawan Mengetik Cepat & Shortcut Word
+                  </p>
+                  <p class="text-[11px] text-slate-600 leading-tight">
+                    Pop balon kata & latih 10 jari sebelum balon jatuh!
+                  </p>
+                  <button onclick="pilihSemester(1); switchTab('ketik');" class="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-title font-black text-[11px] px-3.5 py-1.5 rounded-full shadow-sm transition cursor-pointer">
+                    Mainkan Game ⌨️ <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                  </button>
+                </div>
+                <div class="w-24 shrink-0 flex flex-col items-center justify-center p-2 bg-white rounded-2xl border border-amber-200 shadow-sm text-center">
+                  <span class="text-3xl animate-bounce">🎈</span>
+                  <span class="text-[10px] font-mono font-bold text-amber-800 mt-1">Latihan 10 Jari!</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-[11px] text-purple-700">
             <span>Karya Asli Siswa</span>
             <span class="font-bold">Interaktif & Menyenangkan</span>
           </div>
+        </div>
+
+        <!-- BANNER PROMO GAME EDUKASI SEMESTER 1: PAHLAWAN MENGETIK CEPAT -->
+        <div id="banner-sem1-typing-hero" class="sem1-content col-span-1 md:col-span-3 mt-6 bg-gradient-to-r from-amber-600 via-orange-600 to-rose-700 text-white rounded-3xl p-5 sm:p-6 border-2 border-amber-300/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-yellow-300 text-slate-950 border-2 border-white flex items-center justify-center text-3xl shrink-0 shadow-lg animate-bounce">
+              ⌨️
+            </div>
+            <div>
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-yellow-300/30 text-yellow-200 font-bold text-[10px] uppercase border border-yellow-300/40">Game Semester 1 • Latihan 10 Jari &amp; Shortcut Word</span>
+              <h3 class="font-title font-black text-xl sm:text-2xl mt-0.5 text-white">Pahlawan Mengetik Cepat 🎈</h3>
+              <p class="text-xs text-amber-100 mt-1 max-w-xl">Latih kelincahan jarimu memecahkan balon kata positif dan kuasai kombinasi tombol shortcut Microsoft Word (Ctrl+B, Ctrl+S, Ctrl+Z) sebelum balon menyentuh tanah!</p>
+            </div>
+          </div>
+          <button onclick="pilihSemester(1); switchTab('ketik');" class="shrink-0 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-300 to-amber-400 hover:from-yellow-200 hover:to-amber-300 active:scale-95 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-amber-950/40 transition flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-play"></i> <span>Mainkan Ketik Cepat ▶️</span>
+          </button>
+        </div>
+
+        <!-- BANNER PROMO GAME EDUKASI SEMESTER 2: LABIRIN LOGIKA ROBOT ROBO -->
+        <div id="banner-sem2-robo-maze" class="sem2-feature-card sem2-content hidden col-span-1 md:col-span-3 mt-6 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white rounded-3xl p-5 sm:p-6 border-2 border-purple-400/40 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-yellow-400/20 border-2 border-yellow-400/50 flex items-center justify-center text-3xl shrink-0 shadow-lg animate-bounce">
+              🎮
+            </div>
+            <div>
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 font-bold text-[10px] uppercase border border-yellow-400/30">Game Semester 2 • Berpikir Komputasional</span>
+              <h3 class="font-title font-black text-xl sm:text-2xl mt-0.5">Labirin Logika Robot Robo 🤖</h3>
+              <p class="text-xs text-purple-200 mt-1 max-w-xl">Susun balok kode visual (Maju, Belok Kanan/Kiri, Ambil Bintang) untuk memandu Robo melewati rintangan dan mengumpulkan bintang kebaikan!</p>
+            </div>
+          </div>
+          <button onclick="pilihSemester(2); switchTab('labirin');" class="shrink-0 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 active:scale-95 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-yellow-500/30 transition flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-play"></i> <span>Mainkan Game Sekarang ▶️</span>
+          </button>
         </div>
 
       </div>
@@ -1256,6 +1328,8 @@
             <div><b>Batu Meteor:</b> Tembak dengan laser atau hindari agar perisai aman!</div>
           </div>
         </div>
+
+
 
       </div>
     </section>
@@ -3257,6 +3331,8 @@
 
         </div>
 
+
+
       </div>
 
       <!-- DETAIL MODUL TP 2.2 -->
@@ -5110,6 +5186,8 @@
 
         </div>
 
+
+
       </div>
 
       <!-- Kotak Feedback Evaluasi Berpikir Komputasional Poster Word -->
@@ -5351,6 +5429,8 @@
 
         </div>
 
+
+
       </div>
     </section>
 
@@ -5460,6 +5540,8 @@
         <div id="tp-excel-content-area" class="bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200 text-xs leading-relaxed space-y-3">
           <!-- Konten di-render dinamis oleh renderTPExcelContent('tp1_1') -->
         </div>
+
+
 
       </div>
 
@@ -6161,6 +6243,8 @@
           </div>
         </div>
 
+
+
       </div>
 
       <!-- FLOATING CONTEXT MENU EXCEL (KLIK KANAN: CUT, COPY, PASTE, EDIT, DELETE) -->
@@ -6276,6 +6360,439 @@
           </div>
         </div>
 
+
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB KHUSUS: GAME EDUKASI "PAHLAWAN MENGETIK CEPAT" (KEYBOARD HERO) -->
+    <!-- Semester 1 • Latihan 10 Jari & Pembiasaan Keyboard MS Word (TP 2.2) -->
+    <!-- ======================================================== -->
+    <section id="tab-ketik" class="tab-content hidden space-y-6 animate-fadeIn pb-16">
+      
+      <!-- 1. Header Top Bar & Level Selector -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-slate-950 p-5 sm:p-6 rounded-3xl border-2 border-amber-300 shadow-xl relative overflow-hidden">
+        <!-- Background Decorative Icon -->
+        <div class="absolute -right-8 -bottom-8 opacity-15 text-white text-[150px] pointer-events-none select-none">
+          <i class="fa-solid fa-keyboard"></i>
+        </div>
+
+        <div class="flex items-center gap-4 relative z-10">
+          <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-black text-slate-900 bg-white/90 hover:bg-white px-4 py-2.5 rounded-full border border-white/60 shadow-xs transition cursor-pointer">
+            <i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Beranda</span>
+          </button>
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-slate-950/20 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full uppercase border border-slate-950/20">
+              <i class="fa-solid fa-star text-yellow-300"></i> <span>Game Semester 1 • Latihan 10 Jari &amp; TP 2.2 MS Word</span>
+            </div>
+            <h2 class="font-title text-2xl sm:text-3xl font-black mt-1 text-white drop-shadow flex items-center gap-2">
+              <span>Pahlawan Mengetik Cepat</span> ⌨️🎈
+            </h2>
+          </div>
+        </div>
+
+        <!-- Level Selector & Mode Button -->
+        <div class="flex items-center gap-2.5 flex-wrap relative z-10">
+          <div class="flex items-center gap-1 bg-black/25 backdrop-blur-sm p-1 rounded-2xl border border-white/20">
+            <button onclick="pilihLevelTypingHero(1)" id="btn-typing-lvl-1" class="typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-yellow-300 text-slate-950 shadow-xs scale-105" title="Level 1: Pemula (Kata Pendek 3-5 Huruf)">
+              Lv 1: Pemula 🌱
+            </button>
+            <button onclick="pilihLevelTypingHero(2)" id="btn-typing-lvl-2" class="typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-white hover:text-yellow-200" title="Level 2: Tantangan Shortcut MS Word">
+              Lv 2: Shortcut Word ⚡
+            </button>
+            <button onclick="pilihLevelTypingHero(3)" id="btn-typing-lvl-3" class="typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-white hover:text-yellow-200" title="Level 3: Juara 10 Jari Cepat">
+              Lv 3: Juara 10 Jari 🏆
+            </button>
+          </div>
+          
+          <button onclick="bukaModalPanduanTypingHero()" class="px-3.5 py-2 bg-white/90 hover:bg-white text-slate-900 rounded-xl font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-circle-question text-amber-600"></i>
+            <span>Cara Main</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Main Game Workspace Grid (Arena & Sidebar) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- KOLOM UTAMA (ARENA BALON & KEYBOARD 10 JARI) - 8 KOLOM -->
+        <div class="lg:col-span-8 space-y-4">
+          
+          <!-- ARENA GAME MENGETIK (LANGIT & BALON MELAYANG) -->
+          <div id="typing-arena-container" class="relative w-full h-[460px] sm:h-[500px] rounded-3xl overflow-hidden border-4 border-amber-400/60 shadow-2xl bg-gradient-to-b from-sky-300 via-sky-200 to-emerald-100 select-none flex flex-col justify-between">
+            
+            <!-- Animated Background Clouds -->
+            <div class="absolute inset-0 pointer-events-none opacity-45 overflow-hidden">
+              <div class="cloud-bubble absolute -top-4 left-10 w-36 h-20 bg-white rounded-full blur-xs"></div>
+              <div class="cloud-bubble absolute top-12 right-16 w-44 h-24 bg-white rounded-full blur-xs"></div>
+              <div class="cloud-bubble absolute top-28 left-1/3 w-32 h-16 bg-white rounded-full blur-xs"></div>
+              <div class="sun-orb absolute top-4 right-6 w-16 h-16 rounded-full bg-yellow-300/80 blur-sm animate-pulse"></div>
+            </div>
+
+            <!-- TOP HUD BAR: SCORE, SPEED, ACCURACY, HEARTS, PAUSE -->
+            <div class="relative z-20 w-full p-3 sm:p-4 bg-slate-900/85 backdrop-blur-md text-white border-b-2 border-amber-400/50 flex flex-wrap items-center justify-between gap-3 text-xs font-mono shadow-md">
+              <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+                <!-- Score -->
+                <div class="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/40 px-2.5 py-1 rounded-xl">
+                  <span class="text-amber-400 font-bold">🏆 Skor:</span>
+                  <span id="typing-hud-score" class="text-yellow-300 font-black text-sm">0</span>
+                </div>
+                <!-- WPM (Kecepatan) -->
+                <div class="flex items-center gap-1.5 bg-blue-500/20 border border-blue-400/40 px-2.5 py-1 rounded-xl">
+                  <span class="text-blue-400 font-bold">⚡ WPM:</span>
+                  <span id="typing-hud-wpm" class="text-sky-300 font-black text-sm">0</span>
+                </div>
+                <!-- Akurasi -->
+                <div class="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-1 rounded-xl">
+                  <span class="text-emerald-400 font-bold">🎯 Akurasi:</span>
+                  <span id="typing-hud-acc" class="text-emerald-300 font-black text-sm">100%</span>
+                </div>
+                <!-- Combo Streak -->
+                <div id="typing-hud-combo-wrap" class="hidden flex items-center gap-1 bg-rose-500/25 border border-rose-400/50 px-2 py-1 rounded-xl animate-bounce">
+                  <span class="text-rose-400 font-bold">🔥</span>
+                  <span id="typing-hud-combo" class="text-rose-300 font-black">2x Combo</span>
+                </div>
+              </div>
+
+              <!-- Right HUD: Lives & Controls -->
+              <div class="flex items-center gap-2">
+                <!-- Hearts / Nyawa -->
+                <div class="flex items-center gap-1 bg-slate-800/90 border border-slate-700 px-2.5 py-1 rounded-xl">
+                  <span id="typing-hud-lives" class="text-rose-500 tracking-widest text-base">❤️❤️❤️</span>
+                </div>
+                <!-- Pause / Resume -->
+                <button type="button" onclick="togglePauseTypingHero()" id="btn-typing-pause" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-300 border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Jeda / Lanjutkan Game">
+                  <i id="typing-pause-icon" class="fa-solid fa-pause"></i>
+                </button>
+                <!-- Restart -->
+                <button type="button" onclick="restartTypingHeroGame()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Mulai Ulang Game">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- LAPISAN BALON TERBANG (BALLOON FLIGHT LAYER) -->
+            <div id="typing-balloons-layer" class="relative z-10 flex-1 min-h-[300px] w-full overflow-hidden">
+              <!-- Balon-balon diinjeksi secara dinamis oleh typingHeroEngine -->
+            </div>
+
+            <!-- TANAH RUMPUT & ZONA BATAS (BOTTOM GROUND ZONE) -->
+            <div class="relative z-20 w-full h-12 bg-gradient-to-t from-emerald-600 via-emerald-500 to-emerald-400 border-t-4 border-emerald-300/80 flex items-center justify-between px-4 text-emerald-950 font-title font-bold text-xs shadow-inner">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🌱</span>
+                <span>Jangan biarkan balon menyentuh rumput! Ketik hurufnya sebelum jatuh.</span>
+              </div>
+              <div id="typing-target-indicator" class="hidden bg-white/95 text-slate-900 px-3 py-1 rounded-full shadow-xs text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse border border-blue-300">
+                <span>Fokus:</span>
+                <span id="typing-target-word" class="text-blue-700 font-black">---</span>
+              </div>
+            </div>
+
+            <!-- OVERLAY 1: START SCREEN OVERLAY -->
+            <div id="typing-overlay-start" class="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
+              <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-4xl shadow-xl shadow-amber-500/30 mb-4 animate-bounce">
+                ⌨️
+              </div>
+              <h3 class="font-title font-black text-2xl sm:text-3xl text-yellow-300">
+                Pahlawan Mengetik Cepat
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-200 max-w-md mt-2 leading-relaxed">
+                Balon kata positif dan shortcut Word akan melayang turun. Ketik di keyboard fisikmu secepat mungkin sebelum balon menyentuh tanah!
+              </p>
+
+              <!-- Level Preview Pills -->
+              <div class="flex items-center justify-center gap-2 mt-5 flex-wrap">
+                <button type="button" onclick="pilihLevelTypingHero(1); mulaiTypingHeroGame();" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  🌱 Mulai Level 1: Pemula
+                </button>
+                <button type="button" onclick="pilihLevelTypingHero(2); mulaiTypingHeroGame();" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  ⚡ Mulai Level 2: Shortcut Word
+                </button>
+                <button type="button" onclick="pilihLevelTypingHero(3); mulaiTypingHeroGame();" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  🏆 Mulai Level 3: Juara 10 Jari
+                </button>
+              </div>
+
+              <!-- Shortcut Cheat Note -->
+              <div class="mt-4 text-[11px] text-amber-200 bg-amber-950/60 border border-amber-500/40 rounded-xl px-3 py-1.5 max-w-sm">
+                💡 Di Level 2, kamu bisa tekan kombinasi tombol sungguhan seperti <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>!
+              </div>
+            </div>
+
+            <!-- OVERLAY 2: GAME OVER / VICTORY OVERLAY -->
+            <div id="typing-overlay-gameover" class="hidden absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
+              <div id="typing-end-icon" class="text-6xl mb-3 animate-bounce">🏆</div>
+              <h3 id="typing-end-title" class="font-title font-black text-2xl sm:text-3xl text-yellow-300">Permainan Selesai!</h3>
+              <p id="typing-end-desc" class="text-xs sm:text-sm text-slate-300 max-w-md mt-1 leading-relaxed">
+                Kerja luar biasa! Kamu berhasil mengetik dengan lincah dan tepat.
+              </p>
+
+              <!-- Stat Box -->
+              <div class="grid grid-cols-3 gap-3 my-5 w-full max-w-sm font-mono text-center">
+                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-700">
+                  <span class="text-[10px] text-slate-400 block font-bold">TOTAL SKOR</span>
+                  <span id="typing-final-score" class="text-xl font-black text-yellow-300">0</span>
+                </div>
+                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-700">
+                  <span class="text-[10px] text-slate-400 block font-bold">KECEPATAN</span>
+                  <span id="typing-final-wpm" class="text-xl font-black text-sky-300">0 WPM</span>
+                </div>
+                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-700">
+                  <span class="text-[10px] text-slate-400 block font-bold">AKURASI</span>
+                  <span id="typing-final-acc" class="text-xl font-black text-emerald-300">100%</span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-3">
+                <button type="button" onclick="mulaiTypingHeroGame()" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-amber-400/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  Main Lagi 🔄
+                </button>
+                <button type="button" onclick="lanjutLevelTypingHeroBerikutnya()" id="btn-typing-next-level" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-lg shadow-blue-500/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  Lanjut Level Berikutnya 🚀
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- PANDUAN KEYBOARD VIRTUAL 10 JARI (TOUCH TYPING INTERAKTIF) -->
+          <div class="bg-slate-900 rounded-3xl p-4 sm:p-5 border-2 border-slate-700 shadow-xl space-y-3 select-none text-white">
+            
+            <!-- Header Keyboard & Indikator Jari Aktif -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm shadow-xs font-black">
+                  ⌨️
+                </span>
+                <div>
+                  <h4 class="font-title font-bold text-sm text-slate-200">Panduan Tuts Keyboard 10 Jari</h4>
+                  <p class="text-[10px] text-slate-400">Warna tombol menunjukkan jari tangan yang tepat untuk menekan tuts tersebut.</p>
+                </div>
+              </div>
+
+              <!-- Indikator Jari Aktif yang Harus Ditekan -->
+              <div id="typing-finger-guide-pill" class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-2xl border border-slate-700 text-xs font-mono">
+                <span class="text-amber-300 font-bold">👉 Jari Berikutnya:</span>
+                <span id="typing-finger-name" class="font-bold text-yellow-300">Siap Mengetik</span>
+              </div>
+            </div>
+
+            <!-- Virtual Keyboard Rows Container -->
+            <div id="typing-virtual-keyboard" class="flex flex-col items-center gap-1.5 pt-1 w-full overflow-x-auto custom-scroll">
+              <!-- Rendered via JS renderTypingVirtualKeyboard() -->
+            </div>
+
+            <!-- Legenda Warna Jari (10 Finger Legend) -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-slate-800 text-[10px] font-medium text-slate-300">
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Kelingking Kiri (1,Q,A,Z,Ctrl)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Manis Kiri (2,W,S,X)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span> Tengah Kiri (3,E,D,C)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Telunjuk Kiri (4,5,R,T,F,G,V,B)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Ibu Jari (Spasi)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span> Telunjuk Kanan (6,7,Y,U,H,J,N,M)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Tengah Kanan (8,I,K,,)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Manis Kanan (9,O,L,.)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Kelingking Kanan (0,P,;,/)</div>
+              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span> <b>Tombol Target (Aktif)</b></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- KOLOM KANAN (KAMUS SHORTCUT & KONTROL CEPAT) - 4 KOLOM -->
+        <div class="lg:col-span-4 space-y-4">
+          
+          <!-- Card 1: Kamus Pintasan Keyboard MS Word (TP 2.2) -->
+          <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-slate-200 shadow-xl space-y-4">
+            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+              <div>
+                <h3 class="font-title font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                  <i class="fa-solid fa-bolt text-amber-500"></i>
+                  <span>Kamus Shortcut MS Word</span>
+                </h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">Hafalkan pintasan ini untuk Level 2!</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 font-mono font-bold text-xs border border-blue-200">
+                10 Pintasan
+              </span>
+            </div>
+
+            <!-- List Shortcut Cards -->
+            <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1 custom-scroll text-xs">
+              
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-blue-700 text-xs">Ctrl + B</kbd>
+                  <span class="font-bold text-slate-800">Bold (Tebal)</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Menebalkan teks</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-purple-700 text-xs">Ctrl + I</kbd>
+                  <span class="font-bold text-slate-800 italic">Italic (Miring)</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Memiringkan teks</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-emerald-700 text-xs">Ctrl + U</kbd>
+                  <span class="font-bold text-slate-800 underline">Underline</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Garis bawah teks</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-amber-700 text-xs">Ctrl + S</kbd>
+                  <span class="font-bold text-slate-800">Save (Simpan)</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Simpan dokumen</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-rose-700 text-xs">Ctrl + Z</kbd>
+                  <span class="font-bold text-slate-800">Undo</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Batalkan / Kembalikan</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-indigo-700 text-xs">Ctrl + C</kbd>
+                  <span class="font-bold text-slate-800">Copy (Salin)</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Salin teks terpilih</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-teal-700 text-xs">Ctrl + V</kbd>
+                  <span class="font-bold text-slate-800">Paste (Tempel)</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Menempel teks salinan</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-cyan-700 text-xs">Ctrl + A</kbd>
+                  <span class="font-bold text-slate-800">Select All</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Pilih semua isi teks</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-blue-800 text-xs">Ctrl + P</kbd>
+                  <span class="font-bold text-slate-800">Print</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Cetak ke printer</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-emerald-800 text-xs">Ctrl + N</kbd>
+                  <span class="font-bold text-slate-800">New Document</span>
+                </div>
+                <span class="text-[10px] text-slate-500">Buka dokumen baru</span>
+              </div>
+
+            </div>
+
+            <!-- Tombol Buka Lab MS Word -->
+            <button onclick="switchTab('msword')" class="w-full py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-file-word"></i>
+              <span>Praktikkan Langsung di Lab MS Word</span>
+            </button>
+          </div>
+
+          <!-- Card 2: Skor Rekor Terbaikmu -->
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-5 border-2 border-amber-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🎖️</span>
+                <h4 class="font-title font-bold text-slate-800 text-sm">Rekor Terbaikmu</h4>
+              </div>
+              <span id="typing-best-badge" class="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px]">
+                Pemula
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2.5 bg-white rounded-xl border border-amber-200 shadow-2xs">
+                <span class="text-[10px] text-slate-500 block">Skor Tertinggi:</span>
+                <b id="typing-record-score" class="text-amber-700 text-base">0</b>
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-amber-200 shadow-2xs">
+                <span class="text-[10px] text-slate-500 block">WPM Tertinggi:</span>
+                <b id="typing-record-wpm" class="text-amber-700 text-base">0 WPM</b>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- MODAL PANDUAN CARA BERMAIN TYPING HERO -->
+      <div id="modal-panduan-typing" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">📖</span>
+              <h3 class="font-title font-bold text-lg text-slate-800">Cara Bermain: Pahlawan Mengetik Cepat</h3>
+            </div>
+            <button onclick="tutupModalPanduanTypingHero()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <div class="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-2.5">
+              <span class="text-xl">🎈</span>
+              <div>
+                <b class="text-amber-950 block">1. Balon Kata Melayang Turun</b>
+                <span>Perhatikan kata-kata atau shortcut yang turun dari langit. Ketik hurufnya sebelum balon menyentuh rumput hijau di bawah.</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-blue-50 rounded-2xl border border-blue-200 flex items-start gap-2.5">
+              <span class="text-xl">⌨️</span>
+              <div>
+                <b class="text-blue-950 block">2. Gunakan Keyboard Komputer / Laptop</b>
+                <span>Ketik huruf pertama dari kata tersebut. Setelah kamu mengetik huruf pertama, fokus akan terkunci pada balon itu sampai kata selesai dan balon meletus (POP!).</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-purple-50 rounded-2xl border border-purple-200 flex items-start gap-2.5">
+              <span class="text-xl">⚡</span>
+              <div>
+                <b class="text-purple-950 block">3. Tantangan Shortcut Word (Level 2)</b>
+                <span>Tekan kombinasi tombol pintasan nyata seperti <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>. Cara terbaik menghafal shortcut MS Word secara otomatis!</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-start gap-2.5">
+              <span class="text-xl">🖐️</span>
+              <div>
+                <b class="text-emerald-950 block">4. Panduan 10 Jari Edukatif</b>
+                <span>Lihat keyboard visual di bawah arena. Tombol yang harus ditekan akan bersinar dan memberi tahu jari tangan mana yang harus digunakan.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="tutupModalPanduanTypingHero()" class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-title font-bold text-sm shadow-md transition cursor-pointer">
+              Mengerti & Siap Bermain! 🚀
+            </button>
+          </div>
+        </div>
       </div>
 
     </section>
@@ -6948,6 +7465,8 @@
           </div>
         </div>
 
+
+
       </div>
     </section>
 
@@ -7077,11 +7596,161 @@
             <div class="bg-[#f9f9fb] p-3 border-b-2 border-slate-200 text-slate-800 flex flex-wrap items-center gap-4 text-xs select-none shadow-xs">
               
               <!-- Group 1: Alat Gambar (Tools) -->
-              <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-1.5">
+              <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-1.5 relative">
                 <span class="text-[10px] font-bold uppercase text-slate-400 block px-1">Alat:</span>
-                <button type="button" onclick="setPaintTool('brush')" id="paint-tool-brush" class="paint-tool-btn active-paint-tool px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5" title="Kuas Cat">
-                  <i class="fa-solid fa-paintbrush text-pink-500"></i> Kuas
-                </button>
+                
+                <!-- Dropdown Kuas / Brushes MS Paint Style (9 Jenis Kuas Windows 11) -->
+                <div class="relative">
+                  <button type="button" onclick="togglePaintBrushesMenu(event)" id="paint-tool-brush" class="paint-tool-btn active-paint-tool px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition" title="Pilihan Ragam Kuas (Brushes)">
+                    <i id="paint-brush-icon" class="fa-solid fa-paintbrush text-pink-500"></i>
+                    <span id="paint-brush-label">Kuas</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-0.5"></i>
+                  </button>
+
+                  <!-- Popover Menu Brushes Windows 11 Paint -->
+                  <div id="paint-brushes-menu" class="hidden absolute top-full left-0 mt-2 w-72 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-slate-200 p-2.5 z-50 text-slate-800 animate-fadeIn space-y-1">
+                    <div class="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 flex items-center justify-between">
+                      <span>Ragam Kuas (Brushes)</span>
+                      <span class="text-[10px] text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded">9 Pilihan</span>
+                    </div>
+
+                    <!-- 1. Kuas Standar (Brush) -->
+                    <button type="button" onclick="selectPaintBrush('brush')" id="paint-brush-opt-brush" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-pink-50 transition border border-transparent hover:border-pink-200 cursor-pointer bg-pink-100/70 border-pink-300">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center text-xs"><i class="fa-solid fa-paintbrush"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Kuas Standar</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Brush</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-pink-600">
+                        <path d="M 4 8 Q 14 2, 24 8 T 44 8" stroke="currentColor" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+
+                    <!-- 2. Kuas Kaligrafi 1 (Calligraphy Brush) -->
+                    <button type="button" onclick="selectPaintBrush('calligraphy1')" id="paint-brush-opt-calligraphy1" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-indigo-50 transition border border-transparent hover:border-indigo-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs"><i class="fa-solid fa-pen-nib"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Kuas Kaligrafi 1</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Calligraphy brush</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-indigo-600">
+                        <path d="M 4 10 L 14 4 L 24 10 L 34 4 L 44 10" stroke="currentColor" stroke-width="4" stroke-linecap="square" fill="none"/>
+                      </svg>
+                    </button>
+
+                    <!-- 3. Pena Kaligrafi 2 (Calligraphy Pen) -->
+                    <button type="button" onclick="selectPaintBrush('calligraphy2')" id="paint-brush-opt-calligraphy2" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-violet-50 transition border border-transparent hover:border-violet-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center text-xs"><i class="fa-solid fa-feather-pointed"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Pena Kaligrafi 2</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Calligraphy pen</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-violet-600">
+                        <path d="M 4 6 L 14 12 L 24 6 L 34 12 L 44 6" stroke="currentColor" stroke-width="3" stroke-linecap="butt" fill="none"/>
+                      </svg>
+                    </button>
+
+                    <!-- 4. Cat Semprot (Airbrush) -->
+                    <button type="button" onclick="selectPaintBrush('airbrush')" id="paint-brush-opt-airbrush" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-emerald-50 transition border border-transparent hover:border-emerald-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs"><i class="fa-solid fa-spray-can"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Cat Semprot</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Airbrush</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-emerald-600">
+                        <circle cx="6" cy="8" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="5" r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="11" r="1.5" fill="currentColor"/>
+                        <circle cx="20" cy="7" r="1.8" fill="currentColor"/>
+                        <circle cx="26" cy="9" r="1.4" fill="currentColor"/>
+                        <circle cx="31" cy="6" r="1.5" fill="currentColor"/>
+                        <circle cx="36" cy="10" r="1.2" fill="currentColor"/>
+                        <circle cx="42" cy="8" r="1.8" fill="currentColor"/>
+                      </svg>
+                    </button>
+
+                    <!-- 5. Kuas Cat Minyak (Oil Brush) -->
+                    <button type="button" onclick="selectPaintBrush('oil')" id="paint-brush-opt-oil" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-amber-50 transition border border-transparent hover:border-amber-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs"><i class="fa-solid fa-brush"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Kuas Cat Minyak</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Oil brush</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-amber-700">
+                        <path d="M 4 7 Q 14 2, 24 7 T 44 7" stroke="currentColor" stroke-width="2.2" fill="none" opacity="0.9"/>
+                        <path d="M 4 9 Q 14 4, 24 9 T 44 9" stroke="currentColor" stroke-width="2.2" fill="none" opacity="0.75"/>
+                        <path d="M 4 11 Q 14 6, 24 11 T 44 11" stroke="currentColor" stroke-width="2.2" fill="none" opacity="0.6"/>
+                      </svg>
+                    </button>
+
+                    <!-- 6. Krayon Lilin (Crayon) -->
+                    <button type="button" onclick="selectPaintBrush('crayon')" id="paint-brush-opt-crayon" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-orange-50 transition border border-transparent hover:border-orange-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-xs"><i class="fa-solid fa-pencil"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Krayon Lilin</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Crayon</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-orange-600">
+                        <path d="M 4 8 Q 14 2, 24 8 T 44 8" stroke="currentColor" stroke-width="5" stroke-dasharray="3 2" fill="none"/>
+                      </svg>
+                    </button>
+
+                    <!-- 7. Spidol / Stabilo (Marker) -->
+                    <button type="button" onclick="selectPaintBrush('marker')" id="paint-brush-opt-marker" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-yellow-50 transition border border-transparent hover:border-yellow-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-yellow-100 text-yellow-700 flex items-center justify-center text-xs"><i class="fa-solid fa-highlighter"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Spidol / Stabilo</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Marker</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-yellow-500">
+                        <path d="M 4 8 Q 14 2, 24 8 T 44 8" stroke="currentColor" stroke-width="7" opacity="0.65" fill="none" stroke-linecap="butt"/>
+                      </svg>
+                    </button>
+
+                    <!-- 8. Pensil Alami (Natural Pencil) -->
+                    <button type="button" onclick="selectPaintBrush('natural_pencil')" id="paint-brush-opt-natural_pencil" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-blue-50 transition border border-transparent hover:border-blue-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs"><i class="fa-solid fa-pen"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Pensil Alami</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Natural pencil</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-blue-600">
+                        <path d="M 4 8 Q 14 2, 24 8 T 44 8" stroke="currentColor" stroke-width="1.8" fill="none"/>
+                      </svg>
+                    </button>
+
+                    <!-- 9. Kuas Cat Air (Watercolour Brush) -->
+                    <button type="button" onclick="selectPaintBrush('watercolor')" id="paint-brush-opt-watercolor" class="w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-bold flex items-center justify-between hover:bg-sky-50 transition border border-transparent hover:border-sky-200 cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center text-xs"><i class="fa-solid fa-droplet"></i></span>
+                        <div>
+                          <div class="leading-tight text-slate-800">Kuas Cat Air</div>
+                          <div class="text-[10px] text-slate-400 font-normal">Watercolour brush</div>
+                        </div>
+                      </div>
+                      <svg width="48" height="16" viewBox="0 0 48 16" class="text-sky-500">
+                        <path d="M 4 8 Q 14 2, 24 8 T 44 8" stroke="currentColor" stroke-width="8" opacity="0.45" fill="none" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
                 <button type="button" onclick="setPaintTool('pencil')" id="paint-tool-pencil" class="paint-tool-btn px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200" title="Pensil Halus">
                   <i class="fa-solid fa-pencil text-blue-500"></i> Pensil
                 </button>
@@ -7099,13 +7768,17 @@
                 </button>
               </div>
 
-              <!-- Group 2: Bentuk (Shapes) -->
-              <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-1.5">
+              <!-- Group 2: Bentuk (Shapes - Dilengkapi Macam Bentuk Segitiga, Belah Ketupat, Panah, Balon Kata) -->
+              <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-1.5 flex-wrap">
                 <span class="text-[10px] font-bold uppercase text-slate-400 block px-1">Bentuk:</span>
                 <button type="button" onclick="setPaintShape('none')" id="paint-shape-none" class="paint-shape-btn active-paint-shape px-2 py-1.5 rounded-xl font-bold text-xs" title="Goresan Bebas">Bebas</button>
                 <button type="button" onclick="setPaintShape('line')" id="paint-shape-line" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Garis Lurus"><i class="fa-solid fa-slash"></i></button>
                 <button type="button" onclick="setPaintShape('rect')" id="paint-shape-rect" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Kotak / Persegi"><i class="fa-regular fa-square"></i></button>
                 <button type="button" onclick="setPaintShape('circle')" id="paint-shape-circle" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Lingkaran / Oval"><i class="fa-regular fa-circle"></i></button>
+                <button type="button" onclick="setPaintShape('triangle')" id="paint-shape-triangle" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Segitiga (Triangle)"><i class="fa-solid fa-play -rotate-90 text-[11px] text-amber-600"></i></button>
+                <button type="button" onclick="setPaintShape('diamond')" id="paint-shape-diamond" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Belah Ketupat (Diamond)"><i class="fa-solid fa-diamond text-[11px] text-teal-600"></i></button>
+                <button type="button" onclick="setPaintShape('arrow')" id="paint-shape-arrow" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Panah Kanan (Right Arrow)"><i class="fa-solid fa-arrow-right text-[11px] text-blue-600"></i></button>
+                <button type="button" onclick="setPaintShape('bubble')" id="paint-shape-bubble" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Balon Kata (Speech Bubble)"><i class="fa-solid fa-comment text-[11px] text-purple-600"></i></button>
                 <button type="button" onclick="setPaintShape('star')" id="paint-shape-star" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Bintang"><i class="fa-solid fa-star text-yellow-500"></i></button>
                 <button type="button" onclick="setPaintShape('heart')" id="paint-shape-heart" class="paint-shape-btn px-2 py-1.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200" title="Hati"><i class="fa-solid fa-heart text-red-500"></i></button>
               </div>
@@ -7559,7 +8232,7 @@
               </div>
 
               <!-- Gambar AI Nyata -->
-              <img id="ai-result-image" src="" alt="Gambar AI 7 Kebiasaan Anak Indonesia Hebat" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onload="onGambarAIBerhasilDimuat()" onerror="onGambarAIGagalDimuat()">
+              <img id="ai-result-image" alt="Gambar AI 7 Kebiasaan Anak Indonesia Hebat" class="hidden w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
 
               <!-- Fallback Ilustrasi SVG Cerdas (Jika Offline / Sedang Inisialisasi) -->
               <div id="ai-svg-fallback" class="w-full h-full p-6 flex flex-col items-center justify-between text-center bg-gradient-to-br from-indigo-50 via-sky-50 to-purple-50 select-none">
@@ -7759,6 +8432,8 @@
           </div>
 
         </div>
+
+
 
       </div>
 
@@ -8222,6 +8897,8 @@
           </div>
         </div>
 
+
+
       </div>
     </section>
 
@@ -8314,6 +8991,2153 @@
         </div>
       </div>
     </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB KHUSUS: GAME LABIRIN LOGIKA ROBOT ROBO (BLOCK CODING) -->
+    <!-- Game Edukasi Berpikir Komputasional & Petualangan Algoritma Cilik -->
+    <!-- ======================================================== -->
+    <section id="tab-labirin" class="tab-content hidden space-y-6 animate-fadeIn pb-16">
+      
+      <!-- 1. Header Top Bar & Level Selector -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white p-5 sm:p-6 rounded-3xl border border-purple-500/30 shadow-xl relative overflow-hidden">
+        <div class="flex items-center gap-4">
+          <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-full border border-white/20 shadow-xs transition cursor-pointer">
+            <i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Beranda</span>
+          </button>
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-yellow-400/20 text-yellow-300 text-xs font-black px-2.5 py-0.5 rounded-full uppercase border border-yellow-400/30">
+              <i class="fa-solid fa-puzzle-piece"></i> <span>Game Asah Otak • Berpikir Komputasional</span>
+            </div>
+            <h2 class="font-title text-2xl sm:text-3xl font-bold mt-1 text-white flex items-center gap-2">
+              <span>Labirin Logika Robot Robo</span> 🤖
+            </h2>
+          </div>
+        </div>
+
+        <!-- Level Selector & Bintang Counter -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="flex items-center gap-1 bg-white/10 p-1 rounded-2xl border border-white/15">
+            <button onclick="pilihLevelRoboMaze(1)" id="btn-lvl-1" class="robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition bg-yellow-400 text-slate-950 shadow-xs">Lv 1</button>
+            <button onclick="pilihLevelRoboMaze(2)" id="btn-lvl-2" class="robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition text-slate-300 hover:text-white">Lv 2</button>
+            <button onclick="pilihLevelRoboMaze(3)" id="btn-lvl-3" class="robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition text-slate-300 hover:text-white">Lv 3</button>
+            <button onclick="pilihLevelRoboMaze(4)" id="btn-lvl-4" class="robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition text-slate-300 hover:text-white">Lv 4</button>
+            <button onclick="pilihLevelRoboMaze(5)" id="btn-lvl-5" class="robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition text-slate-300 hover:text-white">Lv 5</button>
+            <button onclick="pilihLevelRoboMaze(6)" id="btn-lvl-6" class="robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition text-slate-300 hover:text-white">Lv 6</button>
+          </div>
+          <div class="flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/40 px-3.5 py-1.5 rounded-2xl text-yellow-300 text-xs font-black shadow-inner">
+            <i class="fa-solid fa-star text-yellow-400 text-sm"></i>
+            <span id="robo-star-hud">0 / 1 Bintang</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Main Arena & Code Workspace Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- KOLOM KIRI: ARENA LABIRIN (GRID MAZE) -->
+        <div class="lg:col-span-7 bg-slate-900 rounded-3xl p-5 sm:p-6 border-4 border-indigo-500/40 shadow-2xl flex flex-col items-center justify-between text-white relative overflow-hidden">
+          
+          <!-- Header Arena -->
+          <div class="w-full flex items-center justify-between border-b border-slate-700 pb-3 mb-4 text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="robo-level-title" class="font-bold text-indigo-300">Level 1: Langkah Pertama Robo</span>
+            </div>
+            <div class="text-slate-400" id="robo-step-counter">Langkah: 0</div>
+          </div>
+
+          <!-- Petak Labirin Dinamis (Grid Canvas) -->
+          <div class="w-full min-h-[320px] sm:min-h-[400px] p-3 sm:p-5 bg-slate-950/95 rounded-2xl border-2 border-indigo-400/50 shadow-inner flex items-center justify-center overflow-x-auto">
+            <div id="robo-maze-grid" style="display: grid; grid-template-columns: repeat(5, 56px); grid-template-rows: repeat(5, 56px); width: max-content;" class="grid gap-2 select-none mx-auto p-1">
+              <!-- BARIS 0 (y=0) -->
+              <div onclick="klikPetakLabirin(0, 0)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(1, 0)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(2, 0)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(3, 0)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(4, 0)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+
+              <!-- BARIS 1 (y=1) -->
+              <div onclick="klikPetakLabirin(0, 1)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(1, 1)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: not-allowed;" title="Batu Rintangan 🪨" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500"><span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span></div>
+              <div onclick="klikPetakLabirin(2, 1)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: not-allowed;" title="Batu Rintangan 🪨" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500"><span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span></div>
+              <div onclick="klikPetakLabirin(3, 1)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: not-allowed;" title="Batu Rintangan 🪨" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500"><span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span></div>
+              <div onclick="klikPetakLabirin(4, 1)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+
+              <!-- BARIS 2 (y=2) - JALUR UTAMA LEVEL 1 -->
+              <div onclick="klikPetakLabirin(0, 2)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Robo (Karaktermu)" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-indigo-900 border-2 border-indigo-300 shadow-xl shadow-indigo-500/60 z-20 scale-105 ring-2 ring-indigo-400/50">
+                <div class="relative flex items-center justify-center w-full h-full">
+                  <div style="transform: rotate(90deg);" class="transition-transform duration-300 flex items-center justify-center">
+                    <img src="robot_head_logo.svg" alt="Robo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow" />
+                  </div>
+                  <span class="absolute -top-1 -right-1 text-[10px] bg-indigo-950 border border-indigo-300 rounded-full px-1 shadow">➡️</span>
+                </div>
+              </div>
+              <div onclick="klikPetakLabirin(1, 2)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(2, 2)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Bintang Tzu Chi ⭐ (Klik untuk ambil)" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105">
+                <span class="text-xl sm:text-2xl drop-shadow text-yellow-400 animate-bounce select-none">⭐</span>
+              </div>
+              <div onclick="klikPetakLabirin(3, 2)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(4, 2)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Tujuan Finish 🏁 (Klik untuk jalan ke sini)" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-emerald-950/90 border-2 border-emerald-400 shadow-lg shadow-emerald-500/40 text-emerald-300 hover:scale-105">
+                <span class="text-xl sm:text-2xl drop-shadow animate-pulse select-none">🏁</span>
+              </div>
+
+              <!-- BARIS 3 (y=3) -->
+              <div onclick="klikPetakLabirin(0, 3)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(1, 3)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: not-allowed;" title="Batu Rintangan 🪨" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500"><span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span></div>
+              <div onclick="klikPetakLabirin(2, 3)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: not-allowed;" title="Batu Rintangan 🪨" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500"><span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span></div>
+              <div onclick="klikPetakLabirin(3, 3)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: not-allowed;" title="Batu Rintangan 🪨" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500"><span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span></div>
+              <div onclick="klikPetakLabirin(4, 3)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+
+              <!-- BARIS 4 (y=4) -->
+              <div onclick="klikPetakLabirin(0, 4)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(1, 4)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(2, 4)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(3, 4)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+              <div onclick="klikPetakLabirin(4, 4)" style="width: 56px; height: 56px; min-width: 56px; min-height: 56px; cursor: pointer;" title="Klik untuk melangkah ke sini" class="rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105"></div>
+            </div>
+          </div>
+
+          <!-- Status Bar Panduan Robot -->
+          <div class="w-full mt-4 bg-slate-800/90 rounded-2xl p-3 border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">💡</span>
+              <span id="robo-maze-instruction" class="text-slate-200 font-medium">Pandu Robo maju lurus 4 langkah dan ambil bintang di tengah!</span>
+            </div>
+            <div id="robo-status-badge" class="px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-bold font-mono text-[11px] shrink-0">
+              Siap Bergerak
+            </div>
+          </div>
+
+          <!-- Baris Status Gerak Robot -->
+          <div id="robo-debug-bar" class="w-full mt-2 bg-slate-950/80 rounded-xl px-3 py-1.5 border border-indigo-500/30 flex items-center justify-between text-[11px] font-mono text-slate-300">
+            <div><span class="text-indigo-400 font-bold">Posisi:</span> <span id="robo-dbg-pos" class="text-yellow-300 font-bold">(0, 2)</span> | <span class="text-indigo-400 font-bold">Arah:</span> <span id="robo-dbg-dir" class="text-sky-300 font-bold">Kanan ➡️</span></div>
+            <div id="robo-dbg-last" class="text-emerald-400 font-bold truncate max-w-[240px]">Status: Siap Melangkah</div>
+          </div>
+        </div>
+
+        <!-- KOLOM KANAN: KONTROL PERMAINAN ROBO (DUAL MODE: REMOTE & CODING) -->
+        <div class="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border-2 border-slate-200 shadow-xl space-y-4">
+          
+          <!-- Header Kolom Kanan & Panduan -->
+          <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <div>
+              <h3 class="font-title font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-indigo-600"></i>
+                <span>Kontrol Permainan Robo</span>
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">Pilih cara bermain favoritmu di bawah ini:</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="bukaPanduanMainRobo()" class="px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-title font-bold text-xs border border-blue-200 flex items-center gap-1 transition cursor-pointer" title="Cara Bermain">
+                <i class="fa-solid fa-circle-question text-blue-500"></i>
+                <span>Panduan</span>
+              </button>
+              <button type="button" onclick="bukaPetunjukLevelRobo()" class="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-title font-bold text-xs border border-purple-200 flex items-center gap-1 transition cursor-pointer" title="Petunjuk Level Ini">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                <span>Petunjuk</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB PEMILIH MODE: KENDALI LANGSUNG VS SUSUN KODE -->
+          <div class="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+            <button type="button" id="btn-mode-remote" onclick="setRoboPlayMode('remote')" class="flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 bg-white text-indigo-700 shadow-xs border border-indigo-200 cursor-pointer">
+              <i class="fa-solid fa-gamepad text-indigo-500"></i>
+              <span>🎮 Kendali Langsung</span>
+            </button>
+            <button type="button" id="btn-mode-coding" onclick="setRoboPlayMode('coding')" class="flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer">
+              <i class="fa-solid fa-puzzle-piece text-purple-500"></i>
+              <span>🧩 Susun Algoritma</span>
+            </button>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- PANEL 1: KENDALI LANGSUNG (REMOTE D-PAD KONTROL) -->
+          <!-- ============================================== -->
+          <div id="robo-panel-remote" class="space-y-3.5">
+            <!-- Box Panduan Interaktif -->
+            <div class="bg-indigo-50/90 rounded-2xl p-3 border border-indigo-200 text-xs text-indigo-950 font-medium space-y-1 shadow-xs">
+              <div class="flex items-center gap-2 font-bold text-indigo-900">
+                <span class="text-base">🕹️</span>
+                <span>Cara Kendali Robot Robo:</span>
+              </div>
+              <p class="text-[11px] text-indigo-800 leading-relaxed">
+                Di <b>Level 1</b>, Robo menghadap ke <b>Kanan ➡️</b>. Tekan tombol biru <b>Maju 🚀</b> atau <b>Kanan ➡️</b> untuk langsung melangkah menuju Bintang ⭐ dan Garis Finish 🏁!
+              </p>
+            </div>
+
+            <!-- CONTROLLER INTERAKTIF LENGKAP -->
+            <div class="bg-slate-900 rounded-3xl p-4 sm:p-5 border-2 border-indigo-500/40 shadow-inner flex flex-col items-center justify-center gap-3 select-none">
+              
+              <!-- 1. TOMBOL UTAMA TERBESAR: MAJU 1 LANGKAH (FORWARD) -->
+              <button type="button" onclick="majuRoboDepan()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white font-title font-black text-sm sm:text-base shadow-lg shadow-indigo-600/40 border-2 border-indigo-300 flex items-center justify-center gap-2.5 transition cursor-pointer" title="Gerakkan Robo maju 1 langkah ke arah hadapnya">
+                <span class="text-xl">🚀</span>
+                <span id="label-btn-maju">Maju 1 Langkah (➡️ Kanan)</span>
+              </button>
+
+              <!-- 2. TOMBOL PUTAR KIRI & PUTAR KANAN -->
+              <div class="grid grid-cols-2 gap-2 w-full">
+                <button type="button" onclick="putarRobo('LEFT')" class="py-2.5 px-3 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-purple-200 font-title font-bold text-xs shadow-md border border-purple-500/40 flex items-center justify-center gap-1.5 transition cursor-pointer" title="Putar arah hadap ke kiri 90 derajat">
+                  <span class="text-base">↩️</span>
+                  <span>Putar Kiri 90°</span>
+                </button>
+                <button type="button" onclick="putarRobo('RIGHT')" class="py-2.5 px-3 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-emerald-200 font-title font-bold text-xs shadow-md border border-emerald-500/40 flex items-center justify-center gap-1.5 transition cursor-pointer" title="Putar arah hadap ke kanan 90 derajat">
+                  <span class="text-base">↪️</span>
+                  <span>Putar Kanan 90°</span>
+                </button>
+              </div>
+
+              <!-- 3. D-PAD 4 ARAH MATA ANGIN -->
+              <div class="w-full pt-1.5 border-t border-slate-800 flex flex-col items-center gap-2">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                  <span>Atau Tekan Tombol Arah Petak:</span>
+                </div>
+                
+                <!-- Tombol Atas -->
+                <button type="button" onclick="gerakRoboKeArah(0)" class="w-36 sm:w-44 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-title font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition cursor-pointer border border-slate-600" title="Gerak ke petak atas (Utara)">
+                  <span class="text-base">⬆️</span>
+                  <span>Atas</span>
+                </button>
+
+                <!-- Baris Tengah: Kiri, Ambil Bintang, Kanan -->
+                <div class="grid grid-cols-3 gap-2 w-full max-w-sm">
+                  <button type="button" onclick="gerakRoboKeArah(3)" class="py-2.5 px-2 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-title font-bold text-xs sm:text-sm shadow-md flex flex-col items-center justify-center gap-0.5 transition cursor-pointer border border-slate-600" title="Gerak ke petak kiri (Barat)">
+                    <span class="text-base">⬅️</span>
+                    <span>Kiri</span>
+                  </button>
+                  <button type="button" onclick="kendaliRoboLangsung('PICK_STAR')" class="py-2.5 px-2 rounded-2xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md shadow-amber-400/40 flex flex-col items-center justify-center gap-0.5 transition cursor-pointer border border-amber-300 animate-pulse" title="Ambil Bintang di petak saat ini">
+                    <span class="text-base">⭐</span>
+                    <span class="text-[11px]">Ambil</span>
+                  </button>
+                  <button type="button" onclick="gerakRoboKeArah(1)" class="py-2.5 px-2 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-title font-extrabold text-xs sm:text-sm shadow-md shadow-blue-600/35 flex flex-col items-center justify-center gap-0.5 transition cursor-pointer border-2 border-blue-400" title="Gerak ke petak kanan (Menuju Target Finish 🏁)">
+                    <span class="text-base">➡️</span>
+                    <span class="text-[11px]">Kanan 🏁</span>
+                  </button>
+                </div>
+
+                <!-- Tombol Bawah -->
+                <button type="button" onclick="gerakRoboKeArah(2)" class="w-36 sm:w-44 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-title font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition cursor-pointer border border-slate-600" title="Gerak ke petak bawah (Selatan)">
+                  <span class="text-base">⬇️</span>
+                  <span>Bawah</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi Bantuan Autopilot & Reset -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" onclick="jalankanDemoAutopilotRobo()" class="py-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title font-bold text-xs shadow-md shadow-emerald-500/25 flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95" title="Bantu Robo jalan otomatis menyelesaikan misi">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                <span>Bantu Jalan 🤖</span>
+              </button>
+              <button type="button" onclick="resetPosisiRobo()" class="py-2.5 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs border border-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95" title="Kembalikan posisi Robo ke titik awal">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Ulangi 🔄</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- PANEL 2: SUSUN KODE ALGORITMA (BLOCK CODING)  -->
+          <!-- ============================================== -->
+          <div id="robo-panel-coding" class="hidden space-y-3.5">
+            <div class="text-center bg-purple-50/80 rounded-2xl p-2.5 border border-purple-100 text-xs text-purple-900 font-medium">
+              🧩 <b>Klik balok di bawah</b> untuk menyusun urutan, lalu tekan tombol hijau <b>Jalankan Algoritma ▶️</b>!
+            </div>
+
+            <!-- Toolbox Balok Pilihan (4 Balok Utama) -->
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="tambahBalokRobo('FORWARD')" class="px-3 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-title font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 flex items-center gap-2 transition cursor-pointer">
+                <span class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-base">⬆️</span>
+                <div class="text-left">
+                  <div class="leading-tight">+ Maju 1 Langkah</div>
+                  <div class="text-[9px] text-blue-200 font-normal font-sans">Tambah balok maju</div>
+                </div>
+              </button>
+              <button type="button" onclick="tambahBalokRobo('PICK_STAR')" class="px-3 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md shadow-amber-500/25 flex items-center gap-2 transition cursor-pointer">
+                <span class="w-7 h-7 rounded-xl bg-white/30 flex items-center justify-center text-base">⭐</span>
+                <div class="text-left">
+                  <div class="leading-tight">+ Ambil Bintang</div>
+                  <div class="text-[9px] text-amber-950 font-normal font-sans">Panen +10 poin</div>
+                </div>
+              </button>
+              <button type="button" onclick="tambahBalokRobo('TURN_LEFT')" class="px-3 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-title font-bold text-xs sm:text-sm shadow-md shadow-purple-500/25 flex items-center gap-2 transition cursor-pointer">
+                <span class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-base">↩️</span>
+                <div class="text-left">
+                  <div class="leading-tight">+ Putar Kiri 90°</div>
+                  <div class="text-[9px] text-purple-200 font-normal font-sans">Belok ke kiri</div>
+                </div>
+              </button>
+              <button type="button" onclick="tambahBalokRobo('TURN_RIGHT')" class="px-3 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-title font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/25 flex items-center gap-2 transition cursor-pointer">
+                <span class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-base">↪️</span>
+                <div class="text-left">
+                  <div class="leading-tight">+ Putar Kanan 90°</div>
+                  <div class="text-[9px] text-emerald-200 font-normal font-sans">Belok ke kanan</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Tombol Aksi Jalankan & Reset -->
+            <div class="grid grid-cols-3 gap-2 pt-1">
+              <button type="button" onclick="jalankanKodeRobo()" id="btn-run-robo" class="col-span-2 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 active:scale-98 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 transition cursor-pointer">
+                <i class="fa-solid fa-play text-base"></i>
+                <span>Jalankan Algoritma ▶️</span>
+              </button>
+              <button type="button" onclick="resetPosisiRobo()" class="py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-title font-bold text-xs border border-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Ulangi 🔄</span>
+              </button>
+            </div>
+
+            <!-- Lembar Urutan Program Siswa -->
+            <div class="bg-slate-50 rounded-2xl p-3 border-2 border-slate-200">
+              <div class="flex items-center justify-between text-xs font-bold text-slate-600 mb-1.5">
+                <span>Urutan Balok Kode (<span id="robo-block-count">0 Balok</span>):</span>
+                <button onclick="hapusSemuaBalokRobo()" class="text-rose-500 hover:text-rose-700 text-[11px] font-bold hover:underline cursor-pointer">
+                  <i class="fa-solid fa-trash-can"></i> Hapus Semua
+                </button>
+              </div>
+              
+              <div id="robo-program-queue" class="min-h-[110px] max-h-[160px] overflow-y-auto space-y-1 p-1 rounded-xl bg-white border border-slate-200">
+                <!-- Rendered program blocks -->
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- Penutup Kolom Kanan -->
+
+      </div> <!-- Penutup Grid Kolom Kiri & Kolom Kanan -->
+
+      <!-- Victory / Menang Modal -->
+      <div id="modal-robo-victory" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 border-4 border-yellow-400 shadow-2xl relative overflow-hidden">
+          <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-amber-500 flex items-center justify-center text-4xl shadow-lg shadow-yellow-500/50 animate-bounce">
+            🏆
+          </div>
+          <h3 class="font-title font-black text-2xl text-slate-900">HEBAT SEKALI! TARGET TERCAPAI!</h3>
+          <p id="robo-victory-desc" class="text-xs sm:text-sm text-slate-600">
+            Robo berhasil mencapai tujuan dengan selamat dan memanen bintang kebaikan!
+          </p>
+          <div class="p-3 bg-yellow-50 rounded-2xl border border-yellow-200 flex items-center justify-center gap-2 text-yellow-700 font-bold text-sm">
+            <span>⭐ Bonus Poin: <b class="text-amber-600">+30 Bintang</b> Berhasil Diklaim!</span>
+          </div>
+          <div class="flex items-center gap-2 pt-2">
+            <button onclick="lanjutLevelBerikutnyaRobo()" id="btn-next-level-robo" class="flex-1 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-title font-black text-sm shadow-lg shadow-emerald-600/30 transition cursor-pointer flex items-center justify-center gap-1.5">
+              <span>Lanjut Level Berikutnya</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button onclick="tutupModalRoboVictory()" class="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition cursor-pointer">
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- ENGINE LOGIKA GAME ROBO MAZE (STANDALONE & INLINE KEBAL CACHE) -->
+    <!-- ======================================================== -->
+    <script id="engine-robo-maze-core">
+    (function initRoboEngineIIFE() {
+      // 1. DATA LEVEL
+      window.ROBO_MAZE_LEVELS = [
+        {
+          level: 1,
+          title: "Level 1: Langkah Pertama",
+          desc: "Pandu Robo maju lurus 4 langkah dan ambil bintang di tengah!",
+          hint: "Gunakan tombol Maju 🚀 atau Kanan ➡️ 4x untuk mencapai garis Finish 🏁!",
+          gridSize: 5,
+          start: { x: 0, y: 2 },
+          startDir: 1, // 0: UP, 1: RIGHT, 2: DOWN, 3: LEFT
+          target: { x: 4, y: 2 },
+          targetIcon: "🏁",
+          stars: [{ x: 2, y: 2 }],
+          walls: [
+            { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 },
+            { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }
+          ]
+        },
+        {
+          level: 2,
+          title: "Level 2: Belok Menuju Stasiun",
+          desc: "Maju 2 langkah, putar kanan 90°, ambil bintang, dan tiba di stasiun!",
+          hint: "Urutan: Maju 2x, Belok Kanan 90°, Maju 2x ke target!",
+          gridSize: 5,
+          start: { x: 1, y: 1 },
+          startDir: 1,
+          target: { x: 3, y: 3 },
+          targetIcon: "⚡",
+          stars: [{ x: 3, y: 2 }],
+          walls: [
+            { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 1 },
+            { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 4, y: 2 },
+            { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 4, y: 3 }
+          ]
+        },
+        {
+          level: 3,
+          title: "Level 3: Hindari Batu Rintangan",
+          desc: "Ada batu di depan! Cari jalan memutar lewat atas untuk mencapai target!",
+          hint: "Belok Kiri, Maju, Belok Kanan, Maju 3x (Ambil Bintang), Belok Kanan, Maju!",
+          gridSize: 5,
+          start: { x: 0, y: 2 },
+          startDir: 1,
+          target: { x: 3, y: 2 },
+          targetIcon: "🏁",
+          stars: [{ x: 2, y: 1 }],
+          walls: [
+            { x: 1, y: 2 }, { x: 2, y: 2 },
+            { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 },
+            { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }
+          ]
+        },
+        {
+          level: 4,
+          title: "Level 4: Memanen Bintang Kebaikan",
+          desc: "Jalur berkelok zigzag! Kumpulkan 2 Bintang Tzu Chi di setiap sudut tikungan.",
+          hint: "Kumpulkan kedua bintang dengan berbelok secara tepat di setiap sudut!",
+          gridSize: 5,
+          start: { x: 0, y: 4 },
+          startDir: 0, // UP
+          target: { x: 4, y: 0 },
+          targetIcon: "🏆",
+          stars: [{ x: 0, y: 2 }, { x: 2, y: 2 }, { x: 2, y: 0 }],
+          walls: [
+            { x: 1, y: 4 }, { x: 1, y: 3 }, { x: 3, y: 2 }, { x: 3, y: 1 }
+          ]
+        },
+        {
+          level: 5,
+          title: "Level 5: Jembatan Berkelok",
+          desc: "Menyeberangi jembatan sempit berbentuk U. Hati-hati jangan menabrak rintangan!",
+          hint: "Jalankan robot menyusuri jembatan tanpa menabrak batu di tengah!",
+          gridSize: 5,
+          start: { x: 1, y: 1 },
+          startDir: 1,
+          target: { x: 1, y: 3 },
+          targetIcon: "⚡",
+          stars: [{ x: 3, y: 1 }, { x: 3, y: 3 }],
+          walls: [
+            { x: 2, y: 2 }, { x: 3, y: 2 }
+          ]
+        },
+        {
+          level: 6,
+          title: "Level 6: Labirin Sekolah Cinta Kasih",
+          desc: "Tantangan Algoritma Master 6x6! Kumpulkan 3 Bintang dan antarkan Robo ke Sekolah Cinta Kasih Tzu Chi!",
+          hint: "Rencanakan rute: Belok kiri dan kanan secara terstruktur menghindari rintangan!",
+          gridSize: 6,
+          start: { x: 0, y: 0 },
+          startDir: 1,
+          target: { x: 5, y: 5 },
+          targetIcon: "🏫",
+          stars: [{ x: 3, y: 0 }, { x: 3, y: 3 }, { x: 1, y: 5 }],
+          walls: [
+            { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 4, y: 1 },
+            { x: 4, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 3 },
+            { x: 3, y: 4 }, { x: 4, y: 4 }
+          ]
+        }
+      ];
+
+      // 2. STATE GAME
+      window.roboMazeState = {
+        currentLevelIndex: 0,
+        mode: 'remote',
+        roboX: 0,
+        roboY: 2,
+        roboDir: 1, // 0: UP, 1: RIGHT, 2: DOWN, 3: LEFT
+        collectedStars: [],
+        program: [],
+        isRunning: false,
+        activeStep: -1,
+        stepsTaken: 0,
+        levelCompleted: false
+      };
+
+      // 3. AUDIO & TOAST HELPER
+      function safePlay(type) {
+        try {
+          if (typeof window.playSound === 'function') {
+            window.playSound(type);
+            return;
+          }
+        } catch(e) {}
+        try {
+          var AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          var ctx = window._roboAudioCtx || (window._roboAudioCtx = new AudioCtx());
+          if (ctx.state === 'suspended') ctx.resume();
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          var now = ctx.currentTime;
+          if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+            osc.start(now);
+            osc.stop(now + 0.18);
+          } else if (type === 'fanfare') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(784, now);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+          } else {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523, now);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+          }
+        } catch(err) {}
+      }
+
+      function safeToast(msg, type) {
+        try {
+          if (typeof window.showToast === 'function') {
+            window.showToast(msg, type || 'info');
+            return;
+          }
+        } catch(e) {}
+        var toast = document.getElementById('toast');
+        var toastMsg = document.getElementById('toast-msg');
+        if (toast && toastMsg) {
+          toastMsg.innerText = msg;
+          toast.classList.add('show');
+          clearTimeout(window._roboToastTimer);
+          window._roboToastTimer = setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+      }
+
+      // 4. UPDATE LABEL TOMBOL MAJU
+      window.updateLabelBtnMaju = function() {
+        var lbl = document.getElementById('label-btn-maju');
+        if (!lbl) return;
+        var arahIndo = ['⬆️ Atas', '➡️ Kanan', '⬇️ Bawah', '⬅️ Kiri'];
+        var text = arahIndo[window.roboMazeState.roboDir] || '➡️ Kanan';
+        lbl.innerText = 'Maju 1 Langkah (' + text + ')';
+      };
+
+      // 5. UPDATE STAR HUD
+      window.updateRoboStarHud = function() {
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        var starHud = document.getElementById('robo-star-hud');
+        if (starHud && lvl) {
+          starHud.innerText = window.roboMazeState.collectedStars.length + ' / ' + lvl.stars.length + ' Bintang';
+        }
+      };
+
+      // 6. RENDER ARENA LABIRIN
+      window.renderRoboMazeGrid = function() {
+        var container = document.getElementById('robo-maze-grid');
+        if (!container) return;
+
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        if (!lvl) return;
+        var size = lvl.gridSize;
+
+        var isSmallScreen = window.innerWidth < 640;
+        var cellSize = (size === 6)
+          ? (isSmallScreen ? 44 : 54)
+          : (isSmallScreen ? 50 : 62);
+
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(' + size + ', ' + cellSize + 'px)';
+        container.style.gridTemplateRows = 'repeat(' + size + ', ' + cellSize + 'px)';
+        container.style.width = 'max-content';
+        container.className = 'grid gap-2 select-none mx-auto p-1';
+
+        var html = '';
+        for (var y = 0; y < size; y++) {
+          for (var x = 0; x < size; x++) {
+            var isRobo = (window.roboMazeState.roboX === x && window.roboMazeState.roboY === y);
+            var isTarget = (lvl.target.x === x && lvl.target.y === y);
+            var isWall = lvl.walls.some(function(w) { return w.x === x && w.y === y; });
+            var isStar = lvl.stars.some(function(s) { return s.x === x && s.y === y; });
+            var isStarCollected = window.roboMazeState.collectedStars.some(function(s) { return s.x === x && s.y === y; });
+
+            var cellClass = 'rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xs select-none ';
+            var cellContent = '';
+            var cellTitle = 'Petak (' + (x + 1) + ', ' + (y + 1) + ')';
+            var cursorStyle = isWall ? 'cursor: not-allowed;' : 'cursor: pointer;';
+
+            if (isWall) {
+              cellClass += 'bg-slate-900 border-2 border-rose-900/80 shadow-inner text-rose-500';
+              cellContent = '<span class="text-xl sm:text-2xl drop-shadow select-none">🪨</span>';
+              cellTitle = 'Batu Rintangan 🪨';
+            } else if (isTarget) {
+              cellClass += 'bg-emerald-950/90 border-2 border-emerald-400 shadow-lg shadow-emerald-500/40 text-emerald-300 hover:scale-105';
+              cellContent = '<span class="text-xl sm:text-2xl drop-shadow animate-pulse select-none">' + (lvl.targetIcon || '🏁') + '</span>';
+              cellTitle = 'Tujuan Finish 🏁';
+            } else {
+              cellClass += 'bg-slate-800 border-2 border-slate-700/80 hover:border-amber-400 hover:scale-105';
+              if (isStar && !isStarCollected) {
+                cellContent = '<span class="text-xl sm:text-2xl drop-shadow text-yellow-400 animate-bounce select-none">⭐</span>';
+                cellTitle = 'Bintang Tzu Chi ⭐';
+              }
+            }
+
+            if (isRobo) {
+              var dirAngles = [0, 90, 180, 270];
+              var rot = dirAngles[window.roboMazeState.roboDir] || 0;
+              var dirArrows = ['⬆️', '➡️', '⬇️', '⬅️'];
+              var arrow = dirArrows[window.roboMazeState.roboDir] || '➡️';
+
+              cellClass = 'rounded-2xl relative flex items-center justify-center transition-all duration-200 shadow-xl scale-105 select-none bg-indigo-900 border-2 border-indigo-300 ring-2 ring-indigo-400/50 z-20 cursor-pointer';
+              cellContent = '<div class="relative flex items-center justify-center w-full h-full">' +
+                '<div style="transform: rotate(' + rot + 'deg);" class="transition-transform duration-200 flex items-center justify-center">' +
+                '<img src="robot_head_logo.svg" alt="Robo" class="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow" />' +
+                '</div>' +
+                '<span class="absolute -top-1 -right-1 text-[10px] bg-indigo-950 border border-indigo-300 rounded-full px-1 shadow">' + arrow + '</span>' +
+                '</div>';
+              cellTitle = 'Robot Robo (Karaktermu)';
+            }
+
+            html += '<div id="robo-cell-' + x + '-' + y + '" onclick="klikPetakLabirin(' + x + ', ' + y + ')" style="width: ' + cellSize + 'px; height: ' + cellSize + 'px; min-width: ' + cellSize + 'px; min-height: ' + cellSize + 'px; ' + cursorStyle + '" title="' + cellTitle + '" class="' + cellClass + '">' + cellContent + '</div>';
+          }
+        }
+
+        container.innerHTML = html;
+        window.updateLabelBtnMaju();
+
+        var pEl = document.getElementById('robo-dbg-pos');
+        var dEl = document.getElementById('robo-dbg-dir');
+        if (pEl) pEl.innerText = '(' + window.roboMazeState.roboX + ', ' + window.roboMazeState.roboY + ')';
+        if (dEl) {
+          var arr = ['Atas ⬆️', 'Kanan ➡️', 'Bawah ⬇️', 'Kiri ⬅️'];
+          dEl.innerText = arr[window.roboMazeState.roboDir] || '➡️';
+        }
+      };
+
+      // 7. GERAK ROBO MAJU KE DEPAN
+      window.majuRoboDepan = function() {
+        window.roboMazeState.isRunning = false;
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        var deltas = [
+          { dx: 0, dy: -1 }, // UP (0)
+          { dx: 1, dy: 0 },  // RIGHT (1)
+          { dx: 0, dy: 1 },  // DOWN (2)
+          { dx: -1, dy: 0 }  // LEFT (3)
+        ];
+        var d = deltas[window.roboMazeState.roboDir] || deltas[1];
+        var nextX = window.roboMazeState.roboX + d.dx;
+        var nextY = window.roboMazeState.roboY + d.dy;
+
+        var hitWall = lvl.walls.some(function(w) { return w.x === nextX && w.y === nextY; });
+        var outOfBounds = nextX < 0 || nextX >= lvl.gridSize || nextY < 0 || nextY >= lvl.gridSize;
+
+        var badgeEl = document.getElementById('robo-status-badge');
+        var stepEl = document.getElementById('robo-step-counter');
+        var lEl = document.getElementById('robo-dbg-last');
+
+        if (hitWall || outOfBounds) {
+          safePlay('error');
+          if (badgeEl) {
+            badgeEl.innerText = 'Terhalang!';
+            badgeEl.className = 'px-3 py-1 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-300 font-bold font-mono text-[11px] shrink-0';
+          }
+          if (lEl) lEl.innerText = 'Terhalang! Petak (' + nextX + ', ' + nextY + ')';
+          window.renderRoboMazeGrid();
+          if (window.roboMazeState.currentLevelIndex === 0 && (window.roboMazeState.roboDir === 0 || window.roboMazeState.roboDir === 2)) {
+            safeToast('💡 Di Level 1 garis Finish ada di Kanan ➡️. Putar robot menghadap ke kanan atau klik Kanan ➡️ ya!', 'info');
+          } else {
+            safeToast('💥 Terhalang batu rintangan 🪨! Tekan belok atau pilih jalur yang terbuka.', 'warning');
+          }
+          return false;
+        }
+
+        window.roboMazeState.roboX = nextX;
+        window.roboMazeState.roboY = nextY;
+        window.roboMazeState.stepsTaken++;
+        safePlay('click');
+        if (lEl) lEl.innerText = 'Melangkah ke (' + nextX + ', ' + nextY + ')';
+
+        if (badgeEl) {
+          badgeEl.innerText = 'Maju Melangkah! 🚀';
+          badgeEl.className = 'px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-bold font-mono text-[11px] shrink-0';
+        }
+
+        // Ambil bintang otomatis jika melangkah ke petak bintang
+        var starMatch = lvl.stars.find(function(s) { return s.x === nextX && s.y === nextY; });
+        if (starMatch && !window.roboMazeState.collectedStars.some(function(s) { return s.x === starMatch.x && s.y === starMatch.y; })) {
+          window.roboMazeState.collectedStars.push(starMatch);
+          safePlay('fanfare');
+          window.updateRoboStarHud();
+          safeToast('⭐ Yeaay! Bintang kebaikan berhasil diambil (+10 Bintang)', 'success');
+        }
+
+        window.renderRoboMazeGrid();
+
+        if (stepEl) stepEl.innerText = 'Langkah: ' + window.roboMazeState.stepsTaken;
+
+        if (window.roboMazeState.roboX === lvl.target.x && window.roboMazeState.roboY === lvl.target.y) {
+          window.menangkanLevelRobo();
+        }
+
+        return true;
+      };
+
+      // 8. GERAK KE ARAH MATA ANGIN TERTENTU
+      window.gerakRoboKeArah = function(arah) {
+        window.roboMazeState.isRunning = false;
+        window.roboMazeState.roboDir = arah;
+        return window.majuRoboDepan();
+      };
+
+      // 9. PUTAR ARAH HADAP ROBOT
+      window.putarRobo = function(arahPutar) {
+        window.roboMazeState.isRunning = false;
+        if (arahPutar === 'LEFT') {
+          window.roboMazeState.roboDir = (window.roboMazeState.roboDir + 3) % 4;
+        } else {
+          window.roboMazeState.roboDir = (window.roboMazeState.roboDir + 1) % 4;
+        }
+        window.roboMazeState.stepsTaken++;
+        safePlay('click');
+        window.renderRoboMazeGrid();
+      };
+
+      // 10. KLIK LANGSUNG PETAK LABIRIN (POINT & CLICK)
+      window.klikPetakLabirin = function(x, y) {
+        window.roboMazeState.isRunning = false;
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+
+        if (lvl.walls.some(function(w) { return w.x === x && w.y === y; })) {
+          safePlay('error');
+          safeToast('Itu batu rintangan 🪨, tidak bisa dilewati!', 'warning');
+          return;
+        }
+
+        if (window.roboMazeState.roboX === x && window.roboMazeState.roboY === y) {
+          window.putarRobo('RIGHT');
+          return;
+        }
+
+        var dx = x - window.roboMazeState.roboX;
+        var dy = y - window.roboMazeState.roboY;
+        if (Math.abs(dx) + Math.abs(dy) === 1) {
+          var arah = 1;
+          if (dx === 1) arah = 1;
+          else if (dx === -1) arah = 3;
+          else if (dy === 1) arah = 2;
+          else if (dy === -1) arah = 0;
+          window.gerakRoboKeArah(arah);
+          return;
+        }
+
+        window.navigasiRoboKePetak(x, y);
+      };
+
+      // 11. NAVIGASI PINTAR (BFS PATHFINDING)
+      window.navigasiRoboKePetak = async function(targetX, targetY) {
+        window.roboMazeState.isRunning = false;
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+
+        var queue = [[{ x: window.roboMazeState.roboX, y: window.roboMazeState.roboY, dir: window.roboMazeState.roboDir }]];
+        var visited = new Set();
+        visited.add(window.roboMazeState.roboX + ',' + window.roboMazeState.roboY);
+
+        var foundPath = null;
+        var deltas = [
+          { dx: 0, dy: -1, dir: 0 },
+          { dx: 1, dy: 0, dir: 1 },
+          { dx: 0, dy: 1, dir: 2 },
+          { dx: -1, dy: 0, dir: 3 }
+        ];
+
+        while (queue.length > 0) {
+          var path = queue.shift();
+          var current = path[path.length - 1];
+
+          if (current.x === targetX && current.y === targetY) {
+            foundPath = path;
+            break;
+          }
+
+          for (var i = 0; i < deltas.length; i++) {
+            var d = deltas[i];
+            var nx = current.x + d.dx;
+            var ny = current.y + d.dy;
+            var key = nx + ',' + ny;
+
+            if (nx >= 0 && nx < lvl.gridSize && ny >= 0 && ny < lvl.gridSize) {
+              var isWall = lvl.walls.some(function(w) { return w.x === nx && w.y === ny; });
+              if (!isWall && !visited.has(key)) {
+                visited.add(key);
+                queue.push(path.concat([{ x: nx, y: ny, dir: d.dir }]));
+              }
+            }
+          }
+        }
+
+        if (!foundPath || foundPath.length <= 1) {
+          safeToast('Jalan ke petak tersebut terhalang batu!', 'warning');
+          return;
+        }
+
+        window.roboMazeState.isRunning = true;
+        for (var stepIdx = 1; stepIdx < foundPath.length; stepIdx++) {
+          if (!window.roboMazeState.isRunning) break;
+          var step = foundPath[stepIdx];
+          window.roboMazeState.roboDir = step.dir;
+          window.roboMazeState.roboX = step.x;
+          window.roboMazeState.roboY = step.y;
+          window.roboMazeState.stepsTaken++;
+          safePlay('click');
+
+          var starMatch = lvl.stars.find(function(s) { return s.x === step.x && s.y === step.y; });
+          if (starMatch && !window.roboMazeState.collectedStars.some(function(s) { return s.x === starMatch.x && s.y === starMatch.y; })) {
+            window.roboMazeState.collectedStars.push(starMatch);
+            safePlay('fanfare');
+            window.updateRoboStarHud();
+            safeToast('⭐ Yeaay! Bintang kebaikan berhasil diambil (+10 Bintang)', 'success');
+          }
+
+          window.renderRoboMazeGrid();
+          var stepEl = document.getElementById('robo-step-counter');
+          if (stepEl) stepEl.innerText = 'Langkah: ' + window.roboMazeState.stepsTaken;
+
+          await new Promise(function(r) { setTimeout(r, 220); });
+        }
+
+        window.roboMazeState.isRunning = false;
+        if (window.roboMazeState.roboX === lvl.target.x && window.roboMazeState.roboY === lvl.target.y) {
+          window.menangkanLevelRobo();
+        }
+      };
+
+      // 12. DEMO AUTOPILOT
+      window.jalankanDemoAutopilotRobo = async function() {
+        window.roboMazeState.isRunning = false;
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        safeToast('🤖 Robo sedang berjalan otomatis menyelesaikan misi level...', 'info');
+
+        for (var i = 0; i < lvl.stars.length; i++) {
+          var star = lvl.stars[i];
+          if (!window.roboMazeState.collectedStars.some(function(s) { return s.x === star.x && s.y === star.y; })) {
+            await window.navigasiRoboKePetak(star.x, star.y);
+            await new Promise(function(r) { setTimeout(r, 150); });
+          }
+        }
+
+        await window.navigasiRoboKePetak(lvl.target.x, lvl.target.y);
+      };
+
+      // 13. MENANGKAN LEVEL
+      window.menangkanLevelRobo = function() {
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        var badgeEl = document.getElementById('robo-status-badge');
+        safePlay('fanfare');
+        window.roboMazeState.levelCompleted = true;
+
+        if (typeof window.tambahPoin === 'function') {
+          try { window.tambahPoin(30); } catch(e) {}
+        }
+
+        if (badgeEl) {
+          badgeEl.innerText = 'Target Tercapai! 🏆';
+          badgeEl.className = 'px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold font-mono text-[11px] shrink-0';
+        }
+
+        var victoryModal = document.getElementById('modal-robo-victory');
+        var victoryDesc = document.getElementById('robo-victory-desc');
+        var nextBtn = document.getElementById('btn-next-level-robo');
+
+        if (victoryDesc) {
+          victoryDesc.innerText = 'Selamat! Kamu berhasil memandu Robo menyelesaikan ' + lvl.title + ' dalam ' + window.roboMazeState.stepsTaken + ' langkah serta mengumpulkan ' + window.roboMazeState.collectedStars.length + ' dari ' + lvl.stars.length + ' bintang kebaikan!';
+        }
+        if (nextBtn) {
+          if (window.roboMazeState.currentLevelIndex >= window.ROBO_MAZE_LEVELS.length - 1) {
+            nextBtn.innerHTML = '<span>Tantangan Tamat! Main Lagi 🔄</span>';
+          } else {
+            nextBtn.innerHTML = '<span>Lanjut Level Berikutnya</span> <i class="fa-solid fa-arrow-right"></i>';
+          }
+        }
+        if (victoryModal) victoryModal.classList.remove('hidden');
+      };
+
+      // 14. RESET POSISI
+      window.resetPosisiRobo = function() {
+        window.roboMazeState.isRunning = false;
+        safePlay('click');
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        window.roboMazeState.roboX = lvl.start.x;
+        window.roboMazeState.roboY = lvl.start.y;
+        window.roboMazeState.roboDir = lvl.startDir;
+        window.roboMazeState.collectedStars = [];
+        window.roboMazeState.stepsTaken = 0;
+        window.roboMazeState.activeStep = -1;
+
+        var badgeEl = document.getElementById('robo-status-badge');
+        var stepEl = document.getElementById('robo-step-counter');
+
+        if (badgeEl) {
+          badgeEl.innerText = 'Siap Bergerak';
+          badgeEl.className = 'px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-bold font-mono text-[11px] shrink-0';
+        }
+        if (stepEl) stepEl.innerText = 'Langkah: 0';
+
+        window.updateRoboStarHud();
+        window.renderRoboMazeGrid();
+        window.renderRoboProgramQueue(-1);
+        safeToast('Posisi Robo dikembalikan ke titik awal 🔄');
+      };
+
+      // 15. KENDALI LANGSUNG WRAPPER
+      window.kendaliRoboLangsung = function(action) {
+        window.roboMazeState.isRunning = false;
+        if (action === 'FORWARD') {
+          window.majuRoboDepan();
+        } else if (action === 'TURN_LEFT') {
+          window.putarRobo('LEFT');
+        } else if (action === 'TURN_RIGHT') {
+          window.putarRobo('RIGHT');
+        } else if (action === 'PICK_STAR') {
+          var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+          var starMatch = lvl.stars.find(function(s) { return s.x === window.roboMazeState.roboX && s.y === window.roboMazeState.roboY; });
+          if (starMatch && !window.roboMazeState.collectedStars.some(function(s) { return s.x === starMatch.x && s.y === starMatch.y; })) {
+            window.roboMazeState.collectedStars.push(starMatch);
+            safePlay('fanfare');
+            window.updateRoboStarHud();
+            window.renderRoboMazeGrid();
+            safeToast('⭐ Yeaay! Bintang kebaikan berhasil diambil (+10 Bintang)', 'success');
+          } else {
+            safePlay('click');
+            safeToast('Tidak ada bintang di petak ini.', 'info');
+          }
+        }
+      };
+
+      // 16. PILIH LEVEL
+      window.pilihLevelRoboMaze = function(lvlNum) {
+        var idx = Math.max(0, Math.min(window.ROBO_MAZE_LEVELS.length - 1, lvlNum - 1));
+        window.roboMazeState.currentLevelIndex = idx;
+        var lvl = window.ROBO_MAZE_LEVELS[idx];
+
+        window.roboMazeState.roboX = lvl.start.x;
+        window.roboMazeState.roboY = lvl.start.y;
+        window.roboMazeState.roboDir = lvl.startDir;
+        window.roboMazeState.collectedStars = [];
+        window.roboMazeState.stepsTaken = 0;
+        window.roboMazeState.isRunning = false;
+        window.roboMazeState.activeStep = -1;
+        window.roboMazeState.levelCompleted = false;
+
+        for (var i = 1; i <= 6; i++) {
+          var btn = document.getElementById('btn-lvl-' + i);
+          if (btn) {
+            if (i === lvlNum) {
+              btn.className = 'robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition bg-yellow-400 text-slate-950 shadow-xs scale-105';
+            } else {
+              btn.className = 'robo-lvl-btn px-2.5 py-1 rounded-xl text-xs font-bold transition text-slate-300 hover:text-white';
+            }
+          }
+        }
+
+        var titleEl = document.getElementById('robo-level-title');
+        var instructEl = document.getElementById('robo-maze-instruction');
+        var badgeEl = document.getElementById('robo-status-badge');
+        var stepEl = document.getElementById('robo-step-counter');
+
+        if (titleEl) titleEl.innerText = lvl.title;
+        if (instructEl) instructEl.innerText = lvl.desc;
+        if (badgeEl) {
+          badgeEl.innerText = 'Siap Bergerak';
+          badgeEl.className = 'px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-bold font-mono text-[11px] shrink-0';
+        }
+        if (stepEl) stepEl.innerText = 'Langkah: 0';
+
+        window.updateRoboStarHud();
+        window.renderRoboMazeGrid();
+        window.renderRoboProgramQueue(-1);
+      };
+
+      // 17. BLOCK CODING FUNCTIONS
+      window.setRoboPlayMode = function(mode) {
+        window.roboMazeState.mode = mode;
+        var panelRemote = document.getElementById('robo-panel-remote');
+        var panelCoding = document.getElementById('robo-panel-coding');
+        var btnRemote = document.getElementById('btn-mode-remote');
+        var btnCoding = document.getElementById('btn-mode-coding');
+
+        if (mode === 'coding') {
+          if (panelRemote) panelRemote.classList.add('hidden');
+          if (panelCoding) panelCoding.classList.remove('hidden');
+          if (btnRemote) btnRemote.className = 'flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer';
+          if (btnCoding) btnCoding.className = 'flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 bg-white text-purple-700 shadow-xs border border-purple-200 cursor-pointer';
+          safeToast('Mode Susun Algoritma aktif 🧩. Klik balok untuk membuat kode!', 'info');
+        } else {
+          if (panelRemote) panelRemote.classList.remove('hidden');
+          if (panelCoding) panelCoding.classList.add('hidden');
+          if (btnRemote) btnRemote.className = 'flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 bg-white text-indigo-700 shadow-xs border border-indigo-200 cursor-pointer';
+          if (btnCoding) btnCoding.className = 'flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer';
+          safeToast('Mode Kendali Langsung aktif 🎮. Klik tombol panah untuk jalan!', 'info');
+        }
+      };
+
+      window.tambahBalokRobo = function(cmd) {
+        window.roboMazeState.program.push(cmd);
+        window.renderRoboProgramQueue(-1);
+        safePlay('click');
+        var names = { FORWARD: 'Maju 1 Langkah', TURN_LEFT: 'Putar Kiri 90°', TURN_RIGHT: 'Putar Kanan 90°', PICK_STAR: 'Ambil Bintang' };
+        safeToast('Balok "' + (names[cmd] || cmd) + '" ditambahkan! 🧩', 'info');
+      };
+
+      window.hapusBalokRobo = function(index) {
+        window.roboMazeState.program.splice(index, 1);
+        window.renderRoboProgramQueue(-1);
+        safePlay('click');
+      };
+
+      window.hapusSemuaBalokRobo = function() {
+        window.roboMazeState.program = [];
+        window.renderRoboProgramQueue(-1);
+        safePlay('click');
+        safeToast('Semua balok telah dihapus 🗑️');
+      };
+
+      window.renderRoboProgramQueue = function(activeIdx) {
+        var container = document.getElementById('robo-program-queue');
+        var countEl = document.getElementById('robo-block-count');
+        if (!container) return;
+
+        if (countEl) countEl.innerText = window.roboMazeState.program.length + ' Balok';
+
+        if (window.roboMazeState.program.length === 0) {
+          container.innerHTML = '<div class="h-32 flex flex-col items-center justify-center text-slate-400 text-center p-3">' +
+            '<i class="fa-solid fa-puzzle-piece text-2xl mb-1.5 text-slate-300"></i>' +
+            '<p class="text-xs font-semibold text-slate-700">Belum ada balok algoritma.</p>' +
+            '<p class="text-[11px] text-slate-400 mt-0.5">Klik balok di atas untuk menyusun perintah jalan Robo!</p>' +
+            '</div>';
+          return;
+        }
+
+        var blockMeta = {
+          FORWARD: { label: 'Maju 1 Langkah', icon: '⬆️', bg: 'bg-blue-50 border-blue-200 text-blue-900' },
+          TURN_LEFT: { label: 'Putar Kiri 90°', icon: '↩️', bg: 'bg-purple-50 border-purple-200 text-purple-900' },
+          TURN_RIGHT: { label: 'Putar Kanan 90°', icon: '↪️', bg: 'bg-emerald-50 border-emerald-200 text-emerald-900' },
+          PICK_STAR: { label: 'Ambil Bintang Tzu Chi', icon: '⭐', bg: 'bg-amber-50 border-amber-200 text-amber-900' }
+        };
+
+        var html = window.roboMazeState.program.map(function(cmd, i) {
+          var meta = blockMeta[cmd] || { label: cmd, icon: '⚙️', bg: 'bg-slate-50 border-slate-200 text-slate-800' };
+          var isActive = (i === activeIdx);
+          var activeStyle = isActive
+            ? 'ring-4 ring-yellow-400 scale-105 bg-yellow-100 border-yellow-400 shadow-md font-black'
+            : (meta.bg + ' shadow-2xs font-bold');
+
+          return '<div class="p-2 rounded-xl border flex items-center justify-between text-xs transition-all duration-200 ' + activeStyle + '">' +
+            '<div class="flex items-center gap-2">' +
+            '<span class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-mono">' + (i + 1) + '</span>' +
+            '<span class="text-sm">' + meta.icon + '</span>' +
+            '<span class="text-xs truncate">' + meta.label + '</span>' +
+            '</div>' +
+            (!window.roboMazeState.isRunning ? '<button type="button" onclick="hapusBalokRobo(' + i + ')" class="w-6 h-6 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center text-xs transition cursor-pointer" title="Hapus"><i class="fa-solid fa-xmark"></i></button>' : '') +
+            '</div>';
+        }).join('');
+
+        container.innerHTML = html;
+      };
+
+      window.jalankanKodeRobo = async function() {
+        if (window.roboMazeState.isRunning) return;
+        if (window.roboMazeState.program.length === 0) {
+          safePlay('warning');
+          safeToast('Silakan tambahkan balok perintah terlebih dahulu! 🧩', 'warning');
+          return;
+        }
+
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        window.roboMazeState.roboX = lvl.start.x;
+        window.roboMazeState.roboY = lvl.start.y;
+        window.roboMazeState.roboDir = lvl.startDir;
+        window.roboMazeState.collectedStars = [];
+        window.roboMazeState.stepsTaken = 0;
+        window.roboMazeState.isRunning = true;
+        window.updateRoboStarHud();
+        window.renderRoboMazeGrid();
+
+        var btnRun = document.getElementById('btn-run-robo');
+        var badgeEl = document.getElementById('robo-status-badge');
+        var stepEl = document.getElementById('robo-step-counter');
+
+        if (btnRun) {
+          btnRun.classList.add('opacity-70', 'pointer-events-none');
+          btnRun.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-lg"></i> <span>Mengeksekusi Algoritma...</span>';
+        }
+        if (badgeEl) {
+          badgeEl.innerText = 'Sedang Berjalan...';
+          badgeEl.className = 'px-3 py-1 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold font-mono text-[11px] shrink-0 animate-pulse';
+        }
+
+        safePlay('click');
+
+        for (var i = 0; i < window.roboMazeState.program.length; i++) {
+          if (!window.roboMazeState.isRunning) break;
+          var cmd = window.roboMazeState.program[i];
+          window.roboMazeState.activeStep = i;
+          window.renderRoboProgramQueue(i);
+
+          if (cmd === 'FORWARD') {
+            var deltas = [{ dx: 0, dy: -1 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }];
+            var d = deltas[window.roboMazeState.roboDir];
+            var nextX = window.roboMazeState.roboX + d.dx;
+            var nextY = window.roboMazeState.roboY + d.dy;
+
+            var hitWall = lvl.walls.some(function(w) { return w.x === nextX && w.y === nextY; });
+            var outOfBounds = nextX < 0 || nextX >= lvl.gridSize || nextY < 0 || nextY >= lvl.gridSize;
+
+            if (hitWall || outOfBounds) {
+              safePlay('error');
+              if (badgeEl) {
+                badgeEl.innerText = 'Menabrak Rintangan!';
+                badgeEl.className = 'px-3 py-1 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-300 font-bold font-mono text-[11px] shrink-0';
+              }
+              safeToast('💥 Oops! Robo menabrak rintangan atau batas labirin!', 'error');
+              window.roboMazeState.isRunning = false;
+              window.renderRoboProgramQueue(-1);
+              if (btnRun) {
+                btnRun.classList.remove('opacity-70', 'pointer-events-none');
+                btnRun.innerHTML = '<i class="fa-solid fa-play text-lg"></i> <span>Jalankan Algoritma ▶️</span>';
+              }
+              return;
+            }
+
+            window.roboMazeState.roboX = nextX;
+            window.roboMazeState.roboY = nextY;
+            window.roboMazeState.stepsTaken++;
+            safePlay('click');
+            window.renderRoboMazeGrid();
+
+          } else if (cmd === 'TURN_LEFT') {
+            window.roboMazeState.roboDir = (window.roboMazeState.roboDir + 3) % 4;
+            window.roboMazeState.stepsTaken++;
+            safePlay('click');
+            window.renderRoboMazeGrid();
+
+          } else if (cmd === 'TURN_RIGHT') {
+            window.roboMazeState.roboDir = (window.roboMazeState.roboDir + 1) % 4;
+            window.roboMazeState.stepsTaken++;
+            safePlay('click');
+            window.renderRoboMazeGrid();
+
+          } else if (cmd === 'PICK_STAR') {
+            var starMatch = lvl.stars.find(function(s) { return s.x === window.roboMazeState.roboX && s.y === window.roboMazeState.roboY; });
+            if (starMatch && !window.roboMazeState.collectedStars.some(function(s) { return s.x === starMatch.x && s.y === starMatch.y; })) {
+              window.roboMazeState.collectedStars.push(starMatch);
+              safePlay('fanfare');
+              window.updateRoboStarHud();
+              window.renderRoboMazeGrid();
+              safeToast('⭐ Yeaay! Bintang kebaikan berhasil diambil (+10 Bintang)', 'success');
+            } else {
+              safePlay('click');
+            }
+          }
+
+          if (stepEl) stepEl.innerText = 'Langkah: ' + window.roboMazeState.stepsTaken;
+          await new Promise(function(res) { setTimeout(res, 400); });
+        }
+
+        var isAtTarget = (window.roboMazeState.roboX === lvl.target.x && window.roboMazeState.roboY === lvl.target.y);
+        if (isAtTarget) {
+          window.menangkanLevelRobo();
+        } else {
+          safePlay('warning');
+          if (badgeEl) {
+            badgeEl.innerText = 'Belum Tiba di Target';
+            badgeEl.className = 'px-3 py-1 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold font-mono text-[11px] shrink-0';
+          }
+          safeToast('Robo belum tiba di garis Target 🏁. Tambahkan langkah lagi ya!', 'warning');
+        }
+
+        window.roboMazeState.isRunning = false;
+        window.renderRoboProgramQueue(-1);
+        if (btnRun) {
+          btnRun.classList.remove('opacity-70', 'pointer-events-none');
+          btnRun.innerHTML = '<i class="fa-solid fa-play text-lg"></i> <span>Jalankan Algoritma ▶️</span>';
+        }
+      };
+
+      // 18. MODAL & DIALOG
+      window.bukaPanduanMainRobo = function() {
+        safePlay('click');
+        alert("🤖 CARA BERMAIN LABIRIN LOGIKA ROBO:\n\n1. 🎯 TUJUAN:\nPandu Robo dari titik awal menuju Garis Finish 🏁!\n\n2. 🎮 KENDALI LANGSUNG:\n- Tekan tombol biru 'Maju 1 Langkah' untuk melangkah ke depan.\n- Tekan 'Putar Kiri' atau 'Putar Kanan' untuk belok.\n- Atau gunakan tombol panah (Atas, Bawah, Kiri, Kanan) atau Panah Keyboard!\n- Atau klik langsung petak mana saja di labirin!\n\n3. ⭐ BINTANG KEBAIKAN:\nAmbil bintang di jalan untuk mendapatkan poin bonus!\n\n4. 🪨 HINDARI BATU:\nJangan sampai menabrak batu hitam rintangan!");
+      };
+
+      window.bukaPetunjukLevelRobo = function() {
+        safePlay('click');
+        var lvl = window.ROBO_MAZE_LEVELS[window.roboMazeState.currentLevelIndex];
+        alert("💡 PETUNJUK LEVEL " + lvl.level + " (" + lvl.title + "):\n\n" + lvl.desc + "\n\nSaran Solusi:\n" + lvl.hint);
+      };
+
+      window.lanjutLevelBerikutnyaRobo = function() {
+        window.tutupModalRoboVictory();
+        if (window.roboMazeState.currentLevelIndex >= window.ROBO_MAZE_LEVELS.length - 1) {
+          window.pilihLevelRoboMaze(1);
+          safeToast('Selamat! Kamu telah menyelesaikan seluruh Level Labirin Logika Robo! 🎓🌟', 'success');
+        } else {
+          window.pilihLevelRoboMaze(window.roboMazeState.currentLevelIndex + 2);
+          safePlay('fanfare');
+        }
+      };
+
+      window.tutupModalRoboVictory = function() {
+        var modal = document.getElementById('modal-robo-victory');
+        if (modal) modal.classList.add('hidden');
+      };
+
+      // 19. KEYBOARD SHORTCUTS
+      window.addEventListener('keydown', function(e) {
+        var tabLabirin = document.getElementById('tab-labirin');
+        if (!tabLabirin || tabLabirin.classList.contains('hidden')) return;
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          window.gerakRoboKeArah(1);
+        } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+          e.preventDefault();
+          window.gerakRoboKeArah(0);
+        } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+          e.preventDefault();
+          window.gerakRoboKeArah(2);
+        } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          window.gerakRoboKeArah(3);
+        } else if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault();
+          window.kendaliRoboLangsung('PICK_STAR');
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          window.majuRoboDepan();
+        }
+      });
+
+      // 20. ERROR DIAGNOSTIC MONITOR (CONSOLE ONLY)
+      window.addEventListener('error', function(evt) {
+        if (!evt) return;
+        if (evt.target && (evt.target.tagName === 'IMG' || evt.target.tagName === 'LINK' || evt.target.tagName === 'AUDIO')) return;
+        if (evt.message === 'Script error.' && !evt.error) return;
+        console.warn('RoboMaze notice:', evt.message || evt);
+      }, true);
+
+      // 21. AUTO-INIT SAAT DOKUMEN SIAP
+      window.initRoboMazeGame = function() {
+        window.pilihLevelRoboMaze(window.roboMazeState.currentLevelIndex + 1);
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(window.initRoboMazeGame, 50);
+        });
+      } else {
+        setTimeout(window.initRoboMazeGame, 50);
+      }
+    })();
+    </script>
+
+    <!-- ======================================================== -->
+    <!-- ENGINE GAME "PAHLAWAN MENGETIK CEPAT" (KEYBOARD HERO CORE) -->
+    <!-- Semester 2 • Pendukung Lab MS Word & Pembiasaan Mengetik 10 Jari -->
+    <!-- ======================================================== -->
+    <script id="engine-typing-hero-core">
+    (function() {
+      'use strict';
+
+      // 1. SOUND SYNTHESIZER (WEB AUDIO API - ZERO EXTERNAL ASSET)
+      var audioCtx = null;
+      function getAudioCtx() {
+        if (!audioCtx) {
+          var AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtxClass) {
+            audioCtx = new AudioCtxClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function() {});
+        }
+        return audioCtx;
+      }
+
+      function safePlay(type) {
+        try {
+          var ctx = getAudioCtx();
+          if (!ctx) return;
+          var t = ctx.currentTime;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          if (type === 'type') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(650, t);
+            osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+            osc.start(t);
+            osc.stop(t + 0.05);
+          } else if (type === 'pop') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(450, t);
+            osc.frequency.exponentialRampToValueAtTime(90, t + 0.16);
+            gain.gain.setValueAtTime(0.35, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+            osc.start(t);
+            osc.stop(t + 0.16);
+          } else if (type === 'shortcut') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, t);
+            osc.frequency.setValueAtTime(659.25, t + 0.08);
+            osc.frequency.setValueAtTime(783.99, t + 0.16);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.start(t);
+            osc.stop(t + 0.3);
+          } else if (type === 'miss') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(190, t);
+            osc.frequency.linearRampToValueAtTime(80, t + 0.22);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+            osc.start(t);
+            osc.stop(t + 0.22);
+          } else if (type === 'victory') {
+            var notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach(function(freq, idx) {
+              var o = ctx.createOscillator();
+              var g = ctx.createGain();
+              o.connect(g);
+              g.connect(ctx.destination);
+              o.type = 'triangle';
+              o.frequency.setValueAtTime(freq, t + idx * 0.11);
+              g.gain.setValueAtTime(0.22, t + idx * 0.11);
+              g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.11 + 0.35);
+              o.start(t + idx * 0.11);
+              o.stop(t + idx * 0.11 + 0.35);
+            });
+          }
+        } catch(e) {}
+      }
+
+      function safeToast(msg, type) {
+        if (typeof window.tampilkanToast === 'function') {
+          window.tampilkanToast(msg, type);
+        }
+      }
+
+      // 2. DATA LEVEL & CONFIG
+      var LEVEL_DATA = {
+        1: {
+          name: 'Pemula (Kata Pendek)',
+          targetScore: 100,
+          speed: 0.85,
+          spawnInterval: 2800,
+          words: [
+            'BUKU', 'KATA', 'BACA', 'KITA', 'GURU', 'RAJIN', 'SANTUN', 'SOPAN',
+            'RAMAH', 'PINTAR', 'BELAJAR', 'JUJUR', 'DAMAI', 'SAYANG', 'IKHLAS',
+            'CERIA', 'HEBAT', 'BISA', 'ADIL', 'RUKUN', 'TERTIB', 'BERSIH'
+          ]
+        },
+        2: {
+          name: 'Tantangan Shortcut MS Word',
+          targetScore: 120,
+          speed: 0.80,
+          spawnInterval: 3200,
+          shortcuts: [
+            { key: 'B', text: 'Ctrl+B', label: 'Bold (Tebal)' },
+            { key: 'I', text: 'Ctrl+I', label: 'Italic (Miring)' },
+            { key: 'U', text: 'Ctrl+U', label: 'Underline (Garis Bawah)' },
+            { key: 'S', text: 'Ctrl+S', label: 'Save (Simpan)' },
+            { key: 'Z', text: 'Ctrl+Z', label: 'Undo (Kembalikan)' },
+            { key: 'C', text: 'Ctrl+C', label: 'Copy (Salin)' },
+            { key: 'V', text: 'Ctrl+V', label: 'Paste (Tempel)' },
+            { key: 'A', text: 'Ctrl+A', label: 'Select All' },
+            { key: 'P', text: 'Ctrl+P', label: 'Print (Cetak)' },
+            { key: 'N', text: 'Ctrl+N', label: 'New Document' }
+          ]
+        },
+        3: {
+          name: 'Juara 10 Jari Cepat',
+          targetScore: 180,
+          speed: 1.45,
+          spawnInterval: 2200,
+          words: [
+            'KOMPUTER', 'KEYBOARD', 'DOKUMEN', 'PARAGRAF', 'INTERNET', 'TEKNOLOGI',
+            'ALGORITMA', 'KREATIVITAS', 'TZU CHI', 'INDONESIA', 'CINTA KASIH',
+            'BUDI PEKERTI', 'LESTARIKAN', 'BERSYUKUR', 'KOLABORASI', 'INFORMATIKA'
+          ]
+        }
+      };
+
+      // 3. FINGER GUIDE MAP
+      var FINGER_MAP = {
+        '1': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'Q': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'A': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'Z': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'CTRL': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+
+        '2': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+        'W': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+        'S': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+        'X': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+
+        '3': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+        'E': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+        'D': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+        'C': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+
+        '4': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        '5': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'R': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'T': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'F': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'G': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'V': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'B': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+
+        ' ': { finger: 'Ibu Jari (Spasi)', color: 'bg-blue-500' },
+
+        '6': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        '7': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'Y': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'U': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'H': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'J': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'N': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'M': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+
+        '8': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+        'I': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+        'K': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+        ',': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+
+        '9': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+        'O': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+        'L': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+        '.': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+
+        '0': { finger: 'Kelingking Kanan', color: 'bg-purple-500' },
+        'P': { finger: 'Kelingking Kanan', color: 'bg-purple-500' },
+        ';': { finger: 'Kelingking Kanan', color: 'bg-purple-500' },
+        '/': { finger: 'Kelingking Kanan', color: 'bg-purple-500' }
+      };
+
+      var BALLOON_PALETTES = [
+        { bg: 'from-rose-500 to-red-600', border: 'border-rose-300', text: 'text-white' },
+        { bg: 'from-amber-400 to-orange-500', border: 'border-amber-200', text: 'text-slate-950' },
+        { bg: 'from-emerald-400 to-teal-600', border: 'border-emerald-200', text: 'text-white' },
+        { bg: 'from-sky-400 to-blue-600', border: 'border-sky-200', text: 'text-white' },
+        { bg: 'from-purple-500 to-indigo-600', border: 'border-purple-200', text: 'text-white' },
+        { bg: 'from-pink-400 to-rose-500', border: 'border-pink-200', text: 'text-white' }
+      ];
+
+      // 4. GAME STATE
+      var typingState = {
+        level: 1,
+        score: 0,
+        lives: 3,
+        combo: 0,
+        maxCombo: 0,
+        keystrokesTotal: 0,
+        keystrokesCorrect: 0,
+        wordsCompleted: 0,
+        startTime: null,
+        isPlaying: false,
+        isPaused: false,
+        balloons: [],
+        activeBalloonId: null,
+        nextBalloonId: 1,
+        lastSpawnTime: 0,
+        lastFrameTime: 0,
+        animFrameId: null
+      };
+
+      // 5. VIRTUAL KEYBOARD
+      var KEYBOARD_ROWS = [
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+        ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'],
+        ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.']
+      ];
+
+      function renderTypingVirtualKeyboard() {
+        var container = document.getElementById('typing-virtual-keyboard');
+        if (!container) return;
+
+        var html = '';
+        KEYBOARD_ROWS.forEach(function(row) {
+          html += '<div class="flex items-center justify-center gap-1 sm:gap-1.5 w-full">';
+          row.forEach(function(k) {
+            var f = FINGER_MAP[k] || { finger: '', color: 'bg-slate-700' };
+            var safeId = (k === ',' ? 'comma' : (k === '.' ? 'dot' : (k === ';' ? 'semicolon' : k)));
+            html += '<button type="button" id="vkey-' + safeId + '" onclick="window.onVirtualKeyClick(\'' + k + '\')" class="vkey-btn w-7 h-8 sm:w-10 sm:h-10 rounded-xl font-mono font-bold text-xs sm:text-sm text-white flex items-center justify-center transition-all duration-150 ' + f.color + ' shadow-sm active:scale-95 border border-white/20 hover:brightness-110 cursor-pointer" title="' + k + ' (' + f.finger + ')">' + k + '</button>';
+          });
+          html += '</div>';
+        });
+
+        html += '<div class="flex items-center justify-center gap-2 w-full pt-0.5">';
+        html += '<button type="button" id="vkey-CTRL" onclick="window.onVirtualKeyClick(\'CTRL\')" class="vkey-btn px-4 sm:px-6 h-8 sm:h-9 rounded-xl font-mono font-bold text-xs text-white bg-rose-500 shadow-sm border border-white/20 cursor-pointer hover:brightness-110" title="Ctrl (Kelingking Kiri)">Ctrl</button>';
+        html += '<button type="button" id="vkey-SPACE" onclick="window.onVirtualKeyClick(\' \')" class="vkey-btn flex-1 max-w-xs h-8 sm:h-9 rounded-xl font-mono font-bold text-xs text-white bg-blue-500 shadow-sm border border-white/20 cursor-pointer hover:brightness-110" title="Spasi (Ibu Jari)">Spasi</button>';
+        html += '</div>';
+
+        container.innerHTML = html;
+      }
+
+      function highlightVirtualKey(key, isPressed) {
+        if (!key) return;
+        var cleanKey = key.toUpperCase();
+        var idKey = (cleanKey === ',' ? 'comma' : (cleanKey === '.' ? 'dot' : (cleanKey === ';' ? 'semicolon' : (cleanKey === ' ' ? 'SPACE' : cleanKey))));
+        var el = document.getElementById('vkey-' + idKey);
+        if (!el) return;
+
+        if (isPressed) {
+          el.classList.add('ring-4', 'ring-yellow-300', 'scale-110', 'brightness-125');
+          setTimeout(function() {
+            if (el) el.classList.remove('ring-4', 'ring-yellow-300', 'scale-110', 'brightness-125');
+          }, 150);
+        }
+      }
+
+      function updateFingerGuide() {
+        var pill = document.getElementById('typing-finger-name');
+        if (!pill) return;
+
+        var targetKey = null;
+        var targetLabel = '';
+
+        if (typingState.level === 2) {
+          if (typingState.balloons.length > 0) {
+            var activeB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; }) || typingState.balloons[0];
+            if (activeB && activeB.isShortcut) {
+              targetKey = activeB.shortcutKey;
+              var f = FINGER_MAP[targetKey] ? FINGER_MAP[targetKey].finger : 'Jari';
+              targetLabel = 'Ctrl (Kelingking Kiri) + ' + targetKey + ' (' + f + ')';
+            }
+          }
+        } else {
+          if (typingState.balloons.length > 0) {
+            var activeB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; }) || typingState.balloons[0];
+            if (activeB) {
+              var nextChar = activeB.word.charAt(activeB.typedIndex);
+              if (nextChar) {
+                targetKey = nextChar.toUpperCase();
+                var f = FINGER_MAP[targetKey] ? FINGER_MAP[targetKey].finger : 'Jari';
+                targetLabel = targetKey + ' (' + f + ')';
+              }
+            }
+          }
+        }
+
+        if (targetKey && targetLabel) {
+          pill.innerText = targetLabel;
+          var cleanKey = targetKey === ' ' ? 'SPACE' : (targetKey === ',' ? 'comma' : (targetKey === '.' ? 'dot' : (targetKey === ';' ? 'semicolon' : targetKey)));
+          document.querySelectorAll('.vkey-btn').forEach(function(b) { b.classList.remove('ring-2', 'ring-yellow-400', 'animate-pulse'); });
+          var targetEl = document.getElementById('vkey-' + cleanKey);
+          if (targetEl) targetEl.classList.add('ring-2', 'ring-yellow-400', 'animate-pulse');
+          if (typingState.level === 2) {
+            var ctrlEl = document.getElementById('vkey-CTRL');
+            if (ctrlEl) ctrlEl.classList.add('ring-2', 'ring-yellow-400', 'animate-pulse');
+          }
+        } else {
+          pill.innerText = 'Siap Mengetik';
+          document.querySelectorAll('.vkey-btn').forEach(function(b) { b.classList.remove('ring-2', 'ring-yellow-400', 'animate-pulse'); });
+        }
+      }
+
+      // 6. SPAWN & DOM MANAGEMENT (SMOOTH & ZERO RECREATION)
+      function spawnBalloon() {
+        var layer = document.getElementById('typing-balloons-layer');
+        if (!layer) return;
+
+        var lvlConf = LEVEL_DATA[typingState.level] || LEVEL_DATA[1];
+        var arenaWidth = (layer.clientWidth && layer.clientWidth > 100) ? layer.clientWidth : 600;
+
+        var maxX = Math.max(50, arenaWidth - 140);
+        var spawnX = 20 + Math.floor(Math.random() * (maxX - 20));
+
+        var newBalloon = {
+          id: typingState.nextBalloonId++,
+          x: spawnX,
+          y: 5,
+          speed: lvlConf.speed * (0.85 + Math.random() * 0.3),
+          typedIndex: 0,
+          palette: BALLOON_PALETTES[Math.floor(Math.random() * BALLOON_PALETTES.length)],
+          isShortcut: false
+        };
+
+        if (typingState.level === 2 && lvlConf.shortcuts) {
+          var item = lvlConf.shortcuts[Math.floor(Math.random() * lvlConf.shortcuts.length)];
+          newBalloon.isShortcut = true;
+          newBalloon.shortcutKey = item.key.toUpperCase();
+          newBalloon.word = item.text;
+          newBalloon.label = item.label;
+        } else {
+          var wordPool = lvlConf.words;
+          newBalloon.word = wordPool[Math.floor(Math.random() * wordPool.length)].toUpperCase();
+        }
+
+        typingState.balloons.push(newBalloon);
+
+        var bDiv = document.createElement('div');
+        bDiv.id = 'balloon-' + newBalloon.id;
+        bDiv.className = 'typing-balloon absolute select-none z-10';
+        bDiv.style.left = newBalloon.x + 'px';
+        bDiv.style.top = newBalloon.y + 'px';
+        bDiv.onclick = function() { window.onBalloonClick(newBalloon.id); };
+
+        var wordHtml = '';
+        if (newBalloon.isShortcut) {
+          wordHtml = '<div class="flex items-center gap-1 font-mono font-black text-sm"><span class="text-yellow-200">Ctrl</span><span>+</span><span class="text-white bg-black/30 px-1.5 py-0.5 rounded border border-white/40">' + newBalloon.shortcutKey + '</span></div>' +
+                     '<div class="text-[9px] text-amber-100 font-sans font-bold leading-tight mt-0.5 truncate max-w-[120px]">' + (newBalloon.label || '') + '</div>';
+        } else {
+          wordHtml = '<span class="balloon-word-label font-mono font-black text-sm tracking-wider text-white drop-shadow">' + newBalloon.word + '</span>';
+        }
+
+        bDiv.innerHTML = '<div class="relative flex flex-col items-center">' +
+                         '  <div class="balloon-sphere px-4 py-2.5 rounded-3xl bg-gradient-to-tr ' + newBalloon.palette.bg + ' border-2 ' + newBalloon.palette.border + ' shadow-xl flex flex-col items-center justify-center text-center text-white min-w-[90px]">' +
+                         '    ' + wordHtml +
+                         '  </div>' +
+                         '  <div class="balloon-tail w-2.5 h-2.5 bg-amber-600 rotate-45 -mt-1.5 rounded-xs"></div>' +
+                         '  <div class="balloon-string w-0.5 h-6 bg-slate-700/60 -mt-0.5"></div>' +
+                         '</div>';
+
+        layer.appendChild(bDiv);
+        updateFingerGuide();
+      }
+
+      function updateBalloonDOM(b) {
+        var el = document.getElementById('balloon-' + b.id);
+        if (!el) return;
+
+        var isActive = (b.id === typingState.activeBalloonId);
+        if (isActive) {
+          el.className = 'typing-balloon absolute select-none z-20 ring-4 ring-yellow-400 scale-105';
+        } else {
+          el.className = 'typing-balloon absolute select-none z-10';
+        }
+
+        var wordSpan = el.querySelector('.balloon-word-label');
+        if (wordSpan && !b.isShortcut) {
+          var typedPart = b.word.substring(0, b.typedIndex);
+          var restPart = b.word.substring(b.typedIndex);
+          wordSpan.innerHTML = '<span class="text-yellow-300 underline font-black drop-shadow">' + typedPart + '</span>' +
+                               '<span class="text-white drop-shadow">' + restPart + '</span>';
+        }
+
+        var ind = document.getElementById('typing-target-indicator');
+        var indWord = document.getElementById('typing-target-word');
+        if (ind && indWord) {
+          if (typingState.activeBalloonId === b.id) {
+            ind.classList.remove('hidden');
+            indWord.innerText = b.word;
+          }
+        }
+      }
+
+      // 7. GAME LOOP & ANIMATION
+      function gameLoop(currentTime) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        if (!typingState.lastFrameTime) typingState.lastFrameTime = currentTime;
+        var dt = (currentTime - typingState.lastFrameTime) / 1000;
+        if (dt > 0.1) dt = 0.1;
+        typingState.lastFrameTime = currentTime;
+
+        var lvlConf = LEVEL_DATA[typingState.level] || LEVEL_DATA[1];
+        if (currentTime - typingState.lastSpawnTime > lvlConf.spawnInterval && typingState.balloons.length < 5) {
+          spawnBalloon();
+          typingState.lastSpawnTime = currentTime;
+        }
+
+        var layer = document.getElementById('typing-balloons-layer');
+        var grassLimit = (layer && layer.clientHeight > 100) ? (layer.clientHeight - 70) : 340;
+
+        for (var i = typingState.balloons.length - 1; i >= 0; i--) {
+          var b = typingState.balloons[i];
+          b.y += b.speed * 60 * dt;
+
+          var el = document.getElementById('balloon-' + b.id);
+          if (el) {
+            el.style.top = Math.round(b.y) + 'px';
+          }
+
+          if (b.y >= grassLimit) {
+            var missedB = typingState.balloons.splice(i, 1)[0];
+            handleBalloonMissed(missedB);
+          }
+        }
+
+        updateHUDLive();
+
+        if (typingState.isPlaying && !typingState.isPaused) {
+          typingState.animFrameId = requestAnimationFrame(gameLoop);
+        }
+      }
+
+      function handleBalloonMissed(b) {
+        safePlay('miss');
+        var el = document.getElementById('balloon-' + b.id);
+        if (el && el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+
+        typingState.lives--;
+        typingState.combo = 0;
+        if (typingState.activeBalloonId === b.id) {
+          typingState.activeBalloonId = null;
+          var ind = document.getElementById('typing-target-indicator');
+          if (ind) ind.classList.add('hidden');
+        }
+
+        updateFingerGuide();
+        updateHUDLive();
+
+        safeToast('🎈 Balon "' + b.word + '" jatuh ke rumput! Sisa Nyawa: ' + typingState.lives, 'warning');
+
+        if (typingState.lives <= 0) {
+          endGame(false);
+        }
+      }
+
+      function popBalloon(b, pointsEarned) {
+        safePlay(b.isShortcut ? 'shortcut' : 'pop');
+
+        var el = document.getElementById('balloon-' + b.id);
+        if (el) {
+          el.classList.add('typing-balloon-pop');
+          setTimeout(function() {
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+          }, 350);
+        }
+
+        var layer = document.getElementById('typing-balloons-layer');
+        if (layer) {
+          var fx = document.createElement('div');
+          fx.className = 'absolute pointer-events-none text-xl sm:text-2xl font-black text-yellow-300 animate-ping z-30 font-title';
+          fx.style.left = (b.x + 10) + 'px';
+          fx.style.top = (b.y + 10) + 'px';
+          fx.innerText = b.isShortcut ? '⚡ +' + pointsEarned : '💥 +' + pointsEarned;
+          layer.appendChild(fx);
+          setTimeout(function() { if (fx.parentNode) fx.parentNode.removeChild(fx); }, 500);
+        }
+
+        typingState.score += pointsEarned;
+        typingState.wordsCompleted++;
+        typingState.combo++;
+        if (typingState.combo > typingState.maxCombo) {
+          typingState.maxCombo = typingState.combo;
+        }
+
+        typingState.balloons = typingState.balloons.filter(function(item) { return item.id !== b.id; });
+        if (typingState.activeBalloonId === b.id) {
+          typingState.activeBalloonId = null;
+          var ind = document.getElementById('typing-target-indicator');
+          if (ind) ind.classList.add('hidden');
+        }
+
+        updateFingerGuide();
+        updateHUDLive();
+
+        var lvlConf = LEVEL_DATA[typingState.level] || LEVEL_DATA[1];
+        if (typingState.score >= lvlConf.targetScore) {
+          endGame(true);
+        }
+      }
+
+      // 8. KEYBOARD & INPUT LISTENER
+      function handleKeyDown(e) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        var tabKetik = document.getElementById('tab-ketik');
+        if (!tabKetik || tabKetik.classList.contains('hidden')) return;
+
+        var isCtrl = e.ctrlKey || e.metaKey;
+        var keyUpper = (e.key || '').toUpperCase();
+
+        if (isCtrl && ['S', 'P', 'B', 'I', 'U', 'Z', 'C', 'V', 'A', 'N'].indexOf(keyUpper) !== -1) {
+          e.preventDefault();
+        }
+
+        highlightVirtualKey(keyUpper, true);
+        if (isCtrl) highlightVirtualKey('CTRL', true);
+
+        // LEVEL 2: SHORTCUTS
+        if (typingState.level === 2) {
+          if (isCtrl) {
+            var matchedBalloon = typingState.balloons.find(function(b) {
+              return b.isShortcut && b.shortcutKey === keyUpper;
+            });
+
+            if (matchedBalloon) {
+              typingState.keystrokesCorrect += 2;
+              typingState.keystrokesTotal += 2;
+              popBalloon(matchedBalloon, 30);
+              safeToast('⚡ Pintasan Berhasil: Ctrl + ' + keyUpper + ' (' + (matchedBalloon.label || '') + ')!', 'success');
+              return;
+            } else {
+              typingState.keystrokesTotal++;
+            }
+          }
+          return;
+        }
+
+        // LEVEL 1 & 3: NORMAL WORDS
+        if (e.key && e.key.length === 1 && !isCtrl) {
+          typingState.keystrokesTotal++;
+
+          if (!typingState.activeBalloonId) {
+            var candidate = typingState.balloons.find(function(b) {
+              return b.word.charAt(0) === keyUpper;
+            });
+            if (candidate) {
+              safePlay('type');
+              typingState.activeBalloonId = candidate.id;
+              candidate.typedIndex = 1;
+              typingState.keystrokesCorrect++;
+
+              if (candidate.typedIndex >= candidate.word.length) {
+                popBalloon(candidate, 20);
+              } else {
+                updateBalloonDOM(candidate);
+                updateFingerGuide();
+              }
+              return;
+            }
+          } else {
+            var targetB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; });
+            if (targetB) {
+              var expectedChar = targetB.word.charAt(targetB.typedIndex);
+              if (keyUpper === expectedChar) {
+                safePlay('type');
+                targetB.typedIndex++;
+                typingState.keystrokesCorrect++;
+
+                if (targetB.typedIndex >= targetB.word.length) {
+                  popBalloon(targetB, 20);
+                } else {
+                  updateBalloonDOM(targetB);
+                  updateFingerGuide();
+                }
+                return;
+              }
+            }
+          }
+        }
+      }
+
+      window.onVirtualKeyClick = function(key) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        if (key === 'CTRL') {
+          safeToast('Tahan tombol Ctrl lalu tekan huruf yang sesuai di keyboard!', 'info');
+          return;
+        }
+
+        var fakeEvent = {
+          key: key,
+          ctrlKey: false,
+          metaKey: false,
+          preventDefault: function() {}
+        };
+        handleKeyDown(fakeEvent);
+      };
+
+      window.onBalloonClick = function(balloonId) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        var b = typingState.balloons.find(function(item) { return item.id === balloonId; });
+        if (!b) return;
+
+        if (b.isShortcut) {
+          var fakeEvent = {
+            key: b.shortcutKey,
+            ctrlKey: true,
+            metaKey: false,
+            preventDefault: function() {}
+          };
+          handleKeyDown(fakeEvent);
+        } else {
+          var nextChar = b.word.charAt(b.typedIndex);
+          if (nextChar) {
+            var fakeEvent = {
+              key: nextChar,
+              ctrlKey: false,
+              metaKey: false,
+              preventDefault: function() {}
+            };
+            handleKeyDown(fakeEvent);
+          }
+        }
+      };
+
+      // 9. HUD & STATS
+      function updateHUDLive() {
+        var scoreEl = document.getElementById('typing-hud-score');
+        var wpmEl = document.getElementById('typing-hud-wpm');
+        var accEl = document.getElementById('typing-hud-acc');
+        var comboWrap = document.getElementById('typing-hud-combo-wrap');
+        var comboEl = document.getElementById('typing-hud-combo');
+        var livesEl = document.getElementById('typing-hud-lives');
+
+        if (scoreEl) scoreEl.innerText = typingState.score;
+
+        var elapsedMin = typingState.startTime ? ((Date.now() - typingState.startTime) / 60000) : 0.05;
+        if (elapsedMin < 0.05) elapsedMin = 0.05;
+        var wordsTyped = (typingState.keystrokesCorrect / 5);
+        var wpm = Math.max(0, Math.round(wordsTyped / elapsedMin));
+        if (wpmEl) wpmEl.innerText = wpm;
+
+        var acc = typingState.keystrokesTotal > 0
+          ? Math.round((typingState.keystrokesCorrect / typingState.keystrokesTotal) * 100)
+          : 100;
+        if (accEl) accEl.innerText = acc + '%';
+
+        if (comboWrap && comboEl) {
+          if (typingState.combo >= 2) {
+            comboWrap.classList.remove('hidden');
+            comboEl.innerText = typingState.combo + 'x Combo!';
+          } else {
+            comboWrap.classList.add('hidden');
+          }
+        }
+
+        if (livesEl) {
+          var hearts = '';
+          for (var i = 0; i < typingState.lives; i++) hearts += '❤️';
+          for (var j = typingState.lives; j < 3; j++) hearts += '🖤';
+          livesEl.innerText = hearts;
+        }
+      }
+
+      // 10. GAME LIFECYCLE (START, PAUSE, RESTART, END)
+      window.pilihLevelTypingHero = function(lvl) {
+        typingState.level = lvl;
+        for (var i = 1; i <= 3; i++) {
+          var btn = document.getElementById('btn-typing-lvl-' + i);
+          if (btn) {
+            if (i === lvl) {
+              btn.className = 'typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-yellow-300 text-slate-950 shadow-xs scale-105';
+            } else {
+              btn.className = 'typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-white hover:text-yellow-200';
+            }
+          }
+        }
+
+        var lvlConf = LEVEL_DATA[lvl] || LEVEL_DATA[1];
+        safeToast('Level aktif: ' + lvlConf.name + ' 🎯', 'info');
+        window.mulaiTypingHeroGame();
+      };
+
+      window.mulaiTypingHeroGame = function() {
+        var startOverlay = document.getElementById('typing-overlay-start');
+        var endOverlay = document.getElementById('typing-overlay-gameover');
+        if (startOverlay) startOverlay.classList.add('hidden');
+        if (endOverlay) endOverlay.classList.add('hidden');
+
+        var pauseIcon = document.getElementById('typing-pause-icon');
+        if (pauseIcon) pauseIcon.className = 'fa-solid fa-pause';
+
+        var layer = document.getElementById('typing-balloons-layer');
+        if (layer) layer.innerHTML = '';
+
+        var ind = document.getElementById('typing-target-indicator');
+        if (ind) ind.classList.add('hidden');
+
+        var now = performance.now();
+        typingState.score = 0;
+        typingState.lives = 3;
+        typingState.combo = 0;
+        typingState.maxCombo = 0;
+        typingState.keystrokesTotal = 0;
+        typingState.keystrokesCorrect = 0;
+        typingState.wordsCompleted = 0;
+        typingState.startTime = Date.now();
+        typingState.isPlaying = true;
+        typingState.isPaused = false;
+        typingState.balloons = [];
+        typingState.activeBalloonId = null;
+        typingState.lastSpawnTime = now;
+        typingState.lastFrameTime = now;
+
+        if (typingState.animFrameId) {
+          cancelAnimationFrame(typingState.animFrameId);
+        }
+
+        renderTypingVirtualKeyboard();
+        updateHUDLive();
+
+        // Spawn balon pertama seketika
+        spawnBalloon();
+
+        safeToast('🚀 Permainan dimulai! Siapkan jarimu pada keyboard!', 'success');
+        typingState.animFrameId = requestAnimationFrame(gameLoop);
+      };
+
+      window.togglePauseTypingHero = function() {
+        if (!typingState.isPlaying) {
+          window.mulaiTypingHeroGame();
+          return;
+        }
+
+        typingState.isPaused = !typingState.isPaused;
+        var icon = document.getElementById('typing-pause-icon');
+        if (icon) {
+          icon.className = typingState.isPaused ? 'fa-solid fa-play text-emerald-400' : 'fa-solid fa-pause';
+        }
+
+        if (typingState.isPaused) {
+          safeToast('Permainan dijeda ⏸️', 'info');
+        } else {
+          safeToast('Permainan dilanjutkan ▶️', 'info');
+          typingState.lastFrameTime = performance.now();
+          typingState.animFrameId = requestAnimationFrame(gameLoop);
+        }
+      };
+
+      window.pauseTypingHeroGame = function() {
+        if (typingState.isPlaying && !typingState.isPaused) {
+          typingState.isPaused = true;
+          var icon = document.getElementById('typing-pause-icon');
+          if (icon) icon.className = 'fa-solid fa-play text-emerald-400';
+        }
+      };
+
+      window.restartTypingHeroGame = function() {
+        window.mulaiTypingHeroGame();
+      };
+
+      window.lanjutLevelTypingHeroBerikutnya = function() {
+        var nextLvl = typingState.level < 3 ? (typingState.level + 1) : 1;
+        window.pilihLevelTypingHero(nextLvl);
+      };
+
+      function endGame(isVictory) {
+        typingState.isPlaying = false;
+        if (typingState.animFrameId) {
+          cancelAnimationFrame(typingState.animFrameId);
+        }
+
+        var endOverlay = document.getElementById('typing-overlay-gameover');
+        var endIcon = document.getElementById('typing-end-icon');
+        var endTitle = document.getElementById('typing-end-title');
+        var endDesc = document.getElementById('typing-end-desc');
+        var finalScore = document.getElementById('typing-final-score');
+        var finalWpm = document.getElementById('typing-final-wpm');
+        var finalAcc = document.getElementById('typing-final-acc');
+        var btnNext = document.getElementById('btn-typing-next-level');
+
+        var elapsedMin = typingState.startTime ? ((Date.now() - typingState.startTime) / 60000) : 0.05;
+        if (elapsedMin < 0.05) elapsedMin = 0.05;
+        var wpm = Math.max(0, Math.round((typingState.keystrokesCorrect / 5) / elapsedMin));
+        var acc = typingState.keystrokesTotal > 0
+          ? Math.round((typingState.keystrokesCorrect / typingState.keystrokesTotal) * 100)
+          : 100;
+
+        if (finalScore) finalScore.innerText = typingState.score;
+        if (finalWpm) finalWpm.innerText = wpm + ' WPM';
+        if (finalAcc) finalAcc.innerText = acc + '%';
+
+        try {
+          var bestScore = parseInt(localStorage.getItem('typing_hero_best_score') || '0', 10);
+          var bestWpm = parseInt(localStorage.getItem('typing_hero_best_wpm') || '0', 10);
+          if (typingState.score > bestScore) {
+            localStorage.setItem('typing_hero_best_score', typingState.score);
+          }
+          if (wpm > bestWpm) {
+            localStorage.setItem('typing_hero_best_wpm', wpm);
+          }
+          updateRecordDisplays();
+        } catch(e) {}
+
+        if (isVictory) {
+          safePlay('victory');
+          if (endIcon) endIcon.innerText = '🏆';
+          if (endTitle) endTitle.innerText = 'Luar Biasa! Misi Level Tuntas!';
+          if (endDesc) endDesc.innerText = 'Hebat sekali! Jarimu sangat lincah dan tepat mengetik kata & shortcut Word.';
+          if (btnNext) btnNext.classList.remove('hidden');
+
+          if (typeof window.tambahPoin === 'function') {
+            window.tambahPoin(20);
+          }
+          safeToast('🎉 Selamat! Target level tercapai (+20 Poin Kebaikan)', 'success');
+        } else {
+          safePlay('miss');
+          if (endIcon) endIcon.innerText = '💪';
+          if (endTitle) endTitle.innerText = 'Tetap Semangat!';
+          if (endDesc) endDesc.innerText = 'Jangan menyerah! Latih terus penempatan jarimu di keyboard agar semakin cepat.';
+          if (btnNext) btnNext.classList.add('hidden');
+        }
+
+        if (endOverlay) endOverlay.classList.remove('hidden');
+      }
+
+      function updateRecordDisplays() {
+        var recScore = document.getElementById('typing-record-score');
+        var recWpm = document.getElementById('typing-record-wpm');
+        var badge = document.getElementById('typing-best-badge');
+
+        try {
+          var s = localStorage.getItem('typing_hero_best_score') || '0';
+          var w = localStorage.getItem('typing_hero_best_wpm') || '0';
+          if (recScore) recScore.innerText = s;
+          if (recWpm) recWpm.innerText = w + ' WPM';
+
+          if (badge) {
+            var wVal = parseInt(w, 10);
+            if (wVal >= 35) {
+              badge.innerText = 'Juara 10 Jari 🏆';
+              badge.className = 'px-2.5 py-0.5 rounded-full bg-purple-200 text-purple-900 font-bold text-[10px]';
+            } else if (wVal >= 20) {
+              badge.innerText = 'Terampil ⚡';
+              badge.className = 'px-2.5 py-0.5 rounded-full bg-blue-200 text-blue-900 font-bold text-[10px]';
+            } else {
+              badge.innerText = 'Pemula 🌱';
+              badge.className = 'px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px]';
+            }
+          }
+        } catch(e) {}
+      }
+
+      // 11. MODAL PANDUAN
+      window.bukaModalPanduanTypingHero = function() {
+        var m = document.getElementById('modal-panduan-typing');
+        if (m) m.classList.remove('hidden');
+      };
+
+      window.tutupModalPanduanTypingHero = function() {
+        var m = document.getElementById('modal-panduan-typing');
+        if (m) m.classList.add('hidden');
+      };
+
+      // 12. INITIALIZATION
+      window.initTypingHeroGame = function() {
+        renderTypingVirtualKeyboard();
+        updateRecordDisplays();
+        updateFingerGuide();
+
+        var startOverlay = document.getElementById('typing-overlay-start');
+        if (!typingState.isPlaying && startOverlay) {
+          startOverlay.classList.remove('hidden');
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(window.initTypingHeroGame, 100);
+        });
+      } else {
+        setTimeout(window.initTypingHeroGame, 100);
+      }
+    })();
+    </script>
 
     <!-- ======================================================== -->
     <!-- TAB 9: DASBOR GURU (DATABASE & MONITORING LATIHAN SISWA) -->
@@ -10083,6 +12907,8 @@
           </div>
         </div>
 
+
+
       </div>
 
       <div class="pt-2 flex items-center justify-between border-t border-slate-100">
@@ -10130,6 +12956,6 @@
   <!-- Canvas Hidden Helper untuk Export Download Poster -->
   <canvas id="export-canvas" width="600" height="750" class="hidden"></canvas>
 
-  <script src="app.js?v=20261027_modul_tp2_2_poster"></script>
+  <script src="app.js?v=20261028_sem_games_v13"></script>
 </body>
 </html>
