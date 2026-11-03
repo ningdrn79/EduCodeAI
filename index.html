@@ -12,6 +12,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- JSZip untuk membuat dan membaca file .docx asli di browser -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Mammoth.js untuk ekstraksi teks dokumen Word (.docx) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <!-- PDF.js untuk ekstraksi teks berkas PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+  <!-- Google Firebase Compat SDKs (App, Firestore, Storage) untuk Server Cloud Database Siswa -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -42,7 +55,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261020_update_classes_11">
+  <link rel="stylesheet" href="styles.css?v=20261103_layar_statis_ketik_v1">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -1593,6 +1606,32 @@
                 </tr>
               </tfoot>
             </table>
+          </div>
+
+          <!-- BANNER KELULUSAN MODUL & SERTIFIKAT DIGITAL SISWA -->
+          <div id="banner-sertifikat-modul-siswa" class="mt-4 p-5 rounded-3xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-900 border-2 border-yellow-300 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-white/95 text-amber-600 flex items-center justify-center text-2xl shadow-sm shrink-0">
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/80 text-amber-900 mb-0.5">
+                  <span>🌟 Ketuntasan Modul TP 2.1 - TP 2.4 (100%)</span>
+                </div>
+                <h4 class="font-title font-black text-slate-900 text-base sm:text-lg leading-tight">
+                  Piagam Penghargaan &amp; Sertifikat Digital Siswa
+                </h4>
+                <p class="text-xs text-amber-950 font-medium mt-0.5">
+                  Setiap siswa yang telah menuntaskan modul dan kuis otomatis berhak menerima Sertifikat Digital Resmi atas nama akun masing-masing!
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 shrink-0 w-full md:w-auto">
+              <button type="button" onclick="bukaKuisAtauSertifikatSiswa()" class="w-full md:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-title text-xs sm:text-sm font-bold shadow-lg transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-graduation-cap text-yellow-400"></i>
+                <span id="btn-text-sertifikat-modul">Ikuti Kuis &amp; Ambil Sertifikat 🏆</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -4105,9 +4144,10 @@
 
           <!-- Kanan: User Avatar, Tombol Layar Penuh (seperti di Ms. Excel) & Window Controls (Minimize, Restore, Close) -->
           <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div class="hidden sm:flex items-center gap-1.5 text-[11px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded cursor-pointer">
-              <span class="w-5 h-5 rounded-full bg-blue-700 text-white font-bold text-[10px] flex items-center justify-center">ND</span>
-              <span>ning darningsih</span>
+            <!-- Profil Akun Siswa Aktif di Header Lab Word (Dinamis Sesuai Login Siswa) -->
+            <div id="word-account-badge" onclick="bukaModalProfilSiswa()" class="hidden sm:flex items-center gap-1.5 text-[11px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded cursor-pointer transition" title="Profil Akun Siswa yang Sedang Bekerja (Klik untuk Ganti/Lihat Kartu Pelajar)">
+              <span id="word-account-avatar" class="w-5 h-5 rounded-full bg-blue-700 text-white font-bold text-[10px] flex items-center justify-center">ND</span>
+              <span id="word-account-name" class="font-medium">ning darningsih</span>
             </div>
 
             <!-- Tombol Nilai Otomatis AI (0-100) Berbasis Rubrik -->
@@ -6370,187 +6410,200 @@
     <!-- TAB KHUSUS: GAME EDUKASI "PAHLAWAN MENGETIK CEPAT" (KEYBOARD HERO) -->
     <!-- Semester 1 • Latihan 10 Jari & Pembiasaan Keyboard MS Word (TP 2.2) -->
     <!-- ======================================================== -->
-    <section id="tab-ketik" class="tab-content hidden space-y-6 animate-fadeIn pb-16">
+    <section id="tab-ketik" class="tab-content hidden space-y-3 animate-fadeIn overscroll-contain">
       
-      <!-- 1. Header Top Bar & Level Selector -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-slate-950 p-5 sm:p-6 rounded-3xl border-2 border-amber-300 shadow-xl relative overflow-hidden">
+      <!-- 1. Header Top Bar & Level Selector (Compact Layar Statis Bar) -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-slate-950 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl border-2 border-amber-300 shadow-lg relative overflow-hidden">
         <!-- Background Decorative Icon -->
-        <div class="absolute -right-8 -bottom-8 opacity-15 text-white text-[150px] pointer-events-none select-none">
+        <div class="absolute -right-6 -bottom-6 opacity-15 text-white text-[110px] pointer-events-none select-none">
           <i class="fa-solid fa-keyboard"></i>
         </div>
 
-        <div class="flex items-center gap-4 relative z-10">
-          <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-black text-slate-900 bg-white/90 hover:bg-white px-4 py-2.5 rounded-full border border-white/60 shadow-xs transition cursor-pointer">
-            <i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Beranda</span>
+        <div class="flex items-center gap-2.5 relative z-10">
+          <button onclick="switchTab('beranda')" class="inline-flex items-center gap-1.5 text-xs font-black text-slate-900 bg-white/95 hover:bg-white px-3 py-1.5 rounded-full border border-white/60 shadow-xs transition cursor-pointer active:scale-95">
+            <i class="fa-solid fa-arrow-left"></i> <span>Beranda</span>
           </button>
           <div>
-            <div class="inline-flex items-center gap-1.5 bg-slate-950/20 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full uppercase border border-slate-950/20">
-              <i class="fa-solid fa-star text-yellow-300"></i> <span>Game Semester 1 • Latihan 10 Jari &amp; TP 2.2 MS Word</span>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1 bg-slate-950/20 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase border border-slate-950/20">
+                <i class="fa-solid fa-star text-yellow-300"></i> Latihan 10 Jari &amp; TP 2.2
+              </span>
+              <!-- Status Layar Statis (Anti-Geser) -->
+              <span class="inline-flex items-center gap-1 bg-emerald-950/30 text-emerald-100 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-300/40 shadow-2xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Layar Statis (Terkunci)</span>
+              </span>
             </div>
-            <h2 class="font-title text-2xl sm:text-3xl font-black mt-1 text-white drop-shadow flex items-center gap-2">
+            <h2 class="font-title text-lg sm:text-xl font-black text-white drop-shadow flex items-center gap-1.5">
               <span>Pahlawan Mengetik Cepat</span> ⌨️🎈
             </h2>
           </div>
         </div>
 
         <!-- Level Selector & Mode Button -->
-        <div class="flex items-center gap-2.5 flex-wrap relative z-10">
-          <div class="flex items-center gap-1 bg-black/25 backdrop-blur-sm p-1 rounded-2xl border border-white/20">
-            <button onclick="pilihLevelTypingHero(1)" id="btn-typing-lvl-1" class="typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-yellow-300 text-slate-950 shadow-xs scale-105" title="Level 1: Pemula (Kata Pendek 3-5 Huruf)">
+        <div class="flex items-center gap-1.5 flex-wrap relative z-10">
+          <div class="flex items-center gap-1 bg-black/25 backdrop-blur-sm p-1 rounded-xl border border-white/20 text-xs">
+            <button onclick="pilihLevelTypingHero(1)" id="btn-typing-lvl-1" class="typing-lvl-btn px-2.5 py-1 rounded-lg text-xs font-bold transition bg-yellow-300 text-slate-950 shadow-xs scale-105" title="Level 1: Pemula (Kata Pendek 3-5 Huruf)">
               Lv 1: Pemula 🌱
             </button>
-            <button onclick="pilihLevelTypingHero(2)" id="btn-typing-lvl-2" class="typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-white hover:text-yellow-200" title="Level 2: Tantangan Shortcut MS Word">
-              Lv 2: Shortcut Word ⚡
+            <button onclick="pilihLevelTypingHero(2)" id="btn-typing-lvl-2" class="typing-lvl-btn px-2.5 py-1 rounded-lg text-xs font-bold transition text-white hover:text-yellow-200" title="Level 2: Tantangan Shortcut MS Word">
+              Lv 2: Shortcut ⚡
             </button>
-            <button onclick="pilihLevelTypingHero(3)" id="btn-typing-lvl-3" class="typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-white hover:text-yellow-200" title="Level 3: Juara 10 Jari Cepat">
-              Lv 3: Juara 10 Jari 🏆
+            <button onclick="pilihLevelTypingHero(3)" id="btn-typing-lvl-3" class="typing-lvl-btn px-2.5 py-1 rounded-lg text-xs font-bold transition text-white hover:text-yellow-200" title="Level 3: Juara 10 Jari Cepat">
+              Lv 3: Juara 🏆
             </button>
           </div>
           
-          <button onclick="bukaModalPanduanTypingHero()" class="px-3.5 py-2 bg-white/90 hover:bg-white text-slate-900 rounded-xl font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+          <button onclick="bukaModalPanduanTypingHero()" class="px-2.5 py-1.5 bg-white/95 hover:bg-white text-slate-900 rounded-xl font-bold text-xs shadow-xs transition flex items-center gap-1 cursor-pointer">
             <i class="fa-solid fa-circle-question text-amber-600"></i>
             <span>Cara Main</span>
+          </button>
+
+          <!-- Tombol Mode Layar Penuh / Arcade Statis -->
+          <button onclick="toggleTypingFullscreen()" id="btn-typing-fullscreen" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-950 text-amber-300 rounded-xl font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer border border-amber-300/40 active:scale-95" title="Kunci Tampilan Penuh (Layar Statis Bebas Gangguan)">
+            <i id="icon-typing-fullscreen" class="fa-solid fa-expand"></i>
+            <span id="text-typing-fullscreen">Layar Penuh ⛶</span>
           </button>
         </div>
       </div>
 
       <!-- 2. Main Game Workspace Grid (Arena & Sidebar) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div id="typing-main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
         
         <!-- KOLOM UTAMA (ARENA BALON & KEYBOARD 10 JARI) - 8 KOLOM -->
-        <div class="lg:col-span-8 space-y-4">
+        <div class="lg:col-span-8 space-y-2.5">
           
           <!-- ARENA GAME MENGETIK (LANGIT & BALON MELAYANG) -->
-          <div id="typing-arena-container" class="relative w-full h-[460px] sm:h-[500px] rounded-3xl overflow-hidden border-4 border-amber-400/60 shadow-2xl bg-gradient-to-b from-sky-300 via-sky-200 to-emerald-100 select-none flex flex-col justify-between">
+          <div id="typing-arena-container" class="relative w-full h-[330px] sm:h-[360px] rounded-2xl overflow-hidden border-3 border-amber-400/70 shadow-xl bg-gradient-to-b from-sky-300 via-sky-200 to-emerald-100 select-none flex flex-col justify-between">
             
             <!-- Animated Background Clouds -->
             <div class="absolute inset-0 pointer-events-none opacity-45 overflow-hidden">
               <div class="cloud-bubble absolute -top-4 left-10 w-36 h-20 bg-white rounded-full blur-xs"></div>
               <div class="cloud-bubble absolute top-12 right-16 w-44 h-24 bg-white rounded-full blur-xs"></div>
               <div class="cloud-bubble absolute top-28 left-1/3 w-32 h-16 bg-white rounded-full blur-xs"></div>
-              <div class="sun-orb absolute top-4 right-6 w-16 h-16 rounded-full bg-yellow-300/80 blur-sm animate-pulse"></div>
+              <div class="sun-orb absolute top-4 right-6 w-14 h-14 rounded-full bg-yellow-300/80 blur-sm animate-pulse"></div>
             </div>
 
             <!-- TOP HUD BAR: SCORE, SPEED, ACCURACY, HEARTS, PAUSE -->
-            <div class="relative z-20 w-full p-3 sm:p-4 bg-slate-900/85 backdrop-blur-md text-white border-b-2 border-amber-400/50 flex flex-wrap items-center justify-between gap-3 text-xs font-mono shadow-md">
-              <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+            <div class="relative z-20 w-full p-2 sm:p-2.5 bg-slate-900/90 backdrop-blur-md text-white border-b-2 border-amber-400/50 flex flex-wrap items-center justify-between gap-2 text-xs font-mono shadow-md">
+              <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
                 <!-- Score -->
-                <div class="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/40 px-2.5 py-1 rounded-xl">
+                <div class="flex items-center gap-1 bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 rounded-lg">
                   <span class="text-amber-400 font-bold">🏆 Skor:</span>
                   <span id="typing-hud-score" class="text-yellow-300 font-black text-sm">0</span>
                 </div>
                 <!-- WPM (Kecepatan) -->
-                <div class="flex items-center gap-1.5 bg-blue-500/20 border border-blue-400/40 px-2.5 py-1 rounded-xl">
+                <div class="flex items-center gap-1 bg-blue-500/20 border border-blue-400/40 px-2 py-0.5 rounded-lg">
                   <span class="text-blue-400 font-bold">⚡ WPM:</span>
                   <span id="typing-hud-wpm" class="text-sky-300 font-black text-sm">0</span>
                 </div>
                 <!-- Akurasi -->
-                <div class="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-1 rounded-xl">
+                <div class="flex items-center gap-1 bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 rounded-lg">
                   <span class="text-emerald-400 font-bold">🎯 Akurasi:</span>
                   <span id="typing-hud-acc" class="text-emerald-300 font-black text-sm">100%</span>
                 </div>
                 <!-- Combo Streak -->
-                <div id="typing-hud-combo-wrap" class="hidden flex items-center gap-1 bg-rose-500/25 border border-rose-400/50 px-2 py-1 rounded-xl animate-bounce">
+                <div id="typing-hud-combo-wrap" class="hidden flex items-center gap-1 bg-rose-500/25 border border-rose-400/50 px-2 py-0.5 rounded-lg animate-bounce">
                   <span class="text-rose-400 font-bold">🔥</span>
                   <span id="typing-hud-combo" class="text-rose-300 font-black">2x Combo</span>
                 </div>
               </div>
 
               <!-- Right HUD: Lives & Controls -->
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
                 <!-- Hearts / Nyawa -->
-                <div class="flex items-center gap-1 bg-slate-800/90 border border-slate-700 px-2.5 py-1 rounded-xl">
-                  <span id="typing-hud-lives" class="text-rose-500 tracking-widest text-base">❤️❤️❤️</span>
+                <div class="flex items-center gap-1 bg-slate-800/90 border border-slate-700 px-2 py-0.5 rounded-lg">
+                  <span id="typing-hud-lives" class="text-rose-500 tracking-wider text-sm">❤️❤️❤️</span>
                 </div>
                 <!-- Pause / Resume -->
-                <button type="button" onclick="togglePauseTypingHero()" id="btn-typing-pause" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-300 border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Jeda / Lanjutkan Game">
-                  <i id="typing-pause-icon" class="fa-solid fa-pause"></i>
+                <button type="button" onclick="togglePauseTypingHero()" id="btn-typing-pause" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-300 border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Jeda / Lanjutkan Game">
+                  <i id="typing-pause-icon" class="fa-solid fa-pause text-xs"></i>
                 </button>
                 <!-- Restart -->
-                <button type="button" onclick="restartTypingHeroGame()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Mulai Ulang Game">
-                  <i class="fa-solid fa-rotate-left"></i>
+                <button type="button" onclick="restartTypingHeroGame()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Mulai Ulang Game">
+                  <i class="fa-solid fa-rotate-left text-xs"></i>
                 </button>
               </div>
             </div>
 
             <!-- LAPISAN BALON TERBANG (BALLOON FLIGHT LAYER) -->
-            <div id="typing-balloons-layer" class="relative z-10 flex-1 min-h-[300px] w-full overflow-hidden">
+            <div id="typing-balloons-layer" class="relative z-10 flex-1 min-h-[190px] w-full overflow-hidden">
               <!-- Balon-balon diinjeksi secara dinamis oleh typingHeroEngine -->
             </div>
 
             <!-- TANAH RUMPUT & ZONA BATAS (BOTTOM GROUND ZONE) -->
-            <div class="relative z-20 w-full h-12 bg-gradient-to-t from-emerald-600 via-emerald-500 to-emerald-400 border-t-4 border-emerald-300/80 flex items-center justify-between px-4 text-emerald-950 font-title font-bold text-xs shadow-inner">
-              <div class="flex items-center gap-2">
-                <span class="text-base">🌱</span>
-                <span>Jangan biarkan balon menyentuh rumput! Ketik hurufnya sebelum jatuh.</span>
+            <div class="relative z-20 w-full h-9 sm:h-10 bg-gradient-to-t from-emerald-600 via-emerald-500 to-emerald-400 border-t-3 border-emerald-300/80 flex items-center justify-between px-3 text-emerald-950 font-title font-bold text-xs shadow-inner">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="text-sm">🌱</span>
+                <span class="truncate">Ketik hurufnya sebelum balon menyentuh rumput!</span>
               </div>
-              <div id="typing-target-indicator" class="hidden bg-white/95 text-slate-900 px-3 py-1 rounded-full shadow-xs text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse border border-blue-300">
+              <div id="typing-target-indicator" class="hidden shrink-0 bg-white/95 text-slate-900 px-2.5 py-0.5 rounded-full shadow-xs text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse border border-blue-300">
                 <span>Fokus:</span>
                 <span id="typing-target-word" class="text-blue-700 font-black">---</span>
               </div>
             </div>
 
             <!-- OVERLAY 1: START SCREEN OVERLAY -->
-            <div id="typing-overlay-start" class="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
-              <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-4xl shadow-xl shadow-amber-500/30 mb-4 animate-bounce">
+            <div id="typing-overlay-start" class="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-3xl shadow-lg shadow-amber-500/30 mb-2 animate-bounce">
                 ⌨️
               </div>
-              <h3 class="font-title font-black text-2xl sm:text-3xl text-yellow-300">
+              <h3 class="font-title font-black text-xl sm:text-2xl text-yellow-300">
                 Pahlawan Mengetik Cepat
               </h3>
-              <p class="text-xs sm:text-sm text-slate-200 max-w-md mt-2 leading-relaxed">
-                Balon kata positif dan shortcut Word akan melayang turun. Ketik di keyboard fisikmu secepat mungkin sebelum balon menyentuh tanah!
+              <p class="text-xs text-slate-200 max-w-md mt-1 leading-relaxed">
+                Balon kata melayang turun. Ketik di keyboardmu sebelum menyentuh tanah! Layar telah <b>terkunci statis</b> agar tidak bergeser saat mengetik.
               </p>
 
               <!-- Level Preview Pills -->
-              <div class="flex items-center justify-center gap-2 mt-5 flex-wrap">
-                <button type="button" onclick="pilihLevelTypingHero(1); mulaiTypingHeroGame();" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+              <div class="flex items-center justify-center gap-2 mt-3.5 flex-wrap">
+                <button type="button" onclick="pilihLevelTypingHero(1); mulaiTypingHeroGame();" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
                   🌱 Mulai Level 1: Pemula
                 </button>
-                <button type="button" onclick="pilihLevelTypingHero(2); mulaiTypingHeroGame();" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                <button type="button" onclick="pilihLevelTypingHero(2); mulaiTypingHeroGame();" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
                   ⚡ Mulai Level 2: Shortcut Word
                 </button>
-                <button type="button" onclick="pilihLevelTypingHero(3); mulaiTypingHeroGame();" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                <button type="button" onclick="pilihLevelTypingHero(3); mulaiTypingHeroGame();" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
                   🏆 Mulai Level 3: Juara 10 Jari
                 </button>
               </div>
 
               <!-- Shortcut Cheat Note -->
-              <div class="mt-4 text-[11px] text-amber-200 bg-amber-950/60 border border-amber-500/40 rounded-xl px-3 py-1.5 max-w-sm">
-                💡 Di Level 2, kamu bisa tekan kombinasi tombol sungguhan seperti <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>!
+              <div class="mt-2.5 text-[10px] text-amber-200 bg-amber-950/60 border border-amber-500/40 rounded-lg px-2.5 py-1 max-w-sm">
+                💡 Di Level 2, tekan kombinasi sungguhan: <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>!
               </div>
             </div>
 
             <!-- OVERLAY 2: GAME OVER / VICTORY OVERLAY -->
-            <div id="typing-overlay-gameover" class="hidden absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
-              <div id="typing-end-icon" class="text-6xl mb-3 animate-bounce">🏆</div>
-              <h3 id="typing-end-title" class="font-title font-black text-2xl sm:text-3xl text-yellow-300">Permainan Selesai!</h3>
-              <p id="typing-end-desc" class="text-xs sm:text-sm text-slate-300 max-w-md mt-1 leading-relaxed">
+            <div id="typing-overlay-gameover" class="hidden absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white">
+              <div id="typing-end-icon" class="text-5xl mb-2 animate-bounce">🏆</div>
+              <h3 id="typing-end-title" class="font-title font-black text-xl sm:text-2xl text-yellow-300">Permainan Selesai!</h3>
+              <p id="typing-end-desc" class="text-xs text-slate-300 max-w-md mt-1 leading-relaxed">
                 Kerja luar biasa! Kamu berhasil mengetik dengan lincah dan tepat.
               </p>
 
               <!-- Stat Box -->
-              <div class="grid grid-cols-3 gap-3 my-5 w-full max-w-sm font-mono text-center">
-                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-700">
-                  <span class="text-[10px] text-slate-400 block font-bold">TOTAL SKOR</span>
-                  <span id="typing-final-score" class="text-xl font-black text-yellow-300">0</span>
+              <div class="grid grid-cols-3 gap-2.5 my-3.5 w-full max-w-sm font-mono text-center">
+                <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-700">
+                  <span class="text-[9px] text-slate-400 block font-bold">TOTAL SKOR</span>
+                  <span id="typing-final-score" class="text-lg font-black text-yellow-300">0</span>
                 </div>
-                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-700">
-                  <span class="text-[10px] text-slate-400 block font-bold">KECEPATAN</span>
-                  <span id="typing-final-wpm" class="text-xl font-black text-sky-300">0 WPM</span>
+                <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-700">
+                  <span class="text-[9px] text-slate-400 block font-bold">KECEPATAN</span>
+                  <span id="typing-final-wpm" class="text-lg font-black text-sky-300">0 WPM</span>
                 </div>
-                <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-700">
-                  <span class="text-[10px] text-slate-400 block font-bold">AKURASI</span>
-                  <span id="typing-final-acc" class="text-xl font-black text-emerald-300">100%</span>
+                <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-700">
+                  <span class="text-[9px] text-slate-400 block font-bold">AKURASI</span>
+                  <span id="typing-final-acc" class="text-lg font-black text-emerald-300">100%</span>
                 </div>
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex items-center gap-3">
-                <button type="button" onclick="mulaiTypingHeroGame()" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-amber-400/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <button type="button" onclick="mulaiTypingHeroGame()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-title font-black text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
                   Main Lagi 🔄
                 </button>
-                <button type="button" onclick="lanjutLevelTypingHeroBerikutnya()" id="btn-typing-next-level" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-lg shadow-blue-500/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                <button type="button" onclick="lanjutLevelTypingHeroBerikutnya()" id="btn-typing-next-level" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
                   Lanjut Level Berikutnya 🚀
                 </button>
               </div>
@@ -6559,44 +6612,38 @@
           </div>
 
           <!-- PANDUAN KEYBOARD VIRTUAL 10 JARI (TOUCH TYPING INTERAKTIF) -->
-          <div class="bg-slate-900 rounded-3xl p-4 sm:p-5 border-2 border-slate-700 shadow-xl space-y-3 select-none text-white">
+          <div class="bg-slate-900 rounded-2xl p-2.5 sm:p-3 border border-slate-700 shadow-lg space-y-1.5 select-none text-white">
             
             <!-- Header Keyboard & Indikator Jari Aktif -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
               <div class="flex items-center gap-2">
-                <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm shadow-xs font-black">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shadow-xs font-black">
                   ⌨️
                 </span>
-                <div>
-                  <h4 class="font-title font-bold text-sm text-slate-200">Panduan Tuts Keyboard 10 Jari</h4>
-                  <p class="text-[10px] text-slate-400">Warna tombol menunjukkan jari tangan yang tepat untuk menekan tuts tersebut.</p>
-                </div>
+                <span class="font-title font-bold text-xs text-slate-200">Panduan Tuts 10 Jari</span>
               </div>
 
               <!-- Indikator Jari Aktif yang Harus Ditekan -->
-              <div id="typing-finger-guide-pill" class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-2xl border border-slate-700 text-xs font-mono">
-                <span class="text-amber-300 font-bold">👉 Jari Berikutnya:</span>
+              <div id="typing-finger-guide-pill" class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 text-xs font-mono">
+                <span class="text-amber-300 font-bold">👉 Tuts:</span>
                 <span id="typing-finger-name" class="font-bold text-yellow-300">Siap Mengetik</span>
               </div>
             </div>
 
             <!-- Virtual Keyboard Rows Container -->
-            <div id="typing-virtual-keyboard" class="flex flex-col items-center gap-1.5 pt-1 w-full overflow-x-auto custom-scroll">
+            <div id="typing-virtual-keyboard" class="flex flex-col items-center gap-1 w-full overflow-x-auto custom-scroll">
               <!-- Rendered via JS renderTypingVirtualKeyboard() -->
             </div>
 
-            <!-- Legenda Warna Jari (10 Finger Legend) -->
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-slate-800 text-[10px] font-medium text-slate-300">
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Kelingking Kiri (1,Q,A,Z,Ctrl)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Manis Kiri (2,W,S,X)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span> Tengah Kiri (3,E,D,C)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Telunjuk Kiri (4,5,R,T,F,G,V,B)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Ibu Jari (Spasi)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span> Telunjuk Kanan (6,7,Y,U,H,J,N,M)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Tengah Kanan (8,I,K,,)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Manis Kanan (9,O,L,.)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Kelingking Kanan (0,P,;,/)</div>
-              <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span> <b>Tombol Target (Aktif)</b></div>
+            <!-- Legenda Warna Jari (Compact 10 Finger Legend) -->
+            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1.5 border-t border-slate-800/80 text-[10px] text-slate-300">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Kelingking (Q/A/Z/Ctrl)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Manis (W/S/X)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-400"></span> Tengah (E/D/C)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Telunjuk Kiri</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-teal-400"></span> Telunjuk Kanan</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Spasi (Ibu Jari)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span> <b>Target Aktif</b></span>
             </div>
 
           </div>
@@ -6604,134 +6651,134 @@
         </div>
 
         <!-- KOLOM KANAN (KAMUS SHORTCUT & KONTROL CEPAT) - 4 KOLOM -->
-        <div class="lg:col-span-4 space-y-4">
+        <div class="lg:col-span-4 space-y-2.5">
           
           <!-- Card 1: Kamus Pintasan Keyboard MS Word (TP 2.2) -->
-          <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-slate-200 shadow-xl space-y-4">
-            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+          <div id="typing-shortcut-card" class="bg-white rounded-2xl p-3.5 border-2 border-slate-200 shadow-lg space-y-2 flex flex-col justify-between">
+            <div class="border-b border-slate-100 pb-2 flex items-center justify-between">
               <div>
-                <h3 class="font-title font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                <h3 class="font-title font-bold text-sm text-slate-800 flex items-center gap-1.5">
                   <i class="fa-solid fa-bolt text-amber-500"></i>
                   <span>Kamus Shortcut MS Word</span>
                 </h3>
-                <p class="text-[11px] text-slate-500 mt-0.5">Hafalkan pintasan ini untuk Level 2!</p>
+                <p class="text-[10px] text-slate-500">Hafalkan pintasan ini untuk Level 2!</p>
               </div>
-              <span class="px-2.5 py-1 rounded-xl bg-blue-50 text-blue-700 font-mono font-bold text-xs border border-blue-200">
+              <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-mono font-bold text-[11px] border border-blue-200">
                 10 Pintasan
               </span>
             </div>
 
-            <!-- List Shortcut Cards -->
-            <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1 custom-scroll text-xs">
+            <!-- List Shortcut Cards with Clean Internal Scroll -->
+            <div class="space-y-1.5 max-h-[295px] overflow-y-auto pr-1 custom-scroll text-xs">
               
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-blue-700 text-xs">Ctrl + B</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-blue-700 text-xs">Ctrl + B</kbd>
                   <span class="font-bold text-slate-800">Bold (Tebal)</span>
                 </div>
                 <span class="text-[10px] text-slate-500">Menebalkan teks</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-purple-700 text-xs">Ctrl + I</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-purple-700 text-xs">Ctrl + I</kbd>
                   <span class="font-bold text-slate-800 italic">Italic (Miring)</span>
                 </div>
                 <span class="text-[10px] text-slate-500">Memiringkan teks</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-emerald-700 text-xs">Ctrl + U</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-emerald-700 text-xs">Ctrl + U</kbd>
                   <span class="font-bold text-slate-800 underline">Underline</span>
                 </div>
                 <span class="text-[10px] text-slate-500">Garis bawah teks</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-amber-700 text-xs">Ctrl + S</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-amber-700 text-xs">Ctrl + S</kbd>
                   <span class="font-bold text-slate-800">Save (Simpan)</span>
                 </div>
                 <span class="text-[10px] text-slate-500">Simpan dokumen</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-rose-700 text-xs">Ctrl + Z</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-rose-700 text-xs">Ctrl + Z</kbd>
                   <span class="font-bold text-slate-800">Undo</span>
                 </div>
-                <span class="text-[10px] text-slate-500">Batalkan / Kembalikan</span>
+                <span class="text-[10px] text-slate-500">Batalkan langkah</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-indigo-700 text-xs">Ctrl + C</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-indigo-700 text-xs">Ctrl + C</kbd>
                   <span class="font-bold text-slate-800">Copy (Salin)</span>
                 </div>
-                <span class="text-[10px] text-slate-500">Salin teks terpilih</span>
+                <span class="text-[10px] text-slate-500">Salin teks</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-teal-700 text-xs">Ctrl + V</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-teal-700 text-xs">Ctrl + V</kbd>
                   <span class="font-bold text-slate-800">Paste (Tempel)</span>
                 </div>
-                <span class="text-[10px] text-slate-500">Menempel teks salinan</span>
+                <span class="text-[10px] text-slate-500">Menempel teks</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-cyan-700 text-xs">Ctrl + A</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-cyan-700 text-xs">Ctrl + A</kbd>
                   <span class="font-bold text-slate-800">Select All</span>
                 </div>
-                <span class="text-[10px] text-slate-500">Pilih semua isi teks</span>
+                <span class="text-[10px] text-slate-500">Pilih semua teks</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-blue-800 text-xs">Ctrl + P</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-blue-800 text-xs">Ctrl + P</kbd>
                   <span class="font-bold text-slate-800">Print</span>
                 </div>
-                <span class="text-[10px] text-slate-500">Cetak ke printer</span>
+                <span class="text-[10px] text-slate-500">Cetak dokumen</span>
               </div>
 
-              <div class="p-2.5 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <kbd class="px-2 py-1 bg-white rounded-lg border-2 border-slate-300 shadow-xs font-mono font-black text-emerald-800 text-xs">Ctrl + N</kbd>
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-emerald-800 text-xs">Ctrl + N</kbd>
                   <span class="font-bold text-slate-800">New Document</span>
                 </div>
-                <span class="text-[10px] text-slate-500">Buka dokumen baru</span>
+                <span class="text-[10px] text-slate-500">Dokumen baru</span>
               </div>
 
             </div>
 
             <!-- Tombol Buka Lab MS Word -->
-            <button onclick="switchTab('msword')" class="w-full py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+            <button onclick="switchTab('msword')" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-title font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
               <i class="fa-solid fa-file-word"></i>
-              <span>Praktikkan Langsung di Lab MS Word</span>
+              <span>Praktikkan di Lab MS Word</span>
             </button>
           </div>
 
-          <!-- Card 2: Skor Rekor Terbaikmu -->
-          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-5 border-2 border-amber-200 shadow-sm space-y-3">
+          <!-- Card 2: Skor Rekor Terbaikmu (Compact) -->
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-2.5 border-2 border-amber-200 shadow-2xs space-y-1.5">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">🎖️</span>
-                <h4 class="font-title font-bold text-slate-800 text-sm">Rekor Terbaikmu</h4>
+              <div class="flex items-center gap-1.5">
+                <span class="text-base">🎖️</span>
+                <h4 class="font-title font-bold text-slate-800 text-xs">Rekor Terbaikmu</h4>
               </div>
-              <span id="typing-best-badge" class="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px]">
+              <span id="typing-best-badge" class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px]">
                 Pemula
               </span>
             </div>
             <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div class="p-2.5 bg-white rounded-xl border border-amber-200 shadow-2xs">
+              <div class="p-2 bg-white rounded-xl border border-amber-200 shadow-2xs">
                 <span class="text-[10px] text-slate-500 block">Skor Tertinggi:</span>
-                <b id="typing-record-score" class="text-amber-700 text-base">0</b>
+                <b id="typing-record-score" class="text-amber-700 text-sm">0</b>
               </div>
-              <div class="p-2.5 bg-white rounded-xl border border-amber-200 shadow-2xs">
+              <div class="p-2 bg-white rounded-xl border border-amber-200 shadow-2xs">
                 <span class="text-[10px] text-slate-500 block">WPM Tertinggi:</span>
-                <b id="typing-record-wpm" class="text-amber-700 text-base">0 WPM</b>
+                <b id="typing-record-wpm" class="text-amber-700 text-sm">0 WPM</b>
               </div>
             </div>
           </div>
@@ -8912,43 +8959,98 @@
         </button>
       </div>
 
-      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 mb-6">
+      <div class="bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl border-2 border-indigo-100 shadow-2xl space-y-6 text-slate-800">
+        <!-- Header Kuis Lucu & Berwarna -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-3 py-1 rounded-full">Ujian Pengetahuan Digital</span>
-            <h2 class="font-title text-2xl sm:text-3xl font-bold text-slate-800 mt-1">Kuis Petualangan Kreator Cilik</h2>
-            <p class="text-sm text-slate-500">Jawab 5 pertanyaan kuis dari materi TP 2.1 sampai TP 2.4 untuk mendapatkan Sertifikat Digital!</p>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-extrabold font-title uppercase tracking-wider mb-1">
+              <i class="fa-solid fa-star text-amber-600"></i> Ujian Pengetahuan Digital Siswa
+            </div>
+            <h2 class="font-title text-2xl sm:text-3xl font-black text-slate-900 mt-1 flex items-center gap-2">
+              <span>Kuis Petualangan Kreator Cilik</span> 🚀✨
+            </h2>
+            <p id="quiz-header-subtitle" class="text-xs sm:text-sm text-slate-600 mt-0.5">Jawab pertanyaan kuis materi semester aktif untuk mendapatkan Sertifikat Digital!</p>
           </div>
-          <div class="flex items-center gap-3">
-            <div class="bg-amber-100 text-amber-900 px-4 py-2 rounded-2xl font-bold text-sm">
-              Skor: <span id="quiz-score">0</span> / 100
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button id="btn-lihat-sertifikat-top" type="button" onclick="tampilkanSertifikatTersimpanSiswa()" class="hidden px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-title font-bold rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-award text-amber-900"></i> <span>Lihat Piagam Sertifikat</span>
+            </button>
+            <div class="flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 text-slate-950 px-4 py-2 rounded-2xl font-black text-xs sm:text-sm shadow-md border-2 border-amber-200">
+              <i class="fa-solid fa-star text-amber-800 text-base animate-pulse"></i>
+              <span>Skor Kamu: <span id="quiz-score" class="text-base sm:text-lg">0</span> / 100</span>
             </div>
           </div>
         </div>
 
+        <!-- Maskot Robo Pendamping Kuis (Lucu & Menyemangati Siswa) -->
+        <div class="bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 p-3.5 sm:p-4 rounded-2xl border-2 border-indigo-100 flex items-center gap-3.5 shadow-xs">
+          <div class="relative shrink-0">
+            <div id="quiz-robo-avatar" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 via-sky-400 to-blue-500 flex items-center justify-center text-2xl sm:text-3xl shadow-md text-white border-2 border-white transition-transform duration-300">
+              🤖
+            </div>
+            <span class="absolute -bottom-1 -right-1 text-xs">⭐</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-0.5">
+              <span class="font-title font-extrabold text-xs text-indigo-950">Robo Tzu Chi</span>
+              <span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">Sahabat Belajar Cilik</span>
+            </div>
+            <p id="quiz-robo-speech" class="text-xs sm:text-sm text-slate-700 font-bold leading-relaxed">
+              "Halo teman pintar! Baca soal dengan teliti dan pilih jawaban terbaikmu ya! Ayo kumpulkan nilai terbaik! 🌟"
+            </p>
+          </div>
+        </div>
+
         <!-- Quiz Container -->
-        <div id="quiz-box" class="max-w-2xl mx-auto space-y-6">
-          <div class="flex items-center justify-between text-xs font-bold text-slate-500">
-            <span id="quiz-progress-text">Pertanyaan 1 dari 5</span>
-            <span id="quiz-tp-badge" class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full font-title">Materi TP 2.1</span>
+        <div id="quiz-box" class="max-w-2xl mx-auto space-y-5">
+          <!-- Indikator Soal & Bar Kemajuan Gamified -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-title border border-slate-200">
+                <i class="fa-solid fa-bullseye text-indigo-600"></i>
+                <span id="quiz-progress-text">Pertanyaan 1 dari 5</span>
+              </span>
+              <span id="quiz-tp-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 text-indigo-700 font-title font-bold border border-indigo-200">
+                Materi TP 2.1
+              </span>
+            </div>
+            <!-- Progress Bar Striped Smooth -->
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200 shadow-inner">
+              <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-500 rounded-full transition-all duration-500 shadow-sm" style="width: 20%;"></div>
+            </div>
           </div>
 
-          <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-4">
-            <h3 id="quiz-question" class="font-title text-lg sm:text-xl font-bold text-slate-800 leading-snug">
-              Sedang memuat pertanyaan...
-            </h3>
-            <div id="quiz-options" class="space-y-2.5">
+          <!-- Kartu Pertanyaan & Opsi Jawaban High-Contrast & Lucu -->
+          <div class="bg-gradient-to-b from-slate-50/80 to-white p-5 sm:p-7 rounded-3xl border-2 border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-start gap-2.5">
+              <span class="w-7 h-7 rounded-xl bg-amber-400 text-amber-950 font-black text-xs flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                <i class="fa-solid fa-lightbulb"></i>
+              </span>
+              <h3 id="quiz-question" class="font-title text-base sm:text-xl font-black text-slate-900 leading-snug flex-1">
+                Sedang memuat pertanyaan kuis...
+              </h3>
+            </div>
+            
+            <!-- Tempat Butir Pilihan Ganda -->
+            <div id="quiz-options" class="space-y-3 pt-1">
               <!-- Opsi jawaban dimuat lewat JavaScript -->
             </div>
           </div>
 
-          <div id="quiz-explanation" class="hidden p-4 rounded-2xl text-xs sm:text-sm font-medium"></div>
+          <!-- Kotak Pembahasan Edukatif Interaktif -->
+          <div id="quiz-explanation" class="hidden p-4 sm:p-5 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-300"></div>
 
+          <!-- Tombol Lanjut ke Pertanyaan Berikutnya -->
           <div class="flex justify-between items-center pt-2">
-            <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden ml-auto bg-blue-600 hover:bg-blue-700 text-white font-title text-sm font-bold px-6 py-2.5 rounded-2xl shadow transition">
-              Lanjut Pertanyaan Berikutnya <i class="fa-solid fa-arrow-right ml-1"></i>
+            <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden ml-auto bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-title text-xs sm:text-sm font-extrabold px-6 py-3 rounded-2xl shadow-lg hover:shadow-indigo-500/25 transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+              <span id="quiz-next-btn-text">Lanjut Pertanyaan Berikutnya</span> <i class="fa-solid fa-arrow-right animate-pulse"></i>
             </button>
           </div>
+        </div>
+
+        <!-- TAMPILAN KUIS TERKUNCI (MODE KUNCI TOTAL GURU ATAU PRASYARAT TUGAS BELUM SELESAI) -->
+        <div id="quiz-locked-box" class="hidden max-w-2xl mx-auto space-y-6 text-center animate-fadeIn py-2">
+          <!-- Di-render dinamis oleh renderLayarKuisTerkunci(access) di app.js -->
         </div>
 
         <!-- Sertifikat Kelulusan (Tampil jika kuis selesai) -->
@@ -8986,6 +9088,9 @@
             </button>
             <button onclick="restartQuiz()" class="bg-amber-500 hover:bg-amber-600 text-white font-title text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
               <i class="fa-solid fa-rotate-right"></i> Coba Kuis Lagi
+            </button>
+            <button onclick="kembaliKeSoalKuis()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-arrow-left"></i> Kembali ke Soal
             </button>
           </div>
         </div>
@@ -10476,14 +10581,14 @@
           row.forEach(function(k) {
             var f = FINGER_MAP[k] || { finger: '', color: 'bg-slate-700' };
             var safeId = (k === ',' ? 'comma' : (k === '.' ? 'dot' : (k === ';' ? 'semicolon' : k)));
-            html += '<button type="button" id="vkey-' + safeId + '" onclick="window.onVirtualKeyClick(\'' + k + '\')" class="vkey-btn w-7 h-8 sm:w-10 sm:h-10 rounded-xl font-mono font-bold text-xs sm:text-sm text-white flex items-center justify-center transition-all duration-150 ' + f.color + ' shadow-sm active:scale-95 border border-white/20 hover:brightness-110 cursor-pointer" title="' + k + ' (' + f.finger + ')">' + k + '</button>';
+            html += '<button type="button" id="vkey-' + safeId + '" onclick="window.onVirtualKeyClick(\'' + k + '\')" class="vkey-btn w-6.5 h-7 sm:w-8 sm:h-8 rounded-lg font-mono font-bold text-xs text-white flex items-center justify-center transition-all duration-150 ' + f.color + ' shadow-2xs active:scale-95 border border-white/20 hover:brightness-110 cursor-pointer" title="' + k + ' (' + f.finger + ')">' + k + '</button>';
           });
           html += '</div>';
         });
 
-        html += '<div class="flex items-center justify-center gap-2 w-full pt-0.5">';
-        html += '<button type="button" id="vkey-CTRL" onclick="window.onVirtualKeyClick(\'CTRL\')" class="vkey-btn px-4 sm:px-6 h-8 sm:h-9 rounded-xl font-mono font-bold text-xs text-white bg-rose-500 shadow-sm border border-white/20 cursor-pointer hover:brightness-110" title="Ctrl (Kelingking Kiri)">Ctrl</button>';
-        html += '<button type="button" id="vkey-SPACE" onclick="window.onVirtualKeyClick(\' \')" class="vkey-btn flex-1 max-w-xs h-8 sm:h-9 rounded-xl font-mono font-bold text-xs text-white bg-blue-500 shadow-sm border border-white/20 cursor-pointer hover:brightness-110" title="Spasi (Ibu Jari)">Spasi</button>';
+        html += '<div class="flex items-center justify-center gap-1.5 w-full pt-0.5">';
+        html += '<button type="button" id="vkey-CTRL" onclick="window.onVirtualKeyClick(\'CTRL\')" class="vkey-btn px-3 sm:px-4 h-7 sm:h-8 rounded-lg font-mono font-bold text-xs text-white bg-rose-500 shadow-2xs border border-white/20 cursor-pointer hover:brightness-110" title="Ctrl (Kelingking Kiri)">Ctrl</button>';
+        html += '<button type="button" id="vkey-SPACE" onclick="window.onVirtualKeyClick(\' \')" class="vkey-btn flex-1 max-w-xs h-7 sm:h-8 rounded-lg font-mono font-bold text-xs text-white bg-blue-500 shadow-2xs border border-white/20 cursor-pointer hover:brightness-110" title="Spasi (Ibu Jari)">Spasi</button>';
         html += '</div>';
 
         container.innerHTML = html;
@@ -10750,19 +10855,33 @@
         }
       }
 
-      // 8. KEYBOARD & INPUT LISTENER
+      // 8. KEYBOARD & INPUT LISTENER (LAYAR STATIS & ANTI-GESER)
       function handleKeyDown(e) {
-        if (!typingState.isPlaying || typingState.isPaused) return;
-
         var tabKetik = document.getElementById('tab-ketik');
         if (!tabKetik || tabKetik.classList.contains('hidden')) return;
+
+        // KUNCI PERAMBAN: CEGAH SCROLL / PERGESERAN LAYAR
+        // Tombol Spasi, Panah Atas/Bawah/Kiri/Kanan, Tab, Backspace, PgUp, PgDn, Home, End
+        var scrollKeys = ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'PageUp', 'PageDown', 'Home', 'End'];
+        if (scrollKeys.indexOf(e.code) !== -1 || e.key === ' ' || e.key === 'Tab') {
+          e.preventDefault();
+        }
 
         var isCtrl = e.ctrlKey || e.metaKey;
         var keyUpper = (e.key || '').toUpperCase();
 
-        if (isCtrl && ['S', 'P', 'B', 'I', 'U', 'Z', 'C', 'V', 'A', 'N'].indexOf(keyUpper) !== -1) {
+        // Cegah shortcut bawaan browser yang memicu dialog (Print, Save, Find, Bookmark, dll)
+        if (isCtrl && ['S', 'P', 'B', 'I', 'U', 'Z', 'C', 'V', 'A', 'N', 'F', 'O', 'K', 'D'].indexOf(keyUpper) !== -1) {
           e.preventDefault();
         }
+
+        // Tuts Escape untuk keluar dari mode layar penuh
+        if (e.key === 'Escape' && window.isTypingFullscreen) {
+          window.toggleTypingFullscreen();
+          return;
+        }
+
+        if (!typingState.isPlaying || typingState.isPaused) return;
 
         highlightVirtualKey(keyUpper, true);
         if (isCtrl) highlightVirtualKey('CTRL', true);
@@ -10787,8 +10906,9 @@
           return;
         }
 
-        // LEVEL 1 & 3: NORMAL WORDS
+        // LEVEL 1 & 3: NORMAL WORDS (HURUF ATAU KATA BERTUKAR SPASI)
         if (e.key && e.key.length === 1 && !isCtrl) {
+          e.preventDefault(); // Kunci pergerakan browser saat mengetik karakter apapun
           typingState.keystrokesTotal++;
 
           if (!typingState.activeBalloonId) {
@@ -11115,6 +11235,35 @@
         if (m) m.classList.add('hidden');
       };
 
+      // 11B. MODE LAYAR STATIS & FULLSCREEN THEATER ARCADE
+      window.isTypingFullscreen = false;
+      window.toggleTypingFullscreen = function() {
+        var tab = document.getElementById('tab-ketik');
+        var icon = document.getElementById('icon-typing-fullscreen');
+        var txt = document.getElementById('text-typing-fullscreen');
+        if (!tab) return;
+
+        window.isTypingFullscreen = !window.isTypingFullscreen;
+        if (window.isTypingFullscreen) {
+          tab.classList.add('tab-ketik-fullscreen');
+          document.body.classList.add('typing-screen-locked');
+          if (icon) icon.className = 'fa-solid fa-compress';
+          if (txt) txt.innerText = 'Layar Normal 🗗';
+          safeToast('Mode Layar Statis Penuh Aktif! Layar terkunci dan tidak akan bergeser 🔒 (Tekan ESC untuk kembali)', 'info');
+        } else {
+          tab.classList.remove('tab-ketik-fullscreen');
+          if (icon) icon.className = 'fa-solid fa-expand';
+          if (txt) txt.innerText = 'Layar Penuh ⛶';
+          safeToast('Kembali ke tampilan standar jendela.', 'info');
+        }
+      };
+
+      window.exitTypingFullscreen = function() {
+        if (window.isTypingFullscreen) {
+          window.toggleTypingFullscreen();
+        }
+      };
+
       // 12. INITIALIZATION
       window.initTypingHeroGame = function() {
         renderTypingVirtualKeyboard();
@@ -11295,10 +11444,13 @@
             <i class="fa-solid fa-chart-pie"></i> Analisis Capaian TP
           </button>
           <button onclick="pilihSubTabGuru('galeri')" id="guru-subtab-btn-galeri" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
-            <i class="fa-solid fa-images"></i> Galeri Karya Siswa
+            <i class="fa-solid fa-palette text-pink-500"></i> Galeri Poster Siswa (Sem 1)
           </button>
           <button onclick="pilihSubTabGuru('cloud')" id="guru-subtab-btn-cloud" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
             <i class="fa-solid fa-cloud-arrow-up"></i> Sinkronisasi Cloud & Backup
+          </button>
+          <button onclick="pilihSubTabGuru('bank-soal')" id="guru-subtab-btn-bank-soal" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-question text-amber-500"></i> Bank Soal Kuis
           </button>
         </div>
 
@@ -11520,21 +11672,39 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 3: GALERI KARYA TANTANGAN SISWA -->
+      <!-- SUB-TAB 3: GALERI HASIL KARYA SISWA (SEMESTER 1: POSTER & SEMESTER 2: CODING/AI SAAT AKTIF) -->
       <div id="guru-view-galeri" class="hidden space-y-4">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 class="font-title font-bold text-base text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-palette text-pink-600"></i> Galeri Poster & Lembar Tantangan Siswa
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span id="guru-galeri-sem-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-pink-100 text-pink-700 border border-pink-200">
+                  Semester 1 • TP 2.1 - TP 2.4
+                </span>
+                <span id="guru-galeri-count-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+                  Karya Poster Siswa
+                </span>
+              </div>
+              <h3 id="guru-galeri-title" class="font-title font-bold text-lg text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-palette text-pink-600"></i> Galeri Hasil Karya Poster Siswa (Semester 1)
               </h3>
-              <p class="text-xs text-slate-500 mt-1">
-                Kumpulan hasil poster MS Word dan tantangan tabel spreadsheet yang dibuat oleh siswa.
+              <p id="guru-galeri-desc" class="text-xs text-slate-500 mt-1">
+                Kumpulan portofolio digital hasil karya poster MS Word & Konten Digital TP 2.1 - TP 2.4 yang dirancang mandiri oleh siswa Kelas 4.
               </p>
             </div>
-            <span class="text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 self-start">
-              <i class="fa-solid fa-cloud-arrow-down"></i> Auto-Sync dari Browser Siswa
-            </span>
+            <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+              <span class="text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <i class="fa-solid fa-cloud-arrow-down"></i> Auto-Sync dari Browser Siswa
+              </span>
+              <button type="button" onclick="renderGaleriGuru()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Segarkan Galeri">
+                <i class="fa-solid fa-rotate text-xs"></i> Segarkan
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab Switcher Semester Galeri (Semester 1 vs Semester 2 Aktif) -->
+          <div id="guru-galeri-sem-switcher" class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
+            <!-- Diatur otomatis lewat renderGaleriGuru() -->
           </div>
 
           <!-- Cards Grid Galeri Siswa -->
@@ -11548,6 +11718,98 @@
       <div id="guru-view-cloud" class="hidden space-y-4">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           
+          <!-- Box 0: Server Cloud Database Siswa (Google Firebase: Firestore & Storage) -->
+          <div class="bg-gradient-to-br from-amber-50/60 via-white to-orange-50/40 p-6 rounded-3xl border-2 border-amber-300 shadow-md space-y-4 lg:col-span-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200/80">
+              <div class="flex items-center gap-3">
+                <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-2xl font-bold shadow-md shadow-orange-500/20">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-title font-bold text-slate-800 text-base">Server Cloud Database Siswa (Google Firebase)</h4>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">Rekomendasi Utama</span>
+                  </div>
+                  <p class="text-xs text-slate-600">Penyimpanan awan terpusat untuk ~200 akun siswa. Karya poster Word & Drive tidak akan hilang saat PC lab direstart / Deep Freeze.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="badge-status-firebase" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-300 flex items-center gap-1.5 transition-all">
+                  <i class="fa-solid fa-circle-dot text-slate-400"></i> Mode Lokal Komputer
+                </span>
+              </div>
+            </div>
+
+            <!-- Manfaat & Jaminan Keamanan Cloud -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3 bg-white/80 rounded-2xl border border-amber-200/70 shadow-2xs space-y-1">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-800">
+                  <i class="fa-solid fa-shield-halved text-amber-500"></i> Aman dari Deep Freeze
+                </div>
+                <p class="text-[11px] text-slate-600 leading-snug">
+                  Hasil karya disimpan di server Google Firebase secara instan, aman meskipun komputer lab dimatikan atau di-restore.
+                </p>
+              </div>
+              <div class="p-3 bg-white/80 rounded-2xl border border-amber-200/70 shadow-2xs space-y-1">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-blue-800">
+                  <i class="fa-solid fa-network-wired text-blue-500"></i> Bebas Pindah PC Lab
+                </div>
+                <p class="text-[11px] text-slate-600 leading-snug">
+                  Siswa cukup login dengan NIS di komputer lab mana saja, karya Word & Drive otomatis termuat kembali.
+                </p>
+              </div>
+              <div class="p-3 bg-white/80 rounded-2xl border border-amber-200/70 shadow-2xs space-y-1">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                  <i class="fa-solid fa-gift text-emerald-500"></i> 100% Gratis Google Cloud
+                </div>
+                <p class="text-[11px] text-slate-600 leading-snug">
+                  Firebase Spark Plan gratis mencakup 1 GB Firestore Database & 5 GB File Storage (sangat berlebih untuk 200+ siswa).
+                </p>
+              </div>
+            </div>
+
+            <!-- Form Konfigurasi Firebase -->
+            <div class="p-4 bg-white rounded-2xl border border-amber-200 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <label for="firebase-config-input" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <i class="fa-solid fa-code text-amber-600"></i> Kode Konfigurasi Firebase (<code class="text-[11px] bg-slate-100 px-1 py-0.5 rounded text-amber-700">firebaseConfig</code>):
+                </label>
+                <button type="button" onclick="bukaPanduanFirebase()" class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1.5 underline cursor-pointer">
+                  <i class="fa-solid fa-circle-question"></i> Lihat Panduan Setup 3 Menit (Gratis)
+                </button>
+              </div>
+
+              <textarea id="firebase-config-input" rows="4" placeholder='Tempelkan (Paste) konfigurasi proyek Firebase di sini.
+Bisa format JSON: {"apiKey": "...", "projectId": "...", "storageBucket": "..."}
+Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...", ... };' class="w-full text-xs font-mono p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition resize-y"></textarea>
+
+              <div class="flex flex-wrap items-center gap-2 pt-1">
+                <button type="button" onclick="simpanDanUjiFirebase()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
+                  <i class="fa-solid fa-bolt"></i> Simpan & Uji Koneksi Cloud
+                </button>
+                <button type="button" onclick="unggahSemuaKaryaLokalKeCloud()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Unggah Semua Karya Lokal ke Cloud
+                </button>
+                <button type="button" onclick="putusKoneksiFirebase()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-bold transition flex items-center gap-2 border border-slate-200 cursor-pointer">
+                  <i class="fa-solid fa-link-slash text-slate-500"></i> Putus Koneksi
+                </button>
+              </div>
+            </div>
+
+            <!-- Status Diagnostik & Koleksi Terhubung -->
+            <div id="firebase-diag-box" class="p-3.5 bg-amber-50/50 rounded-2xl border border-amber-200 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-server text-amber-600 text-sm"></i>
+                <span id="firebase-diag-project" class="font-medium text-slate-700">Project: <b class="text-slate-900 font-mono">Belum Diatur</b></span>
+                <span class="text-slate-300">•</span>
+                <span id="firebase-diag-storage" class="font-medium text-slate-700">Bucket: <b class="text-slate-900 font-mono">Belum Ada</b></span>
+              </div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                <span id="firebase-diag-sync"><i class="fa-regular fa-clock"></i> Sinkronisasi: Belum pernah</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Box 1: Integrasi Google Spreadsheet Tiap Kelas (Penyimpanan Berbeda Sesuai Kelas) -->
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 lg:col-span-2">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
@@ -11633,10 +11895,32 @@
                   <button onclick="ujiCekNisGuru()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-magnifying-glass"></i> Uji Cek NIS
                   </button>
-                  <button onclick="salinKodeAppsScript()" class="px-3 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-code"></i> Skrip Apps
+                  <button onclick="salinKodeAppsScript()" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-code"></i> Salin Kode Google Apps Script
+                  </button>
+                  <button onclick="bukaModalPanduanSheets()" class="px-3 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-book-open"></i> Cara Pasang
                   </button>
                 </div>
+              </div>
+
+              <!-- Input URL Webhook Google Apps Script -->
+              <div class="pt-3 border-t border-slate-200/80 space-y-2">
+                <label class="block text-xs font-bold text-slate-700">
+                  <i class="fa-solid fa-link text-emerald-600"></i> URL Webhook Google Apps Script (Auto-Sync Nilai & Portofolio Siswa):
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  <input type="text" id="guru-webhook-url" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="flex-1 min-w-[240px] px-3 py-2 rounded-xl text-xs border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-800 shadow-2xs">
+                  <button onclick="simpanWebhookGuruForm()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan Webhook
+                  </button>
+                  <button onclick="ujiKirimWebhookGuru()" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-paper-plane"></i> Uji Kirim
+                  </button>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-snug">
+                  Setelah memasang skrip di Google Spreadsheet, tempelkan URL Web App hasil <i>Deploy</i> di sini agar setiap tugas poster dan nilai siswa otomatis terkirim ke Google Drive Anda.
+                </p>
               </div>
             </div>
 
@@ -11712,6 +11996,152 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SUB-TAB 5: BANK SOAL KUIS (SEMESTER 1 & SEMESTER 2)       -->
+      <!-- ======================================================== -->
+      <div id="guru-view-bank-soal" class="hidden space-y-5 animate-fadeIn">
+        <!-- Header Banner Bank Soal -->
+        <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 p-6 rounded-3xl border-2 border-amber-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-2xl shadow-md shrink-0">
+              <i class="fa-solid fa-clipboard-question"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-amber-700 bg-amber-200/60 px-2.5 py-0.5 rounded-full border border-amber-300">
+                  Manajemen Soal Ujian Digital
+                </span>
+                <span id="bank-soal-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-white text-slate-700 border border-amber-200 shadow-2xs">
+                  5 Soal Aktif
+                </span>
+              </div>
+              <h3 class="font-title text-xl sm:text-2xl font-bold text-slate-800 mt-1">Bank Soal Kuis Siswa</h3>
+              <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                Kelola pertanyaan pilihan ganda untuk kuis interaktif siswa. Setiap butir soal yang ditambah, diedit, atau dihapus akan langsung tersinkronkan ke akun siswa saat mereka mengerjakan kuis di semester yang bersangkutan.
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button onclick="bukaModalUploadDokumenSoal()" class="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer" title="Impor otomatis dari file Word (.docx), PDF (.pdf), atau salin-tempel teks soal">
+              <i class="fa-solid fa-file-arrow-up text-sm"></i> Upload Dokumen (Word / PDF)
+            </button>
+            <button onclick="bukaModalTambahSoal()" class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-title font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-circle-plus text-sm"></i> Tambah Manual
+            </button>
+            <button onclick="resetBankSoalGuruKonfirmasi()" class="px-3.5 py-2.5 bg-white hover:bg-slate-100 text-slate-700 font-title font-semibold text-xs rounded-xl border border-slate-300 shadow-xs transition flex items-center gap-1.5 cursor-pointer" title="Kembalikan butir soal ke kurikulum standar">
+              <i class="fa-solid fa-rotate-left text-slate-500"></i> Reset Soal Standar
+            </button>
+          </div>
+        </div>
+
+        <!-- Semester Switcher Bar for Bank Soal -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wide mr-1">Pilih Semester:</span>
+            <button id="btn-bank-sem1" onclick="pilihSemesterBankSoalGuru(1)" class="px-4 py-2 rounded-xl text-xs font-title font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs cursor-pointer">
+              <i class="fa-solid fa-book-open"></i> Semester 1 (Konten Digital, Word & Excel)
+            </button>
+            <button id="btn-bank-sem2" onclick="pilihSemesterBankSoalGuru(2)" class="px-4 py-2 rounded-xl text-xs font-title font-semibold transition flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">
+              <i class="fa-solid fa-robot"></i> Semester 2 (Coding Scratch & RoboMind AI)
+            </button>
+          </div>
+          <div class="text-xs text-slate-500 italic">
+            <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Soal yang aktif di sini langsung diujikan ke kuis siswa di semester tersebut.
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- KONTROL AKSES KUIS SISWA OLEH GURU (PILIHAN 3: MODE BEBAS, PRASYARAT TUGAS, & KUNCI TOTAL) -->
+        <!-- ======================================================== -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-5 sm:p-6 border-2 border-indigo-400/40 text-white shadow-xl space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/10 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-indigo-600/40 border border-indigo-400/40 text-amber-300 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              <div>
+                <h4 class="font-title font-black text-base sm:text-lg text-white">
+                  Kontrol Akses Soal Kuis Siswa (Semester <span id="label-akses-kuis-sem">1</span>)
+                </h4>
+                <p class="text-xs text-slate-300">
+                  Pilih aturan kapan siswa diperbolehkan mengerjakan kuis interaktif ini.
+                </p>
+              </div>
+            </div>
+            <div id="badge-status-akses-kuis" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-400/20 text-yellow-300 border border-amber-300/40 self-start md:self-auto">
+              <i class="fa-solid fa-lock"></i> <span>Status: Wajib Selesai Tugas</span>
+            </div>
+          </div>
+
+          <!-- 3 Pilihan Mode Akses Kuis -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            
+            <!-- Mode 1: Bebas -->
+            <button type="button" onclick="setModeAksesKuisGuru('bebas')" id="btn-mode-kuis-bebas" class="p-3.5 rounded-2xl border-2 transition-all text-left flex flex-col justify-between cursor-pointer group bg-white/5 border-white/10 hover:border-emerald-400/60 hover:bg-emerald-950/20">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-sm font-bold">
+                    🟢
+                  </span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Mode 1</span>
+                </div>
+                <div class="font-title font-extrabold text-xs sm:text-sm text-white">Buka Bebas Kapan Saja</div>
+                <p class="text-[11px] text-slate-300 mt-1 leading-snug">
+                  Siswa dapat langsung membuka dan mengerjakan kuis kapan pun tanpa syarat tugas.
+                </p>
+              </div>
+              <div class="mt-3 text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                <span>Pilih Mode Ini</span> <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+              </div>
+            </button>
+
+            <!-- Mode 2: Prasyarat Tugas (Recommended) -->
+            <button type="button" onclick="setModeAksesKuisGuru('prasyarat')" id="btn-mode-kuis-prasyarat" class="p-3.5 rounded-2xl border-2 transition-all text-left flex flex-col justify-between cursor-pointer group bg-indigo-900/60 border-yellow-400 ring-2 ring-yellow-400/30">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-yellow-300 flex items-center justify-center text-sm font-bold">
+                    🟡
+                  </span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-yellow-300 bg-amber-500/30 px-2 py-0.5 rounded-full">Disarankan ⭐</span>
+                </div>
+                <div class="font-title font-extrabold text-xs sm:text-sm text-white">Wajib Selesai Tugas</div>
+                <p class="text-[11px] text-slate-300 mt-1 leading-snug">
+                  Kuis terkunci otomatis dan baru terbuka setelah siswa menyelesaikan tugas poster / praktikum.
+                </p>
+              </div>
+              <div class="mt-3 text-[10px] font-bold text-yellow-300 flex items-center gap-1">
+                <span>Aktif Sekarang</span> <i class="fa-solid fa-check text-[9px]"></i>
+              </div>
+            </button>
+
+            <!-- Mode 3: Kunci Total -->
+            <button type="button" onclick="setModeAksesKuisGuru('kunci')" id="btn-mode-kuis-kunci" class="p-3.5 rounded-2xl border-2 transition-all text-left flex flex-col justify-between cursor-pointer group bg-white/5 border-white/10 hover:border-rose-400/60 hover:bg-rose-950/20">
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-sm font-bold">
+                    🔴
+                  </span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400">Mode 3</span>
+                </div>
+                <div class="font-title font-extrabold text-xs sm:text-sm text-white">Kunci Total (Ditutup)</div>
+                <p class="text-[11px] text-slate-300 mt-1 leading-snug">
+                  Kuis ditutup untuk semua siswa sampai guru membukanya saat jam ujian tiba.
+                </p>
+              </div>
+              <div class="mt-3 text-[10px] font-bold text-rose-400 flex items-center gap-1">
+                <span>Pilih Mode Ini</span> <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Daftar Kartu Soal Container -->
+        <div id="bank-soal-cards-container" class="space-y-4">
+          <!-- Diisi via renderBankSoalGuru() -->
         </div>
       </div>
     </section>
@@ -12216,6 +12646,9 @@
         <p id="pesan-error-pin" class="text-xs text-rose-500 font-bold hidden flex items-center justify-center gap-1">
           <i class="fa-solid fa-circle-exclamation"></i> PIN salah! Silakan coba lagi.
         </p>
+        <div id="hint-pin-login-guru" class="text-[11px] text-slate-400">
+          <span class="text-slate-400 font-medium">Default: 1234</span>
+        </div>
 
         <!-- Touchscreen Friendly Keypad -->
         <div class="grid grid-cols-3 gap-2 pt-1">
@@ -12423,12 +12856,15 @@
 
         <!-- Tombol Aksi di Tampilan Kartu -->
         <div class="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <button onclick="tampilkanFormGantiSiswa()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5">
-              <i class="fa-solid fa-user-pen"></i> Ganti Akun / Masuk Lain
+              <i class="fa-solid fa-user-pen"></i> Ganti Akun
+            </button>
+            <button onclick="tutupModalProfilSiswa(); bukaKuisAtauSertifikatSiswa();" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-award text-amber-900"></i> Sertifikat Kuis 🏆
             </button>
             <button onclick="konfirmasiKeluarSiswa()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Keluar Akun Siswa">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar Akun
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
             </button>
           </div>
           <button onclick="tutupModalProfilSiswa()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-title font-bold text-xs shadow-md transition">
@@ -12925,37 +13361,495 @@
 
 
   <!-- ======================================================== -->
-  <!-- FLOATING SCROLL NAVIGATION (TOMBOL GULIR KE ATAS & BAWAH) -->
+  <!-- MODAL PANDUAN SETUP GOOGLE SPREADSHEET & APPS SCRIPT      -->
   <!-- ======================================================== -->
-  <aside id="floating-scroll-nav" aria-label="Navigasi Gulir Cepat" class="fixed right-4 sm:right-6 bottom-20 sm:bottom-24 z-50 flex flex-col items-center gap-2.5 select-none">
-    <!-- Tombol 1: Gulir ke Paling Atas (Scroll to Top) -->
-    <button type="button" id="btn-scroll-top" onclick="gulirKeAtas()" title="Kembali ke Bagian Paling Atas" class="group flex items-center justify-center gap-2 px-4 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white font-title font-black text-xs sm:text-sm shadow-xl shadow-blue-600/35 border-2 border-blue-300/80 backdrop-blur-md transition-all cursor-pointer">
-      <i class="fa-solid fa-arrow-up text-sm sm:text-base group-hover:-translate-y-1 transition-transform"></i>
-      <span>Ke Atas</span>
-    </button>
+  <div id="modal-panduan-sheets" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-emerald-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="p-5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-bold shadow-inner">
+            <i class="fa-solid fa-table-cells"></i>
+          </div>
+          <div>
+            <h3 class="font-title font-bold text-lg leading-tight">Panduan Setup Google Spreadsheet & Apps Script</h3>
+            <p class="text-xs text-emerald-100">Buku Nilai & Portofolio Siswa Terhubung Langsung ke Google Drive Pribadi/Sekolah (100% Gratis)</p>
+          </div>
+        </div>
+        <button onclick="tutupModalPanduanSheets()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
 
-    <!-- Tombol 2: Cepat Loncat ke Tabel Nilai (Aktif di Dasbor Guru) -->
-    <button type="button" id="btn-scroll-tabel" onclick="gulirKeTabelGuru()" title="Loncat Cepat ke Tabel Nilai Siswa" class="hidden group flex items-center justify-center gap-2 px-4 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active:scale-95 text-slate-950 font-title font-black text-xs sm:text-sm shadow-xl shadow-amber-500/35 border-2 border-amber-300 backdrop-blur-md transition-all cursor-pointer">
-      <i class="fa-solid fa-table-list text-xs sm:text-sm"></i>
-      <span>Ke Tabel</span>
-    </button>
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 text-slate-700 text-xs leading-relaxed">
+        
+        <!-- Info Banner -->
+        <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 flex items-start gap-3">
+          <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5"></i>
+          <div>
+            <span class="font-bold">Keunggulan Integrasi Google Sheets:</span>
+            <p class="text-[11px] text-emerald-800 mt-0.5">
+              Hanya membutuhkan akun Google biasa (Gmail / akun Google Workspace Sekolah). Tidak diblokir oleh jaringan sekolah/lab komputer, data siswa otomatis tersimpan di Google Drive Bapak/Ibu guru secara rapi!
+            </p>
+          </div>
+        </div>
 
-    <!-- Tombol 3: Gulir ke Paling Bawah (Scroll to Bottom) -->
-    <button type="button" id="btn-scroll-bottom" onclick="gulirKeBawah()" title="Langsung Menuju Bagian Paling Bawah" class="group flex items-center justify-center gap-2 px-4 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 active:scale-95 text-white font-title font-black text-xs sm:text-sm shadow-xl shadow-slate-900/40 border-2 border-slate-600/80 backdrop-blur-md transition-all cursor-pointer">
-      <i class="fa-solid fa-arrow-down text-sm sm:text-base group-hover:translate-y-1 transition-transform"></i>
-      <span>Ke Bawah</span>
-    </button>
-  </aside>
+        <!-- 3 Langkah Sederhana -->
+        <div class="space-y-4">
+          <!-- Langkah 1 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">1</span>
+              <span>Buat Berkas Google Spreadsheet</span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Buka <a href="https://sheets.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline inline-flex items-center gap-1">sheets.google.com <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>, buat Spreadsheet Baru (misal dinamai: <b>Buku Nilai Komputer Tzu Chi Kelas 4</b>). Buat tab sheet dengan nama kelas seperti <b>4A</b>, <b>4B</b>, dst.
+            </p>
+            <div class="pl-8 pt-1">
+              <div class="p-2.5 bg-white border border-slate-200 rounded-xl text-[11px] text-slate-700 font-mono">
+                Baris 1 (Header): <b>No | NIS | Nama Siswa | Jenis Kelamin</b>
+              </div>
+            </div>
+          </div>
 
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-bold">
-    <i id="toast-icon" class="fa-solid fa-bell text-yellow-400 text-lg"></i>
-    <span id="toast-msg">Pesan notifikasi</span>
+          <!-- Langkah 2 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">2</span>
+              <span>Atur Hak Akses Menjadi Publik Melihat</span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Di pojok kanan atas Google Sheets, klik tombol <b>Share (Bagikan)</b> &rarr; Ubah <i>General access (Akses umum)</i> dari "Restricted" menjadi: <b class="text-emerald-700">"Anyone with the link" (Siapa saja yang memiliki link)</b> sebagai <b>Viewer (Pelihat)</b>.
+            </p>
+            <p class="text-slate-600 pl-8">
+              Lalu salin link Spreadsheet tersebut dan tempelkan ke kolom <b>Link URL / ID Spreadsheet</b> di aplikasi ini.
+            </p>
+          </div>
+
+          <!-- Langkah 3 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">3</span>
+              <span>Pasang Google Apps Script (Opsional: Untuk Merekam Nilai & Portofolio Siswa Otomatis)</span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Jika Bapak/Ibu ingin nilai latihan, kuis, dan portofolio karya otomatis tercatat ke Spreadsheet saat siswa mengerjakan di lab:
+            </p>
+            <ol class="list-decimal list-inside pl-8 space-y-1 text-slate-600 text-[11px]">
+              <li>Di Google Sheets, klik menu <b>Ekstensi (Extensions) &rarr; Apps Script</b>.</li>
+              <li>Hapus teks yang ada, lalu klik tombol <b class="text-emerald-700 font-bold">"Salin Kode Google Apps Script"</b> di aplikasi dan tempelkan (paste).</li>
+              <li>Klik tombol <b>Terapkan (Deploy) &rarr; Deployment baru (New deployment)</b>.</li>
+              <li>Pilih jenis <b>Web app (Aplikasi web)</b>:
+                <ul class="list-disc list-inside pl-4 text-slate-500">
+                  <li>Execute as (Jalankan sebagai): <i>Me (Saya)</i></li>
+                  <li>Who has access (Siapa yang memiliki akses): <b>Anyone (Siapa saja)</b></li>
+                </ul>
+              </li>
+              <li>Klik <b>Deploy</b>, salin <b>Web app URL</b>, lalu simpan ke pengaturan Webhook aplikasi.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">
+          <i class="fa-solid fa-lock text-emerald-600 mr-1"></i> Data aman di Google Drive Anda sendiri
+        </span>
+        <div class="flex items-center gap-2">
+          <button onclick="salinKodeAppsScript()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-title font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-code"></i> Salin Kode Script
+          </button>
+          <button onclick="tutupModalPanduanSheets()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition cursor-pointer">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal-panduan-firebase" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-amber-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="p-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-bold shadow-inner">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <div>
+            <h3 class="font-title font-bold text-lg leading-tight">Panduan Setup Google Firebase Cloud</h3>
+            <p class="text-xs text-amber-100">Langkah mudah 3 menit untuk menghubungkan penyimpanan awan 200+ siswa (Gratis 100%)</p>
+          </div>
+        </div>
+        <button onclick="tutupPanduanFirebase()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 text-slate-700 text-xs leading-relaxed">
+        
+        <!-- Info Banner Gratis -->
+        <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 flex items-start gap-3">
+          <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5"></i>
+          <div>
+            <span class="font-bold">Paket Spark Gratis Google Firebase:</span>
+            <p class="text-[11px] text-amber-800 mt-0.5">
+              Tidak membutuhkan kartu kredit. Menyediakan <b>1 GB Cloud Firestore</b> (jutaan catatan tugas siswa) dan <b>5 GB Cloud Storage</b> (ribuan poster gambar), sangat berlebih dan aman untuk SDS Cinta Kasih Tzu Chi.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4 Langkah Setup -->
+        <div class="space-y-4">
+          <!-- Langkah 1 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">1</span>
+              <span>Buka Firebase Console & Buat Proyek</span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Buka website <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold underline inline-flex items-center gap-1">console.firebase.google.com <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>, login dengan akun Google. Klik <b>"Tambahkan proyek" (Add project)</b>, beri nama proyek misalnya: <code class="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-bold text-amber-700">sd-tzuchi-kelas4</code>, lalu klik Terus & Buat Proyek.
+            </p>
+          </div>
+
+          <!-- Langkah 2 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">2</span>
+              <span>Aktifkan Cloud Firestore (Database Teks & Data)</span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Pada menu bilah kiri, klik <b>Build &rarr; Firestore Database</b>, lalu klik tombol <b>"Create database"</b>. Pada pilihan aturan keamanan, pilih <b class="text-emerald-700 font-bold">"Start in test mode"</b> (Mode Uji coba agar siswa di lab dapat langsung menyimpan tanpa login email). Pilih lokasi terdekat (misal <code class="font-bold">asia-southeast2 Jakarta</code>) lalu klik <b>Enable</b>.
+            </p>
+          </div>
+
+          <!-- Langkah 3 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">3</span>
+              <span>Aktifkan Cloud Storage (Penyimpanan Berkas Gambar)</span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Pada menu bilah kiri, klik <b>Build &rarr; Storage</b>, lalu klik tombol <b>"Get started"</b>. Pilih juga <b class="text-emerald-700 font-bold">"Start in test mode"</b>, lalu klik <b>Next & Done</b>. Storage siap menampung gambar poster Word dan lukisan Paint siswa.
+            </p>
+          </div>
+
+          <!-- Langkah 4 -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">4</span>
+              <span>Daftarkan Web App & Salin Kode <code class="text-xs bg-white px-1 rounded text-amber-700">firebaseConfig</code></span>
+            </div>
+            <p class="text-slate-600 pl-8">
+              Klik ikon gerigi <b>Project Settings (Setelan Proyek)</b> di pojok kiri atas. Gulir ke bawah ke bagian <b>"Your apps"</b>, klik ikon Web <b>(&lt;/&gt;)</b>. Beri nama aplikasi (misal: <code class="font-bold">EduCode Web</code>), klik <b>Register app</b>. Salin (copy) kode konfigurasi:
+            </p>
+            <div class="pl-8 pt-1">
+              <pre class="bg-slate-900 text-amber-300 p-3 rounded-xl font-mono text-[11px] overflow-x-auto select-all">const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "sd-tzuchi-kelas4.firebaseapp.com",
+  projectId: "sd-tzuchi-kelas4",
+  storageBucket: "sd-tzuchi-kelas4.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef"
+};</pre>
+            </div>
+            <p class="text-slate-600 pl-8 pt-1">
+              Tempelkan (paste) seluruh blok tersebut ke kotak isian <b>Kode Konfigurasi Firebase</b> di Dasbor Guru, lalu klik tombol <b class="text-amber-700">"Simpan & Uji Koneksi Cloud"</b>!
+            </p>
+          </div>
+        </div>
+
+        <!-- Catatan Penting -->
+        <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-[11px] text-emerald-900 space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i> Sinkronisasi Hibrida Cerdas Otomatis:
+          </div>
+          <p class="leading-relaxed">
+            Aplikasi tetap bekerja lancar dan cepat secara lokal (localStorage). Saat koneksi Firebase aktif, aplikasi otomatis mengunggah karya ke server cloud Google di latar belakang, sehingga ketika siswa pindah PC lab besok hari, data karya mereka langsung ditarik dari Cloud Firestore & Storage secara otomatis.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">
+          <i class="fa-solid fa-lock text-emerald-600 mr-1"></i> Data disimpan aman di server Google Cloud
+        </span>
+        <button onclick="tutupPanduanFirebase()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-title font-bold text-xs shadow-md transition cursor-pointer">
+          Saya Mengerti
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Canvas Hidden Helper untuk Export Download Poster -->
-  <canvas id="export-canvas" width="600" height="750" class="hidden"></canvas>
+  <!-- ======================================================== -->
+  <!-- MODAL TAMBAH / EDIT SOAL KUIS GURU                      -->
+  <!-- ======================================================== -->
+  <div id="modal-bank-soal-guru" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-amber-200 overflow-hidden my-8 max-h-[92vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="p-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-bold shadow-inner">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+          <div>
+            <h3 id="modal-bank-soal-title" class="font-title font-bold text-lg leading-tight">Tambah Soal Kuis Baru</h3>
+            <p id="modal-bank-soal-sub" class="text-xs text-amber-100">Semester 1 • Konten Digital & Berpikir Komputasional</p>
+          </div>
+        </div>
+        <button onclick="tutupModalBankSoalGuru()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
 
-  <script src="app.js?v=20261028_sem_games_v13"></script>
+      <!-- Modal Body -->
+      <form id="form-bank-soal-guru" onsubmit="simpanSoalBankGuru(event)" class="p-6 overflow-y-auto space-y-4 text-slate-700 text-xs">
+        <input type="hidden" id="bank-soal-edit-index" value="-1">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Target Semester:</label>
+            <select id="bank-soal-input-sem" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="1">Semester 1 (Word, Excel & Konten Digital)</option>
+              <option value="2">Semester 2 (Coding Scratch & RoboMind AI)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Materi / Indikator TP:</label>
+            <input type="text" id="bank-soal-input-tp" placeholder="Contoh: TP 2.1 (Konten Tunggal Sederhana)" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Pertanyaan Soal:</label>
+          <textarea id="bank-soal-input-pertanyaan" rows="3" placeholder="Tuliskan teks pertanyaan kuis di sini..." required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed"></textarea>
+        </div>
+
+        <!-- Opsi Jawaban A, B, C, D -->
+        <div class="space-y-2.5 pt-1">
+          <label class="block font-bold text-slate-800">Pilihan Jawaban (A, B, C, D):</label>
+          
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 border border-slate-300">A</span>
+            <input type="text" id="bank-soal-input-opt-0" placeholder="Pilihan jawaban A" required class="flex-1 px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 border border-slate-300">B</span>
+            <input type="text" id="bank-soal-input-opt-1" placeholder="Pilihan jawaban B" required class="flex-1 px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 border border-slate-300">C</span>
+            <input type="text" id="bank-soal-input-opt-2" placeholder="Pilihan jawaban C" required class="flex-1 px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 border border-slate-300">D</span>
+            <input type="text" id="bank-soal-input-opt-3" placeholder="Pilihan jawaban D" required class="flex-1 px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <!-- Kunci Jawaban Benar -->
+        <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200">
+          <label class="block font-bold text-emerald-950 mb-1">
+            <i class="fa-solid fa-circle-check text-emerald-600"></i> Kunci Jawaban Benar:
+          </label>
+          <select id="bank-soal-input-correct" class="w-full sm:w-64 px-3 py-2 rounded-xl border border-emerald-300 bg-white font-bold text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="0">Opsi A</option>
+            <option value="1">Opsi B</option>
+            <option value="2">Opsi C</option>
+            <option value="3">Opsi D</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Pembahasan / Penjelasan Jawaban (Muncul saat siswa selesai menjawab):</label>
+          <textarea id="bank-soal-input-penjelasan" rows="2" placeholder="Tuliskan penjelasan logis atau alasan mengapa jawaban tersebut benar..." required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 leading-relaxed"></textarea>
+        </div>
+
+        <!-- Modal Footer Buttons -->
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="tutupModalBankSoalGuru()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition cursor-pointer">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Soal ke Bank Soal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL IMPORT SOAL OTOMATIS (WORD, PDF, & TEKS)          -->
+  <!-- ======================================================== -->
+  <div id="modal-upload-dokumen-soal" class="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border-2 border-indigo-200 overflow-hidden my-6 max-h-[94vh] flex flex-col animate-fadeIn">
+      <!-- Modal Header -->
+      <div class="p-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-bold shadow-inner">
+            <i class="fa-solid fa-file-circle-question"></i>
+          </div>
+          <div>
+            <h3 class="font-title font-bold text-lg sm:text-xl leading-tight">Upload & Ekstrak Soal Otomatis</h3>
+            <p class="text-xs text-indigo-100">Mendukung Dokumen Word (.docx), PDF (.pdf), serta Salin-Tempel Teks</p>
+          </div>
+        </div>
+        <button onclick="tutupModalUploadDokumenSoal()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 sm:p-6 overflow-y-auto space-y-5 text-slate-700 text-xs">
+        
+        <!-- Pilihan Tab Metode: File vs Tempel Teks -->
+        <div class="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200">
+          <button type="button" id="tab-btn-upload-file" onclick="setMetodeUploadSoal('file')" class="flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-2 bg-white text-indigo-700 shadow-xs border border-indigo-200 cursor-pointer">
+            <i class="fa-solid fa-cloud-arrow-up text-indigo-500"></i>
+            <span>Upload Berkas (.docx / .pdf / .txt)</span>
+          </button>
+          <button type="button" id="tab-btn-upload-paste" onclick="setMetodeUploadSoal('paste')" class="flex-1 py-2 px-3 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 cursor-pointer">
+            <i class="fa-solid fa-paste text-purple-500"></i>
+            <span>Salin-Tempel Teks (Copy-Paste)</span>
+          </button>
+        </div>
+
+        <!-- Panel 1: Unggah Berkas Word / PDF -->
+        <div id="panel-upload-file" class="space-y-3">
+          <div id="dropzone-soal" onclick="document.getElementById('input-file-soal').click()" class="border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/50 hover:bg-indigo-50/90 rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition flex flex-col items-center justify-center gap-3">
+            <input type="file" id="input-file-soal" accept=".docx,.pdf,.txt" class="hidden" onchange="handleFileSoalDipilih(event)">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl shadow-sm">
+              <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+              <p class="font-title font-bold text-slate-800 text-sm sm:text-base">
+                Klik atau Seret Berkas Soal ke Sini
+              </p>
+              <p class="text-slate-500 text-[11px] mt-0.5">
+                Format yang didukung: <b>Microsoft Word (.docx)</b>, <b>PDF (.pdf)</b>, atau <b>Teks (.txt)</b>
+              </p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-white text-indigo-700 border border-indigo-200 font-bold text-[10px] shadow-2xs">
+              Maksimal 10 MB per berkas
+            </span>
+          </div>
+
+          <div id="file-soal-info-box" class="hidden p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 flex items-center justify-between">
+            <div class="flex items-center gap-2.5 truncate">
+              <i class="fa-solid fa-circle-check text-emerald-600 text-base shrink-0"></i>
+              <div class="truncate">
+                <span id="file-soal-nama" class="font-bold text-xs">nama_file.docx</span>
+                <span id="file-soal-ukuran" class="text-[10px] text-emerald-700 ml-1.5">(120 KB)</span>
+              </div>
+            </div>
+            <button type="button" onclick="resetFileSoalPilihan()" class="text-rose-600 hover:text-rose-800 text-xs font-bold shrink-0 ml-2 cursor-pointer">
+              Ganti
+            </button>
+          </div>
+        </div>
+
+        <!-- Panel 2: Salin-Tempel Teks (Copy-Paste) -->
+        <div id="panel-upload-paste" class="hidden space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-slate-700">Tempelkan Teks Soal dari Word / PDF / Catatan Anda:</label>
+            <button type="button" onclick="isiContohFormatSoal()" class="text-[11px] text-indigo-600 hover:underline font-bold cursor-pointer">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Lihat Contoh Format
+            </button>
+          </div>
+          <textarea id="textarea-paste-soal" rows="7" placeholder="Contoh format:&#10;1. Manakah contoh konten digital teks sederhana?&#10;A. Slogan: Matikan Keran Air&#10;B. Video film tanpa teks&#10;C. 10 foto acak&#10;D. Gambar krayon manual&#10;Kunci: A&#10;Pembahasan: Slogan singkat adalah konten digital teks.&#10;&#10;2. Mengapa judul dan gambar dibuat terpisah?&#10;A. Agar lambat&#10;B. Agar mudah diedit&#10;C. Agar warnanya hilang&#10;D. Tidak tahu&#10;Kunci: B" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 bg-slate-50 font-mono text-[11px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"></textarea>
+        </div>
+
+        <!-- Target Semester & Opsi Penggabungan -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Target Semester Kuis:</label>
+            <select id="import-target-sem" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="1">📘 Semester 1 (Konten Digital, Word & Excel)</option>
+              <option value="2">🚀 Semester 2 (Coding Scratch & RoboMind AI)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Metode Penyimpanan:</label>
+            <div class="space-y-1.5 pt-1">
+              <label class="flex items-center gap-2 cursor-pointer text-slate-700">
+                <input type="radio" name="import-merge-mode" value="append" checked class="text-indigo-600 focus:ring-indigo-500">
+                <span><b>Tambahkan</b> ke butir soal yang sudah ada</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-slate-700">
+                <input type="radio" name="import-merge-mode" value="replace" class="text-indigo-600 focus:ring-indigo-500">
+                <span class="text-amber-800"><b>Gantikan</b> seluruh soal di semester ini</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Analisis / Parse -->
+        <div class="flex items-center justify-between pt-1 flex-wrap gap-2">
+          <button type="button" onclick="prosesAnalisisDokumenSoal()" id="btn-proses-analisis-soal" class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-title font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Pindai & Ekstrak Soal Otomatis</span>
+          </button>
+          <span id="status-analisis-dokumen" class="text-slate-500 font-medium text-[11px]"></span>
+        </div>
+
+        <!-- PREVIEW CONTAINER: DAFTAR SOAL YANG BERHASIL DI-PARSE -->
+        <div id="preview-import-container" class="hidden space-y-3 pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+              <span id="preview-soal-count" class="font-bold text-emerald-950 text-xs">5 Butir Soal Berhasil Dikenali!</span>
+            </div>
+            <span class="text-[10px] text-emerald-800 font-medium">Periksa kunci jawaban di bawah sebelum disimpan:</span>
+          </div>
+
+          <div id="preview-soal-list" class="max-h-64 overflow-y-auto space-y-3 p-1">
+            <!-- Diisi lewat renderPreviewImportSoal() -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2">
+        <span class="text-[11px] text-slate-500">
+          <i class="fa-solid fa-shield-halved text-indigo-600 mr-1"></i> Aman diproses 100% di browser lokal Anda
+        </span>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="tutupModalUploadDokumenSoal()" class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-title font-bold text-xs transition cursor-pointer">
+            Batal
+          </button>
+          <button type="button" id="btn-final-simpan-import" onclick="eksekusiSimpanSoalImport()" disabled class="px-5 py-2.5 rounded-xl bg-slate-300 text-slate-500 font-title font-bold text-xs transition flex items-center gap-1.5 cursor-not-allowed">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan ke Bank Soal & Terbitkan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING SCROLL NAVIGATION (KE ATAS / KE TABEL / KE BAWAH) -->
+  <div id="floating-scroll-nav" class="fixed right-4 sm:right-6 bottom-6 z-40 flex flex-col gap-2">
+    <button type="button" onclick="gulirKeAtas()" class="px-3.5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-title font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition cursor-pointer">
+      <i class="fa-solid fa-arrow-up"></i> <span>Ke Atas</span>
+    </button>
+    <button type="button" id="btn-scroll-tabel" onclick="gulirKeTabelGuru()" class="hidden px-3.5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-title font-bold text-xs shadow-lg shadow-amber-500/30 flex items-center gap-1.5 transition cursor-pointer">
+      <i class="fa-solid fa-table-list"></i> <span>Ke Tabel</span>
+    </button>
+    <button type="button" onclick="gulirKeBawah()" class="px-3.5 py-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-white font-title font-bold text-xs shadow-lg border border-slate-700 flex items-center gap-1.5 transition cursor-pointer">
+      <i class="fa-solid fa-arrow-down"></i> <span>Ke Bawah</span>
+    </button>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast flex items-center gap-3">
+    <i id="toast-icon" class="fa-solid fa-bell text-blue-400 text-lg"></i>
+    <span id="toast-msg">Notifikasi</span>
+  </div>
+
+  <canvas id="export-canvas" class="hidden"></canvas>
+
+  <script src="app.js?v=20261103_layar_statis_ketik_v29"></script>
 </body>
 </html>
