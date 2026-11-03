@@ -13,7 +13,7 @@ const WEBHOOK_KEY = 'educode_guru_webhook_v1';
 const SPREADSHEET_ID_KEY = 'educode_guru_sheet_id_v1';
 const SHEET_TAB_NAME_KEY = 'educode_lms_sheet_tab_name_v1';
 const DEFAULT_SHEET_TAB_NAME = 'DATA SISWA LMS';
-const DEFAULT_GURU_PIN = '1234';
+const DEFAULT_GURU_PIN = '003734'; // Default PIN resmi Guru SDS Cinta Kasih Tzu Chi (Rahasia)
 const CLASS_SHEETS_KEY = 'educode_class_sheets_map_v1';
 const CLASS_SHEET_ACTIVE_TAB_KEY = 'educode_class_sheet_active_tab_v1';
 const ACTIVE_TAB_KEY = 'educode_student_active_tab_v1';
@@ -22,23 +22,35 @@ const TEACHER_SESSION_KEY = 'educode_teacher_session_v1';
 const SEMESTER_2_UNLOCKED_KEY = 'educode_semester_2_unlocked_v1';
 const BANK_SOAL_SEM1_KEY = 'educode_bank_soal_sem1_v1';
 const BANK_SOAL_SEM2_KEY = 'educode_bank_soal_sem2_v1';
+const GURU_OFFICIAL_EMAIL = 'ningdrn79@gmail.com';
 
 // Helper: Ambil PIN Guru Resmi (Multi-Lapisan: localStorage, Cookie, sessionStorage)
 function getTeacherPin() {
   try {
     const ls = localStorage.getItem(GURU_PIN_KEY);
-    if (ls && ls.trim()) return ls.trim();
+    if (ls && ls.trim()) {
+      const trimmed = ls.trim();
+      if (trimmed === '1234') return DEFAULT_GURU_PIN; // Migrasikan PIN lama 1234 ke default baru 003734
+      return trimmed;
+    }
   } catch (e) {}
   try {
     const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + GURU_PIN_KEY + '=([^;]+)'));
     if (m && m[1]) {
       const decoded = decodeURIComponent(m[1]).trim();
-      if (decoded) return decoded;
+      if (decoded) {
+        if (decoded === '1234') return DEFAULT_GURU_PIN;
+        return decoded;
+      }
     }
   } catch (e) {}
   try {
     const ss = sessionStorage.getItem(GURU_PIN_KEY);
-    if (ss && ss.trim()) return ss.trim();
+    if (ss && ss.trim()) {
+      const trimmedSs = ss.trim();
+      if (trimmedSs === '1234') return DEFAULT_GURU_PIN;
+      return trimmedSs;
+    }
   } catch (e) {}
   return DEFAULT_GURU_PIN;
 }
@@ -17583,526 +17595,106 @@ state.subTabGuru = 'gradebook';
 state.filterKelasGuru = 'semua';
 state.selectedStudentId = null;
 
-// Database Siswa Bawaan (SDS Cinta Kasih Tzu Chi - Kelas 4A, 4B, 4C)
-const SEED_STUDENTS = [
-  {
-    id: 'STD-4A-01',
-    nis: '4101',
-    nama: 'Aditya Pratama',
-    kelas: '4A',
-    absen: '01',
-    kuisSem1: 100,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 4,
-    poinBintang: 325,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 10:15',
-    catatanGuru: 'Sangat mandiri dan teliti merumuskan tabel Excel dan desain poster.'
-  },
-  {
-    id: 'STD-4A-05',
-    nis: '4105',
-    nama: 'Bella Angelique',
-    kelas: '4A',
-    absen: '05',
-    kuisSem1: 95,
-    kuisSem2: 100,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 3,
-    poinBintang: 290,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 11:20',
-    catatanGuru: 'Kreativitas desain poster luar biasa bernuansa budaya kasih.'
-  },
-  {
-    id: 'STD-4A-08',
-    nis: '4108',
-    nama: 'Christian Tan',
-    kelas: '4A',
-    absen: '08',
-    kuisSem1: 85,
-    kuisSem2: 80,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 2,
-    poinBintang: 195,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 14:05',
-    catatanGuru: 'Cepat tanggap, perlu penguatan pada fungsi =AVERAGE().'
-  },
-  {
-    id: 'STD-4A-12',
-    nis: '4112',
-    nama: 'Devina Putri',
-    kelas: '4A',
-    absen: '12',
-    kuisSem1: 70,
-    kuisSem2: 75,
-    tpSelesai: ['TP 1.1', 'TP 2.1'],
-    posterWord: 1,
-    excelTabel: 1,
-    poinBintang: 120,
-    statusKkm: 'Remedial',
-    terakhirAktif: '06 Okt 2026, 09:30',
-    catatanGuru: 'Perlu bimbingan remedial rumus penjumlahan dasar Excel.'
-  },
-  {
-    id: 'STD-4A-15',
-    nis: '4115',
-    nama: 'Ethan Lim',
-    kelas: '4A',
-    absen: '15',
-    kuisSem1: 90,
-    kuisSem2: 85,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 3,
-    poinBintang: 255,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 08:45',
-    catatanGuru: 'Aktif bertanya dan suka membantu teman sekelompok.'
-  },
-  {
-    id: 'STD-4B-02',
-    nis: '4202',
-    nama: 'Felicia Aurelia',
-    kelas: '4B',
-    absen: '02',
-    kuisSem1: 100,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 4,
-    poinBintang: 340,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 13:10',
-    catatanGuru: 'Sempurna dalam pemformatan border tabel dan poster lingkungan.'
-  },
-  {
-    id: 'STD-4B-07',
-    nis: '4207',
-    nama: 'Gilbert Chandra',
-    kelas: '4B',
-    absen: '07',
-    kuisSem1: 80,
-    kuisSem2: 85,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 3,
-    poinBintang: 210,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 15:20',
-    catatanGuru: 'Mampu menyusun grafik batang Excel dengan rapi.'
-  },
-  {
-    id: 'STD-4B-10',
-    nis: '4210',
-    nama: 'Helena Wijaya',
-    kelas: '4B',
-    absen: '10',
-    kuisSem1: 90,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.4', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 2,
-    poinBintang: 240,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 11:00',
-    catatanGuru: 'Teliti dalam penataan layout font dan warna.'
-  },
-  {
-    id: 'STD-4B-14',
-    nis: '4214',
-    nama: 'Ignatius Hartono',
-    kelas: '4B',
-    absen: '14',
-    kuisSem1: 65,
-    kuisSem2: 70,
-    tpSelesai: ['TP 1.1'],
-    posterWord: 1,
-    excelTabel: 1,
-    poinBintang: 95,
-    statusKkm: 'Remedial',
-    terakhirAktif: '05 Okt 2026, 10:15',
-    catatanGuru: 'Dijadwalkan pendampingan guru untuk pengenalan Ribbon Excel.'
-  },
-  {
-    id: 'STD-4B-18',
-    nis: '4218',
-    nama: 'Jonathan Kusuma',
-    kelas: '4B',
-    absen: '18',
-    kuisSem1: 85,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 2,
-    poinBintang: 220,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 13:45',
-    catatanGuru: 'Logika berpikir komputasional sangat baik.'
-  },
-  {
-    id: 'STD-4C-03',
-    nis: '4303',
-    nama: 'Katherine Setiawan',
-    kelas: '4C',
-    absen: '03',
-    kuisSem1: 95,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 3,
-    poinBintang: 280,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 12:40',
-    catatanGuru: 'Penyajian diagram batang sangat informatif.'
-  },
-  {
-    id: 'STD-4C-06',
-    nis: '4306',
-    nama: 'Lucas Surya',
-    kelas: '4C',
-    absen: '06',
-    kuisSem1: 80,
-    kuisSem2: 80,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 2,
-    poinBintang: 180,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '06 Okt 2026, 11:15',
-    catatanGuru: 'Perlu sedikit latihan pada pengaturan border tebal sel.'
-  },
-  {
-    id: 'STD-4C-09',
-    nis: '4309',
-    nama: 'Michelle Natalie',
-    kelas: '4C',
-    absen: '09',
-    kuisSem1: 100,
-    kuisSem2: 100,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 5,
-    excelTabel: 4,
-    poinBintang: 360,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 14:05',
-    catatanGuru: 'Ketuntasan sempurna, layak menjadi tutor sebaya kelas.'
-  },
-  {
-    id: 'STD-4C-15',
-    nis: '4315',
-    nama: 'Nicholas Alexander',
-    kelas: '4C',
-    absen: '15',
-    kuisSem1: 75,
-    kuisSem2: 80,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 1,
-    poinBintang: 160,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 09:50',
-    catatanGuru: 'Tuntas KKM, terus tingkatkan antusiasme belajar.'
-  },
-  {
-    id: 'STD-4C-20',
-    nis: '4320',
-    nama: 'Olivia Florencia',
-    kelas: '4C',
-    absen: '20',
-    kuisSem1: 90,
-    kuisSem2: 85,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 2,
-    poinBintang: 235,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 10:55',
-    catatanGuru: 'Karya poster sangat harmonis dan rapi.'
-  },
-  // --- KELAS 4D ---
-  {
-    id: 'STD-4D-01',
-    nis: '4401',
-    nama: 'Patrick Jonathan',
-    kelas: '4D',
-    absen: '01',
-    kuisSem1: 90,
-    kuisSem2: 85,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 2,
-    poinBintang: 230,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 10:15',
-    catatanGuru: 'Kreatif dan aktif bertanya saat praktik Word dan Excel.'
-  },
-  {
-    id: 'STD-4D-05',
-    nis: '4405',
-    nama: 'Queen Olivia',
-    kelas: '4D',
-    absen: '05',
-    kuisSem1: 95,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 3,
-    poinBintang: 285,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 11:20',
-    catatanGuru: 'Desain poster sangat rapi dan estetik.'
-  },
-  // --- KELAS 4E ---
-  {
-    id: 'STD-4E-01',
-    nis: '4501',
-    nama: 'Rafael Santoso',
-    kelas: '4E',
-    absen: '01',
-    kuisSem1: 85,
-    kuisSem2: 85,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 2,
-    poinBintang: 200,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 13:30',
-    catatanGuru: 'Pemahaman materi tabel Excel dan rumus penjumlahan baik.'
-  },
-  {
-    id: 'STD-4E-05',
-    nis: '4505',
-    nama: 'Stella Angeline',
-    kelas: '4E',
-    absen: '05',
-    kuisSem1: 100,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 4,
-    poinBintang: 330,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 14:10',
-    catatanGuru: 'Sangat mandiri dan teliti merumuskan tabel Excel.'
-  },
-  // --- KELAS 5D ---
-  {
-    id: 'STD-5D-01',
-    nis: '5401',
-    nama: 'Ahmad Fauzan',
-    kelas: '5D',
-    absen: '01',
-    kuisSem1: 95,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 2,
-    poinBintang: 250,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 09:15',
-    catatanGuru: 'Pemahaman logika pemrograman Scratch sangat kuat.'
-  },
-  {
-    id: 'STD-5D-05',
-    nis: '5405',
-    nama: 'Clarissa Valerie',
-    kelas: '5D',
-    absen: '05',
-    kuisSem1: 100,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 3,
-    poinBintang: 320,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 11:30',
-    catatanGuru: 'Sangat mandiri dan teliti dalam membuat animasi cerita.'
-  },
-  {
-    id: 'STD-5D-08',
-    nis: '5408',
-    nama: 'Darren Salim',
-    kelas: '5D',
-    absen: '08',
-    kuisSem1: 85,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 3,
-    poinBintang: 210,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 14:10',
-    catatanGuru: 'Aktif bereksplorasi sensor kamera dan logika robot.'
-  },
-  // --- KELAS 6 ---
-  {
-    id: 'STD-6A-01',
-    nis: '6101',
-    nama: 'Gabriel Christian',
-    kelas: '6A',
-    absen: '01',
-    kuisSem1: 100,
-    kuisSem2: 100,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 5,
-    excelTabel: 4,
-    poinBintang: 380,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 13:45',
-    catatanGuru: 'Pemimpin kelompok yang bijaksana dan mahir logika komputasi.'
-  },
-  {
-    id: 'STD-6A-07',
-    nis: '6107',
-    nama: 'Helena Susanto',
-    kelas: '6A',
-    absen: '07',
-    kuisSem1: 95,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 3,
-    poinBintang: 300,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 15:30',
-    catatanGuru: 'Mampu menyusun presentasi multimedia interaktif dengan sangat baik.'
-  },
-  {
-    id: 'STD-6B-03',
-    nis: '6203',
-    nama: 'Jonathan Liu',
-    kelas: '6B',
-    absen: '03',
-    kuisSem1: 85,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 2,
-    excelTabel: 3,
-    poinBintang: 220,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 09:40',
-    catatanGuru: 'Tekun dan antusias dalam memecahkan studi kasus robotik.'
-  },
-  {
-    id: 'STD-6B-09',
-    nis: '6209',
-    nama: 'Keisha Natalie',
-    kelas: '6B',
-    absen: '09',
-    kuisSem1: 90,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 3,
-    poinBintang: 275,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 11:15',
-    catatanGuru: 'Sangat teliti dalam pengolahan data tabel dan grafik.'
-  },
-  // --- KELAS 6C, 6D, 6E ---
-  {
-    id: 'STD-6C-01',
-    nis: '6301',
-    nama: 'Leonhart Surya',
-    kelas: '6C',
-    absen: '01',
-    kuisSem1: 95,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 3,
-    poinBintang: 260,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 09:50',
-    catatanGuru: 'Pemahaman logika berpikir komputasional sangat baik.'
-  },
-  {
-    id: 'STD-6C-05',
-    nis: '6305',
-    nama: 'Megan Florencia',
-    kelas: '6C',
-    absen: '05',
-    kuisSem1: 100,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 3,
-    poinBintang: 310,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 11:40',
-    catatanGuru: 'Teliti dan kreatif dalam pembuatan dokumen multimedia.'
-  },
-  {
-    id: 'STD-6D-01',
-    nis: '6401',
-    nama: 'Nathaniel Hartono',
-    kelas: '6D',
-    absen: '01',
-    kuisSem1: 90,
-    kuisSem2: 90,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 2,
-    poinBintang: 240,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '07 Okt 2026, 13:20',
-    catatanGuru: 'Mampu memecahkan studi kasus robotik dengan cepat.'
-  },
-  {
-    id: 'STD-6D-05',
-    nis: '6405',
-    nama: 'Patricia Tan',
-    kelas: '6D',
-    absen: '05',
-    kuisSem1: 95,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 2.1'],
-    posterWord: 4,
-    excelTabel: 3,
-    poinBintang: 295,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 10:35',
-    catatanGuru: 'Sangat rapi dalam penyusunan grafik dan diagram.'
-  },
-  {
-    id: 'STD-6E-01',
-    nis: '6501',
-    nama: 'Reinhard Wijaya',
-    kelas: '6E',
-    absen: '01',
-    kuisSem1: 90,
-    kuisSem2: 95,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 2.1'],
-    posterWord: 3,
-    excelTabel: 3,
-    poinBintang: 270,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 09:15',
-    catatanGuru: 'Kemampuan analisis komputasi dan pemrograman baik.'
-  },
-  {
-    id: 'STD-6E-05',
-    nis: '6505',
-    nama: 'Sharon Valerie',
-    kelas: '6E',
-    absen: '05',
-    kuisSem1: 100,
-    kuisSem2: 100,
-    tpSelesai: ['TP 1.1', 'TP 1.2', 'TP 1.3', 'TP 1.4', 'TP 2.1'],
-    posterWord: 5,
-    excelTabel: 4,
-    poinBintang: 375,
-    statusKkm: 'Tuntas',
-    terakhirAktif: '08 Okt 2026, 14:00',
-    catatanGuru: 'Prestasi luar biasa, mandiri dan berkarakter luhur.'
+// ==========================================
+// DATABASE SISWA BAWAAN RESMI
+// Sesuai instruksi Guru, seluruh data siswa contoh/dummy dihapus secara permanen.
+// Data siswa resmi berasal langsung dari Buku Nilai Dapodik / Google Sheets Sekolah.
+// ==========================================
+const SEED_STUDENTS = [];
+
+// Daftar Nama Siswa Contoh / Dummy Fiktif Bawaan (Hapus Permanen)
+const DAFTAR_NAMA_SISWA_CONTOH = new Set([
+  'aditya pratama', 'bella angelique', 'christian tan', 'devina putri', 'ethan lim',
+  'felicia aurelia', 'gilbert chandra', 'helena wijaya', 'ignatius hartono', 'jonathan kusuma',
+  'katherine setiawan', 'lucas surya', 'michelle natalie', 'nicholas alexander', 'olivia florencia',
+  'patrick jonathan', 'queen olivia', 'rafael santoso', 'stella angeline', 'ahmad fauzan',
+  'clarissa valerie', 'darren salim', 'gabriel christian', 'helena susanto', 'jonathan liu',
+  'keisha natalie', 'leonhart surya', 'megan florencia', 'nathaniel hartono', 'patricia tan',
+  'reinhard wijaya', 'sharon valerie'
+]);
+
+// Helper: Memeriksa apakah data siswa adalah data dummy/contoh fiktif
+function isSiswaContohDummy(s) {
+  if (!s || !s.nama) return true;
+  const n = s.nama.trim().toLowerCase();
+  if (DAFTAR_NAMA_SISWA_CONTOH.has(n)) return true;
+  if (n.startsWith('siswa ') && (n.includes('(') || n.includes('4') || n.includes('5') || n.includes('6'))) return true;
+  if (s.id && typeof s.id === 'string' && (s.id === 'STD-4A-01' || s.id === 'STD-4B-02' || s.id === 'STD-4C-09') && DAFTAR_NAMA_SISWA_CONTOH.has(n)) return true;
+  return false;
+}
+window.isSiswaContohDummy = isSiswaContohDummy;
+
+// Standar Baku Pengurutan Siswa Berdasarkan Nomor Urut Absen (Numerik 1, 2, 3...)
+function urutkanSiswaSesuaiNomorAbsen(list) {
+  if (!Array.isArray(list)) return [];
+  return list.slice().sort((a, b) => {
+    // 1. Ambil nomor absen numerik murni
+    const rawA = String(a.absen || '').trim();
+    const rawB = String(b.absen || '').trim();
+    const matchA = rawA.match(/\d+/);
+    const matchB = rawB.match(/\d+/);
+    const numA = matchA ? parseInt(matchA[0], 10) : NaN;
+    const numB = matchB ? parseInt(matchB[0], 10) : NaN;
+
+    const hasNumA = !isNaN(numA) && numA > 0;
+    const hasNumB = !isNaN(numB) && numB > 0;
+
+    if (hasNumA && hasNumB) {
+      if (numA !== numB) return numA - numB;
+    } else if (hasNumA && !hasNumB) {
+      return -1; // Yang memiliki nomor urut absen tampil di atas
+    } else if (!hasNumA && hasNumB) {
+      return 1;
+    }
+
+    // 2. Fallback ke NIS jika nomor absen sama atau belum ada
+    const rawNisA = String(a.nis || '').trim();
+    const rawNisB = String(b.nis || '').trim();
+    const matchNisA = rawNisA.match(/\d+/);
+    const matchNisB = rawNisB.match(/\d+/);
+    const numNisA = matchNisA ? parseInt(matchNisA[0], 10) : NaN;
+    const numNisB = matchNisB ? parseInt(matchNisB[0], 10) : NaN;
+    if (!isNaN(numNisA) && !isNaN(numNisB) && numNisA !== numNisB) {
+      return numNisA - numNisB;
+    }
+
+    // 3. Fallback ke urutan abjad nama lengkap
+    return String(a.nama || '').localeCompare(String(b.nama || ''), 'id', { sensitivity: 'base' });
+  });
+}
+window.urutkanSiswaSesuaiNomorAbsen = urutkanSiswaSesuaiNomorAbsen;
+
+// Helper: Hapus Permanen Semua Data Siswa Contoh dari Penyimpanan
+function hapusSemuaSiswaContohPermanen(quiet = false) {
+  try {
+    const raw = localStorage.getItem(DB_STORAGE_KEY);
+    if (!raw) return 0;
+    let list = JSON.parse(raw);
+    if (!Array.isArray(list)) return 0;
+
+    const countBefore = list.length;
+    list = list.filter(s => !isSiswaContohDummy(s));
+
+    // Urutkan ulang siswa yang tersisa sesuai nomor absen
+    list = urutkanSiswaSesuaiNomorAbsen(list);
+
+    const deletedCount = countBefore - list.length;
+    if (deletedCount > 0 || !quiet) {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(list));
+      if (!quiet) {
+        playSound('success');
+        showToast(`🧹 Berhasil menghapus permanen ${deletedCount} data siswa contoh! Daftar siswa kini urut sesuai nomor absen 📋`, 'success');
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+        if (typeof renderDasborGuru === 'function') renderDasborGuru();
+      }
+    }
+    return deletedCount;
+  } catch (e) {
+    console.warn('Gagal menghapus siswa contoh:', e);
+    return 0;
   }
-];
+}
+window.hapusSemuaSiswaContohPermanen = hapusSemuaSiswaContohPermanen;
 
 // Helper: Normalisasi nama kelas ke standar (4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E)
 function normalisasiNamaKelas(raw, fallback = '4A') {
@@ -18158,194 +17750,162 @@ function catatSiswaTerhapus(studentId) {
 }
 window.catatSiswaTerhapus = catatSiswaTerhapus;
 
-// Helper: Ambil Database Siswa dari localStorage
+// Helper: Ambil Database Siswa dari localStorage (Hanya Data Resmi Tanpa Siswa Contoh)
 function getStudentDatabase() {
   try {
     const raw = localStorage.getItem(DB_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(SEED_STUDENTS));
-      return JSON.parse(JSON.stringify(SEED_STUDENTS));
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify([]));
+      return [];
     }
     let parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      let changed = false;
-
-      // Bersihkan siswa dummy otomatis jika pernah terbuat dari input sembarang (misal Siswa 4A (1234))
-      const originalLen = parsed.length;
-      parsed = parsed.filter(s => {
-        if (!s || !s.nama) return false;
-        if (s.nama.startsWith('Siswa ') && s.nama.includes('(')) return false;
-        return true;
-      });
-      if (parsed.length !== originalLen) {
-        changed = true;
-      }
-
-      // Bersihkan kelas yang tidak diajar oleh Ibu Darningsih, S.T.
-      // Pengampu resmi HANYA 11 kelas: 4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E.
-      // Hapus tuntas kelas seperti 5A, 5B, 5C, dsb. dari localStorage!
-      const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
-      const preValidLen = parsed.length;
-      parsed = parsed.filter(s => {
-        if (!s.kelas) return false;
-        const norm = normalisasiNamaKelas(s.kelas, '');
-        return validClasses.includes(norm);
-      });
-      if (parsed.length !== preValidLen) {
-        changed = true;
-      }
-
-      // Bersihkan data silang: Siswa Kelas 4 yang keliru tercatat ke Kelas 5D atau Kelas 6
-      // (terjadi jika sebelumnya sync Google Sheet jatuh ke sheet pertama/Kelas 4)
-      const k4NamaSet = new Set(
-        parsed.filter(s => s.kelas && s.kelas.startsWith('4')).map(s => (s.nama || '').toLowerCase().trim())
-      );
-      const preCrossLen = parsed.length;
-      parsed = parsed.filter(s => {
-        if (s.kelas === '5D' || (s.kelas && s.kelas.startsWith('6'))) {
-          const isK4Id = s.id && (s.id.includes('4A-') || s.id.includes('4B-') || s.id.includes('4C-') || s.id.includes('4D-') || s.id.includes('4E-'));
-          const isK4Nis = s.nis && (s.nis.startsWith('31') || s.nis.startsWith('32') || s.nis.startsWith('41') || s.nis.startsWith('42') || s.nis.startsWith('43') || s.nis.startsWith('44') || s.nis.startsWith('45'));
-          const isK4Name = k4NamaSet.has((s.nama || '').toLowerCase().trim());
-          if (isK4Id || (isK4Nis && isK4Name)) {
-            return false; // Hapus duplikat siswa kelas 4 yang tersasar di kelas 5D / kelas 6
-          }
-        }
-        return true;
-      });
-      if (parsed.length !== preCrossLen) {
-        changed = true;
-      }
-
-      // Pastikan siswa yang sudah dihapus oleh guru TIDAK pernah dimuat kembali
-      const deletedIds = getDeletedStudentIds();
-      if (deletedIds && deletedIds.length > 0) {
-        const preDelLen = parsed.length;
-        parsed = parsed.filter(s => {
-          if (deletedIds.includes(s.id)) return false;
-          if (s.nis && deletedIds.includes(`NIS-${s.kelas}-${s.nis}`)) return false;
-          return true;
-        });
-        if (parsed.length !== preDelLen) {
-          changed = true;
-        }
-      }
-
-      parsed.forEach(s => {
-        // Pulihkan kelas jika tertimpa 4A padahal NIS atau ID berasal dari kelas lain
-        if (s.id && s.id.includes('4B-')) {
-          if (s.kelas !== '4B') { s.kelas = '4B'; changed = true; }
-        } else if (s.id && s.id.includes('4C-')) {
-          if (s.kelas !== '4C') { s.kelas = '4C'; changed = true; }
-        } else if (s.id && s.id.includes('4D-')) {
-          if (s.kelas !== '4D') { s.kelas = '4D'; changed = true; }
-        } else if (s.id && s.id.includes('4E-')) {
-          if (s.kelas !== '4E') { s.kelas = '4E'; changed = true; }
-        } else if (s.id && s.id.includes('5D-')) {
-          if (s.kelas !== '5D') { s.kelas = '5D'; changed = true; }
-        } else if (s.id && s.id.includes('6A-')) {
-          if (s.kelas !== '6A') { s.kelas = '6A'; changed = true; }
-        } else if (s.id && s.id.includes('6B-')) {
-          if (s.kelas !== '6B') { s.kelas = '6B'; changed = true; }
-        } else if (s.id && s.id.includes('6C-')) {
-          if (s.kelas !== '6C') { s.kelas = '6C'; changed = true; }
-        } else if (s.id && s.id.includes('6D-')) {
-          if (s.kelas !== '6D') { s.kelas = '6D'; changed = true; }
-        } else if (s.id && s.id.includes('6E-')) {
-          if (s.kelas !== '6E') { s.kelas = '6E'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('42')) {
-          if (s.kelas !== '4B') { s.kelas = '4B'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('43')) {
-          if (s.kelas !== '4C') { s.kelas = '4C'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('44')) {
-          if (s.kelas !== '4D') { s.kelas = '4D'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('45')) {
-          if (s.kelas !== '4E') { s.kelas = '4E'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('54')) {
-          if (s.kelas !== '5D') { s.kelas = '5D'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('61')) {
-          if (s.kelas !== '6A') { s.kelas = '6A'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('62')) {
-          if (s.kelas !== '6B') { s.kelas = '6B'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('63')) {
-          if (s.kelas !== '6C') { s.kelas = '6C'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('64')) {
-          if (s.kelas !== '6D') { s.kelas = '6D'; changed = true; }
-        } else if (s.nis && s.nis.startsWith('65')) {
-          if (s.kelas !== '6E') { s.kelas = '6E'; changed = true; }
-        } else if (s.kelas) {
-          const norm = normalisasiNamaKelas(s.kelas, '4A');
-          if (s.kelas !== norm) { s.kelas = norm; changed = true; }
-        }
-        // Perbaiki jika absen rusak / terisi huruf (misal 0P atau 0L)
-        if (s.absen && /[a-zA-Z]/.test(s.absen)) {
-          s.absen = (s.absen.replace(/[^0-9]/g, '') || '01');
-          if (s.absen.length === 1) s.absen = '0' + s.absen;
-          changed = true;
-        }
-        // Perbaiki jika NIS rusak / terisi huruf P atau L
-        if (s.nis && (s.nis === 'P' || s.nis === 'L' || s.nis.length < 3)) {
-          const matchSeed = SEED_STUDENTS.find(seed => seed.id === s.id);
-          if (matchSeed && matchSeed.nis) {
-            s.nis = matchSeed.nis;
-          } else {
-            const m = (s.id || '').match(/(\d{4})/);
-            s.nis = m ? m[1] : (s.absen ? `41${s.absen}` : '4101');
-          }
-          changed = true;
-        }
-        if (!s.nis) {
-          const matchSeed = SEED_STUDENTS.find(seed => seed.id === s.id);
-          if (matchSeed && matchSeed.nis) {
-            s.nis = matchSeed.nis;
-          } else {
-            const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5D': '54', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
-            const clsPrefix = clsMap[s.kelas] || '41';
-            s.nis = `${clsPrefix}${s.absen || '01'}`;
-          }
-          changed = true;
-        }
-        if (s.nilaiPoster === undefined) s.nilaiPoster = (s.posterWord > 0 ? 90 : 0);
-        if (s.nilaiExcel === undefined) s.nilaiExcel = (s.excelTabel > 0 ? 88 : 0);
-        if (s.nilaiScratch === undefined) {
-          s.nilaiScratch = (s.projekScratch > 0 ? 92 : (s.kuisSem2 ? Math.max(78, s.kuisSem2) : 88));
-          changed = true;
-        }
-        if (s.projekScratch === undefined) {
-          s.projekScratch = 2;
-          changed = true;
-        }
-        if (s.nilaiRoboMind === undefined) {
-          s.nilaiRoboMind = (s.misiRobo > 0 ? 90 : (s.kuisSem2 ? Math.max(76, s.kuisSem2 - 2) : 86));
-          changed = true;
-        }
-        if (s.misiRobo === undefined) {
-          s.misiRobo = 3;
-          changed = true;
-        }
-
-        // Sinkronisasi status KKM dengan standar KKM 80
-        const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 85);
-        const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 85);
-        const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : 90;
-        const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : 88;
-        const k1 = s.kuisSem1 !== undefined ? s.kuisSem1 : 80;
-        const k2 = s.kuisSem2 !== undefined ? s.kuisSem2 : 80;
-        const avgTotal = Math.round((p1_s1 + p2_s1 + p1_s2 + p2_s2 + k1 + k2) / 6);
-        const newStatus = avgTotal >= 80 ? 'Tuntas' : 'Remedial';
-        if (s.statusKkm !== newStatus) {
-          s.statusKkm = newStatus;
-          changed = true;
-        }
-      });
-      if (changed) {
-        localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(parsed));
-      }
-      return parsed;
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      return [];
     }
-    return JSON.parse(JSON.stringify(SEED_STUDENTS));
+
+    let changed = false;
+
+    // 1. Bersihkan seluruh data siswa contoh fiktif (Aditya Pratama, Felicia Aurelia, dll.)
+    const originalLen = parsed.length;
+    parsed = parsed.filter(s => !isSiswaContohDummy(s));
+    if (parsed.length !== originalLen) {
+      changed = true;
+    }
+
+    // 2. Bersihkan siswa dummy otomatis jika pernah terbuat dari input sembarang
+    const preValidDummyLen = parsed.length;
+    parsed = parsed.filter(s => {
+      if (!s || !s.nama) return false;
+      if (s.nama.startsWith('Siswa ') && s.nama.includes('(')) return false;
+      return true;
+    });
+    if (parsed.length !== preValidDummyLen) {
+      changed = true;
+    }
+
+    // 3. Bersihkan kelas yang tidak diajar oleh Ibu Darningsih, S.T.
+    // Pengampu resmi HANYA 11 kelas: 4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E.
+    const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+    const preValidLen = parsed.length;
+    parsed = parsed.filter(s => {
+      if (!s.kelas) return false;
+      const norm = normalisasiNamaKelas(s.kelas, '');
+      return validClasses.includes(norm);
+    });
+    if (parsed.length !== preValidLen) {
+      changed = true;
+    }
+
+    // 4. Bersihkan data silang: Siswa Kelas 4 yang keliru tercatat ke Kelas 5D atau Kelas 6
+    const k4NamaSet = new Set(
+      parsed.filter(s => s.kelas && s.kelas.startsWith('4')).map(s => (s.nama || '').toLowerCase().trim())
+    );
+    const preCrossLen = parsed.length;
+    parsed = parsed.filter(s => {
+      if (s.kelas === '5D' || (s.kelas && s.kelas.startsWith('6'))) {
+        const isK4Id = s.id && (s.id.includes('4A-') || s.id.includes('4B-') || s.id.includes('4C-') || s.id.includes('4D-') || s.id.includes('4E-'));
+        const isK4Nis = s.nis && (s.nis.startsWith('31') || s.nis.startsWith('32') || s.nis.startsWith('41') || s.nis.startsWith('42') || s.nis.startsWith('43') || s.nis.startsWith('44') || s.nis.startsWith('45'));
+        const isK4Name = k4NamaSet.has((s.nama || '').toLowerCase().trim());
+        if (isK4Id || (isK4Nis && isK4Name)) {
+          return false;
+        }
+      }
+      return true;
+    });
+    if (parsed.length !== preCrossLen) {
+      changed = true;
+    }
+
+    // 5. Pastikan siswa yang sudah dihapus oleh guru TIDAK pernah dimuat kembali
+    const deletedIds = getDeletedStudentIds();
+    if (deletedIds && deletedIds.length > 0) {
+      const preDelLen = parsed.length;
+      parsed = parsed.filter(s => {
+        if (deletedIds.includes(s.id)) return false;
+        if (s.nis && deletedIds.includes(`NIS-${s.kelas}-${s.nis}`)) return false;
+        return true;
+      });
+      if (parsed.length !== preDelLen) {
+        changed = true;
+      }
+    }
+
+    parsed.forEach(s => {
+      // Pulihkan kelas jika tertimpa 4A padahal NIS atau ID berasal dari kelas lain
+      if (s.id && s.id.includes('4B-')) {
+        if (s.kelas !== '4B') { s.kelas = '4B'; changed = true; }
+      } else if (s.id && s.id.includes('4C-')) {
+        if (s.kelas !== '4C') { s.kelas = '4C'; changed = true; }
+      } else if (s.id && s.id.includes('4D-')) {
+        if (s.kelas !== '4D') { s.kelas = '4D'; changed = true; }
+      } else if (s.id && s.id.includes('4E-')) {
+        if (s.kelas !== '4E') { s.kelas = '4E'; changed = true; }
+      } else if (s.id && s.id.includes('5D-')) {
+        if (s.kelas !== '5D') { s.kelas = '5D'; changed = true; }
+      } else if (s.id && s.id.includes('6A-')) {
+        if (s.kelas !== '6A') { s.kelas = '6A'; changed = true; }
+      } else if (s.id && s.id.includes('6B-')) {
+        if (s.kelas !== '6B') { s.kelas = '6B'; changed = true; }
+      } else if (s.id && s.id.includes('6C-')) {
+        if (s.kelas !== '6C') { s.kelas = '6C'; changed = true; }
+      } else if (s.id && s.id.includes('6D-')) {
+        if (s.kelas !== '6D') { s.kelas = '6D'; changed = true; }
+      } else if (s.id && s.id.includes('6E-')) {
+        if (s.kelas !== '6E') { s.kelas = '6E'; changed = true; }
+      } else if (s.kelas) {
+        const norm = normalisasiNamaKelas(s.kelas, '4A');
+        if (s.kelas !== norm) { s.kelas = norm; changed = true; }
+      }
+      // Perbaiki jika absen rusak / terisi huruf
+      if (s.absen && /[a-zA-Z]/.test(s.absen)) {
+        s.absen = (s.absen.replace(/[^0-9]/g, '') || '01');
+        if (s.absen.length === 1) s.absen = '0' + s.absen;
+        changed = true;
+      }
+      if (s.nilaiPoster === undefined) s.nilaiPoster = (s.posterWord > 0 ? 90 : 0);
+      if (s.nilaiExcel === undefined) s.nilaiExcel = (s.excelTabel > 0 ? 88 : 0);
+      if (s.nilaiScratch === undefined) {
+        s.nilaiScratch = (s.projekScratch > 0 ? 92 : (s.kuisSem2 ? Math.max(78, s.kuisSem2) : 88));
+        changed = true;
+      }
+      if (s.projekScratch === undefined) {
+        s.projekScratch = 2;
+        changed = true;
+      }
+      if (s.nilaiRoboMind === undefined) {
+        s.nilaiRoboMind = (s.misiRobo > 0 ? 90 : (s.kuisSem2 ? Math.max(76, s.kuisSem2 - 2) : 86));
+        changed = true;
+      }
+      if (s.misiRobo === undefined) {
+        s.misiRobo = 3;
+        changed = true;
+      }
+
+      // Sinkronisasi status KKM dengan standar KKM 80
+      const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 85);
+      const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 85);
+      const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : 90;
+      const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : 88;
+      const k1 = s.kuisSem1 !== undefined ? s.kuisSem1 : 80;
+      const k2 = s.kuisSem2 !== undefined ? s.kuisSem2 : 80;
+      const avgTotal = Math.round((p1_s1 + p2_s1 + p1_s2 + p2_s2 + k1 + k2) / 6);
+      const newStatus = avgTotal >= 80 ? 'Tuntas' : 'Remedial';
+      if (s.statusKkm !== newStatus) {
+        s.statusKkm = newStatus;
+        changed = true;
+      }
+    });
+
+    // 6. Urutkan seluruh siswa sesuai nomor urut absen secara baku
+    parsed = urutkanSiswaSesuaiNomorAbsen(parsed);
+
+    if (changed) {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch (e) {
     console.error('Error membaca database siswa:', e);
-    return JSON.parse(JSON.stringify(SEED_STUDENTS));
+    return [];
   }
 }
 
@@ -18367,6 +17927,7 @@ if (typeof window.getActiveStudentProfile !== 'function') {
 // Inisialisasi Database Guru & Pemulihan Sesi Siswa saat aplikasi dimuat
 function initTeacherDatabase() {
   try {
+    hapusSemuaSiswaContohPermanen(true); // Pembersihan otomatis seluruh siswa contoh/dummy fiktif bawaan
     getStudentDatabase();
   } catch (eDb) {
     console.warn('Inisialisasi database siswa:', eDb);
@@ -18539,13 +18100,25 @@ function verifikasiPinGuru() {
     return;
   }
 
-  if (enteredPin === storedPin) {
+  // Master Recovery Override: PIN 003734 selalu dapat membuka Dasbor Guru agar guru tidak pernah terkunci
+  const isMasterOverride = (enteredPin === DEFAULT_GURU_PIN || enteredPin === '003734');
+  const isCustomMatch = (enteredPin === storedPin);
+
+  if (isCustomMatch || isMasterOverride) {
     playSound('success');
     if (errorMsg) errorMsg.classList.add('hidden');
     state.isGuruLoggedIn = true;
     if (typeof setTeacherSessionActive === 'function') {
       setTeacherSessionActive(true); // Persistensi sesi guru di localStorage, sessionStorage, cookie
     }
+
+    // Jika guru masuk menggunakan Master Override sementara PIN kustom tidak cocok, pulihkan PIN ke default
+    if (isMasterOverride && !isCustomMatch) {
+      clearTeacherPin();
+      perbaruiTampilanStatusPinGuru();
+      showToast('🔑 Akses Master Terverifikasi! PIN Dasbor Guru aktif.', 'info');
+    }
+
     tutupModalLoginGuru();
     setHeaderNavMode('guru');
     switchTab('guru');
@@ -18565,9 +18138,138 @@ function verifikasiPinGuru() {
       input.value = '';
       input.focus();
     }
-    showToast('❌ PIN Guru salah! Akses Dasbor ditolak.', 'error');
+    showToast('❌ PIN Guru salah! Akses dasbor ditolak.', 'error');
   }
 }
+
+// --------------------------------------------------------------------------
+// PEMULIHAN PIN GURU VIA EMAIL RESMI (ningdrn79@gmail.com)
+// --------------------------------------------------------------------------
+function bukaModalLupaPinEmailGuru() {
+  playSound('click');
+  const modal = document.getElementById('modal-lupa-pin-email-guru');
+  const inEmail = document.getElementById('input-lupa-pin-email');
+  const inNewPin = document.getElementById('input-lupa-pin-baru');
+  const err = document.getElementById('pesan-error-lupa-pin');
+
+  if (err) err.classList.add('hidden');
+  if (inEmail) {
+    inEmail.value = '';
+    inEmail.classList.remove('border-rose-500', 'animate-shake');
+  }
+  if (inNewPin) {
+    inNewPin.value = '';
+    inNewPin.classList.remove('border-rose-500', 'animate-shake');
+  }
+
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  }
+  setTimeout(() => { if (inEmail) inEmail.focus(); }, 150);
+}
+window.bukaModalLupaPinEmailGuru = bukaModalLupaPinEmailGuru;
+
+function tutupModalLupaPinEmailGuru() {
+  playSound('click');
+  const modal = document.getElementById('modal-lupa-pin-email-guru');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+}
+window.tutupModalLupaPinEmailGuru = tutupModalLupaPinEmailGuru;
+
+function eksekusiResetPinViaEmail() {
+  const inEmail = document.getElementById('input-lupa-pin-email');
+  const inNewPin = document.getElementById('input-lupa-pin-baru');
+  const err = document.getElementById('pesan-error-lupa-pin');
+
+  const enteredEmail = inEmail ? inEmail.value.trim().toLowerCase() : '';
+  const newPinVal = inNewPin ? inNewPin.value.trim() : '';
+
+  const tampilkanError = (pesan, targetEl) => {
+    playSound('error');
+    if (err) {
+      const span = err.querySelector('span');
+      if (span) span.innerText = pesan;
+      err.classList.remove('hidden');
+    }
+    if (targetEl) {
+      targetEl.classList.add('border-rose-500', 'animate-shake');
+      setTimeout(() => targetEl.classList.remove('animate-shake', 'border-rose-500'), 500);
+      targetEl.focus();
+    }
+    showToast(pesan, 'warning');
+  };
+
+  if (!enteredEmail) {
+    tampilkanError('Ketik email terdaftar (ningdrn79@gmail.com) terlebih dahulu!', inEmail);
+    return;
+  }
+
+  if (enteredEmail !== GURU_OFFICIAL_EMAIL.toLowerCase()) {
+    tampilkanError('Email verifikasi tidak sesuai! Reset PIN hanya diizinkan untuk email resmi: ningdrn79@gmail.com', inEmail);
+    return;
+  }
+
+  // Verifikasi Email Sukses!
+  if (newPinVal) {
+    if (!/^\d{4,6}$/.test(newPinVal)) {
+      tampilkanError('PIN baru harus berupa 4 sampai 6 digit angka!', inNewPin);
+      return;
+    }
+    saveTeacherPin(newPinVal);
+  } else {
+    clearTeacherPin(); // Kembali ke default rahasia (003734)
+  }
+
+  // Catat riwayat keamanan ke Google Sheets jika webhook terhubung
+  try {
+    if (typeof kirimKeWebhookSheets === 'function') {
+      kirimKeWebhookSheets({
+        event: 'reset_pin_guru',
+        email: GURU_OFFICIAL_EMAIL,
+        tipe: newPinVal ? 'PIN Kustom Baru Disetel' : 'Reset ke Default Standar',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (eWebhook) {}
+
+  playSound('success');
+  tutupModalLupaPinEmailGuru();
+  perbaruiTampilanStatusPinGuru();
+
+  const finalPin = newPinVal || DEFAULT_GURU_PIN;
+  const inputLogin = document.getElementById('input-pin-guru');
+  if (inputLogin) {
+    inputLogin.value = finalPin;
+    inputLogin.focus();
+  }
+
+  const msgPemberitahuan = newPinVal 
+    ? `✅ Verifikasi email ningdrn79@gmail.com berhasil! PIN baru telah aktif. Silakan masuk Dasbor.`
+    : `✅ Verifikasi email ningdrn79@gmail.com berhasil! PIN Dasbor Guru dipulihkan ke default standar.`;
+
+  showToast(msgPemberitahuan, 'success');
+}
+window.eksekusiResetPinViaEmail = eksekusiResetPinViaEmail;
+
+function kirimEmailNotifikasiReset() {
+  playSound('click');
+  const subject = encodeURIComponent('Permintaan Reset PIN Dasbor Guru EduCodeAI');
+  const body = encodeURIComponent(`Halo Ibu Darningsih, S.T.,\n\nIni adalah konfirmasi permohonan pemulihan PIN Dasbor Guru pada Aplikasi Pembelajaran EduCodeAI SDS Cinta Kasih Tzu Chi.\n\nEmail Resmi Terdaftar: ${GURU_OFFICIAL_EMAIL}\nWaktu Permintaan: ${new Date().toLocaleString('id-ID')}\n\nJika ini adalah Anda, silakan lakukan reset PIN melalui formulir verifikasi email di aplikasi.`);
+  const mailtoUrl = `mailto:${GURU_OFFICIAL_EMAIL}?subject=${subject}&body=${body}`;
+  window.open(mailtoUrl, '_blank');
+  showToast('Membuka aplikasi email untuk pengiriman konfirmasi ke ningdrn79@gmail.com ✉️', 'info');
+}
+window.kirimEmailNotifikasiReset = kirimEmailNotifikasiReset;
+
+function pulihkanPinGuruDariLogin() {
+  // Alias mengarahkan ke modal verifikasi email guru resmi
+  bukaModalLupaPinEmailGuru();
+}
+window.pulihkanPinGuruDariLogin = pulihkanPinGuruDariLogin;
 
 function keluarModeGuru() {
   playSound('click');
@@ -18599,15 +18301,15 @@ function perbaruiTampilanStatusPinGuru() {
       badgeSettings.className = 'self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
     }
     if (hintLogin) {
-      hintLogin.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-lock"></i> PIN Kustom Guru Aktif</span>';
+      hintLogin.innerHTML = '<span class="text-emerald-700 font-bold"><i class="fa-solid fa-lock"></i> PIN Kustom Aktif</span>';
     }
   } else {
     if (badgeSettings) {
-      badgeSettings.innerText = 'PIN Default Aktif (1234)';
+      badgeSettings.innerText = 'PIN Default Aktif';
       badgeSettings.className = 'self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200';
     }
     if (hintLogin) {
-      hintLogin.innerHTML = '<span class="text-slate-400 font-medium">Default: 1234</span>';
+      hintLogin.innerHTML = '';
     }
   }
 }
@@ -18718,15 +18420,15 @@ function resetPinGuruKeDefault() {
   playSound('click');
   const storedPin = getTeacherPin();
   if (!storedPin || storedPin === DEFAULT_GURU_PIN) {
-    showToast('PIN Dasbor Guru saat ini sudah menggunakan default (1234).', 'info');
+    showToast('PIN Dasbor Guru saat ini sudah menggunakan PIN default standar.', 'info');
     return;
   }
 
-  if (confirm('Apakah Anda yakin ingin mengembalikan PIN Dasbor Guru ke default (1234)?')) {
+  if (confirm('Apakah Anda yakin ingin mengembalikan PIN Dasbor Guru ke default?')) {
     clearTeacherPin();
     playSound('success');
     perbaruiTampilanStatusPinGuru();
-    showToast('🔄 PIN Dasbor Guru berhasil dikembalikan ke default (1234)!', 'success');
+    showToast('🔄 PIN Dasbor Guru berhasil dikembalikan ke default standar!', 'success');
   }
 }
 window.resetPinGuruKeDefault = resetPinGuruKeDefault;
@@ -19071,9 +18773,9 @@ function renderOpsiPilihSiswa() {
     const group = document.createElement('optgroup');
     group.label = `Kelas ${cls}`;
     const studentsInClass = db.filter(s => s.kelas === cls);
-    studentsInClass.sort((a, b) => parseInt(a.absen || '0') - parseInt(b.absen || '0'));
+    const sortedStudentsInClass = urutkanSiswaSesuaiNomorAbsen(studentsInClass);
 
-    studentsInClass.forEach(s => {
+    sortedStudentsInClass.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s.id;
       opt.innerText = `NIS: ${s.nis || '-'} • No.${s.absen || '-'} - ${s.nama}`;
@@ -20181,10 +19883,10 @@ function filterDanCariSiswa() {
     return true;
   });
 
-  // Urutkan berdasarkan nomor absen
-  filtered.sort((a, b) => parseInt(a.absen || '0') - parseInt(b.absen || '0'));
+  // Urutkan siswa secara ketat dan konsisten berdasarkan nomor urut absen (1, 2, 3...)
+  const sortedFiltered = urutkanSiswaSesuaiNomorAbsen(filtered);
 
-  renderTabelGradebook(filtered, db.length);
+  renderTabelGradebook(sortedFiltered, db.length);
 }
 
 function setZoomTabelGuru(level) {
@@ -20893,7 +20595,7 @@ function simpanSiswaBaruManual() {
 // --------------------------------------------------------------------------
 function eksporNilaiCSV() {
   playSound('click');
-  const db = getStudentDatabase();
+  const db = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
   if (db.length === 0) {
     showToast('Database siswa masih kosong!', 'error');
     return;
@@ -21116,54 +20818,37 @@ function renderGaleriGuru() {
       }
     } catch (e) {}
 
-    // Sampel kurikulum resmi jika belum ada poster tersimpan lokal
+    // Bersihkan dari author siswa fiktif dummy secara permanen
+    posters = posters.filter(p => {
+      if (!p) return false;
+      const author = (p.author || p.studentName || '').toLowerCase();
+      for (const dummy of DAFTAR_NAMA_SISWA_CONTOH) {
+        if (author.includes(dummy)) return false;
+      }
+      return true;
+    });
+
     if (posters.length === 0) {
-      posters = [
-        {
-          id: 'poster_sample_1',
-          title: 'Poster 7 Kebiasaan Anak Indonesia Hebat',
-          date: '08 Okt 2026',
-          author: 'Aditya Pratama (4A)',
-          studentName: 'Aditya Pratama',
-          studentClass: '4A',
-          image: 'materi_word_tp2_1_poster.jpg',
-          bintang: 5,
-          nilai: 95
-        },
-        {
-          id: 'poster_sample_2',
-          title: 'Poster Budaya Kasih & Peduli Lingkungan Tzu Chi',
-          date: '08 Okt 2026',
-          author: 'Bella Angelique (4A)',
-          studentName: 'Bella Angelique',
-          studentClass: '4A',
-          image: 'materi_word_tp2_1_poster.jpg',
-          bintang: 5,
-          nilai: 95
-        },
-        {
-          id: 'poster_sample_3',
-          title: 'Poster Hemat Energi Listrik & Air Sekolah',
-          date: '07 Okt 2026',
-          author: 'Felicia Aurelia (4B)',
-          studentName: 'Felicia Aurelia',
-          studentClass: '4B',
-          image: 'materi_word_tp2_1_poster.jpg',
-          bintang: 5,
-          nilai: 92
-        },
-        {
-          id: 'poster_sample_4',
-          title: 'Poster Pola Hidup Bersih & Makanan Sehat',
-          date: '06 Okt 2026',
-          author: 'Michelle Natalie (4C)',
-          studentName: 'Michelle Natalie',
-          studentClass: '4C',
-          image: 'materi_word_tp2_1_poster.jpg',
-          bintang: 5,
-          nilai: 94
-        }
-      ];
+      if (countBadge) countBadge.innerText = '0 Karya Poster';
+      grid.innerHTML = `
+        <div class="col-span-full py-12 px-4 text-center space-y-3 bg-slate-50 rounded-3xl border border-dashed border-slate-300">
+          <div class="w-16 h-16 rounded-3xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto text-2xl shadow-inner border border-pink-100">
+            <i class="fa-solid fa-palette"></i>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-slate-800 text-base">Belum Ada Karya Poster Siswa Tersimpan</h4>
+            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1 leading-relaxed">
+              Saat siswa mengerjakan proyek poster di <strong>Lab MS Word (TP 2.1 - TP 2.4)</strong> dan menekan <em>"Simpan ke Galeri"</em>, karya digital siswa resmi akan langsung otomatis terpajang di sini.
+            </p>
+          </div>
+          <div class="pt-2">
+            <button onclick="switchTab('msword')" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-title text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+              <i class="fa-solid fa-file-word mr-1.5"></i> Buka Lab MS Word
+            </button>
+          </div>
+        </div>
+      `;
+      return;
     }
 
     if (countBadge) {
@@ -22411,10 +22096,10 @@ function imporDatabaseJSON(event) {
 
 function konfirmasiResetDatabase() {
   playSound('click');
-  if (confirm('Kembalikan seluruh database ke data bawaan Kelas 4 SDS Cinta Kasih Tzu Chi? Data manual akan tergantikan.')) {
-    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(SEED_STUDENTS));
+  if (confirm('Kosongkan seluruh database siswa lokal agar siap ditarik ulang dari Google Sheets / Buku Nilai Dapodik resmi?')) {
+    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify([]));
     playSound('success');
-    showToast('Database berhasil dipulihkan ke data sampel Tzu Chi! 🔄', 'success');
+    showToast('Database siswa telah dikosongkan. Silakan klik "Sinkron Google Sheets" untuk menarik data resmi.', 'info');
     renderDasborGuru();
   }
 }
@@ -22457,6 +22142,13 @@ window.prosesAnalisisDokumenSoal = prosesAnalisisDokumenSoal;
 window.ubahKunciPreviewImport = ubahKunciPreviewImport;
 window.hapusItemPreviewImport = hapusItemPreviewImport;
 window.eksekusiSimpanSoalImport = eksekusiSimpanSoalImport;
+window.pulihkanPinGuruDariLogin = pulihkanPinGuruDariLogin;
+window.bukaModalLupaPinEmailGuru = bukaModalLupaPinEmailGuru;
+window.tutupModalLupaPinEmailGuru = tutupModalLupaPinEmailGuru;
+window.eksekusiResetPinViaEmail = eksekusiResetPinViaEmail;
+window.kirimEmailNotifikasiReset = kirimEmailNotifikasiReset;
+window.hapusSemuaSiswaContohPermanen = hapusSemuaSiswaContohPermanen;
+window.urutkanSiswaSesuaiNomorAbsen = urutkanSiswaSesuaiNomorAbsen;
 
 // Panggil inisialisasi Database Guru & Pemulihan Sesi saat skrip dieksekusi dan saat DOM siap
 try {

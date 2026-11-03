@@ -11484,6 +11484,9 @@
 
           <!-- Filter KKM & Search -->
           <div class="flex flex-wrap items-center gap-2.5">
+            <button type="button" onclick="hapusSemuaSiswaContohPermanen()" class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Hapus permanen semua data siswa contoh fiktif bawaan">
+              <i class="fa-solid fa-broom text-rose-600"></i> Hapus Siswa Contoh
+            </button>
             <select id="guru-filter-kkm" onchange="filterDanCariSiswa()" class="text-xs font-medium px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="semua">Semua Status KKM</option>
               <option value="tuntas">✅ Tuntas KKM (≥ 80)</option>
@@ -11992,7 +11995,7 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
                 <i class="fa-solid fa-lock"></i> Ubah PIN Guru Sekarang
               </button>
               <button onclick="resetPinGuruKeDefault()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 cursor-pointer">
-                <i class="fa-solid fa-rotate-left"></i> Reset ke Default (1234)
+                <i class="fa-solid fa-rotate-left"></i> Reset ke PIN Standar
               </button>
             </div>
           </div>
@@ -12633,7 +12636,7 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
       </div>
       <div>
         <h4 class="font-title font-bold text-slate-800 text-lg sm:text-xl">Akses Dasbor Guru</h4>
-        <p class="text-xs text-slate-500 mt-1">Masukkan 4-digit PIN Guru untuk mengelola database dan nilai siswa.</p>
+        <p class="text-xs text-slate-500 mt-1">Masukkan PIN Dasbor Guru untuk mengelola database dan nilai siswa.</p>
       </div>
 
       <div class="space-y-3">
@@ -12646,9 +12649,6 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
         <p id="pesan-error-pin" class="text-xs text-rose-500 font-bold hidden flex items-center justify-center gap-1">
           <i class="fa-solid fa-circle-exclamation"></i> PIN salah! Silakan coba lagi.
         </p>
-        <div id="hint-pin-login-guru" class="text-[11px] text-slate-400">
-          <span class="text-slate-400 font-medium">Default: 1234</span>
-        </div>
 
         <!-- Touchscreen Friendly Keypad -->
         <div class="grid grid-cols-3 gap-2 pt-1">
@@ -12682,6 +12682,79 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
         <button type="button" onclick="tutupModalLoginGuru(); bukaPilihSiswaCepat();" class="text-emerald-700 font-bold hover:underline text-xs cursor-pointer inline-flex items-center gap-1">
           <i class="fa-solid fa-graduation-cap text-emerald-600"></i> Masuk sebagai Siswa (Login NIS)
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: LUPA PIN GURU (RESET VIA EMAIL RESMI) -->
+  <!-- ======================================================== -->
+  <div id="modal-lupa-pin-email-guru" class="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLupaPinEmailGuru()">
+    <div class="bg-white rounded-3xl max-w-sm sm:max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold shadow-inner">
+            <i class="fa-solid fa-envelope-circle-check"></i>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-slate-800 text-base sm:text-lg">Pemulihan PIN Guru</h4>
+            <p class="text-[11px] text-slate-500">Verifikasi email terdaftar untuk reset PIN</p>
+          </div>
+        </div>
+        <button type="button" onclick="tutupModalLupaPinEmailGuru()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Informasi Email Resmi Guru -->
+      <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-center space-y-1.5 shadow-2xs">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-shield-halved text-amber-600"></i> Email Terdaftar Resmi Guru:
+        </span>
+        <div class="font-mono font-black text-slate-900 text-base sm:text-lg tracking-wide select-all bg-white py-1.5 px-3 rounded-xl border border-amber-300 inline-block shadow-inner">
+          ningdrn79@gmail.com
+        </div>
+        <p class="text-[11px] text-slate-600 leading-relaxed pt-0.5">
+          Guru Pengampu: <strong>Ibu Darningsih, S.T.</strong> • SDS Cinta Kasih Tzu Chi
+        </p>
+      </div>
+
+      <!-- Form Konfirmasi Reset -->
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">
+            Ketik Email Anda untuk Verifikasi Identitas:
+          </label>
+          <input type="email" id="input-lupa-pin-email" placeholder="Ketik ningdrn79@gmail.com" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();eksekusiResetPinViaEmail();}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 font-medium text-slate-800">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">
+            Setel PIN Baru (4 - 6 Digit Angka):
+          </label>
+          <input type="password" id="input-lupa-pin-baru" maxlength="6" placeholder="Contoh: 1234 atau PIN baru pilihan Anda" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();eksekusiResetPinViaEmail();}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 font-mono tracking-widest text-slate-800">
+          <span class="text-[10px] text-slate-400 mt-0.5 block">Jika dikosongkan, PIN akan otomatis di-reset ke PIN default standar.</span>
+        </div>
+
+        <p id="pesan-error-lupa-pin" class="text-xs text-rose-500 font-bold hidden flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-exclamation"></i> <span>Pesan error</span>
+        </p>
+      </div>
+
+      <!-- Tombol Aksi Verifikasi -->
+      <div class="space-y-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="eksekusiResetPinViaEmail()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-key"></i> Verifikasi Email & Reset PIN
+        </button>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="kirimEmailNotifikasiReset()" class="py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl font-title font-bold text-[11px] transition flex items-center justify-center gap-1 cursor-pointer" title="Buka aplikasi email untuk mengirim konfirmasi ke ningdrn79@gmail.com">
+            <i class="fa-solid fa-paper-plane text-[10px]"></i> Buka Aplikasi Email
+          </button>
+          <button type="button" onclick="tutupModalLupaPinEmailGuru()" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-[11px] transition">
+            Batal
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -13850,6 +13923,6 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261103_layar_statis_ketik_v29"></script>
+  <script src="app.js?v=20261103_default_pin_003734_v32"></script>
 </body>
 </html>
