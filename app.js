@@ -5668,22 +5668,7 @@ function muatDrive7Kebiasaan(studentProfile) {
       return studentProfile.driveData;
     }
 
-    // 2. Cek di database siswa resmi (tersimpan dari akun guru atau sinkronisasi)
-    if (typeof getStudentDatabase === 'function') {
-      try {
-        const db = getStudentDatabase();
-        const found = db.find(s => 
-          (studentProfile.id && s.id === studentProfile.id) || 
-          (studentProfile.nis && s.nis && String(s.nis) === String(studentProfile.nis)) || 
-          (studentProfile.nama && s.nama && s.nama.toLowerCase() === studentProfile.nama.toLowerCase() && s.kelas === studentProfile.kelas)
-        );
-        if (found && found.driveData && typeof found.driveData === 'object' && Object.keys(found.driveData).length > 0) {
-          return found.driveData;
-        }
-      } catch (e) {}
-    }
-
-    // 3. Coba beberapa variasi kunci penyimpanan siswa (NIS, ID, Nama) di localStorage
+    // 2. Coba beberapa variasi kunci penyimpanan siswa (NIS, ID, Nama) di localStorage
     const possibleKeys = [
       studentProfile.nis ? `educode_drive_7kebiasaan_${studentProfile.nis}` : null,
       studentProfile.id ? `educode_drive_7kebiasaan_${studentProfile.id}` : null,
@@ -5703,25 +5688,10 @@ function muatDrive7Kebiasaan(studentProfile) {
     }
   }
 
-  // 4. Jika dipanggil tanpa parameter (misal siswa aktif saat belajar)
+  // 3. Jika dipanggil tanpa parameter (misal siswa aktif saat belajar)
   const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-  if (activeStudent) {
-    if (activeStudent.driveData && typeof activeStudent.driveData === 'object' && Object.keys(activeStudent.driveData).length > 0) {
-      return activeStudent.driveData;
-    }
-    if (typeof getStudentDatabase === 'function') {
-      try {
-        const db = getStudentDatabase();
-        const found = db.find(s => 
-          (activeStudent.id && s.id === activeStudent.id) || 
-          (activeStudent.nis && s.nis && String(s.nis) === String(activeStudent.nis)) || 
-          (activeStudent.nama && s.nama && s.nama.toLowerCase() === activeStudent.nama.toLowerCase() && s.kelas === activeStudent.kelas)
-        );
-        if (found && found.driveData && typeof found.driveData === 'object' && Object.keys(found.driveData).length > 0) {
-          return found.driveData;
-        }
-      } catch (e) {}
-    }
+  if (activeStudent && activeStudent.driveData && typeof activeStudent.driveData === 'object' && Object.keys(activeStudent.driveData).length > 0) {
+    return activeStudent.driveData;
   }
 
   const key = getDriveStorageKey(studentProfile || activeStudent);
@@ -17795,10 +17765,309 @@ state.selectedStudentId = null;
 
 // ==========================================
 // DATABASE SISWA BAWAAN RESMI
-// Sesuai instruksi Guru, seluruh data siswa contoh/dummy dihapus secara permanen.
-// Data siswa resmi berasal langsung dari Buku Nilai Dapodik / Google Sheets Sekolah.
+// Sesuai Buku Nilai LMS SDS Cinta Kasih Tzu Chi
 // ==========================================
-const SEED_STUDENTS = [];
+const SEED_STUDENTS = [
+  {
+    id: 'STD-4A-3201',
+    nis: '3201',
+    nama: 'ABELLINE DYLAN',
+    kelas: '4A',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Februari 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3204',
+    nis: '3204',
+    nama: 'ADHYASTHA PUTRA PRATAMA',
+    kelas: '4A',
+    absen: '02',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Desember 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3297',
+    nis: '3297',
+    nama: 'ALEYDANISA HUMAIRA',
+    kelas: '4A',
+    absen: '03',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 April 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3236',
+    nis: '3236',
+    nama: 'ALKHALIFI GHAISAN',
+    kelas: '4A',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Maret 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3298',
+    nis: '3298',
+    nama: 'ALVIAN LEWIS PUTRA',
+    kelas: '4A',
+    absen: '05',
+    jenisKelamin: 'L',
+    tempatLahir: 'KUDUS',
+    tanggalLahir: '23 Februari 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3331',
+    nis: '3331',
+    nama: 'ANANDA DWI RIZKY',
+    kelas: '4A',
+    absen: '06',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Juni 2015',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3382',
+    nis: '3382',
+    nama: 'ANDITA SANELA ZAHRA',
+    kelas: '4A',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '08 September 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3302',
+    nis: '3302',
+    nama: 'ASSYLA KANSYAFA',
+    kelas: '4A',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 Mei 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3207',
+    nis: '3207',
+    nama: 'BELLVANIA CHRISTABELL',
+    kelas: '4A',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 April 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3304',
+    nis: '3304',
+    nama: 'CALYSTA VANESYA',
+    kelas: '4A',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'WONOSOBO',
+    tanggalLahir: '21 April 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3741',
+    nis: '3741',
+    nama: 'DARVIN ZHANG',
+    kelas: '4A',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 Agustus 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3312',
+    nis: '3312',
+    nama: 'FLORINDA LIN',
+    kelas: '4A',
+    absen: '12',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Agustus 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3202',
+    nis: '3202',
+    nama: 'ABINAYA DHITAJAYANTI',
+    kelas: '4C',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Maret 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  }
+];
 
 // Daftar Nama Siswa Contoh / Dummy Fiktif Bawaan (Hapus Permanen)
 const DAFTAR_NAMA_SISWA_CONTOH = new Set([
@@ -17872,6 +18141,10 @@ function hapusSemuaSiswaContohPermanen(quiet = false) {
 
     const countBefore = list.length;
     list = list.filter(s => !isSiswaContohDummy(s));
+
+    if (list.length === 0 && Array.isArray(SEED_STUDENTS) && SEED_STUDENTS.length > 0) {
+      list = JSON.parse(JSON.stringify(SEED_STUDENTS));
+    }
 
     // Urutkan ulang siswa yang tersisa sesuai nomor absen
     list = urutkanSiswaSesuaiNomorAbsen(list);
@@ -17952,13 +18225,17 @@ window.catatSiswaTerhapus = catatSiswaTerhapus;
 function getStudentDatabase() {
   try {
     const raw = localStorage.getItem(DB_STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify([]));
-      return [];
+    let parsed = null;
+    if (raw) {
+      try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
     }
-    let parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
-      return [];
+      if (Array.isArray(SEED_STUDENTS) && SEED_STUDENTS.length > 0) {
+        parsed = JSON.parse(JSON.stringify(SEED_STUDENTS));
+        localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(parsed));
+      } else {
+        return [];
+      }
     }
 
     let changed = false;
@@ -18062,7 +18339,7 @@ function getStudentDatabase() {
       }
       // Sinkronisasi nilai Drive 7 Kebiasaan (TP 2.1)
       if (s.nilaiDrive === undefined || s.koleksiDrive === undefined) {
-        const driveData = muatDrive7Kebiasaan(s);
+        const driveData = s.driveData || {};
         const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
         if (s.nilaiDrive === undefined) s.nilaiDrive = evalDrive.totalSkor;
         if (s.koleksiDrive === undefined) s.koleksiDrive = evalDrive.filledCount;
@@ -20230,12 +20507,7 @@ function filterDanCariSiswa() {
     // Hitung status nilai berdasarkan mode penilaian aktif
     let skorAktif = 80;
     if (mode === 1) {
-      let nilaiDrive = s.nilaiDrive;
-      if (nilaiDrive === undefined) {
-        const driveData = muatDrive7Kebiasaan(s);
-        const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
-        nilaiDrive = evalDrive.totalSkor;
-      }
+      const nilaiDrive = s.nilaiDrive !== undefined ? s.nilaiDrive : (s.driveData ? hitungNilaiDrive7Kebiasaan(s.driveData).totalSkor : 0);
       const p1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
       const p2 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 0);
       skorAktif = Math.round(((s.kuisSem1 || 0) * 0.25) + (nilaiDrive * 0.25) + (p1 * 0.25) + (p2 * 0.25));
@@ -20244,12 +20516,7 @@ function filterDanCariSiswa() {
       const p2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : (s.misiRobo > 0 ? 88 : 0);
       skorAktif = Math.round(((s.kuisSem2 || 0) * 0.3) + (p1 * 0.35) + (p2 * 0.35));
     } else {
-      let nilaiDrive = s.nilaiDrive;
-      if (nilaiDrive === undefined) {
-        const driveData = muatDrive7Kebiasaan(s);
-        const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
-        nilaiDrive = evalDrive.totalSkor;
-      }
+      const nilaiDrive = s.nilaiDrive !== undefined ? s.nilaiDrive : (s.driveData ? hitungNilaiDrive7Kebiasaan(s.driveData).totalSkor : 0);
       const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
       const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 0);
       const nilaiSem1 = Math.round(((s.kuisSem1 || 0) * 0.25) + (nilaiDrive * 0.25) + (p1_s1 * 0.25) + (p2_s1 * 0.25));
@@ -22578,6 +22845,58 @@ function doPost(e) {
         payload.type || "Gambar",
         driveFileUrl
       ]);
+    }
+
+    // 4. Update otomatis nilai langsung ke baris siswa di Tab "DATA SISWA LMS" (Satu File)
+    var sheetData = ss.getSheetByName("DATA SISWA LMS");
+    if (sheetData && payload.nis) {
+      try {
+        var dValues = sheetData.getDataRange().getValues();
+        if (dValues.length > 1) {
+          var dHeaders = dValues[0].map(function(h) { return h.toString().toLowerCase().trim(); });
+          var dNisIdx = dHeaders.indexOf("nis");
+          if (dNisIdx !== -1) {
+            var targetRow = -1;
+            for (var r = 1; r < dValues.length; r++) {
+              if (dValues[r][dNisIdx] && dValues[r][dNisIdx].toString().trim() === payload.nis.toString().trim()) {
+                targetRow = r + 1; // 1-based index di Spreadsheet
+                break;
+              }
+            }
+
+            if (targetRow !== -1) {
+              var colKuis1 = dHeaders.indexOf("kuis sem 1");
+              var colPoster = dHeaders.indexOf("poster word");
+              var colExcel = dHeaders.indexOf("tabel excel");
+              var colDrive = dHeaders.indexOf("drive 7 kebiasaan");
+              var colKkm = dHeaders.indexOf("status kkm");
+
+              var curLastCol = sheetData.getLastColumn();
+              if (colKuis1 === -1) { sheetData.getRange(1, ++curLastCol).setValue("Kuis Sem 1"); colKuis1 = curLastCol - 1; }
+              if (colPoster === -1) { sheetData.getRange(1, ++curLastCol).setValue("Poster Word"); colPoster = curLastCol - 1; }
+              if (colExcel === -1) { sheetData.getRange(1, ++curLastCol).setValue("Tabel Excel"); colExcel = curLastCol - 1; }
+              if (colDrive === -1) { sheetData.getRange(1, ++curLastCol).setValue("Drive 7 Kebiasaan"); colDrive = curLastCol - 1; }
+              if (colKkm === -1) { sheetData.getRange(1, ++curLastCol).setValue("Status KKM"); colKkm = curLastCol - 1; }
+
+              if (payload.event === "kuis" || payload.kuisSem1 !== undefined) {
+                sheetData.getRange(targetRow, colKuis1 + 1).setValue(payload.nilai !== undefined ? payload.nilai : payload.kuisSem1);
+              }
+              if (payload.event === "simpan_poster" || payload.type === "poster") {
+                sheetData.getRange(targetRow, colPoster + 1).setValue(payload.nilai || 90);
+              }
+              if (payload.event === "simpan_excel" || payload.type === "excel") {
+                sheetData.getRange(targetRow, colExcel + 1).setValue(payload.nilai || 88);
+              }
+              if (payload.event === "simpan_slot_drive" || payload.type === "drive_7kebiasaan") {
+                sheetData.getRange(targetRow, colDrive + 1).setValue((payload.koleksiDrive !== undefined ? payload.koleksiDrive : "Update") + "/7 Gambar");
+              }
+              if (payload.statusKkm) {
+                sheetData.getRange(targetRow, colKkm + 1).setValue(payload.statusKkm);
+              }
+            }
+          }
+        }
+      } catch (eUp) {}
     }
     
     return ContentService.createTextOutput(JSON.stringify({
