@@ -55,7 +55,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261103_rapor_print_v2">
+  <link rel="stylesheet" href="styles.css?v=20261104_firebase_contrast_v3">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -11440,11 +11440,14 @@
           <button onclick="pilihSubTabGuru('gradebook')" id="guru-subtab-btn-gradebook" class="px-4 py-2 rounded-xl text-xs font-bold font-title transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs">
             <i class="fa-solid fa-table-list"></i> Buku Nilai & Progres Siswa
           </button>
-          <button onclick="pilihSubTabGuru('analisis')" id="guru-subtab-btn-analisis" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie"></i> Analisis Capaian TP
+          <button onclick="pilihSubTabGuru('drive7k')" id="guru-subtab-btn-drive7k" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+            <i class="fa-solid fa-folder-open text-purple-600"></i> Drive 7 Kebiasaan (TP 2.1)
           </button>
           <button onclick="pilihSubTabGuru('galeri')" id="guru-subtab-btn-galeri" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
-            <i class="fa-solid fa-palette text-pink-500"></i> Galeri Poster Siswa (Sem 1)
+            <i class="fa-solid fa-palette text-pink-500"></i> Hasil Poster Siswa (Sem 1)
+          </button>
+          <button onclick="pilihSubTabGuru('analisis')" id="guru-subtab-btn-analisis" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie"></i> Analisis Capaian TP
           </button>
           <button onclick="pilihSubTabGuru('cloud')" id="guru-subtab-btn-cloud" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
             <i class="fa-solid fa-cloud-arrow-up"></i> Sinkronisasi Cloud & Backup
@@ -11581,7 +11584,91 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 2: ANALISIS PENGUASAAN TP -->
+      <!-- SUB-TAB 2: MONITORING DRIVE 7 KEBIASAAN SISWA (TP 2.1) -->
+      <div id="guru-view-drive7k" class="hidden space-y-4">
+        <!-- Top Stats Summary -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Siswa</div>
+              <div id="guru-drive7k-stat-total" class="font-title font-black text-lg text-slate-800">0</div>
+            </div>
+          </div>
+          <div class="p-4 bg-white rounded-2xl border border-emerald-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Lengkap (7/7)</div>
+              <div id="guru-drive7k-stat-lengkap" class="font-title font-black text-lg text-emerald-700">0</div>
+            </div>
+          </div>
+          <div class="p-4 bg-white rounded-2xl border border-amber-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Proses (1-6)</div>
+              <div id="guru-drive7k-stat-proses" class="font-title font-black text-lg text-amber-700">0</div>
+            </div>
+          </div>
+          <div class="p-4 bg-white rounded-2xl border border-rose-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Belum Ada (0/7)</div>
+              <div id="guru-drive7k-stat-kosong" class="font-title font-black text-lg text-rose-700">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar Drive 7K -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-filter text-purple-600"></i> Status:
+            </span>
+            <div class="inline-flex rounded-xl bg-slate-100 p-1" id="group-filter-drive7k-status">
+              <button type="button" onclick="setFilterDrive7KStatus('semua')" id="btn-f-drive7k-semua" class="px-3 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-xs transition cursor-pointer">Semua</button>
+              <button type="button" onclick="setFilterDrive7KStatus('lengkap')" id="btn-f-drive7k-lengkap" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer">Lengkap (7/7)</button>
+              <button type="button" onclick="setFilterDrive7KStatus('proses')" id="btn-f-drive7k-proses" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer">Belum Lengkap (1-6)</button>
+              <button type="button" onclick="setFilterDrive7KStatus('kosong')" id="btn-f-drive7k-kosong" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer">Belum Kumpul (0/7)</button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1 sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="guru-cari-drive7k" oninput="renderMonitoringDrive7KGuru()" placeholder="Cari nama atau NIS siswa..." class="w-full pl-9 pr-3 py-2 rounded-xl text-xs border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <button type="button" onclick="renderMonitoringDrive7KGuru()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Segarkan Data Drive">
+              <i class="fa-solid fa-rotate text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Student Cards Grid -->
+        <div id="guru-drive7k-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Diisi via renderMonitoringDrive7KGuru() -->
+        </div>
+
+        <!-- Empty State Drive 7K -->
+        <div id="guru-drive7k-empty" class="hidden p-12 text-center space-y-3 bg-white rounded-3xl border border-dashed border-slate-300">
+          <div class="w-16 h-16 rounded-full bg-purple-50 text-purple-400 flex items-center justify-center mx-auto text-2xl">
+            <i class="fa-solid fa-folder-open"></i>
+          </div>
+          <h4 class="font-title font-bold text-slate-700 text-sm">Tidak ada siswa yang sesuai filter</h4>
+          <p class="text-xs text-slate-500 max-w-sm mx-auto">
+            Coba pilih status "Semua" atau sesuaikan kata kunci pencarian.
+          </p>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3: ANALISIS PENGUASAAN TP -->
       <div id="guru-view-analisis" class="hidden space-y-4">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
           <div>
@@ -11675,8 +11762,39 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 3: GALERI HASIL KARYA SISWA (SEMESTER 1: POSTER & SEMESTER 2: CODING/AI SAAT AKTIF) -->
+      <!-- SUB-TAB 4: HASIL POSTER SISWA & GALERI (SEMESTER 1: POSTER & SEMESTER 2: CODING/AI SAAT AKTIF) -->
       <div id="guru-view-galeri" class="hidden space-y-4">
+        <!-- Top Summary Cards Pengumpulan Poster -->
+        <div id="guru-poster-stats-row" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Siswa Kelas</div>
+              <div id="guru-poster-stat-total" class="font-title font-black text-lg text-slate-800">0</div>
+            </div>
+          </div>
+          <div class="p-4 bg-white rounded-2xl border border-emerald-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Sudah Kumpul Poster</div>
+              <div id="guru-poster-stat-sudah" class="font-title font-black text-lg text-emerald-700">0 Siswa</div>
+            </div>
+          </div>
+          <div class="p-4 bg-white rounded-2xl border border-rose-200 shadow-xs flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Belum Kumpul Poster</div>
+              <div id="guru-poster-stat-belum" class="font-title font-black text-lg text-rose-700">0 Siswa</div>
+            </div>
+          </div>
+        </div>
+
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -11689,7 +11807,7 @@
                 </span>
               </div>
               <h3 id="guru-galeri-title" class="font-title font-bold text-lg text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-palette text-pink-600"></i> Galeri Hasil Karya Poster Siswa (Semester 1)
+                <i class="fa-solid fa-palette text-pink-600"></i> Hasil Poster Siswa (Semester 1)
               </h3>
               <p id="guru-galeri-desc" class="text-xs text-slate-500 mt-1">
                 Kumpulan portofolio digital hasil karya poster MS Word & Konten Digital TP 2.1 - TP 2.4 yang dirancang mandiri oleh siswa Kelas 4.
@@ -11705,13 +11823,45 @@
             </div>
           </div>
 
+          <!-- Switcher Mode Tampilan: Rekap Status Siswa vs Galeri Visual -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+            <div class="inline-flex rounded-xl bg-slate-100 p-1" id="group-mode-tampilan-poster">
+              <button type="button" onclick="setModeTampilanPosterGuru('rekap')" id="btn-mode-poster-rekap" class="px-3.5 py-1.5 rounded-lg text-xs font-bold font-title bg-pink-600 text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-list-check"></i> Rekap Status Siswa (Siapa Sudah / Belum)
+              </button>
+              <button type="button" onclick="setModeTampilanPosterGuru('galeri')" id="btn-mode-poster-galeri" class="px-3.5 py-1.5 rounded-lg text-xs font-bold font-title text-slate-600 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-table-cells-large"></i> Galeri Visual Poster
+              </button>
+            </div>
+
+            <!-- Filter Status Pengumpulan di Rekap -->
+            <div id="guru-poster-filter-box" class="flex items-center gap-2">
+              <select id="guru-filter-poster-status" onchange="renderGaleriGuru()" class="text-xs font-medium px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                <option value="semua">Semua Status Siswa</option>
+                <option value="sudah">✅ Sudah Kumpul Poster</option>
+                <option value="belum">🔴 Belum Kumpul Poster</option>
+              </select>
+              <div class="relative w-48 sm:w-56">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="guru-cari-poster-siswa" oninput="renderGaleriGuru()" placeholder="Cari siswa..." class="w-full pl-8 pr-3 py-1.5 rounded-xl text-xs border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500">
+              </div>
+            </div>
+          </div>
+
           <!-- Tab Switcher Semester Galeri (Semester 1 vs Semester 2 Aktif) -->
-          <div id="guru-galeri-sem-switcher" class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
+          <div id="guru-galeri-sem-switcher" class="flex flex-wrap items-center gap-2 pt-2">
             <!-- Diatur otomatis lewat renderGaleriGuru() -->
           </div>
 
-          <!-- Cards Grid Galeri Siswa -->
-          <div id="guru-galeri-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+          <!-- TAMPILAN 1: REKAP STATUS SISWA (DAFTAR SIAPA SUDAH & SIAPA BELUM) -->
+          <div id="guru-poster-rekap-container" class="space-y-3 pt-2">
+            <div id="guru-poster-status-list" class="space-y-2.5">
+              <!-- Diisi via renderGaleriGuru() -->
+            </div>
+          </div>
+
+          <!-- TAMPILAN 2: CARDS GRID GALERI VISUAL SISWA -->
+          <div id="guru-galeri-grid" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
             <!-- Diisi via renderGaleriGuru() -->
           </div>
         </div>
@@ -11772,22 +11922,28 @@
             </div>
 
             <!-- Form Konfigurasi Firebase -->
-            <div class="p-4 bg-white rounded-2xl border border-amber-200 space-y-3">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="p-5 bg-white rounded-2xl border-2 border-amber-200 shadow-sm space-y-3.5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <label for="firebase-config-input" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <i class="fa-solid fa-code text-amber-600"></i> Kode Konfigurasi Firebase (<code class="text-[11px] bg-slate-100 px-1 py-0.5 rounded text-amber-700">firebaseConfig</code>):
+                  <i class="fa-solid fa-code text-amber-600"></i> Kode Konfigurasi Firebase (<code class="text-[11px] bg-slate-100 px-1 py-0.5 rounded text-amber-700 font-bold">firebaseConfig</code>):
                 </label>
-                <button type="button" onclick="bukaPanduanFirebase()" class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1.5 underline cursor-pointer">
-                  <i class="fa-solid fa-circle-question"></i> Lihat Panduan Setup 3 Menit (Gratis)
-                </button>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button type="button" onclick="pasangFirebaseTzuChiOtomatis()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-200"></i> Pasang Otomatis (sd-tzuchi-kelas4)
+                  </button>
+                  <button type="button" onclick="bukaPanduanFirebase()" class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1.5 underline cursor-pointer">
+                    <i class="fa-solid fa-circle-question"></i> Panduan Setup (Gratis)
+                  </button>
+                </div>
               </div>
 
-              <textarea id="firebase-config-input" rows="4" placeholder='Tempelkan (Paste) konfigurasi proyek Firebase di sini.
-Bisa format JSON: {"apiKey": "...", "projectId": "...", "storageBucket": "..."}
-Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...", ... };' class="w-full text-xs font-mono p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition resize-y"></textarea>
+              <textarea id="firebase-config-input" rows="5" placeholder='Tempelkan (Paste) konfigurasi proyek Firebase di sini.
+Bisa salin seluruh blok dari Firebase Console:
+const firebaseConfig = { apiKey: "...", projectId: "...", ... };
+Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs font-mono p-3 bg-white text-slate-900 border-2 border-amber-300 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition resize-y font-semibold shadow-inner" style="color: #0f172a !important; background-color: #ffffff !important; caret-color: #d97706 !important;"></textarea>
 
               <div class="flex flex-wrap items-center gap-2 pt-1">
-                <button type="button" onclick="simpanDanUjiFirebase()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
+                <button type="button" id="btn-simpan-firebase" onclick="simpanDanUjiFirebase()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
                   <i class="fa-solid fa-bolt"></i> Simpan & Uji Koneksi Cloud
                 </button>
                 <button type="button" onclick="unggahSemuaKaryaLokalKeCloud()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
@@ -13934,6 +14090,44 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
   </div>
 
   <!-- ======================================================== -->
+  <!-- MODAL STATUS KONEKSI & DIAGNOSTIK FIREBASE               -->
+  <!-- ======================================================== -->
+  <div id="modal-status-koneksi-firebase" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-amber-200 overflow-hidden my-8 max-h-[92vh] flex flex-col animate-fadeIn">
+      <!-- Modal Header -->
+      <div class="p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="modal-firebase-status-icon" class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-bold shadow-inner">
+            <i class="fa-solid fa-cloud-check"></i>
+          </div>
+          <div>
+            <h3 id="modal-firebase-status-title" class="font-title font-bold text-base leading-tight">Status Sambungan Firebase</h3>
+            <p class="text-xs text-amber-100">Server Cloud SDS Cinta Kasih Tzu Chi</p>
+          </div>
+        </div>
+        <button onclick="tutupModalStatusFirebase()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div id="modal-firebase-status-body" class="p-6 overflow-y-auto space-y-4">
+        <!-- Diisi lewat tampilkanModalStatusFirebase() -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 font-bold hover:underline flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Firebase Console
+        </a>
+        <button onclick="tutupModalStatusFirebase()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-title font-bold text-xs shadow-md transition cursor-pointer">
+          Tutup & Selesai
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
   <!-- MODAL TAMBAH / EDIT SOAL KUIS GURU                      -->
   <!-- ======================================================== -->
   <div id="modal-bank-soal-guru" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
@@ -14198,6 +14392,6 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261104_fix_lag_and_nis_v41"></script>
+  <script src="app.js?v=20261104_firebase_fix_v44"></script>
 </body>
 </html>

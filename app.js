@@ -329,8 +329,12 @@ let state = {
   isExecutingCode: false,
   // Dasbor Guru State
   isGuruLoggedIn: typeof isTeacherSessionActive === 'function' ? isTeacherSessionActive() : false,
+  subTabGuru: 'gradebook',
   modePenilaianGuru: 1, // 1: Semester 1 (Word & Excel), 2: Semester 2 (Scratch & RoboMind), 'semua': Rekap Gabungan
   galeriSemester: 1, // 1: Semester 1 (Hasil Karya Poster), 2: Semester 2 (Coding & AI saat aktif)
+  modeTampilanPosterGuru: 'rekap', // 'rekap' (checklist siapa sudah/belum) vs 'galeri' (kartu visual poster)
+  filterPosterStatus: 'semua', // 'semua', 'sudah', 'belum'
+  filterDrive7KStatus: 'semua', // 'semua', 'lengkap', 'proses', 'kosong'
   bankSoalSemester: 1, // 1: Semester 1 (Konten Digital & Word/Excel), 2: Semester 2 (Coding & AI)
   quizCorrectCount: 0
 };
@@ -5707,8 +5711,20 @@ window.muatDrive7Kebiasaan = muatDrive7Kebiasaan;
 
 function hitungNilaiDrive7Kebiasaan(driveData) {
   if (!driveData || typeof driveData !== 'object') {
-    return { totalSkor: 0, filledCount: 0, validNameCount: 0, statusKkm: 'Remedial' };
+    return {
+      totalSkor: 0,
+      filledCount: 0,
+      validNameCount: 0,
+      statusKkm: 'Remedial',
+      paintCount: 0,
+      aiCount: 0,
+      paintValid: false,
+      aiValid: false,
+      isSesuaiKategori: false,
+      catatanAnalisis: 'Belum ada gambar yang dikumpulkan di Drive.'
+    };
   }
+
   const keys = Object.keys(driveData).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k));
   const filledCount = keys.filter(k => driveData[k] && (driveData[k].imageSrc || driveData[k].gambar)).length;
   const validNameCount = keys.filter(k => {
@@ -5717,16 +5733,92 @@ function hitungNilaiDrive7Kebiasaan(driveData) {
   }).length;
 
   if (filledCount === 0) {
-    return { totalSkor: 0, filledCount: 0, validNameCount: 0, statusKkm: 'Remedial' };
+    return {
+      totalSkor: 0,
+      filledCount: 0,
+      validNameCount: 0,
+      statusKkm: 'Remedial',
+      paintCount: 0,
+      aiCount: 0,
+      paintValid: false,
+      aiValid: false,
+      isSesuaiKategori: false,
+      catatanAnalisis: 'Belum ada gambar yang dikumpulkan di Drive.'
+    };
   }
 
-  // Bobot penilaian TP 2.1: 70% kelengkapan 7 gambar + 30% standar nama file baku
-  const skorGambar = Math.round((filledCount / 7) * 70);
-  const skorNama = Math.round((validNameCount / 7) * 30);
-  const totalSkor = Math.min(100, Math.max(filledCount > 0 ? 25 : 0, skorGambar + skorNama));
+  // 1. Analisis 3 Tema Wajib Gambar Sendiri (Aplikasi Paint Terbaru)
+  // Tema: 1. Bangun Pagi, 5. Gemar Belajar & Membaca, 7. Tidur Tepat Waktu
+  const paintKeys = ['bangun_pagi', 'tidur_tepat', 'belajar_membaca'];
+  let paintScoreCount = 0;
+  paintKeys.forEach(pk => {
+    const item = driveData[pk];
+    if (item && (item.imageSrc || item.gambar)) {
+      const srcStr = (item.sumber || item.source || '').toLowerCase();
+      if (srcStr.includes('paint') || srcStr.includes('gambar') || srcStr.includes('sendiri') || srcStr.includes('manual') || srcStr.includes('komputer')) {
+        paintScoreCount += 1;
+      } else {
+        paintScoreCount += 0.8;
+      }
+    }
+  });
+
+  // 2. Analisis 4 Tema Wajib Gambar AI (Studio Gambar AI Generatif)
+  // Tema: 2. Beribadah & Berdoa, 3. Berolahraga, 4. Makan Sehat & Bergizi, 6. Hidup Rukun & Berbagi
+  const aiKeys = ['beribadah', 'olahraga', 'makan_sehat', 'rukun_berbagi'];
+  let aiScoreCount = 0;
+  aiKeys.forEach(ak => {
+    const item = driveData[ak];
+    if (item && (item.imageSrc || item.gambar)) {
+      const srcStr = (item.sumber || item.source || '').toLowerCase();
+      if (srcStr.includes('ai') || srcStr.includes('generatif') || srcStr.includes('kartun') || srcStr.includes('vektor') || srcStr.includes('pinterest')) {
+        aiScoreCount += 1;
+      } else {
+        aiScoreCount += 0.8;
+      }
+    }
+  });
+
+  const isAll7 = (filledCount === 7);
+  const paintValid = (paintScoreCount >= 2.6);
+  const aiValid = (aiScoreCount >= 3.6);
+  const isSesuaiKategori = paintValid && aiValid;
+
+  // Aturan Penilaian Ibu Guru Darningsih, S.T.:
+  // Syarat Nilai 100 (Tuntas): Seluruh 7 slot terisi lengkap (7/7) dan sesuai komposisi 3 Paint + 4 AI
+  let totalSkor = 0;
+  let catatanAnalisis = '';
+
+  if (isAll7) {
+    if (isSesuaiKategori) {
+      totalSkor = 100;
+      catatanAnalisis = 'Luar Biasa! 7/7 gambar lengkap dan sesuai kategori (3 Paint mandiri + 4 Studio AI). TUNTAS 100! 🌟';
+    } else {
+      totalSkor = 90;
+      catatanAnalisis = 'Koleksi 7/7 lengkap (Tuntas). Sebagian sumber gambar masih bisa disempurnakan (3 Paint & 4 AI).';
+    }
+  } else {
+    // Belum lengkap 7/7 -> belum mencapai KKM 80 (skor bertahap proporsional)
+    const skorGambar = Math.round((filledCount / 7) * 65);
+    const skorNama = Math.round((validNameCount / 7) * 10);
+    totalSkor = Math.min(75, skorGambar + skorNama);
+    catatanAnalisis = `Koleksi baru ${filledCount} dari 7 gambar. Lengkapi sisa ${7 - filledCount} slot gambar lagi untuk meraih Nilai 100!`;
+  }
+
   const statusKkm = totalSkor >= 80 ? 'Tuntas' : 'Remedial';
 
-  return { totalSkor, filledCount, validNameCount, statusKkm };
+  return {
+    totalSkor,
+    filledCount,
+    validNameCount,
+    statusKkm,
+    paintCount: Math.round(paintScoreCount),
+    aiCount: Math.round(aiScoreCount),
+    paintValid,
+    aiValid,
+    isSesuaiKategori,
+    catatanAnalisis
+  };
 }
 window.hitungNilaiDrive7Kebiasaan = hitungNilaiDrive7Kebiasaan;
 
@@ -20249,6 +20341,8 @@ function renderDasborGuru() {
   // Render SubTab yang aktif
   if (state.subTabGuru === 'gradebook') {
     filterDanCariSiswa();
+  } else if (state.subTabGuru === 'drive7k') {
+    renderMonitoringDrive7KGuru();
   } else if (state.subTabGuru === 'galeri') {
     renderGaleriGuru();
   } else if (state.subTabGuru === 'bank-soal') {
@@ -20377,7 +20471,7 @@ function pilihSubTabGuru(tabName) {
   playSound('click');
   state.subTabGuru = tabName;
 
-  const tabs = ['gradebook', 'analisis', 'galeri', 'cloud', 'bank-soal'];
+  const tabs = ['gradebook', 'drive7k', 'galeri', 'analisis', 'cloud', 'bank-soal'];
   tabs.forEach(t => {
     const view = document.getElementById(`guru-view-${t}`);
     const btn = document.getElementById(`guru-subtab-btn-${t}`);
@@ -20399,6 +20493,8 @@ function pilihSubTabGuru(tabName) {
 
   if (tabName === 'gradebook') {
     filterDanCariSiswa();
+  } else if (tabName === 'drive7k') {
+    renderMonitoringDrive7KGuru();
   } else if (tabName === 'galeri') {
     renderGaleriGuru();
   } else if (tabName === 'bank-soal') {
@@ -20431,6 +20527,11 @@ function setFilterKelasGuru(kelas) {
   }
 
   filterDanCariSiswa();
+  if (state.subTabGuru === 'drive7k') {
+    renderMonitoringDrive7KGuru();
+  } else if (state.subTabGuru === 'galeri') {
+    renderGaleriGuru();
+  }
 
   // Jika kelas spesifik (seperti '4B') belum memiliki data di lokal, otomatis coba tarik dari Google Sheets
   if (kelas && kelas !== 'semua' && !kelas.startsWith('tingkat_')) {
@@ -20440,6 +20541,8 @@ function setFilterKelasGuru(kelas) {
       sinkronkanDataSiswaPerKelas(kelas, true).then(res => {
         if (res && res.length > 0) {
           filterDanCariSiswa();
+          if (state.subTabGuru === 'drive7k') renderMonitoringDrive7KGuru();
+          if (state.subTabGuru === 'galeri') renderGaleriGuru();
         }
       }).catch(err => console.warn('Auto-sync kelas info:', err));
     }
@@ -21564,10 +21667,160 @@ function bukaDemoCodingLangsung() {
 }
 window.bukaDemoCodingLangsung = bukaDemoCodingLangsung;
 
+// --------------------------------------------------------------------------
+// HELPER: DAPATKAN HASIL POSTER & DRIVE SISWA TERSIMPAN
+// --------------------------------------------------------------------------
+function dapatkanPostersSiswa(student) {
+  if (!student) return [];
+  const list = [];
+  const seenIds = new Set();
+
+  // 1. Cek storage key khusus per-siswa (NIS, ID, Nama)
+  const studentKeys = [
+    student.nis ? `kreator_cilik_word_posters_${student.nis}` : null,
+    student.id ? `kreator_cilik_word_posters_${student.id}` : null,
+    student.nama ? `kreator_cilik_word_posters_${student.nama}` : null
+  ].filter(Boolean);
+
+  for (const k of studentKeys) {
+    try {
+      const raw = localStorage.getItem(k);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          arr.forEach(p => {
+            if (p && p.title && !seenIds.has(p.id || p.title)) {
+              seenIds.add(p.id || p.title);
+              list.push(p);
+            }
+          });
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 2. Cek di storage umum kreator_cilik_word_posters yang mencocokkan nama atau NIS
+  try {
+    const rawAll = localStorage.getItem('kreator_cilik_word_posters');
+    if (rawAll) {
+      const arrAll = JSON.parse(rawAll);
+      if (Array.isArray(arrAll)) {
+        arrAll.forEach(p => {
+          if (p && p.title) {
+            const author = (p.author || p.studentName || '').toLowerCase();
+            const sNama = (student.nama || '').toLowerCase();
+            if ((sNama && author.includes(sNama)) || (student.nis && author.includes(student.nis))) {
+              if (!seenIds.has(p.id || p.title)) {
+                seenIds.add(p.id || p.title);
+                list.push(p);
+              }
+            }
+          }
+        });
+      }
+    }
+  } catch (e) {}
+
+  // 3. Cek di sesi siswa aktif jika siswa ini yang sedang login
+  const activeS = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (activeS && (activeS.id === student.id || (activeS.nis && activeS.nis === student.nis))) {
+    try {
+      const activeKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+      const rawAct = localStorage.getItem(activeKey);
+      if (rawAct) {
+        const listAct = JSON.parse(rawAct);
+        if (Array.isArray(listAct)) {
+          listAct.forEach(p => {
+            if (p && p.title && !seenIds.has(p.id || p.title)) {
+              seenIds.add(p.id || p.title);
+              list.push(p);
+            }
+          });
+        }
+      }
+    } catch (e) {}
+  }
+
+  return list;
+}
+window.dapatkanPostersSiswa = dapatkanPostersSiswa;
+
+function dapatkanDriveSiswa(student) {
+  if (!student) return {};
+  return muatDrive7Kebiasaan(student);
+}
+window.dapatkanDriveSiswa = dapatkanDriveSiswa;
+
+// --------------------------------------------------------------------------
+// PENGALIH MODE TAMPILAN POSTER SISWA (REKAP STATUS vs GALERI VISUAL)
+// --------------------------------------------------------------------------
+function setModeTampilanPosterGuru(mode) {
+  playSound('click');
+  state.modeTampilanPosterGuru = mode;
+  const btnRekap = document.getElementById('btn-mode-poster-rekap');
+  const btnGaleri = document.getElementById('btn-mode-poster-galeri');
+  const rekapBox = document.getElementById('guru-poster-rekap-container');
+  const galeriBox = document.getElementById('guru-galeri-grid');
+  const filterBox = document.getElementById('guru-poster-filter-box');
+
+  if (mode === 'galeri') {
+    if (btnGaleri) btnGaleri.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold font-title bg-pink-600 text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer';
+    if (btnRekap) btnRekap.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold font-title text-slate-600 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer';
+    if (rekapBox) rekapBox.classList.add('hidden');
+    if (galeriBox) {
+      galeriBox.classList.remove('hidden');
+      galeriBox.classList.add('grid');
+    }
+    if (filterBox) filterBox.classList.add('hidden');
+  } else {
+    // Mode 'rekap' (default)
+    if (btnRekap) btnRekap.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold font-title bg-pink-600 text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer';
+    if (btnGaleri) btnGaleri.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold font-title text-slate-600 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer';
+    if (rekapBox) rekapBox.classList.remove('hidden');
+    if (galeriBox) {
+      galeriBox.classList.add('hidden');
+      galeriBox.classList.remove('grid');
+    }
+    if (filterBox) filterBox.classList.remove('hidden');
+  }
+
+  renderGaleriGuru();
+}
+window.setModeTampilanPosterGuru = setModeTampilanPosterGuru;
+
+// --------------------------------------------------------------------------
+// GALERI KARYA SISWA DI DASBOR GURU (SEMESTER 1: POSTER | SEMESTER 2: CODING & AI SAAT AKTIF)
+// --------------------------------------------------------------------------
+function pilihSemesterGaleriGuru(sem) {
+  playSound('click');
+  const isUnlocked = isSemester2Unlocked();
+  if (sem === 2 && !isUnlocked) {
+    playSound('warning');
+    showToast('⚠️ Galeri Semester 2 (Coding & AI) belum diaktifkan oleh Guru! Aktifkan terlebih dahulu melalui tombol "Buka Akses Semester 2" di Dasbor Guru.', 'warning');
+    return;
+  }
+  state.galeriSemester = sem;
+  renderGaleriGuru();
+}
+window.pilihSemesterGaleriGuru = pilihSemesterGaleriGuru;
+
+function bukaDemoCodingLangsung() {
+  playSound('click');
+  if (state.currentSemester !== 2) {
+    pilihSemester(2);
+  }
+  switchTab('coding');
+  showToast('Semester 2: Studio Visual Coding Scratch Dibuka! 💻', 'info');
+}
+window.bukaDemoCodingLangsung = bukaDemoCodingLangsung;
+
 function renderGaleriGuru() {
   const grid = document.getElementById('guru-galeri-grid');
+  const rekapContainer = document.getElementById('guru-poster-status-list');
+  const statsRow = document.getElementById('guru-poster-stats-row');
   if (!grid) return;
   grid.innerHTML = '';
+  if (rekapContainer) rekapContainer.innerHTML = '';
 
   const isUnlocked = isSemester2Unlocked();
   // Jika Semester 2 belum dibuka guru, paksa galeri selalu menampilkan Semester 1
@@ -21626,16 +21879,341 @@ function renderGaleriGuru() {
     const galeriTitle = document.getElementById('guru-galeri-title');
     const galeriDesc = document.getElementById('guru-galeri-desc');
     const countBadge = document.getElementById('guru-galeri-count-badge');
+    const modeTampilan = state.modeTampilanPosterGuru || 'rekap';
+
+    if (statsRow) statsRow.classList.remove('hidden');
 
     if (semPill) {
       semPill.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-pink-100 text-pink-700 border border-pink-200';
       semPill.innerText = 'Semester 1 • TP 2.1 - TP 2.4';
     }
     if (galeriTitle) {
-      galeriTitle.innerHTML = '<i class="fa-solid fa-palette text-pink-600"></i> Galeri Hasil Karya Poster Siswa (Semester 1)';
+      galeriTitle.innerHTML = '<i class="fa-solid fa-palette text-pink-600"></i> Hasil Poster Siswa (Semester 1)';
     }
     if (galeriDesc) {
       galeriDesc.innerText = 'Kumpulan portofolio digital hasil karya poster MS Word & Konten Digital TP 2.1 - TP 2.4 yang dirancang mandiri oleh siswa Kelas 4.';
+    }
+
+    // Ambil daftar siswa kelas saat ini
+    let students = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
+    if (state.filterKelasGuru && state.filterKelasGuru !== 'semua' && !state.filterKelasGuru.startsWith('tingkat_')) {
+      students = students.filter(s => s.kelas === state.filterKelasGuru);
+    }
+    // Bersihkan dari author siswa fiktif dummy secara permanen
+    students = students.filter(s => {
+      const sName = (s.nama || '').toLowerCase();
+      return !DAFTAR_NAMA_SISWA_CONTOH.some(d => sName.includes(d));
+    });
+
+    // Petakan poster masing-masing siswa
+    const studentWithPosters = students.map(s => {
+      const posters = dapatkanPostersSiswa(s);
+      return {
+        student: s,
+        posters: posters,
+        hasPoster: posters.length > 0 || (s.posterWord > 0)
+      };
+    });
+
+    const sudahCount = studentWithPosters.filter(i => i.hasPoster).length;
+    const belumCount = studentWithPosters.filter(i => !i.hasPoster).length;
+
+    // Perbarui KPI Cards di Bagian Atas Galeri
+    const statTotalEl = document.getElementById('guru-poster-stat-total');
+    const statSudahEl = document.getElementById('guru-poster-stat-sudah');
+    const statBelumEl = document.getElementById('guru-poster-stat-belum');
+    if (statTotalEl) statTotalEl.innerText = `${students.length} Siswa`;
+    if (statSudahEl) statSudahEl.innerText = `${sudahCount} Siswa`;
+    if (statBelumEl) statBelumEl.innerText = `${belumCount} Siswa`;
+
+    if (countBadge) {
+      countBadge.innerText = `${sudahCount} dari ${students.length} Siswa Sudah Mengumpulkan`;
+    }
+
+    // Ambil semua poster unik untuk tampilan visual
+    let allPosters = [];
+    studentWithPosters.forEach(item => {
+      item.posters.forEach(p => {
+        if (!allPosters.some(existing => existing.id === p.id || (existing.title && existing.title === p.title && existing.author === p.author))) {
+          allPosters.push(p);
+        }
+      });
+    });
+
+    // ------------------------------------------
+    // TAMPILAN MODE 1: REKAP STATUS SISWA (DAFTAR SIAPA SUDAH VS BELUM)
+    // ------------------------------------------
+    if (modeTampilan === 'rekap') {
+      const rekapBox = document.getElementById('guru-poster-rekap-container');
+      if (rekapBox) rekapBox.classList.remove('hidden');
+      if (grid) {
+        grid.classList.add('hidden');
+        grid.classList.remove('grid');
+      }
+
+      // Filter status pengumpulan
+      const filterSelect = document.getElementById('guru-filter-poster-status');
+      const filterStatus = filterSelect ? filterSelect.value : 'semua';
+      const searchInput = document.getElementById('guru-cari-poster-siswa');
+      const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      let filteredList = studentWithPosters;
+      if (filterStatus === 'sudah') {
+        filteredList = filteredList.filter(i => i.hasPoster);
+      } else if (filterStatus === 'belum') {
+        filteredList = filteredList.filter(i => !i.hasPoster);
+      }
+
+      if (query) {
+        filteredList = filteredList.filter(i => {
+          const s = i.student;
+          return (s.nama && s.nama.toLowerCase().includes(query)) ||
+                 (s.nis && s.nis.toLowerCase().includes(query)) ||
+                 (s.absen && s.absen.toString().includes(query));
+        });
+      }
+
+      if (filteredList.length === 0) {
+        if (rekapContainer) {
+          rekapContainer.innerHTML = `
+            <div class="py-10 px-4 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300 space-y-2">
+              <i class="fa-solid fa-magnifying-glass text-slate-400 text-2xl"></i>
+              <div class="text-xs font-bold text-slate-700">Tidak ada data siswa yang cocok dengan filter.</div>
+              <div class="text-[11px] text-slate-500">Coba pilih status "Semua Status Siswa" atau sesuaikan pencarian.</div>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      let rekapHtml = '';
+      filteredList.forEach(item => {
+        const s = item.student;
+        const posters = item.posters;
+        const hasPoster = item.hasPoster;
+        const latestPoster = posters.length > 0 ? posters[0] : null;
+        const posterImg = latestPoster ? (latestPoster.image || 'materi_word_tp2_1_poster.jpg') : null;
+        const posterTitle = latestPoster ? latestPoster.title : (s.posterWord > 0 ? `Poster Word TP 2.1 (${s.posterWord} Poster)` : 'Belum Ada Karya Poster');
+        const posterDate = latestPoster ? (latestPoster.date || 'Semester 1') : '-';
+        const posterScore = s.nilaiPoster !== undefined ? s.nilaiPoster : (hasPoster ? 95 : 0);
+
+        if (hasPoster) {
+          rekapHtml += `
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-white border-2 border-emerald-200/90 shadow-2xs hover:shadow-md transition flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-l-4 border-l-emerald-500">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-800 font-title font-black text-sm flex items-center justify-center shrink-0 border border-emerald-300">
+                  ${(s.nama || 'S').charAt(0).toUpperCase()}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h5 class="font-title font-bold text-slate-900 text-sm truncate" title="${escapeXml(s.nama)}">
+                      ${escapeXml(s.nama)}
+                    </h5>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                      <i class="fa-solid fa-circle-check text-emerald-600"></i> Sudah Kumpul (${posters.length || s.posterWord || 1} Poster)
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span class="font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">Kelas ${escapeXml(s.kelas)}</span>
+                    <span>•</span>
+                    <span>NIS: ${escapeXml(s.nis || '-')}</span>
+                    <span>•</span>
+                    <span>Absen: ${escapeXml(s.absen || '-')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Poster Preview & Meta -->
+              <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                ${posterImg ? `
+                  <div class="w-16 h-12 bg-slate-900 rounded-lg overflow-hidden shrink-0 cursor-pointer relative group flex items-center justify-center border border-slate-200" onclick="bukaModalGambarMateriDariSrc('${posterImg}', '${escapeXml(posterTitle)} - ${escapeXml(s.nama)}')">
+                    <img src="${posterImg}" alt="Poster" class="max-h-full max-w-full object-contain group-hover:scale-110 transition">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px]">
+                      <i class="fa-solid fa-expand"></i>
+                    </div>
+                  </div>
+                ` : `
+                  <div class="w-16 h-12 bg-pink-50 rounded-lg flex items-center justify-center text-pink-600 text-lg border border-pink-200 shrink-0">
+                    <i class="fa-solid fa-file-word"></i>
+                  </div>
+                `}
+
+                <div class="text-left md:text-right min-w-[140px]">
+                  <div class="text-xs font-bold text-slate-800 truncate max-w-[180px]" title="${escapeXml(posterTitle)}">
+                    ${escapeXml(posterTitle)}
+                  </div>
+                  <div class="text-[11px] text-slate-400">
+                    <span class="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Nilai Poster: ${posterScore}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                  ${posterImg ? `
+                    <button type="button" onclick="bukaModalGambarMateriDariSrc('${posterImg}', '${escapeXml(posterTitle)} - ${escapeXml(s.nama)}')" class="px-3 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 font-title font-bold text-xs transition flex items-center gap-1 cursor-pointer" title="Lihat Poster Penuh">
+                      <i class="fa-solid fa-expand text-[10px]"></i>
+                    </button>
+                  ` : ''}
+                  <button type="button" onclick="beriNilaiKaryaGuru('${escapeXml(posterTitle)}', '${escapeXml(s.nama)}', 'poster')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs transition flex items-center gap-1 shadow-xs cursor-pointer" title="Beri Nilai Angka untuk Rapor">
+                    <i class="fa-solid fa-award text-[10px]"></i> Nilai
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          rekapHtml += `
+            <div class="p-3.5 sm:p-4 rounded-2xl bg-white border-2 border-rose-200/80 shadow-2xs hover:shadow-md transition flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-l-4 border-l-rose-500">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-2xl bg-rose-100 text-rose-800 font-title font-black text-sm flex items-center justify-center shrink-0 border border-rose-300">
+                  ${(s.nama || 'S').charAt(0).toUpperCase()}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h5 class="font-title font-bold text-slate-900 text-sm truncate" title="${escapeXml(s.nama)}">
+                      ${escapeXml(s.nama)}
+                    </h5>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1">
+                      <i class="fa-solid fa-circle-xmark text-rose-600"></i> Belum Kumpul Poster
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span class="font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">Kelas ${escapeXml(s.kelas)}</span>
+                    <span>•</span>
+                    <span>NIS: ${escapeXml(s.nis || '-')}</span>
+                    <span>•</span>
+                    <span>Absen: ${escapeXml(s.absen || '-')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Info & Action -->
+              <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                <span class="text-xs text-rose-600 font-medium italic">
+                  Belum ada berkas poster di lemari portofolio
+                </span>
+                <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Beri Catatan / Nilai Manual">
+                  <i class="fa-solid fa-pen-to-square text-[10px]"></i> Catat
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      if (rekapContainer) rekapContainer.innerHTML = rekapHtml;
+      return;
+    }
+
+    // ------------------------------------------
+    // TAMPILAN MODE 2: GALERI VISUAL POSTER (GRID KARTU BESAR)
+    // ------------------------------------------
+    const rekapBox = document.getElementById('guru-poster-rekap-container');
+    if (rekapBox) rekapBox.classList.add('hidden');
+    if (grid) {
+      grid.classList.remove('hidden');
+      grid.classList.add('grid');
+    }
+
+    if (allPosters.length === 0) {
+      grid.innerHTML = `
+        <div class="col-span-full py-12 px-4 text-center space-y-3 bg-slate-50 rounded-3xl border border-dashed border-slate-300">
+          <div class="w-16 h-16 rounded-3xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto text-2xl shadow-inner border border-pink-100">
+            <i class="fa-solid fa-palette"></i>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-slate-800 text-base">Belum Ada Karya Poster Siswa Tersimpan</h4>
+            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1 leading-relaxed">
+              Saat siswa mengerjakan proyek poster di <strong>Lab MS Word (TP 2.1 - TP 2.4)</strong> dan menekan <em>"Simpan ke Galeri"</em>, karya digital siswa resmi akan langsung otomatis terpajang di sini.
+            </p>
+          </div>
+          <div class="pt-2">
+            <button onclick="switchTab('msword')" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-title text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+              <i class="fa-solid fa-file-word mr-1.5"></i> Buka Lab MS Word
+            </button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    allPosters.forEach(p => {
+      const posterImg = p.image || 'materi_word_tp2_1_poster.jpg';
+      const authorText = p.author || (p.studentName ? `${p.studentName} (${p.studentClass || 'Kelas 4'})` : 'Siswa Kelas 4');
+      const studentClassBadge = p.studentClass || (authorText.match(/\((.*?)\)/) ? authorText.match(/\((.*?)\)/)[1] : '4A');
+
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col group';
+      card.innerHTML = `
+        <div class="h-52 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center cursor-pointer p-2" onclick="bukaModalGambarMateriDariSrc('${posterImg}', '${escapeXml(p.title)}')">
+          <img src="${posterImg}" alt="${escapeXml(p.title)}" class="max-h-full w-auto object-contain rounded-lg shadow-md group-hover:scale-105 transition duration-300">
+          <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 text-pink-300 text-[10px] font-black backdrop-blur-xs flex items-center gap-1.5 border border-white/10">
+            <i class="fa-solid fa-palette text-pink-400"></i> Poster TP 2.1 - 2.4
+          </div>
+          <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 text-amber-300 text-[10px] font-black backdrop-blur-xs flex items-center gap-1 border border-white/10">
+            <i class="fa-solid fa-star text-amber-400"></i> Bintang 5
+          </div>
+          <div class="absolute inset-0 bg-indigo-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
+            <span class="px-3.5 py-1.5 rounded-xl bg-white text-indigo-900 font-title font-bold text-xs shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform">
+              <i class="fa-solid fa-expand text-indigo-600"></i> Perbesar Poster
+            </span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3.5">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-pink-50 text-pink-700 border border-pink-200">
+                Kelas ${escapeXml(studentClassBadge)}
+              </span>
+              <span class="text-[11px] text-slate-400 font-medium">
+                <i class="fa-regular fa-calendar mr-1"></i>${escapeXml(p.date || 'Semester 1')}
+              </span>
+            </div>
+            <h4 class="font-title font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2" title="${escapeXml(p.title)}">
+              ${escapeXml(p.title)}
+            </h4>
+            <div class="text-xs text-slate-600 mt-2 flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-user-pen text-indigo-500"></i>
+              <span>${escapeXml(authorText)}</span>
+            </div>
+          </div>
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+            <button type="button" onclick="bukaModalGambarMateriDariSrc('${posterImg}', '${escapeXml(p.title)}')" class="flex-1 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-expand text-xs"></i> Pratinjau
+            </button>
+            <button type="button" onclick="beriNilaiKaryaGuru('${escapeXml(p.title)}', '${escapeXml(authorText)}', 'poster')" class="flex-1 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Beri Nilai Angka untuk dimasukkan ke Rapor Siswa">
+              <i class="fa-solid fa-award text-xs"></i> Beri Nilai
+            </button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  } else {
+    // ==========================================
+    // SEMESTER 2: HASIL PROJEK CODING & AI SISWA (TP 3.1 - TP 4.2)
+    // ==========================================
+    if (statsRow) statsRow.classList.add('hidden');
+    const rekapBox = document.getElementById('guru-poster-rekap-container');
+    if (rekapBox) rekapBox.classList.add('hidden');
+    if (grid) {
+      grid.classList.remove('hidden');
+      grid.classList.add('grid');
+    }
+
+    const semPill = document.getElementById('guru-galeri-sem-pill');
+    const galeriTitle = document.getElementById('guru-galeri-title');
+    const galeriDesc = document.getElementById('guru-galeri-desc');
+    const countBadge = document.getElementById('guru-galeri-count-badge');
+
+    if (semPill) {
+      semPill.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-700 border border-purple-200';
+      semPill.innerText = 'Semester 2 • TP 3.1 - TP 4.2';
+    }
+    if (galeriTitle) {
+      galeriTitle.innerHTML = '<i class="fa-solid fa-robot text-purple-600"></i> Galeri Hasil Karya Coding & AI Siswa (Semester 2)';
+    }
+    if (galeriDesc) {
+      galeriDesc.innerText = 'Kumpulan portofolio digital hasil projek visual coding Scratch 3.0 dan algoritma simulasi RoboMind 7.0 siswa Kelas 4.';
     }
 
     // Ambil poster tersimpan di browser komputer ini
@@ -21928,6 +22506,366 @@ function beriBintangKaryaGuru(title) {
   playSound('success');
   showToast(`Apresiasi Bintang 5 Guru diberikan untuk "${title}"! ⭐⭐⭐⭐⭐`, 'success');
 }
+
+// --------------------------------------------------------------------------
+// MONITORING DRIVE 7 KEBIASAAN OLEH GURU (MISI TP 2.1)
+// --------------------------------------------------------------------------
+function setFilterDrive7KStatus(status) {
+  playSound('click');
+  state.filterDrive7KStatus = status;
+  const statuses = ['semua', 'lengkap', 'proses', 'kosong'];
+  statuses.forEach(st => {
+    const btn = document.getElementById(`btn-f-drive7k-${st}`);
+    if (btn) {
+      if (st === status) {
+        btn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-xs transition cursor-pointer';
+      } else {
+        btn.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer';
+      }
+    }
+  });
+  renderMonitoringDrive7KGuru();
+}
+window.setFilterDrive7KStatus = setFilterDrive7KStatus;
+
+function renderMonitoringDrive7KGuru() {
+  const grid = document.getElementById('guru-drive7k-grid');
+  const emptyBox = document.getElementById('guru-drive7k-empty');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  if (emptyBox) emptyBox.classList.add('hidden');
+
+  let allStudents = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
+  if (state.filterKelasGuru && state.filterKelasGuru !== 'semua' && !state.filterKelasGuru.startsWith('tingkat_')) {
+    allStudents = allStudents.filter(s => s.kelas === state.filterKelasGuru);
+  }
+
+  // Bersihkan dari author siswa fiktif dummy
+  allStudents = allStudents.filter(s => {
+    const sName = (s.nama || '').toLowerCase();
+    return !DAFTAR_NAMA_SISWA_CONTOH.some(d => sName.includes(d));
+  });
+
+  // Hitung KPI
+  let countLengkap = 0;
+  let countProses = 0;
+  let countKosong = 0;
+
+  const evaluatedStudents = allStudents.map(s => {
+    const driveData = dapatkanDriveSiswa(s);
+    const evalData = hitungNilaiDrive7Kebiasaan(driveData);
+    if (evalData.filledCount === 7) {
+      countLengkap++;
+    } else if (evalData.filledCount > 0) {
+      countProses++;
+    } else {
+      countKosong++;
+    }
+    return {
+      student: s,
+      driveData: driveData,
+      evalData: evalData
+    };
+  });
+
+  const statTotal = document.getElementById('guru-drive7k-stat-total');
+  const statLengkap = document.getElementById('guru-drive7k-stat-lengkap');
+  const statProses = document.getElementById('guru-drive7k-stat-proses');
+  const statKosong = document.getElementById('guru-drive7k-stat-kosong');
+
+  if (statTotal) statTotal.innerText = allStudents.length;
+  if (statLengkap) statLengkap.innerText = `${countLengkap} Siswa`;
+  if (statProses) statProses.innerText = `${countProses} Siswa`;
+  if (statKosong) statKosong.innerText = `${countKosong} Siswa`;
+
+  // Filter berdasarkan status
+  const currentStatus = state.filterDrive7KStatus || 'semua';
+  let filtered = evaluatedStudents;
+  if (currentStatus === 'lengkap') {
+    filtered = filtered.filter(item => item.evalData.filledCount === 7);
+  } else if (currentStatus === 'proses') {
+    filtered = filtered.filter(item => item.evalData.filledCount >= 1 && item.evalData.filledCount < 7);
+  } else if (currentStatus === 'kosong') {
+    filtered = filtered.filter(item => item.evalData.filledCount === 0);
+  }
+
+  // Filter pencarian
+  const searchInput = document.getElementById('guru-cari-drive7k');
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  if (query) {
+    filtered = filtered.filter(item => {
+      const s = item.student;
+      return (s.nama && s.nama.toLowerCase().includes(query)) ||
+             (s.nis && s.nis.toLowerCase().includes(query)) ||
+             (s.absen && s.absen.toString().includes(query));
+    });
+  }
+
+  if (filtered.length === 0) {
+    if (emptyBox) emptyBox.classList.remove('hidden');
+    return;
+  }
+
+  filtered.forEach(item => {
+    const s = item.student;
+    const ev = item.evalData;
+    const drive = item.driveData;
+    const percent = Math.round((ev.filledCount / 7) * 100);
+
+    let statusBadge = '';
+    let borderStatusCls = 'border-slate-200';
+    if (ev.filledCount === 7) {
+      statusBadge = '<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-check text-emerald-600"></i> Lengkap 7/7 (Tuntas 100)</span>';
+      borderStatusCls = 'border-emerald-300 shadow-emerald-500/5';
+    } else if (ev.filledCount > 0) {
+      statusBadge = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-hourglass-half text-amber-600"></i> ${ev.filledCount}/7 Terkumpul (Nilai: ${ev.totalSkor})</span>`;
+      borderStatusCls = 'border-amber-300 shadow-amber-500/5';
+    } else {
+      statusBadge = '<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-xmark text-rose-600"></i> Belum Mengumpulkan (0/7)</span>';
+      borderStatusCls = 'border-rose-200/80';
+    }
+
+    // Mini preview 7 icons
+    const habitIconsHtml = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
+      const hasSlot = drive[cfg.key] && (drive[cfg.key].imageSrc || drive[cfg.key].gambar);
+      if (hasSlot) {
+        return `<span class="w-6 h-6 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] flex items-center justify-center font-bold" title="${cfg.cleanTitle}: Terkumpul">${cfg.emoji}</span>`;
+      } else {
+        return `<span class="w-6 h-6 rounded-lg bg-slate-100 border border-dashed border-slate-300 text-slate-400 text-[11px] flex items-center justify-center opacity-60" title="${cfg.cleanTitle}: Kosong">${cfg.emoji}</span>`;
+      }
+    }).join('');
+
+    const card = document.createElement('div');
+    card.className = `bg-white rounded-3xl border-2 ${borderStatusCls} p-4 sm:p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3.5`;
+    card.innerHTML = `
+      <div>
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-title font-black text-sm flex items-center justify-center shadow-xs shrink-0">
+              ${(s.nama || 'S').charAt(0).toUpperCase()}
+            </div>
+            <div class="min-w-0">
+              <h4 class="font-title font-bold text-slate-900 text-sm leading-snug truncate" title="${escapeXml(s.nama)}">
+                ${escapeXml(s.nama)}
+              </h4>
+              <div class="text-[11px] text-slate-500 flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200">Kelas ${escapeXml(s.kelas)}</span>
+                <span>•</span>
+                <span>NIS: ${escapeXml(s.nis || '-')}</span>
+                <span>•</span>
+                <span>Absen: ${escapeXml(s.absen || '-')}</span>
+              </div>
+            </div>
+          </div>
+          <div>${statusBadge}</div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="space-y-1.5 mt-3">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+            <span>Koleksi 7 Kebiasaan:</span>
+            <span class="font-bold text-slate-800">${ev.filledCount} dari 7 Gambar (${percent}%)</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500 rounded-full transition-all duration-300" style="width: ${percent}%;"></div>
+          </div>
+        </div>
+
+        <!-- 7 Habit Slots Mini Indicators & Composition -->
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
+          <div class="flex items-center gap-1">
+            ${habitIconsHtml}
+          </div>
+          <div class="flex items-center gap-1 text-[10px] font-bold flex-wrap">
+            <span class="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200" title="Kesesuaian 3 Gambar Paint Mandiri">🎨 ${ev.paintCount || 0}/3 Paint</span>
+            <span class="text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200" title="Kesesuaian 4 Gambar Studio AI">🤖 ${ev.aiCount || 0}/4 AI</span>
+            <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" title="Format Baku: Kelas_Nama_File">${ev.validNameCount}/7 Baku</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+        <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id}')" class="flex-1 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-title font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-folder-open text-xs"></i>
+          <span>Periksa 7 Gambar Siswa</span>
+        </button>
+        <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition flex items-center justify-center cursor-pointer" title="Beri Nilai / Catatan Guru">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+window.renderMonitoringDrive7KGuru = renderMonitoringDrive7KGuru;
+
+function bukaModalMonitoringDriveGuru(studentId) {
+  playSound('click');
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === studentId || s.nis === studentId || (s.nama && s.nama.toLowerCase() === (studentId || '').toLowerCase()));
+  if (!student) {
+    showToast('Data siswa tidak ditemukan!', 'warning');
+    return;
+  }
+
+  const modal = document.getElementById('modal-monitoring-drive-guru');
+  if (!modal) return;
+
+  const driveData = dapatkanDriveSiswa(student);
+  const evalData = hitungNilaiDrive7Kebiasaan(driveData);
+  const percent = Math.round((evalData.filledCount / 7) * 100);
+
+  // Set Profile info in Modal
+  const avatarEl = document.getElementById('mon-drive-avatar');
+  const namaEl = document.getElementById('mon-drive-nama');
+  const kelasEl = document.getElementById('mon-drive-kelas');
+  const nisEl = document.getElementById('mon-drive-nis');
+  const absenEl = document.getElementById('mon-drive-absen');
+  const kkmBadge = document.getElementById('mon-drive-status-kkm');
+  const progText = document.getElementById('mon-drive-progress-text');
+  const progBar = document.getElementById('mon-drive-progress-bar');
+  const nilaiBadge = document.getElementById('mon-drive-nilai-badge');
+  const penamaanBadge = document.getElementById('mon-drive-penamaan-badge');
+  const btnEditNilai = document.getElementById('btn-mon-drive-edit-nilai');
+
+  if (avatarEl) avatarEl.innerText = (student.nama || 'S').charAt(0).toUpperCase();
+  if (namaEl) namaEl.innerText = student.nama;
+  if (kelasEl) kelasEl.innerText = `Kelas ${student.kelas}`;
+  if (nisEl) nisEl.innerText = `NIS: ${student.nis || '-'}`;
+  if (absenEl) absenEl.innerText = `Absen: ${student.absen || '-'}`;
+
+  if (kkmBadge) {
+    if (evalData.filledCount === 7) {
+      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950';
+      kkmBadge.innerText = '✅ TUNTAS 100';
+    } else if (evalData.totalSkor >= 80) {
+      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-300 text-slate-900';
+      kkmBadge.innerText = '✅ TUNTAS (≥80)';
+    } else {
+      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-400 text-white';
+      kkmBadge.innerText = '⚠️ PERLU REMEDIAL';
+    }
+  }
+
+  if (progText) progText.innerText = `${evalData.filledCount} dari 7 Terkumpul (${percent}%) • ${evalData.catatanAnalisis || ''}`;
+  if (progBar) progBar.style.width = `${percent}%`;
+  if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${evalData.totalSkor}`;
+  if (penamaanBadge) {
+    penamaanBadge.innerHTML = `
+      <span class="font-bold">${evalData.validNameCount}/7 Format Baku</span>
+      <span class="mx-1 text-slate-300">•</span>
+      <span class="text-purple-700 font-bold">🎨 ${evalData.paintCount || 0}/3 Paint</span>
+      <span class="mx-1 text-slate-300">•</span>
+      <span class="text-indigo-700 font-bold">🤖 ${evalData.aiCount || 0}/4 AI</span>
+    `;
+  }
+
+  if (btnEditNilai) {
+    btnEditNilai.onclick = () => {
+      tutupModalMonitoringDriveGuru();
+      bukaModalDetailSiswa(student.id);
+    };
+  }
+
+  // Render 7 Slots in Grid
+  const gridEl = document.getElementById('mon-drive-grid');
+  if (gridEl) {
+    gridEl.innerHTML = '';
+    DRIVE_7KEBIASAAN_CONFIG.forEach(cfg => {
+      const item = driveData[cfg.key];
+      const isFilled = item && (item.imageSrc || item.gambar || item.dataUrl);
+
+      const slotCard = document.createElement('div');
+      if (isFilled) {
+        const imgSrc = item.imageSrc || item.gambar || item.dataUrl;
+        const fileName = item.fileName || '-';
+        const check = periksaFormatNamaFile(fileName);
+        const sourceLabel = item.sumber || item.source || 'Gambar Terunggah';
+
+        slotCard.className = 'p-3 bg-white rounded-2xl border-2 border-purple-200 shadow-xs space-y-2 flex flex-col justify-between';
+        slotCard.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1">
+              <span class="flex items-center gap-1.5 truncate">
+                <span>${cfg.emoji}</span>
+                <span class="truncate">${cfg.cleanTitle}</span>
+              </span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">Ada</span>
+            </div>
+
+            <!-- Thumbnail -->
+            <div class="h-28 bg-slate-900 rounded-xl overflow-hidden relative group cursor-pointer flex items-center justify-center p-1" onclick="bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')">
+              <img src="${imgSrc}" alt="${escapeXml(cfg.cleanTitle)}" class="max-h-full max-w-full object-contain rounded group-hover:scale-105 transition">
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                <i class="fa-solid fa-expand"></i> Perbesar
+              </div>
+            </div>
+
+            <!-- Info Sumber & Format Nama File -->
+            <div class="mt-2 space-y-1">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-slate-500 font-medium">Sumber:</span>
+                <span class="font-bold text-purple-700 bg-purple-50 px-1 rounded">${escapeXml(sourceLabel)}</span>
+              </div>
+              <div class="text-[10px] text-slate-600 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                <div class="text-slate-400 font-medium text-[9px]">Nama File:</div>
+                <div class="font-bold truncate text-slate-800" title="${escapeXml(fileName)}">${escapeXml(fileName)}</div>
+                <div class="mt-1 flex items-center justify-between">
+                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku ✅</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku ⚠️</span>'}
+                  <span class="text-[9px] text-slate-400">${item.timestamp ? item.timestamp.slice(0, 10) : ''}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')" class="w-full py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-expand text-[10px]"></i> Lihat Ukuran Penuh
+          </button>
+        `;
+      } else {
+        slotCard.className = 'p-3 bg-slate-50/70 rounded-2xl border-2 border-dashed border-slate-300 space-y-2 flex flex-col justify-between text-center';
+        slotCard.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1">
+              <span class="flex items-center gap-1.5 truncate">
+                <span>${cfg.emoji}</span>
+                <span class="truncate">${cfg.cleanTitle}</span>
+              </span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-500 shrink-0">Kosong</span>
+            </div>
+
+            <div class="h-28 bg-white rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center p-3 text-slate-400">
+              <span class="text-2xl mb-1 opacity-50">${cfg.emoji}</span>
+              <span class="text-[11px] font-bold text-slate-500">Belum Ada Gambar</span>
+              <span class="text-[9px] text-slate-400 mt-1 line-clamp-2">${cfg.slogan}</span>
+            </div>
+          </div>
+
+          <span class="text-[10px] font-medium text-slate-400 italic">
+            Slot #${cfg.slotNumber} belum dikumpulkan
+          </span>
+        `;
+      }
+      gridEl.appendChild(slotCard);
+    });
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+window.bukaModalMonitoringDriveGuru = bukaModalMonitoringDriveGuru;
+
+function tutupModalMonitoringDriveGuru() {
+  playSound('click');
+  const modal = document.getElementById('modal-monitoring-drive-guru');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+}
+window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 
 // --------------------------------------------------------------------------
 // CLOUD GOOGLE SPREADSHEET (TAB "DATA SISWA LMS") & WEBHOOK
@@ -23263,51 +24201,42 @@ let firebaseFirestoreInstance = null;
 let firebaseStorageInstance = null;
 let isFirebaseConnected = false;
 
-// Parser fleksibel: menerima JSON murni atau kode JS const firebaseConfig = {...}
+// Parser fleksibel super tangguh: menerima salinan kode SDK modul, import statements, const firebaseConfig = {...}, atau format JSON murni
 function parseFirebaseConfig(raw) {
   if (!raw || typeof raw !== 'string') return null;
-  let str = raw.trim();
+  const str = raw.trim();
 
-  // 1. Jika berupa JSON murni
-  if (str.startsWith('{') && str.endsWith('}')) {
-    try {
-      const obj = JSON.parse(str);
-      if (obj.apiKey && (obj.projectId || obj.authDomain)) return obj;
-    } catch (e) {}
+  // Helper extractor regex yang tahan terhadap kutip ganda, kutip tunggal, spasi, komentar, dan baris baru
+  const extractVal = (key) => {
+    const re = new RegExp(`['"]?${key}['"]?\\s*:\\s*['"]([^'"]+)['"]`, 'i');
+    const m = str.match(re);
+    return m ? m[1].trim() : '';
+  };
+
+  const apiKey = extractVal('apiKey');
+  const projectId = extractVal('projectId');
+  const authDomain = extractVal('authDomain') || (projectId ? `${projectId}.firebaseapp.com` : '');
+  const storageBucket = extractVal('storageBucket') || (projectId ? `${projectId}.firebasestorage.app` : '');
+  const messagingSenderId = extractVal('messagingSenderId');
+  const appId = extractVal('appId');
+  const measurementId = extractVal('measurementId');
+
+  if (apiKey && projectId) {
+    const res = { apiKey, projectId, authDomain, storageBucket };
+    if (messagingSenderId) res.messagingSenderId = messagingSenderId;
+    if (appId) res.appId = appId;
+    if (measurementId) res.measurementId = measurementId;
+    return res;
   }
 
-  // 2. Jika dicopy sebagai const firebaseConfig = { ... };
+  // Fallback jika dimasukkan dalam format JSON murni
   try {
     const jsonMatch = str.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      const jsonCandidate = jsonMatch[0];
-      try {
-        const obj = JSON.parse(jsonCandidate);
-        if (obj.apiKey) return obj;
-      } catch (e) {
-        const cleanObj = (new Function(`return (${jsonCandidate});`))();
-        if (cleanObj && cleanObj.apiKey) return cleanObj;
+      const obj = JSON.parse(jsonMatch[0]);
+      if (obj && obj.apiKey && (obj.projectId || obj.authDomain)) {
+        return obj;
       }
-    }
-  } catch (e) {
-    console.warn('Gagal parsing firebase config:', e);
-  }
-
-  // 3. Fallback regex manual untuk field-field konfigurasi utama
-  try {
-    const extract = (field) => {
-      const m = str.match(new RegExp(`${field}\\s*:\\s*["']([^"']+)["']`));
-      return m ? m[1] : '';
-    };
-    const apiKey = extract('apiKey');
-    const projectId = extract('projectId');
-    const authDomain = extract('authDomain');
-    const storageBucket = extract('storageBucket');
-    const messagingSenderId = extract('messagingSenderId');
-    const appId = extract('appId');
-
-    if (apiKey && projectId) {
-      return { apiKey, projectId, authDomain, storageBucket, messagingSenderId, appId };
     }
   } catch (e) {}
 
@@ -23363,6 +24292,26 @@ function initFirebaseClient(customConfig = null) {
 }
 window.initFirebaseClient = initFirebaseClient;
 
+// Pasang Konfigurasi Resmi SDS Cinta Kasih Tzu Chi (1-Klik Tanpa Perlu Copy-Paste)
+function pasangFirebaseTzuChiOtomatis() {
+  try { playSound('click'); } catch (e) {}
+  const inputEl = document.getElementById('firebase-config-input');
+  const tzuChiConfig = {
+    apiKey: "AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y",
+    authDomain: "sd-tzuchi-kelas4.firebaseapp.com",
+    projectId: "sd-tzuchi-kelas4",
+    storageBucket: "sd-tzuchi-kelas4.firebasestorage.app",
+    messagingSenderId: "1083820511307",
+    appId: "1:1083820511307:web:4bd4f5933d6c061f1b7dce",
+    measurementId: "G-KWEHGW5C0X"
+  };
+  if (inputEl) {
+    inputEl.value = JSON.stringify(tzuChiConfig, null, 2);
+  }
+  simpanDanUjiFirebase();
+}
+window.pasangFirebaseTzuChiOtomatis = pasangFirebaseTzuChiOtomatis;
+
 // Perbarui Tampilan Status Firebase di Dasbor Guru
 function perbaruiStatusFirebaseUI(cfg = null) {
   const badge = document.getElementById('badge-status-firebase');
@@ -23380,7 +24329,12 @@ function perbaruiStatusFirebaseUI(cfg = null) {
       badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Cloud Aktif: Google Firebase (${activeCfg.projectId})`;
     }
     if (inputEl && !inputEl.value.trim() && saved) {
-      inputEl.value = saved;
+      try {
+        const parsedSaved = typeof saved === 'string' && saved.startsWith('{') ? JSON.parse(saved) : parseFirebaseConfig(saved);
+        inputEl.value = JSON.stringify(parsedSaved, null, 2);
+      } catch (e) {
+        inputEl.value = saved;
+      }
     }
     if (diagProject) {
       diagProject.innerHTML = `Project: <b class="text-emerald-700 font-mono">${activeCfg.projectId}</b>`;
@@ -23398,7 +24352,12 @@ function perbaruiStatusFirebaseUI(cfg = null) {
       badge.innerHTML = `<i class="fa-solid fa-circle-dot text-slate-400"></i> Mode Lokal Komputer`;
     }
     if (inputEl && !inputEl.value.trim() && saved) {
-      inputEl.value = saved;
+      try {
+        const parsedSaved = typeof saved === 'string' && saved.startsWith('{') ? JSON.parse(saved) : parseFirebaseConfig(saved);
+        inputEl.value = JSON.stringify(parsedSaved, null, 2);
+      } catch (e) {
+        inputEl.value = saved;
+      }
     }
     if (diagProject) {
       diagProject.innerHTML = `Project: <b class="text-slate-600 font-mono">Belum Diatur</b>`;
@@ -23414,6 +24373,7 @@ window.perbaruiStatusFirebaseUI = perbaruiStatusFirebaseUI;
 async function simpanDanUjiFirebase() {
   try { playSound('click'); } catch (e) {}
   const inputEl = document.getElementById('firebase-config-input');
+  const btn = document.getElementById('btn-simpan-firebase');
   if (!inputEl) return;
   const raw = inputEl.value.trim();
 
@@ -23425,41 +24385,164 @@ async function simpanDanUjiFirebase() {
 
   const parsed = parseFirebaseConfig(raw);
   if (!parsed || !parsed.apiKey || !parsed.projectId) {
-    showToast('❌ Format konfigurasi Firebase tidak valid! Periksa kembali apiKey dan projectId.', 'error');
+    showToast('❌ Format konfigurasi Firebase tidak valid! Pastikan mengandung apiKey dan projectId.', 'error');
     return;
   }
 
-  showToast('🔄 Menguji koneksi ke Server Cloud Google Firebase...', 'info');
+  // Format ulang tampilan textarea menjadi JSON rapi agar tulisan nyaman dibaca
+  const formattedJson = JSON.stringify(parsed, null, 2);
+  inputEl.value = formattedJson;
+  localStorage.setItem(FIREBASE_CONFIG_KEY, formattedJson);
+
+  let origBtnHtml = '';
+  if (btn) {
+    origBtnHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Menghubungkan ke Cloud...';
+  }
+
+  showToast(`🔄 Menguji sambungan ke Firebase (${parsed.projectId})...`, 'info');
 
   try {
     const success = initFirebaseClient(parsed);
-    if (!success || !firebaseFirestoreInstance) {
-      throw new Error('Gagal menginisialisasi Firestore');
+    if (!success) {
+      throw new Error('Firebase SDK belum termuat di browser.');
     }
 
-    // Ping Firestore untuk memvalidasi permissions (Test Mode)
-    await firebaseFirestoreInstance.collection('_ping').doc('educode_test').set({
-      timestamp: Date.now(),
-      app: 'EduCode AI SD Tzu Chi',
-      test: true
-    }, { merge: true });
+    // Ping Firestore dengan batas waktu (timeout) 6 detik agar tombol tidak pernah macet
+    let pingSuccess = false;
+    let pingErrMsg = '';
 
-    // Simpan konfigurasi ke localStorage
-    localStorage.setItem(FIREBASE_CONFIG_KEY, raw);
+    if (firebaseFirestoreInstance) {
+      try {
+        const pingPromise = firebaseFirestoreInstance.collection('_ping').doc('educode_test').set({
+          timestamp: Date.now(),
+          app: 'EduCode AI SD Tzu Chi',
+          projectId: parsed.projectId,
+          guru: 'Darningsih, S.T.'
+        }, { merge: true });
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('TIMEOUT')), 6000)
+        );
+
+        await Promise.race([pingPromise, timeoutPromise]);
+        pingSuccess = true;
+      } catch (errPing) {
+        console.warn('Ping Firestore warning:', errPing);
+        if (errPing.message === 'TIMEOUT') {
+          pingErrMsg = 'Firestore belum merespons dalam 6 detik. Menu "Firestore Database" kemungkinan belum dibuat (Create database) di Firebase Console.';
+        } else if (errPing.code === 'permission-denied' || (errPing.message && errPing.message.includes('permission'))) {
+          pingErrMsg = 'Aturan keamanan (Security Rules) Firestore menolak akses. Harap ubah ke Test Mode: allow read, write: if true;';
+        } else {
+          pingErrMsg = errPing.message || 'Koneksi ke Firestore terhalang.';
+        }
+      }
+    }
+
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     localStorage.setItem(FIREBASE_LAST_SYNC_KEY, nowStr);
-
     isFirebaseConnected = true;
     perbaruiStatusFirebaseUI(parsed);
 
-    try { playSound('fanfare'); } catch (e) {}
-    showToast(`✅ Server Cloud Database Firebase Aktif! (Project: ${parsed.projectId}) ☁️🎉`, 'success');
+    if (pingSuccess) {
+      try { playSound('fanfare'); } catch (e) {}
+      showToast(`✅ BERHASIL TERHUBUNG! Cloud Firebase (${parsed.projectId}) aktif & siap digunakan! ☁️🎉`, 'success');
+      tampilkanModalStatusFirebase(parsed, true);
+    } else {
+      try { playSound('notification'); } catch (e) {}
+      showToast(`⚠️ Konfigurasi ${parsed.projectId} tersimpan! Harap aktifkan Firestore di Firebase Console.`, 'warning');
+      tampilkanModalStatusFirebase(parsed, false, pingErrMsg);
+    }
   } catch (err) {
-    console.error('Error saat uji koneksi Firebase:', err);
-    showToast(`❌ Gagal terhubung ke Firebase: ${err.message || 'Periksa aturan test mode Firestore'}.`, 'error');
+    console.error('Error saat simpan Firebase:', err);
+    showToast(`❌ Gagal terhubung ke Firebase: ${err.message}`, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origBtnHtml || '<i class="fa-solid fa-bolt"></i> Simpan & Uji Koneksi Cloud';
+    }
   }
 }
 window.simpanDanUjiFirebase = simpanDanUjiFirebase;
+
+// Modal Status Hasil Sambungan Firebase
+function tampilkanModalStatusFirebase(cfg, isPingOk, errMsg = '') {
+  const modal = document.getElementById('modal-status-koneksi-firebase');
+  if (!modal) return;
+  const title = document.getElementById('modal-firebase-status-title');
+  const icon = document.getElementById('modal-firebase-status-icon');
+  const body = document.getElementById('modal-firebase-status-body');
+
+  if (isPingOk) {
+    if (title) title.textContent = 'Server Cloud Firebase Terhubung 100%!';
+    if (icon) {
+      icon.className = 'w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl shadow-inner';
+      icon.innerHTML = '<i class="fa-solid fa-cloud-check"></i>';
+    }
+    if (body) {
+      body.innerHTML = `
+        <div class="space-y-3">
+          <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 leading-relaxed">
+            <b>Proyek "${cfg.projectId}" aktif sempurna!</b><br>
+            Mulai sekarang, seluruh hasil poster Word dan Drive 7 Kebiasaan siswa akan otomatis dicadangkan ke Cloud Firebase. Siswa dapat login di komputer lab mana saja tanpa takut karyanya hilang.
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-700 font-mono">
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">Project ID:</span>
+              <b>${cfg.projectId}</b>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">Bucket:</span>
+              <b>${cfg.storageBucket || 'Standard'}</b>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    if (title) title.textContent = 'Konfigurasi Tersimpan! Langkah Terakhir di Firebase:';
+    if (icon) {
+      icon.className = 'w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shadow-inner';
+      icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+    }
+    if (body) {
+      body.innerHTML = `
+        <div class="space-y-3 text-xs text-slate-700">
+          <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 leading-relaxed">
+            <b>Kunci Konfigurasi (${cfg.projectId}) telah BERHASIL disimpan di aplikasi!</b><br>
+            ${errMsg ? `<span class="text-amber-800 text-[11px] mt-1 block font-semibold"><i class="fa-solid fa-circle-info"></i> ${errMsg}</span>` : ''}
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <b class="text-slate-800 flex items-center gap-1.5 text-xs"><i class="fa-solid fa-list-check text-blue-600"></i> Cara Mengaktifkan Firestore Database di Firebase Console:</b>
+            <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-[11px] leading-snug">
+              <li>Buka <a href="https://console.firebase.google.com" target="_blank" class="text-blue-600 underline font-bold">console.firebase.google.com</a>, buka proyek <b>${cfg.projectId}</b>.</li>
+              <li>Di bilah navigasi sebelah kiri, klik <b>Build &rarr; Firestore Database</b> (atau klik pintasan <b>Firestore</b>).</li>
+              <li>Klik tombol <b>"Create database"</b> (Buat database).</li>
+              <li>Pada pilihan aturan keamanan (Security Rules), pilih: <b class="text-emerald-700 font-bold">"Start in test mode"</b>.</li>
+              <li>Pilih lokasi (misal: <code>asia-southeast2 Jakarta</code> atau <code>asia-southeast1 Singapura</code>) lalu klik <b>Enable</b>.</li>
+              <li>(Untuk unggah gambar poster) Di menu kiri klik <b>Storage &rarr; Get started &rarr; Start in test mode &rarr; Done</b>.</li>
+            </ol>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+window.tampilkanModalStatusFirebase = tampilkanModalStatusFirebase;
+
+function tutupModalStatusFirebase() {
+  try { playSound('click'); } catch (e) {}
+  const modal = document.getElementById('modal-status-koneksi-firebase');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+}
+window.tutupModalStatusFirebase = tutupModalStatusFirebase;
 
 // Putus Koneksi Firebase
 function putusKoneksiFirebase() {

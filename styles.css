@@ -2240,6 +2240,16 @@ body.typing-screen-locked {
   }
 }
 
+/* Fix Kontras Teks Kotak Konfigurasi Firebase */
+#firebase-config-input {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background-color: #ffffff !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  line-height: 1.5 !important;
+}
+
+
 
 
 
