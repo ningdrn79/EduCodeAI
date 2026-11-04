@@ -20841,10 +20841,12 @@ function renderTabelGradebook(students, totalAll) {
     let nilaiDrive = s.nilaiDrive;
     let koleksiDrive = s.koleksiDrive;
     if (nilaiDrive === undefined || koleksiDrive === undefined) {
-      const driveData = muatDrive7Kebiasaan(s);
+      const driveData = dapatkanDriveSiswa(s);
       const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
       nilaiDrive = (s.nilaiDrive !== undefined) ? s.nilaiDrive : evalDrive.totalSkor;
       koleksiDrive = (s.koleksiDrive !== undefined) ? s.koleksiDrive : evalDrive.filledCount;
+      s.nilaiDrive = nilaiDrive;
+      s.koleksiDrive = koleksiDrive;
     }
 
     const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
@@ -21668,8 +21670,33 @@ function bukaDemoCodingLangsung() {
 window.bukaDemoCodingLangsung = bukaDemoCodingLangsung;
 
 // --------------------------------------------------------------------------
-// HELPER: DAPATKAN HASIL POSTER & DRIVE SISWA TERSIMPAN
+// HELPER: DAPATKAN HASIL POSTER & DRIVE SISWA TERSIMPAN (DENGAN CACHING CEPAT)
 // --------------------------------------------------------------------------
+let _cachedGeneralPosters = null;
+let _cachedGeneralPostersTime = 0;
+function getCachedGeneralPosters() {
+  const now = Date.now();
+  if (_cachedGeneralPosters && (now - _cachedGeneralPostersTime < 4000)) {
+    return _cachedGeneralPosters;
+  }
+  try {
+    const rawAll = localStorage.getItem('kreator_cilik_word_posters');
+    _cachedGeneralPosters = rawAll ? JSON.parse(rawAll) : [];
+  } catch (e) {
+    _cachedGeneralPosters = [];
+  }
+  _cachedGeneralPostersTime = now;
+  return _cachedGeneralPosters;
+}
+
+const _driveDataCache = new Map();
+function bersihkanCachePerforma() {
+  _cachedGeneralPosters = null;
+  _cachedGeneralPostersTime = 0;
+  _driveDataCache.clear();
+}
+window.bersihkanCachePerforma = bersihkanCachePerforma;
+
 function dapatkanPostersSiswa(student) {
   if (!student) return [];
   const list = [];
@@ -21699,25 +21726,23 @@ function dapatkanPostersSiswa(student) {
     } catch (e) {}
   }
 
-  // 2. Cek di storage umum kreator_cilik_word_posters yang mencocokkan nama atau NIS
+  // 2. Cek di storage umum kreator_cilik_word_posters yang sudah di-cache (tanpa re-parsing berulang)
   try {
-    const rawAll = localStorage.getItem('kreator_cilik_word_posters');
-    if (rawAll) {
-      const arrAll = JSON.parse(rawAll);
-      if (Array.isArray(arrAll)) {
-        arrAll.forEach(p => {
-          if (p && p.title) {
-            const author = (p.author || p.studentName || '').toLowerCase();
-            const sNama = (student.nama || '').toLowerCase();
-            if ((sNama && author.includes(sNama)) || (student.nis && author.includes(student.nis))) {
-              if (!seenIds.has(p.id || p.title)) {
-                seenIds.add(p.id || p.title);
-                list.push(p);
-              }
+    const arrAll = getCachedGeneralPosters();
+    if (Array.isArray(arrAll)) {
+      const sNama = (student.nama || '').toLowerCase();
+      const sNis = student.nis ? String(student.nis).toLowerCase() : '';
+      arrAll.forEach(p => {
+        if (p && p.title) {
+          const author = (p.author || p.studentName || '').toLowerCase();
+          if ((sNama && author.includes(sNama)) || (sNis && author.includes(sNis))) {
+            if (!seenIds.has(p.id || p.title)) {
+              seenIds.add(p.id || p.title);
+              list.push(p);
             }
           }
-        });
-      }
+        }
+      });
     }
   } catch (e) {}
 
@@ -21747,8 +21772,15 @@ window.dapatkanPostersSiswa = dapatkanPostersSiswa;
 
 function dapatkanDriveSiswa(student) {
   if (!student) return {};
-  return muatDrive7Kebiasaan(student);
+  const cacheKey = student.nis || student.id || student.nama;
+  if (_driveDataCache.has(cacheKey)) {
+    return _driveDataCache.get(cacheKey);
+  }
+  const res = muatDrive7Kebiasaan(student);
+  _driveDataCache.set(cacheKey, res);
+  return res;
 }
+window.dapatkanDriveSiswa = dapatkanDriveSiswa;
 window.dapatkanDriveSiswa = dapatkanDriveSiswa;
 
 // --------------------------------------------------------------------------
@@ -24280,7 +24312,9 @@ function initFirebaseClient(customConfig = null) {
       firebaseStorageInstance = firebase.storage();
     }
 
-    isFirebaseConnected = true;
+    // Hanya aktifkan isFirebaseConnected jika cloud sudah diuji dan disetujui
+    const isApproved = localStorage.getItem('educode_firebase_enabled_v1') === 'true';
+    isFirebaseConnected = isApproved;
     perbaruiStatusFirebaseUI(config);
     return true;
   } catch (err) {
@@ -24442,20 +24476,28 @@ async function simpanDanUjiFirebase() {
 
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     localStorage.setItem(FIREBASE_LAST_SYNC_KEY, nowStr);
-    isFirebaseConnected = true;
-    perbaruiStatusFirebaseUI(parsed);
 
     if (pingSuccess) {
+      localStorage.setItem('educode_firebase_enabled_v1', 'true');
+      isFirebaseConnected = true;
+      perbaruiStatusFirebaseUI(parsed);
       try { playSound('fanfare'); } catch (e) {}
       showToast(`✅ BERHASIL TERHUBUNG! Cloud Firebase (${parsed.projectId}) aktif & siap digunakan! ☁️🎉`, 'success');
       tampilkanModalStatusFirebase(parsed, true);
     } else {
+      // Jika ping belum sukses, jangan biarkan background retry loop membekukan browser
+      localStorage.setItem('educode_firebase_enabled_v1', 'false');
+      isFirebaseConnected = false;
+      perbaruiStatusFirebaseUI(parsed);
       try { playSound('notification'); } catch (e) {}
-      showToast(`⚠️ Konfigurasi ${parsed.projectId} tersimpan! Harap aktifkan Firestore di Firebase Console.`, 'warning');
+      showToast(`⚠️ Konfigurasi ${parsed.projectId} tersimpan! Berjalan dalam Mode Lokal cepat.`, 'warning');
       tampilkanModalStatusFirebase(parsed, false, pingErrMsg);
     }
   } catch (err) {
     console.error('Error saat simpan Firebase:', err);
+    localStorage.setItem('educode_firebase_enabled_v1', 'false');
+    isFirebaseConnected = false;
+    perbaruiStatusFirebaseUI();
     showToast(`❌ Gagal terhubung ke Firebase: ${err.message}`, 'error');
   } finally {
     if (btn) {
@@ -24544,19 +24586,33 @@ function tutupModalStatusFirebase() {
 }
 window.tutupModalStatusFirebase = tutupModalStatusFirebase;
 
-// Putus Koneksi Firebase
+// Putus Koneksi Firebase & Beralih ke Mode Cepat Lokal
 function putusKoneksiFirebase() {
   try { playSound('click'); } catch (e) {}
-  if (confirm('Apakah Anda ingin memutuskan koneksi Cloud Database dan kembali ke mode penyimpanan lokal komputer?')) {
+  if (confirm('Kembali ke Mode Cepat Lokal Komputer? Aplikasi akan berjalan 100% instan tanpa hambatan jaringan.')) {
     localStorage.removeItem(FIREBASE_CONFIG_KEY);
+    localStorage.removeItem('educode_firebase_enabled_v1');
     isFirebaseConnected = false;
     firebaseFirestoreInstance = null;
     firebaseStorageInstance = null;
+    if (typeof bersihkanCachePerforma === 'function') bersihkanCachePerforma();
     perbaruiStatusFirebaseUI();
-    showToast('Koneksi Cloud Firebase diputus. Sistem berjalan dalam mode penyimpanan lokal komputer.', 'info');
+    showToast('⚡ Mode Cepat Lokal Aktif! Aplikasi berjalan 100% lancar dan bebas lag.', 'success');
   }
 }
 window.putusKoneksiFirebase = putusKoneksiFirebase;
+
+function aktifkanModeCepatLokal() {
+  try { playSound('click'); } catch (e) {}
+  localStorage.removeItem('educode_firebase_enabled_v1');
+  isFirebaseConnected = false;
+  firebaseFirestoreInstance = null;
+  firebaseStorageInstance = null;
+  if (typeof bersihkanCachePerforma === 'function') bersihkanCachePerforma();
+  perbaruiStatusFirebaseUI();
+  showToast('⚡ Mode Cepat Lokal Aktif! Kecepatan instan dipulihkan 100%.', 'success');
+}
+window.aktifkanModeCepatLokal = aktifkanModeCepatLokal;
 
 // Modal Panduan Setup Firebase
 function bukaPanduanFirebase() {
@@ -24776,11 +24832,17 @@ async function unggahSemuaKaryaLokalKeCloud() {
 }
 window.unggahSemuaKaryaLokalKeCloud = unggahSemuaKaryaLokalKeCloud;
 
-// Otomatis jalankan inisialisasi Firebase saat DOM selesai dimuat
+// Otomatis jalankan inisialisasi Firebase HANYA jika mode cloud disetujui (mencegah lag background network)
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
-    initFirebaseClient();
-  }, 400);
+    const isApproved = localStorage.getItem('educode_firebase_enabled_v1') === 'true';
+    if (isApproved) {
+      initFirebaseClient();
+    } else {
+      isFirebaseConnected = false;
+      perbaruiStatusFirebaseUI();
+    }
+  }, 500);
 });
 
 

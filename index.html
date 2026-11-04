@@ -21,10 +21,10 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
   </script>
-  <!-- Google Firebase Compat SDKs (App, Firestore, Storage) untuk Server Cloud Database Siswa -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <!-- Google Firebase Compat SDKs (App, Firestore, Storage) untuk Server Cloud Database Siswa (Non-Blocking Deferred) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -11952,6 +11952,9 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
                 <button type="button" onclick="putusKoneksiFirebase()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-bold transition flex items-center gap-2 border border-slate-200 cursor-pointer">
                   <i class="fa-solid fa-link-slash text-slate-500"></i> Putus Koneksi
                 </button>
+                <button type="button" onclick="aktifkanModeCepatLokal()" class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-title text-xs font-bold transition flex items-center gap-2 border border-indigo-200 cursor-pointer" title="Jalankan dalam mode lokal komputer yang instan dan bebas lag">
+                  <i class="fa-solid fa-bolt-lightning text-indigo-600"></i> Mode Cepat Lokal (Bebas Lag)
+                </button>
               </div>
             </div>
 
@@ -14392,6 +14395,6 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261104_firebase_fix_v44"></script>
+  <script src="app.js?v=20261104_speed_turbo_v45"></script>
 </body>
 </html>
