@@ -5606,14 +5606,125 @@ const DRIVE_7KEBIASAAN_CONFIG = [
 
 let currentSlotHabitKey = null;
 
-function getDriveStorageKey() {
-  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+function getDriveStorageKey(studentProfile) {
+  const activeStudent = studentProfile || ((typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null);
   const idKey = activeStudent ? (activeStudent.nis || activeStudent.id || activeStudent.nama) : 'tamu_umum';
   return `educode_drive_7kebiasaan_${idKey}`;
 }
 
-function muatDrive7Kebiasaan() {
-  const key = getDriveStorageKey();
+function kompresiGambarDataUrl(dataUrl, maxDimension = 600, quality = 0.8, callback) {
+  if (!dataUrl || typeof dataUrl !== 'string') {
+    if (callback) callback(dataUrl);
+    return;
+  }
+  // SVG atau string yang sudah sangat kecil tidak perlu dikompresi
+  if (dataUrl.startsWith('data:image/svg+xml') || dataUrl.length < 50000) {
+    if (callback) callback(dataUrl);
+    return;
+  }
+
+  const img = new Image();
+  img.onload = function() {
+    let width = img.width;
+    let height = img.height;
+
+    if (width > height) {
+      if (width > maxDimension) {
+        height = Math.round((height * maxDimension) / width);
+        width = maxDimension;
+      }
+    } else {
+      if (height > maxDimension) {
+        width = Math.round((width * maxDimension) / height);
+        height = maxDimension;
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, width);
+    canvas.height = Math.max(1, height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+
+    try {
+      const compressed = canvas.toDataURL('image/jpeg', quality);
+      if (callback) callback(compressed);
+    } catch (e) {
+      console.warn('Gagal kompresi gambar canvas, memakai dataUrl asli:', e);
+      if (callback) callback(dataUrl);
+    }
+  };
+  img.onerror = function() {
+    if (callback) callback(dataUrl);
+  };
+  img.src = dataUrl;
+}
+window.kompresiGambarDataUrl = kompresiGambarDataUrl;
+
+function muatDrive7Kebiasaan(studentProfile) {
+  if (studentProfile) {
+    // 1. Cek langsung properti driveData di profil siswa
+    if (studentProfile.driveData && typeof studentProfile.driveData === 'object' && Object.keys(studentProfile.driveData).length > 0) {
+      return studentProfile.driveData;
+    }
+
+    // 2. Cek di database siswa resmi (tersimpan dari akun guru atau sinkronisasi)
+    if (typeof getStudentDatabase === 'function') {
+      try {
+        const db = getStudentDatabase();
+        const found = db.find(s => 
+          (studentProfile.id && s.id === studentProfile.id) || 
+          (studentProfile.nis && s.nis && String(s.nis) === String(studentProfile.nis)) || 
+          (studentProfile.nama && s.nama && s.nama.toLowerCase() === studentProfile.nama.toLowerCase() && s.kelas === studentProfile.kelas)
+        );
+        if (found && found.driveData && typeof found.driveData === 'object' && Object.keys(found.driveData).length > 0) {
+          return found.driveData;
+        }
+      } catch (e) {}
+    }
+
+    // 3. Coba beberapa variasi kunci penyimpanan siswa (NIS, ID, Nama) di localStorage
+    const possibleKeys = [
+      studentProfile.nis ? `educode_drive_7kebiasaan_${studentProfile.nis}` : null,
+      studentProfile.id ? `educode_drive_7kebiasaan_${studentProfile.id}` : null,
+      studentProfile.nama ? `educode_drive_7kebiasaan_${studentProfile.nama}` : null
+    ].filter(Boolean);
+
+    for (let k of possibleKeys) {
+      let r = localStorage.getItem(k);
+      if (r) {
+        try {
+          const parsed = JSON.parse(r);
+          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+            return parsed;
+          }
+        } catch (e) {}
+      }
+    }
+  }
+
+  // 4. Jika dipanggil tanpa parameter (misal siswa aktif saat belajar)
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (activeStudent) {
+    if (activeStudent.driveData && typeof activeStudent.driveData === 'object' && Object.keys(activeStudent.driveData).length > 0) {
+      return activeStudent.driveData;
+    }
+    if (typeof getStudentDatabase === 'function') {
+      try {
+        const db = getStudentDatabase();
+        const found = db.find(s => 
+          (activeStudent.id && s.id === activeStudent.id) || 
+          (activeStudent.nis && s.nis && String(s.nis) === String(activeStudent.nis)) || 
+          (activeStudent.nama && s.nama && s.nama.toLowerCase() === activeStudent.nama.toLowerCase() && s.kelas === activeStudent.kelas)
+        );
+        if (found && found.driveData && typeof found.driveData === 'object' && Object.keys(found.driveData).length > 0) {
+          return found.driveData;
+        }
+      } catch (e) {}
+    }
+  }
+
+  const key = getDriveStorageKey(studentProfile || activeStudent);
   let raw = localStorage.getItem(key);
   if (!raw) return {};
   try {
@@ -5622,17 +5733,72 @@ function muatDrive7Kebiasaan() {
     return {};
   }
 }
+window.muatDrive7Kebiasaan = muatDrive7Kebiasaan;
+
+function hitungNilaiDrive7Kebiasaan(driveData) {
+  if (!driveData || typeof driveData !== 'object') {
+    return { totalSkor: 0, filledCount: 0, validNameCount: 0, statusKkm: 'Remedial' };
+  }
+  const keys = Object.keys(driveData).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k));
+  const filledCount = keys.filter(k => driveData[k] && (driveData[k].imageSrc || driveData[k].gambar)).length;
+  const validNameCount = keys.filter(k => {
+    const item = driveData[k];
+    return item && item.fileName && periksaFormatNamaFile(item.fileName).valid;
+  }).length;
+
+  if (filledCount === 0) {
+    return { totalSkor: 0, filledCount: 0, validNameCount: 0, statusKkm: 'Remedial' };
+  }
+
+  // Bobot penilaian TP 2.1: 70% kelengkapan 7 gambar + 30% standar nama file baku
+  const skorGambar = Math.round((filledCount / 7) * 70);
+  const skorNama = Math.round((validNameCount / 7) * 30);
+  const totalSkor = Math.min(100, Math.max(filledCount > 0 ? 25 : 0, skorGambar + skorNama));
+  const statusKkm = totalSkor >= 80 ? 'Tuntas' : 'Remedial';
+
+  return { totalSkor, filledCount, validNameCount, statusKkm };
+}
+window.hitungNilaiDrive7Kebiasaan = hitungNilaiDrive7Kebiasaan;
 
 function simpanDrive7Kebiasaan(data) {
   const key = getDriveStorageKey();
   try {
     localStorage.setItem(key, JSON.stringify(data));
+
+    // Sinkronisasi otomatis ke profil siswa aktif di database guru
+    const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (profile) {
+      profile.driveData = data;
+      if (typeof saveActiveStudentSession === 'function') {
+        saveActiveStudentSession(profile);
+      }
+    }
+
+    if (profile && typeof getStudentDatabase === 'function' && typeof saveStudentDatabase === 'function') {
+      const db = getStudentDatabase();
+      const sIdx = db.findIndex(s => s.id === profile.id || (profile.nis && s.nis === profile.nis) || (s.nama && (s.nama.toLowerCase() === (profile.nama||'').toLowerCase()) && s.kelas === profile.kelas));
+      if (sIdx >= 0) {
+        const evaluasi = hitungNilaiDrive7Kebiasaan(data);
+        db[sIdx].koleksiDrive = evaluasi.filledCount;
+        db[sIdx].nilaiDrive = evaluasi.totalSkor;
+        db[sIdx].terakhirAktif = 'Baru saja';
+        db[sIdx].driveData = data;
+        saveStudentDatabase(db);
+        if (typeof renderDasborGuru === 'function' && state.isGuruLoggedIn) {
+          renderDasborGuru();
+        }
+      }
+    }
+
     // Sinkronisasi otomatis ke Server Cloud Database
     if (typeof unggahDriveKeCloud === 'function') {
       unggahDriveKeCloud(data);
     }
   } catch (e) {
     console.warn('Gagal menyimpan Drive 7 Kebiasaan:', e);
+    if (e && (e.name === 'QuotaExceededError' || e.code === 22)) {
+      showToast('⚠️ Penyimpanan browser penuh! Gambar otomatis dikompresi agar muat.', 'warning');
+    }
   }
 }
 
@@ -5967,6 +6133,28 @@ function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun
   if (nowCount >= 7 && !wasCompleteBefore) {
     selesaikanMisiTP2_1();
   }
+
+  // Kirim otomatis berkas gambar ke Google Drive / Google Sheets jika Webhook aktif
+  try {
+    const webhookUrl = (typeof getPersistentWebhookUrl === 'function') ? getPersistentWebhookUrl() : null;
+    if (webhookUrl && typeof kirimKeWebhookSheets === 'function') {
+      const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+      kirimKeWebhookSheets({
+        event: 'simpan_slot_drive',
+        type: 'drive_7kebiasaan',
+        nis: profile ? (profile.nis || profile.id) : '-',
+        nama: profile ? profile.nama : 'Umum',
+        kelas: profile ? profile.kelas : '4A',
+        absen: profile ? profile.absen : '-',
+        habitKey: habitKey,
+        title: finalFileName || (cfg ? cfg.cleanTitle : habitKey),
+        fileName: finalFileName,
+        sourceName: sourceName,
+        image: imageSrc,
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (eWh) {}
 }
 window.simpanGambarKeSlotDrive = simpanGambarKeSlotDrive;
 
@@ -6192,14 +6380,24 @@ function handleDriveSlotUpload(event) {
   const habitKey = event.target.getAttribute('data-target-habit') || currentSlotHabitKey;
   if (!file || !habitKey) return;
 
+  if (file.type && !file.type.startsWith('image/')) {
+    alert('Harap pilih file berupa gambar (JPG, PNG, WebP, GIF)!');
+    event.target.value = '';
+    return;
+  }
+
+  showToast('Memproses & mengoptimalkan gambar...', 'info');
+
   const reader = new FileReader();
   reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
-    const cleanUploadName = file.name.replace(/\.[^/.]+$/, '');
-    const checkUpload = periksaFormatNamaFile(cleanUploadName);
-    const chosenName = checkUpload.valid ? cleanUploadName : buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Upload');
-    simpanGambarKeSlotDrive(habitKey, dataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), '📤 File Komputer', chosenName);
+    const rawDataUrl = e.target.result;
+    kompresiGambarDataUrl(rawDataUrl, 600, 0.8, function(optimizedDataUrl) {
+      const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
+      const cleanUploadName = file.name.replace(/\.[^/.]+$/, '');
+      const checkUpload = periksaFormatNamaFile(cleanUploadName);
+      const chosenName = checkUpload.valid ? cleanUploadName : buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Upload');
+      simpanGambarKeSlotDrive(habitKey, optimizedDataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), '📤 File Komputer', chosenName);
+    });
   };
   reader.readAsDataURL(file);
   event.target.value = '';
@@ -17862,34 +18060,41 @@ function getStudentDatabase() {
         if (s.absen.length === 1) s.absen = '0' + s.absen;
         changed = true;
       }
+      // Sinkronisasi nilai Drive 7 Kebiasaan (TP 2.1)
+      if (s.nilaiDrive === undefined || s.koleksiDrive === undefined) {
+        const driveData = muatDrive7Kebiasaan(s);
+        const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
+        if (s.nilaiDrive === undefined) s.nilaiDrive = evalDrive.totalSkor;
+        if (s.koleksiDrive === undefined) s.koleksiDrive = evalDrive.filledCount;
+      }
       if (s.nilaiPoster === undefined) s.nilaiPoster = (s.posterWord > 0 ? 90 : 0);
       if (s.nilaiExcel === undefined) s.nilaiExcel = (s.excelTabel > 0 ? 88 : 0);
-      if (s.nilaiScratch === undefined) {
-        s.nilaiScratch = (s.projekScratch > 0 ? 92 : (s.kuisSem2 ? Math.max(78, s.kuisSem2) : 88));
+      
+      // Bersihkan nilai dummy Semester 2 karena pembelajaran saat ini baru berjalan di Semester 1
+      if (s.nilaiScratch === undefined || s.nilaiScratch === 88 || s.nilaiScratch === 90 || s.nilaiScratch === 92) {
+        s.nilaiScratch = (s.projekScratch > 0 && s.projekScratch !== 2) ? 90 : 0;
         changed = true;
       }
-      if (s.projekScratch === undefined) {
-        s.projekScratch = 2;
+      if (s.projekScratch === 2 || s.projekScratch === undefined) {
+        s.projekScratch = 0;
         changed = true;
       }
-      if (s.nilaiRoboMind === undefined) {
-        s.nilaiRoboMind = (s.misiRobo > 0 ? 90 : (s.kuisSem2 ? Math.max(76, s.kuisSem2 - 2) : 86));
+      if (s.nilaiRoboMind === undefined || s.nilaiRoboMind === 86 || s.nilaiRoboMind === 88 || s.nilaiRoboMind === 90) {
+        s.nilaiRoboMind = (s.misiRobo > 0 && s.misiRobo !== 3) ? 88 : 0;
         changed = true;
       }
-      if (s.misiRobo === undefined) {
-        s.misiRobo = 3;
+      if (s.misiRobo === 3 || s.misiRobo === undefined) {
+        s.misiRobo = 0;
         changed = true;
       }
 
-      // Sinkronisasi status KKM dengan standar KKM 80
-      const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 85);
-      const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 85);
-      const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : 90;
-      const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : 88;
-      const k1 = s.kuisSem1 !== undefined ? s.kuisSem1 : 80;
-      const k2 = s.kuisSem2 !== undefined ? s.kuisSem2 : 80;
-      const avgTotal = Math.round((p1_s1 + p2_s1 + p1_s2 + p2_s2 + k1 + k2) / 6);
-      const newStatus = avgTotal >= 80 ? 'Tuntas' : 'Remedial';
+      // Sinkronisasi status KKM dengan standar KKM 80 (Murni berdasar Semester 1: Kuis 25%, Drive 25%, Poster 25%, Excel 25%)
+      const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
+      const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 0);
+      const k1 = s.kuisSem1 !== undefined ? s.kuisSem1 : 0;
+      const drv = s.nilaiDrive !== undefined ? s.nilaiDrive : 0;
+      const nilaiSem1 = Math.round((k1 * 0.25) + (drv * 0.25) + (p1_s1 * 0.25) + (p2_s1 * 0.25));
+      const newStatus = nilaiSem1 >= 80 ? 'Tuntas' : 'Remedial';
       if (s.statusKkm !== newStatus) {
         s.statusKkm = newStatus;
         changed = true;
@@ -18434,29 +18639,58 @@ function resetPinGuruKeDefault() {
 window.resetPinGuruKeDefault = resetPinGuruKeDefault;
 
 // --------------------------------------------------------------------------
-// PROFIL SISWA AKTIF & KARTU PELAJAR DIGITAL (AUTO-SYNC)
+// PROFIL SISWA AKTIF & KARTU PELAJAR DIGITAL (BERSUMBER LANGSUNG DARI TABEL GURU)
 // --------------------------------------------------------------------------
-function bukaModalProfilSiswa() {
-  playSound('click');
-  const profile = getActiveStudentProfile();
-  if (!profile) {
-    bukaPilihSiswaCepat();
-    return;
+function isiDataRaporDigital(student, isTeacherMode = false) {
+  if (!student) return;
+
+  // 1. Perhitungan Nilai Semester 1 (4 Pilar: Kuis 25%, Drive 25%, Poster 25%, Excel 25%)
+  const driveData = muatDrive7Kebiasaan(student);
+  const driveEval = hitungNilaiDrive7Kebiasaan(driveData);
+  const nilaiDrive = student.nilaiDrive !== undefined ? student.nilaiDrive : driveEval.totalSkor;
+  const koleksiDrive = student.koleksiDrive !== undefined ? student.koleksiDrive : driveEval.filledCount;
+
+  const p1_s1 = student.nilaiPoster !== undefined ? student.nilaiPoster : (student.posterWord > 0 ? 90 : 0);
+  const p2_s1 = student.nilaiExcel !== undefined ? student.nilaiExcel : (student.excelTabel > 0 ? 88 : 0);
+  const kuis1 = student.kuisSem1 !== undefined ? student.kuisSem1 : 0;
+  
+  const nilaiSem1 = Math.round((kuis1 * 0.25) + (nilaiDrive * 0.25) + (p1_s1 * 0.25) + (p2_s1 * 0.25));
+  const isKuis1Pass = (kuis1 >= 80);
+  const isDrivePass = (nilaiDrive >= 80);
+  const isSem1Pass = (nilaiSem1 >= 80);
+
+  // 2. Perhitungan Nilai Semester 2 (Tanpa nilai dummy fiktif)
+  const p1_s2 = student.nilaiScratch !== undefined ? student.nilaiScratch : (student.projekScratch > 0 ? 90 : 0);
+  const p2_s2 = student.nilaiRoboMind !== undefined ? student.nilaiRoboMind : (student.misiRobo > 0 ? 88 : 0);
+  const kuis2 = student.kuisSem2 !== undefined ? student.kuisSem2 : 0;
+  const nilaiSem2 = Math.round((kuis2 * 0.3) + (p1_s2 * 0.35) + (p2_s2 * 0.35));
+  const isKuis2Pass = (kuis2 >= 80);
+  const isSem2Pass = (nilaiSem2 >= 80);
+
+  // 3. Kontrol Tampilan Sektor Semester 2:
+  // Pembelajaran saat ini baru berjalan di Semester 1 (Ganjil). Sektor Semester 2 disembunyikan
+  // dan hanya akan tampil jika Guru membuka periode Semester 2 di pengaturan dasbor guru.
+  const isSem2Open = (typeof isSemester2Unlocked === 'function') ? isSemester2Unlocked() : false;
+  const elSektorSem2 = document.getElementById('sektor-rapor-sem2');
+  if (elSektorSem2) {
+    if (isSem2Open) {
+      elSektorSem2.classList.remove('hidden');
+      elSektorSem2.style.display = 'block';
+    } else {
+      elSektorSem2.classList.add('hidden');
+      elSektorSem2.style.display = 'none';
+    }
   }
-  const db = getStudentDatabase();
-  const student = db.find(s => s.id === profile.id || (s.nama.toLowerCase() === profile.nama.toLowerCase() && s.kelas === profile.kelas)) || {
-    id: profile.id,
-    nama: profile.nama,
-    kelas: profile.kelas,
-    absen: profile.absen,
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    excelTabel: 0,
-    poinBintang: state.userPoints || 0,
-    statusKkm: 'Tuntas',
-    catatanGuru: 'Semangat belajar, rajin berlatih dan teliti!'
-  };
+
+  const elPeriode = document.getElementById('card-rapor-periode-label');
+  if (elPeriode) {
+    elPeriode.innerText = isSem2Open
+      ? 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 & 2)'
+      : 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 / Ganjil)';
+  }
+
+  // 4. Status KKM Keseluruhan (Murni bersumber dari Nilai Semester 1 yang sedang aktif)
+  const statusKkmFinal = isSem1Pass ? 'TUNTAS KKM' : 'REMEDIAL';
 
   // Isi data ke Kartu Pelajar & Rapor Digital Siswa
   const elAvatar = document.getElementById('card-siswa-avatar');
@@ -18464,34 +18698,122 @@ function bukaModalProfilSiswa() {
   const elNis = document.getElementById('card-siswa-nis');
   const elKelas = document.getElementById('card-siswa-kelas');
   const elAbsen = document.getElementById('card-siswa-absen');
+  const elStatusBadge = document.getElementById('card-siswa-status-badge');
   const elStatusKkm = document.getElementById('card-siswa-status-kkm');
-  const elKuis1 = document.getElementById('card-siswa-kuis1');
-  const elKuis2 = document.getElementById('card-siswa-kuis2');
-  const elPoster = document.getElementById('card-siswa-poster');
-  const elExcel = document.getElementById('card-siswa-excel');
-  const elBintang = document.getElementById('card-siswa-bintang');
-  const elCatatan = document.getElementById('card-siswa-catatan');
 
   if (elAvatar) elAvatar.innerText = student.nama ? student.nama.charAt(0).toUpperCase() : 'S';
-  if (elNama) elNama.innerText = student.nama;
+  if (elNama) elNama.innerText = student.nama || 'Siswa';
   if (elNis) elNis.innerText = `NIS: ${student.nis || '-'}`;
-  if (elKelas) elKelas.innerText = `Kelas ${student.kelas}`;
+  if (elKelas) elKelas.innerText = `Kelas ${student.kelas || '4A'}`;
   if (elAbsen) elAbsen.innerText = `No. Absen: ${student.absen || '-'}`;
-  if (elStatusKkm) {
-    const isTuntas = (student.statusKkm === 'Tuntas' || (!student.statusKkm && (student.kuisSem1 >= 75 || student.kuisSem1 === 0)));
-    elStatusKkm.innerText = isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
-    elStatusKkm.className = isTuntas ? 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 shadow-2xs' : 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white shadow-2xs';
+
+  if (elStatusBadge) {
+    if (isTeacherMode) {
+      elStatusBadge.innerText = 'DATA RESMI GURU 👩‍🏫';
+      elStatusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 border border-amber-300 uppercase tracking-wide';
+    } else {
+      elStatusBadge.innerText = 'PELAJAR AKTIF 🎓';
+      elStatusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 uppercase tracking-wide';
+    }
   }
-  if (elKuis1) elKuis1.innerText = student.kuisSem1 || 0;
+
+  if (elStatusKkm) {
+    elStatusKkm.innerText = statusKkmFinal;
+    elStatusKkm.className = isSem1Pass
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-900 shadow-2xs'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-2xs animate-pulse';
+  }
+
+  // SEMESTER 1 (KUIS, DRIVE 7 KEBIASAAN, WORD & EXCEL)
+  const elKuis1 = document.getElementById('card-siswa-kuis1');
+  const elKuis1Status = document.getElementById('card-siswa-kuis1-status');
+  if (elKuis1) elKuis1.innerText = kuis1;
+  if (elKuis1Status) {
+    elKuis1Status.innerText = isKuis1Pass ? 'TUNTAS' : 'REMEDIAL';
+    elKuis1Status.className = isKuis1Pass ? 'text-[10px] text-emerald-600 font-bold' : 'text-[10px] text-rose-600 font-bold';
+  }
+
+  // Drive 7 Kebiasaan (TP 2.1)
+  const elDrive = document.getElementById('card-siswa-drive');
+  const elDriveSub = document.getElementById('card-siswa-drive-sub');
+  if (elDrive) elDrive.innerText = nilaiDrive;
+  if (elDriveSub) elDriveSub.innerText = `${koleksiDrive} / 7 Gambar`;
+
+  const elPoster = document.getElementById('card-siswa-poster');
   const elPosterSub = document.getElementById('card-siswa-poster-sub');
+  if (elPoster) elPoster.innerText = p1_s1;
+  if (elPosterSub) elPosterSub.innerText = `${student.posterWord || 0} Poster`;
+
+  const elExcel = document.getElementById('card-siswa-excel');
   const elExcelSub = document.getElementById('card-siswa-excel-sub');
-  if (elPoster) elPoster.innerText = student.nilaiPoster !== undefined ? student.nilaiPoster : (student.posterWord > 0 ? 90 : 0);
-  if (elPosterSub) elPosterSub.innerText = `${student.posterWord || 0} Karya`;
-  if (elExcel) elExcel.innerText = student.nilaiExcel !== undefined ? student.nilaiExcel : (student.excelTabel > 0 ? 88 : 0);
+  if (elExcel) elExcel.innerText = p2_s1;
   if (elExcelSub) elExcelSub.innerText = `${student.excelTabel || 0} Latihan`;
-  if (elBintang) elBintang.innerText = `${Math.max(student.poinBintang || 0, state.userPoints || 0)} ⭐`;
+
+  const elNilaiSem1 = document.getElementById('card-siswa-nilai-sem1');
+  const elNilaiSem1Status = document.getElementById('card-siswa-nilai-sem1-status');
+  if (elNilaiSem1) elNilaiSem1.innerText = nilaiSem1;
+  if (elNilaiSem1Status) {
+    elNilaiSem1Status.innerText = isSem1Pass ? 'TUNTAS KKM' : 'REMEDIAL';
+    elNilaiSem1Status.className = isSem1Pass ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+  }
+
+  // SEMESTER 2 (CODING & AI)
+  const elKuis2 = document.getElementById('card-siswa-kuis2');
+  const elKuis2Status = document.getElementById('card-siswa-kuis2-status');
+  if (elKuis2) elKuis2.innerText = kuis2;
+  if (elKuis2Status) {
+    elKuis2Status.innerText = isKuis2Pass ? 'TUNTAS' : 'REMEDIAL';
+    elKuis2Status.className = isKuis2Pass ? 'text-[10px] text-emerald-600 font-bold' : 'text-[10px] text-rose-600 font-bold';
+  }
+
+  const elScratch = document.getElementById('card-siswa-scratch');
+  const elScratchSub = document.getElementById('card-siswa-scratch-sub');
+  if (elScratch) elScratch.innerText = p1_s2;
+  if (elScratchSub) elScratchSub.innerText = `${student.projekScratch || 0} Projek`;
+
+  const elRobo = document.getElementById('card-siswa-robo');
+  const elRoboSub = document.getElementById('card-siswa-robo-sub');
+  if (elRobo) elRobo.innerText = p2_s2;
+  if (elRoboSub) elRoboSub.innerText = `${student.misiRobo || 0} Misi`;
+
+  const elNilaiSem2 = document.getElementById('card-siswa-nilai-sem2');
+  const elNilaiSem2Status = document.getElementById('card-siswa-nilai-sem2-status');
+  if (elNilaiSem2) elNilaiSem2.innerText = nilaiSem2;
+  if (elNilaiSem2Status) {
+    elNilaiSem2Status.innerText = isSem2Pass ? 'TUNTAS KKM' : 'REMEDIAL';
+    elNilaiSem2Status.className = isSem2Pass ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+  }
+
+  // BINTANG & CATATAN GURU
+  const elBintang = document.getElementById('card-siswa-bintang');
+  if (elBintang) {
+    const pts = student.poinBintang !== undefined ? student.poinBintang : (state.userPoints || 0);
+    elBintang.innerText = `${pts} ⭐`;
+  }
+
+  const elCatatan = document.getElementById('card-siswa-catatan');
   if (elCatatan) {
-    elCatatan.innerText = student.catatanGuru ? `"${student.catatanGuru}"` : '"Teruslah tekun berlatih, jadilah insan yang cerdas dan berbudi pekerti luhur."';
+    elCatatan.innerText = student.catatanGuru ? `"${student.catatanGuru}"` : '"Data resmi tersinkron dari Buku Nilai Google Sheet"';
+  }
+
+  // Tombol Aksi di Modal
+  const btnGantiAkun = document.getElementById('btn-rapor-ganti-akun');
+  const btnEditNilai = document.getElementById('btn-rapor-edit-nilai');
+  const btnKeluar = document.getElementById('btn-rapor-keluar');
+
+  if (btnGantiAkun) {
+    btnGantiAkun.style.display = isTeacherMode ? 'none' : '';
+  }
+  if (btnKeluar) {
+    btnKeluar.style.display = isTeacherMode ? 'none' : '';
+  }
+  if (btnEditNilai) {
+    btnEditNilai.classList.remove('hidden');
+    btnEditNilai.style.display = isTeacherMode ? '' : 'none';
+    btnEditNilai.onclick = () => {
+      tutupModalProfilSiswa();
+      bukaModalDetailSiswa(student.id);
+    };
   }
 
   // Tampilkan Tampilan Kartu Pelajar
@@ -18502,6 +18824,63 @@ function bukaModalProfilSiswa() {
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
   }
+}
+window.isiDataRaporDigital = isiDataRaporDigital;
+
+function bukaRaporDigitalDariGuru(studentId) {
+  playSound('click');
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === studentId || s.nis === studentId);
+  if (!student) {
+    showToast('⚠️ Data siswa tidak ditemukan di database.', 'warning');
+    return;
+  }
+  isiDataRaporDigital(student, true);
+}
+window.bukaRaporDigitalDariGuru = bukaRaporDigitalDariGuru;
+
+function cetakRaporDigitalSiswa() {
+  playSound('click');
+  window.print();
+}
+window.cetakRaporDigitalSiswa = cetakRaporDigitalSiswa;
+
+function bukaModalProfilSiswa() {
+  playSound('click');
+  const profile = getActiveStudentProfile();
+  if (!profile) {
+    bukaPilihSiswaCepat();
+    return;
+  }
+  const db = getStudentDatabase();
+  let student = null;
+  if (profile.nis) {
+    student = db.find(s => s.nis && String(s.nis).trim() === String(profile.nis).trim());
+  }
+  if (!student && profile.id) {
+    student = db.find(s => s.id === profile.id);
+  }
+  if (!student && profile.nama) {
+    student = db.find(s => s.nama && s.nama.toLowerCase().trim() === profile.nama.toLowerCase().trim() && (!profile.kelas || s.kelas === profile.kelas));
+  }
+  if (!student) {
+    student = {
+      id: profile.id || `STD-${profile.kelas || '4A'}-${profile.nis || '01'}`,
+      nama: profile.nama,
+      nis: profile.nis || '-',
+      kelas: profile.kelas || '4A',
+      absen: profile.absen || '01',
+      kuisSem1: 0,
+      kuisSem2: 0,
+      posterWord: 0,
+      excelTabel: 0,
+      poinBintang: state.userPoints || 0,
+      statusKkm: 'Remedial',
+      catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+    };
+  }
+
+  isiDataRaporDigital(student, false);
 }
 window.bukaModalProfilSiswa = bukaModalProfilSiswa;
 
@@ -19851,19 +20230,33 @@ function filterDanCariSiswa() {
     // Hitung status nilai berdasarkan mode penilaian aktif
     let skorAktif = 80;
     if (mode === 1) {
-      const p1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 85);
-      const p2 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 85);
-      skorAktif = Math.round(((s.kuisSem1 || 0) * 0.3) + (p1 * 0.35) + (p2 * 0.35));
+      let nilaiDrive = s.nilaiDrive;
+      if (nilaiDrive === undefined) {
+        const driveData = muatDrive7Kebiasaan(s);
+        const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
+        nilaiDrive = evalDrive.totalSkor;
+      }
+      const p1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
+      const p2 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 0);
+      skorAktif = Math.round(((s.kuisSem1 || 0) * 0.25) + (nilaiDrive * 0.25) + (p1 * 0.25) + (p2 * 0.25));
     } else if (mode === 2) {
-      const p1 = s.nilaiScratch !== undefined ? s.nilaiScratch : 90;
-      const p2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : 88;
+      const p1 = s.nilaiScratch !== undefined ? s.nilaiScratch : (s.projekScratch > 0 ? 90 : 0);
+      const p2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : (s.misiRobo > 0 ? 88 : 0);
       skorAktif = Math.round(((s.kuisSem2 || 0) * 0.3) + (p1 * 0.35) + (p2 * 0.35));
     } else {
-      const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : 85;
-      const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : 85;
-      const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : 88;
-      const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : 86;
-      skorAktif = Math.round((p1_s1 + p2_s1 + p1_s2 + p2_s2 + (s.kuisSem1 || 80) + (s.kuisSem2 || 80)) / 6);
+      let nilaiDrive = s.nilaiDrive;
+      if (nilaiDrive === undefined) {
+        const driveData = muatDrive7Kebiasaan(s);
+        const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
+        nilaiDrive = evalDrive.totalSkor;
+      }
+      const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
+      const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 0);
+      const nilaiSem1 = Math.round(((s.kuisSem1 || 0) * 0.25) + (nilaiDrive * 0.25) + (p1_s1 * 0.25) + (p2_s1 * 0.25));
+      const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : (s.projekScratch > 0 ? 90 : 0);
+      const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : (s.misiRobo > 0 ? 88 : 0);
+      const nilaiSem2 = Math.round(((s.kuisSem2 || 0) * 0.3) + (p1_s2 * 0.35) + (p2_s2 * 0.35));
+      skorAktif = Math.round((nilaiSem1 + nilaiSem2) / 2);
     }
 
     // Filter KKM
@@ -19974,12 +20367,13 @@ function renderTabelGradebook(students, totalAll) {
           <th class="py-4 px-3 min-w-[210px]">Data Siswa</th>
           <th class="py-4 px-2 text-center w-20">Kelas</th>
           <th class="py-4 px-2 text-center w-28">Kuis Sem 1</th>
+          <th class="py-4 px-2 text-center w-36">Drive 7 Kebiasaan</th>
           <th class="py-4 px-2 text-center w-32">1. Poster Word</th>
           <th class="py-4 px-2 text-center w-32">2. Tabel Excel</th>
           <th class="py-4 px-2 text-center w-28">Nilai Sem 1</th>
           <th class="py-4 px-2 text-center w-32">Status KKM</th>
           <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
-          <th class="py-4 px-2 text-center w-24">Aksi</th>
+          <th class="py-4 px-2 text-center w-28">Aksi</th>
         </tr>
       `;
     } else if (mode === 2) {
@@ -20073,15 +20467,24 @@ function renderTabelGradebook(students, totalAll) {
 
     const initial = s.nama ? s.nama.charAt(0).toUpperCase() : 'S';
 
-    // Perhitungan Nilai Semester 1 (2 Penilaian Praktik + Kuis 1)
-    const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 85);
-    const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 85);
-    const nilaiSem1 = Math.round(((s.kuisSem1 || 0) * 0.3) + (p1_s1 * 0.35) + (p2_s1 * 0.35));
+    // Perhitungan Nilai Semester 1 (4 Komponen: Kuis Sem 1, Drive 7 Kebiasaan, Poster Word, Tabel Excel)
+    let nilaiDrive = s.nilaiDrive;
+    let koleksiDrive = s.koleksiDrive;
+    if (nilaiDrive === undefined || koleksiDrive === undefined) {
+      const driveData = muatDrive7Kebiasaan(s);
+      const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
+      nilaiDrive = (s.nilaiDrive !== undefined) ? s.nilaiDrive : evalDrive.totalSkor;
+      koleksiDrive = (s.koleksiDrive !== undefined) ? s.koleksiDrive : evalDrive.filledCount;
+    }
+
+    const p1_s1 = s.nilaiPoster !== undefined ? s.nilaiPoster : (s.posterWord > 0 ? 90 : 0);
+    const p2_s1 = s.nilaiExcel !== undefined ? s.nilaiExcel : (s.excelTabel > 0 ? 88 : 0);
+    const nilaiSem1 = Math.round(((s.kuisSem1 || 0) * 0.25) + (nilaiDrive * 0.25) + (p1_s1 * 0.25) + (p2_s1 * 0.25));
     const isSem1Pass = (nilaiSem1 >= 80);
 
     // Perhitungan Nilai Semester 2 (2 Penilaian Praktik + Kuis 2)
-    const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : 90;
-    const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : 88;
+    const p1_s2 = s.nilaiScratch !== undefined ? s.nilaiScratch : (s.projekScratch > 0 ? 90 : 0);
+    const p2_s2 = s.nilaiRoboMind !== undefined ? s.nilaiRoboMind : (s.misiRobo > 0 ? 88 : 0);
     const nilaiSem2 = Math.round(((s.kuisSem2 || 0) * 0.3) + (p1_s2 * 0.35) + (p2_s2 * 0.35));
     const isSem2Pass = (nilaiSem2 >= 80);
 
@@ -20098,11 +20501,11 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[210px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-title shadow-md shrink-0">
+            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama}">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
-              <div class="font-title font-black text-slate-900 hover:text-indigo-600 transition cursor-pointer ${szNama} leading-tight" onclick="bukaModalDetailSiswa('${s.id}')" title="${s.nama}">
+              <div class="font-title font-black text-slate-900 hover:text-emerald-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Klik untuk Buka Rapor Digital ${s.nama}">
                 ${s.nama}
               </div>
               <div class="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -20122,6 +20525,16 @@ function renderTabelGradebook(students, totalAll) {
             <span class="font-title font-black ${szAngka} ${isKuis1Pass ? 'text-slate-900' : 'text-rose-600'}">${s.kuisSem1 || 0}</span>
             <span class="font-title font-black ${szTag} px-2.5 py-0.5 rounded-lg mt-1 inline-flex items-center gap-1 shadow-2xs ${isKuis1Pass ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'}">
               ${isKuis1Pass ? 'TUNTAS' : 'REMEDIAL'}
+            </span>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringDriveGuru('${s.id}')" title="Klik untuk Monitoring 7 Gambar & Nama File ${s.nama}">
+            <span class="font-title font-black ${szAngka} text-purple-700 group-hover:text-purple-900 group-hover:scale-110 transition flex items-center gap-1">
+              <i class="fa-solid fa-folder-open text-xs text-purple-500"></i> ${nilaiDrive}
+            </span>
+            <span class="font-title font-bold ${szSub} text-purple-900 mt-1 bg-purple-50 px-2.5 py-0.5 rounded-lg border border-purple-200 shadow-2xs group-hover:bg-purple-100 transition">
+              ${koleksiDrive || 0}/7 Gambar
             </span>
           </div>
         </td>
@@ -20152,6 +20565,12 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
+            <button onclick="bukaModalMonitoringDriveGuru('${s.id}')" title="Monitoring Drive 7 Kebiasaan Siswa" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open"></i>
+            </button>
+            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card"></i>
+            </button>
             <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -20167,11 +20586,11 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[210px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-600 to-sky-500 text-white flex items-center justify-center font-title shadow-md shrink-0">
+            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-600 to-sky-500 text-white flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama}">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
-              <div class="font-title font-black text-slate-900 hover:text-purple-600 transition cursor-pointer ${szNama} leading-tight" onclick="bukaModalDetailSiswa('${s.id}')" title="${s.nama}">
+              <div class="font-title font-black text-slate-900 hover:text-emerald-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Klik untuk Buka Rapor Digital ${s.nama}">
                 ${s.nama}
               </div>
               <div class="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -20221,6 +20640,9 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
+            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card"></i>
+            </button>
             <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -20236,11 +20658,11 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[200px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white flex items-center justify-center font-title shadow-md shrink-0">
+            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama}">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
-              <div class="font-title font-black text-slate-900 hover:text-indigo-600 transition cursor-pointer ${szNama} leading-tight" onclick="bukaModalDetailSiswa('${s.id}')" title="${s.nama}">
+              <div class="font-title font-black text-slate-900 hover:text-emerald-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Klik untuk Buka Rapor Digital ${s.nama}">
                 ${s.nama}
               </div>
               <div class="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -20266,6 +20688,9 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
+            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card"></i>
+            </button>
             <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -20280,6 +20705,144 @@ function renderTabelGradebook(students, totalAll) {
     tbody.appendChild(tr);
   });
 }
+
+// --------------------------------------------------------------------------
+// MODAL MONITORING DRIVE 7 KEBIASAAN SISWA OLEH GURU (TP 2.1)
+// --------------------------------------------------------------------------
+function bukaModalMonitoringDriveGuru(studentId) {
+  try { playSound('click'); } catch (e) {}
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === studentId || s.nis === studentId) || {
+    id: studentId,
+    nama: 'Siswa',
+    kelas: '4A',
+    absen: '01',
+    nis: '-'
+  };
+
+  const modal = document.getElementById('modal-monitoring-drive-guru');
+  if (!modal) return;
+
+  const elNama = document.getElementById('mon-drive-nama');
+  const elKelas = document.getElementById('mon-drive-kelas');
+  const elNis = document.getElementById('mon-drive-nis');
+  const elAbsen = document.getElementById('mon-drive-absen');
+  const elAvatar = document.getElementById('mon-drive-avatar');
+  const elProgressText = document.getElementById('mon-drive-progress-text');
+  const elProgressBar = document.getElementById('mon-drive-progress-bar');
+  const elNilaiBadge = document.getElementById('mon-drive-nilai-badge');
+  const elPenamaanBadge = document.getElementById('mon-drive-penamaan-badge');
+  const elStatusKkm = document.getElementById('mon-drive-status-kkm');
+  const gridContainer = document.getElementById('mon-drive-grid');
+
+  if (elNama) elNama.innerText = student.nama || 'Siswa';
+  if (elKelas) elKelas.innerText = `Kelas ${student.kelas || '4A'}`;
+  if (elNis) elNis.innerText = `NIS: ${student.nis || '-'}`;
+  if (elAbsen) elAbsen.innerText = `Absen: ${student.absen || '-'}`;
+  if (elAvatar) elAvatar.innerText = student.nama ? student.nama.charAt(0).toUpperCase() : 'S';
+
+  const driveData = muatDrive7Kebiasaan(student);
+  const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
+
+  const filled = evalDrive.filledCount;
+  const validNames = evalDrive.validNameCount;
+  const total = 7;
+  const pct = Math.round((filled / total) * 100);
+
+  if (elProgressText) elProgressText.innerText = `${filled} dari 7 Gambar Terkumpul (${pct}%)`;
+  if (elProgressBar) elProgressBar.style.width = `${pct}%`;
+  if (elNilaiBadge) elNilaiBadge.innerText = `Nilai TP 2.1: ${evalDrive.totalSkor}`;
+  if (elPenamaanBadge) elPenamaanBadge.innerText = `${validNames}/7 Format Baku`;
+  if (elStatusKkm) {
+    elStatusKkm.innerText = evalDrive.statusKkm === 'Tuntas' ? 'TUNTAS KKM' : 'BELUM TUNTAS';
+    elStatusKkm.className = evalDrive.statusKkm === 'Tuntas' 
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300';
+  }
+
+  // Render 7 Cards
+  if (gridContainer && Array.isArray(DRIVE_7KEBIASAAN_CONFIG)) {
+    gridContainer.innerHTML = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
+      const item = driveData[cfg.key];
+      const isFilled = !!(item && (item.imageSrc || item.gambar));
+      const imgSrc = item ? (item.imageSrc || item.gambar) : '';
+      const sourceBadge = item ? (item.sourceBadge || 'Gambar') : '';
+      const fileName = item ? (item.fileName || '') : '';
+      const checkName = fileName ? periksaFormatNamaFile(fileName) : { valid: false };
+
+      if (isFilled) {
+        return `
+          <div class="p-3 bg-white rounded-2xl border-2 border-emerald-300 shadow-xs flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-1.5 border-b border-emerald-100">
+                <span class="font-title font-bold text-xs text-slate-800 flex items-center gap-1.5 truncate">
+                  <span class="w-5 h-5 rounded-md bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold shrink-0">${cfg.slotNumber}</span>
+                  <span class="truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</span>
+                </span>
+                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full shrink-0">✓ Ada</span>
+              </div>
+              <div class="relative w-full aspect-video bg-slate-100 rounded-xl overflow-hidden my-2 border border-slate-200">
+                <img src="${imgSrc}" alt="${cfg.cleanTitle}" class="w-full h-full object-cover">
+                <span class="absolute top-1 left-1 text-[9px] font-bold bg-slate-900/80 text-white px-1.5 py-0.5 rounded shadow-2xs">${sourceBadge}</span>
+              </div>
+            </div>
+            <div class="pt-1.5 border-t border-slate-100 text-[10px] space-y-1">
+              <div class="font-mono text-slate-700 truncate font-semibold" title="${fileName || 'Tanpa nama'}">
+                📄 ${fileName || '<i class="text-slate-400 font-normal">Belum dinamai</i>'}
+              </div>
+              <div class="flex items-center gap-1">
+                ${checkName.valid 
+                  ? '<span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"><i class="fa-solid fa-check"></i> Format Baku</span>' 
+                  : '<span class="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200"><i class="fa-solid fa-triangle-exclamation"></i> Belum Baku</span>'}
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="p-3 bg-slate-50/80 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col justify-between text-center min-h-[160px]">
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 text-slate-400">
+              <span class="font-title font-bold text-xs text-slate-500 flex items-center gap-1.5 truncate">
+                <span class="w-5 h-5 rounded-md bg-slate-200 text-slate-500 text-[10px] flex items-center justify-center font-bold shrink-0">${cfg.slotNumber}</span>
+                <span class="truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</span>
+              </span>
+              <span class="text-[9px] font-bold text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded-full shrink-0">Kosong</span>
+            </div>
+            <div class="py-4 text-slate-300">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+              <p class="text-[10px] text-slate-400 mt-1">Belum ada gambar</p>
+            </div>
+            <div class="text-[10px] text-slate-400 italic pt-1 border-t border-slate-200/60">
+              Slot ${cfg.slotNumber}
+            </div>
+          </div>
+        `;
+      }
+    }).join('');
+  }
+
+  const btnEdit = document.getElementById('btn-mon-drive-edit-nilai');
+  if (btnEdit) {
+    btnEdit.onclick = () => {
+      tutupModalMonitoringDriveGuru();
+      bukaModalDetailSiswa(student.id);
+    };
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+window.bukaModalMonitoringDriveGuru = bukaModalMonitoringDriveGuru;
+
+function tutupModalMonitoringDriveGuru() {
+  playSound('click');
+  const modal = document.getElementById('modal-monitoring-drive-guru');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+}
+window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 
 // --------------------------------------------------------------------------
 // MODAL DETAIL & EVALUASI SISWA
@@ -20299,6 +20862,8 @@ function bukaModalDetailSiswa(studentId) {
   const inputAbsen = document.getElementById('modal-edit-absen');
   const inputKuis1 = document.getElementById('modal-edit-kuis1');
   const inputKuis2 = document.getElementById('modal-edit-kuis2');
+  const inputNilaiDrive = document.getElementById('modal-edit-nilai-drive');
+  const inputDriveCount = document.getElementById('modal-edit-drive-count');
   const inputNilaiPoster = document.getElementById('modal-edit-nilai-poster');
   const inputPoster = document.getElementById('modal-edit-poster');
   const inputNilaiExcel = document.getElementById('modal-edit-nilai-excel');
@@ -20310,15 +20875,20 @@ function bukaModalDetailSiswa(studentId) {
   const inputBintang = document.getElementById('modal-edit-bintang');
   const inputCatatan = document.getElementById('modal-detail-catatan');
 
+  const driveData = muatDrive7Kebiasaan(student);
+  const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
+
   if (inputNama) inputNama.value = student.nama || '';
   if (inputNis) inputNis.value = student.nis || '';
   if (inputKelas) inputKelas.value = student.kelas || '4A';
   if (inputAbsen) inputAbsen.value = student.absen || '01';
   if (inputKuis1) inputKuis1.value = student.kuisSem1 !== undefined ? student.kuisSem1 : 0;
   if (inputKuis2) inputKuis2.value = student.kuisSem2 !== undefined ? student.kuisSem2 : 0;
-  if (inputNilaiPoster) inputNilaiPoster.value = student.nilaiPoster !== undefined ? student.nilaiPoster : (student.posterWord > 0 ? 90 : 85);
+  if (inputNilaiDrive) inputNilaiDrive.value = student.nilaiDrive !== undefined ? student.nilaiDrive : evalDrive.totalSkor;
+  if (inputDriveCount) inputDriveCount.value = student.koleksiDrive !== undefined ? student.koleksiDrive : evalDrive.filledCount;
+  if (inputNilaiPoster) inputNilaiPoster.value = student.nilaiPoster !== undefined ? student.nilaiPoster : (student.posterWord > 0 ? 90 : 0);
   if (inputPoster) inputPoster.value = student.posterWord !== undefined ? student.posterWord : 0;
-  if (inputNilaiExcel) inputNilaiExcel.value = student.nilaiExcel !== undefined ? student.nilaiExcel : (student.excelTabel > 0 ? 88 : 85);
+  if (inputNilaiExcel) inputNilaiExcel.value = student.nilaiExcel !== undefined ? student.nilaiExcel : (student.excelTabel > 0 ? 88 : 0);
   if (inputExcel) inputExcel.value = student.excelTabel !== undefined ? student.excelTabel : 0;
   if (inputNilaiScratch) inputNilaiScratch.value = student.nilaiScratch !== undefined ? student.nilaiScratch : 90;
   if (inputScratch) inputScratch.value = student.projekScratch !== undefined ? student.projekScratch : 2;
@@ -20361,6 +20931,8 @@ function simpanPerubahanDataSiswaModal() {
   const inputAbsen = document.getElementById('modal-edit-absen');
   const inputKuis1 = document.getElementById('modal-edit-kuis1');
   const inputKuis2 = document.getElementById('modal-edit-kuis2');
+  const inputNilaiDrive = document.getElementById('modal-edit-nilai-drive');
+  const inputDriveCount = document.getElementById('modal-edit-drive-count');
   const inputNilaiPoster = document.getElementById('modal-edit-nilai-poster');
   const inputPoster = document.getElementById('modal-edit-poster');
   const inputNilaiExcel = document.getElementById('modal-edit-nilai-excel');
@@ -20383,6 +20955,8 @@ function simpanPerubahanDataSiswaModal() {
   }
   const kuis1 = inputKuis1 ? parseInt(inputKuis1.value) || 0 : 0;
   const kuis2 = inputKuis2 ? parseInt(inputKuis2.value) || 0 : 0;
+  const nilaiDrive = inputNilaiDrive ? parseInt(inputNilaiDrive.value) || 0 : 0;
+  const koleksiDrive = inputDriveCount ? parseInt(inputDriveCount.value) || 0 : 0;
   const nilaiPoster = inputNilaiPoster ? parseInt(inputNilaiPoster.value) || 0 : 0;
   const poster = inputPoster ? parseInt(inputPoster.value) || 0 : 0;
   const nilaiExcel = inputNilaiExcel ? parseInt(inputNilaiExcel.value) || 0 : 0;
@@ -20408,6 +20982,8 @@ function simpanPerubahanDataSiswaModal() {
     student.absen = absen;
     student.kuisSem1 = kuis1;
     student.kuisSem2 = kuis2;
+    student.nilaiDrive = nilaiDrive;
+    student.koleksiDrive = koleksiDrive;
     student.nilaiPoster = nilaiPoster;
     student.posterWord = poster;
     student.nilaiExcel = nilaiExcel;
@@ -20420,8 +20996,8 @@ function simpanPerubahanDataSiswaModal() {
     student.catatanGuru = catatan;
     student.terakhirAktif = 'Diedit Guru';
 
-    const avg = Math.round((kuis1 + kuis2 + nilaiPoster + nilaiExcel + nilaiScratch + nilaiRoboMind) / 6);
-    student.statusKkm = avg >= 80 ? 'Tuntas' : 'Remedial';
+    const nilaiSem1 = Math.round((kuis1 * 0.25) + (nilaiDrive * 0.25) + (nilaiPoster * 0.25) + (nilaiExcel * 0.25));
+    student.statusKkm = nilaiSem1 >= 80 ? 'Tuntas' : 'Remedial';
 
     saveStudentDatabase(db);
 
@@ -21955,27 +22531,59 @@ function doPost(e) {
       payload.title || payload.keterangan || "-"
     ]);
 
-    // 2. Jika payload berisi karya poster / portofolio gambar siswa, simpan link/metadata ke Tab PORTOFOLIO KARYA
-    if (payload.event === "simpan_poster" || payload.type === "poster" || payload.image) {
-      var sheetKarya = ss.getSheetByName("PORTOFOLIO KARYA SISWA");
+    // 2. SIMPAN BERKAS GAMBAR ASLI KE GOOGLE DRIVE
+    var driveFileUrl = "-";
+    if (payload.image && typeof payload.image === "string" && payload.image.indexOf("base64,") !== -1) {
+      try {
+        var base64Data = payload.image.split("base64,")[1];
+        var decoded = Utilities.base64Decode(base64Data);
+        var isJpeg = payload.image.indexOf("image/jpeg") !== -1;
+        var ext = isJpeg ? ".jpg" : ".png";
+        var mime = isJpeg ? "image/jpeg" : "image/png";
+        var rawNama = payload.fileName || payload.title || ("Karya_" + (payload.nama || "Siswa"));
+        var namaFile = rawNama.replace(/[^a-zA-Z0-9_\- ]/g, "").trim() + ext;
+        var blob = Utilities.newBlob(decoded, mime, namaFile);
+
+        // Cari atau buat Folder Utama "Karya Siswa - EduCode AI" di Google Drive
+        var mainFolderName = "Karya Siswa - EduCode AI";
+        var folders = DriveApp.getFoldersByName(mainFolderName);
+        var mainFolder = folders.hasNext() ? folders.next() : DriveApp.createFolder(mainFolderName);
+
+        // Buat subfolder kelas (misal: "Kelas 4A")
+        var subFolderName = payload.kelas ? ("Kelas " + payload.kelas) : "Kelas 4";
+        var subFolders = mainFolder.getFoldersByName(subFolderName);
+        var targetFolder = subFolders.hasNext() ? subFolders.next() : mainFolder.createFolder(subFolderName);
+
+        var file = targetFolder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        driveFileUrl = file.getUrl();
+      } catch (errDrive) {
+        driveFileUrl = "Gagal simpan Drive: " + errDrive.toString();
+      }
+    }
+
+    // 3. Rekam Portofolio & Link Google Drive ke Tab PORTOFOLIO GOOGLE DRIVE
+    if (payload.event === "simpan_poster" || payload.event === "simpan_slot_drive" || payload.type === "poster" || payload.type === "drive_7kebiasaan" || payload.image) {
+      var sheetKarya = ss.getSheetByName("PORTOFOLIO GOOGLE DRIVE");
       if (!sheetKarya) {
-        sheetKarya = ss.insertSheet("PORTOFOLIO KARYA SISWA");
-        sheetKarya.appendRow(["Waktu", "NIS", "Nama Siswa", "Kelas", "Judul Karya", "Tipe", "Ringkasan Dokumen"]);
+        sheetKarya = ss.insertSheet("PORTOFOLIO GOOGLE DRIVE");
+        sheetKarya.appendRow(["Waktu", "NIS", "Nama Siswa", "Kelas", "Judul Karya / Slot", "Tipe", "Link Google Drive"]);
       }
       sheetKarya.appendRow([
         new Date(),
         payload.nis || "-",
         payload.nama || "-",
         payload.kelas || "-",
-        payload.title || "Poster_Word_Siswa",
-        payload.type || "Poster Word",
-        payload.summary || "Dokumen Poster Kreator Cilik"
+        payload.title || payload.habitKey || "Karya Siswa",
+        payload.type || "Gambar",
+        driveFileUrl
       ]);
     }
     
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      message: "Data & Nilai berhasil direkam di Google Sheets!"
+      message: "Data & Berkas Gambar berhasil disimpan di Google Drive & Google Sheets!",
+      driveUrl: driveFileUrl
     })).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({

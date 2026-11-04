@@ -2204,6 +2204,43 @@ body.typing-screen-locked {
   max-height: 52vh !important;
 }
 
+/* ======================================================== */
+/* PRINT STYLING KHUSUS CETAK RAPOR DIGITAL SISWA           */
+/* ======================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  body > * {
+    visibility: hidden !important;
+  }
+  #modal-profil-siswa, #modal-profil-siswa * {
+    visibility: visible !important;
+  }
+  #modal-profil-siswa {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+  #modal-profil-siswa > div {
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 10px !important;
+  }
+  #profil-view-card button, #profil-view-form, .planet-interactive, nav, header {
+    display: none !important;
+  }
+}
+
+
 
 
 

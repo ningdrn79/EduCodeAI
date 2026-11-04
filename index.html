@@ -55,7 +55,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261103_layar_statis_ketik_v1">
+  <link rel="stylesheet" href="styles.css?v=20261103_rapor_print_v2">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -12837,21 +12837,27 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 max-h-[92vh] overflow-y-auto">
       
       <!-- TAMPILAN 1: KARTU PELAJAR & RAPOR DIGITAL SISWA (AKTIF SAAT LOGIN) -->
+      <!-- TAMPILAN 1: KARTU PELAJAR & RAPOR DIGITAL SISWA (BERSUMBER LANGSUNG DARI TABEL GURU) -->
       <div id="profil-view-card" class="space-y-4">
         <!-- Header Kartu Pelajar -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center gap-2.5">
-            <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+            <span class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center font-bold text-sm shadow-md">
               <i class="fa-solid fa-id-card"></i>
             </span>
             <div>
-              <h4 class="font-title font-bold text-slate-800 text-sm sm:text-base leading-tight">Kartu Pelajar & Rapor Digital</h4>
-              <span class="text-[11px] text-slate-400">SDS Cinta Kasih Tzu Chi • Tahun 2026/2027</span>
+              <h4 class="font-title font-black text-slate-800 text-sm sm:text-base leading-tight">Kartu Pelajar & Rapor Digital</h4>
+              <span id="card-rapor-periode-label" class="text-[11px] text-slate-400">SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 / Ganjil)</span>
             </div>
           </div>
-          <button onclick="tutupModalProfilSiswa()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm transition">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button onclick="cetakRaporDigitalSiswa()" title="Cetak Rapor Digital" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 flex items-center justify-center text-sm transition cursor-pointer">
+              <i class="fa-solid fa-print"></i>
+            </button>
+            <button onclick="tutupModalProfilSiswa()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm transition">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Kartu Identitas Siswa Tzu Chi (Gaya Kartu Pelajar Modern) -->
@@ -12861,49 +12867,103 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
             <div id="card-siswa-avatar" class="w-14 h-14 rounded-2xl bg-white text-emerald-700 flex items-center justify-center font-black text-2xl shadow-lg flex-shrink-0">
               A
             </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 uppercase tracking-wide">Pelajar Aktif</span>
-                <span id="card-siswa-status-kkm" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 shadow-2xs">TUNTAS KKM</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="card-siswa-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 uppercase tracking-wide">Pelajar Aktif</span>
+                <span id="card-siswa-status-kkm" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-900 shadow-2xs">TUNTAS KKM</span>
               </div>
-              <h3 id="card-siswa-nama" class="font-title font-black text-lg sm:text-xl text-white mt-1 leading-tight">Aditya Pratama</h3>
+              <h3 id="card-siswa-nama" class="font-title font-black text-lg sm:text-xl text-white mt-1 leading-tight truncate">Nama Siswa</h3>
               <div class="text-xs text-emerald-100 mt-1 flex items-center gap-2 flex-wrap">
-                <span id="card-siswa-nis" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/20 text-white border border-white/30 font-mono tracking-wider">NIS: 4101</span>
+                <span id="card-siswa-nis" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/20 text-white border border-white/30 font-mono tracking-wider">NIS: -</span>
                 <span>•</span>
                 <span id="card-siswa-kelas" class="font-bold">Kelas 4A</span>
                 <span>•</span>
-                <span id="card-siswa-absen">No. Absen: 01</span>
+                <span id="card-siswa-absen">No. Absen: -</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Rangkuman Nilai & Capaian Belajar -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kuis Sem 1</div>
-            <div id="card-siswa-kuis1" class="text-xl font-black text-slate-800 mt-0.5">100</div>
-            <div class="text-[10px] text-emerald-600 font-bold">Tuntas KKM</div>
+        <!-- SEKTOR 1: PENILAIAN SEMESTER 1 (KONTEN DIGITAL, WORD & EXCEL) -->
+        <div class="space-y-2 pt-1">
+          <div class="flex items-center justify-between text-xs px-1">
+            <span class="font-title font-black text-indigo-950 flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
+              <i class="fa-solid fa-book-open text-indigo-600"></i> Capaian Nilai Semester 1 (Konten Digital, Word & Excel)
+            </span>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">KKM: 80</span>
           </div>
-          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kuis Sem 2</div>
-            <div id="card-siswa-kuis2" class="text-xl font-black text-slate-800 mt-0.5">90</div>
-            <div class="text-[10px] text-emerald-600 font-bold">Tuntas KKM</div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <!-- 1. Kuis Sem 1 -->
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kuis Sem 1</div>
+              <div id="card-siswa-kuis1" class="text-xl font-black text-slate-900 my-0.5">0</div>
+              <div id="card-siswa-kuis1-status" class="text-[10px] text-rose-600 font-bold">REMEDIAL</div>
+            </div>
+            <!-- 2. Drive 7 Kebiasaan (TP 2.1) -->
+            <div class="p-2.5 rounded-xl bg-purple-50/70 border border-purple-200 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-purple-800 font-bold uppercase tracking-wider">Drive TP 2.1</div>
+              <div id="card-siswa-drive" class="text-xl font-black text-purple-700 my-0.5">0</div>
+              <div id="card-siswa-drive-sub" class="text-[10px] text-purple-600 font-semibold">0 Gambar</div>
+            </div>
+            <!-- 3. 1. Poster Word -->
+            <div class="p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-indigo-800 font-bold uppercase tracking-wider">1. Poster Word</div>
+              <div id="card-siswa-poster" class="text-xl font-black text-indigo-700 my-0.5">0</div>
+              <div id="card-siswa-poster-sub" class="text-[10px] text-indigo-600 font-semibold">0 Poster</div>
+            </div>
+            <!-- 4. 2. Tabel Excel -->
+            <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">2. Tabel Excel</div>
+              <div id="card-siswa-excel" class="text-xl font-black text-emerald-700 my-0.5">0</div>
+              <div id="card-siswa-excel-sub" class="text-[10px] text-emerald-600 font-semibold">0 Latihan</div>
+            </div>
+            <!-- 5. Nilai Sem 1 -->
+            <div class="p-2.5 rounded-xl bg-blue-50/80 border-2 border-blue-300 text-center flex flex-col justify-between shadow-2xs col-span-2 sm:col-span-1">
+              <div class="text-[10px] text-blue-900 font-black uppercase tracking-wider">Nilai Sem 1</div>
+              <div id="card-siswa-nilai-sem1" class="text-xl font-black text-blue-900 my-0.5">0</div>
+              <div id="card-siswa-nilai-sem1-status" class="text-[10px] text-rose-600 font-black">REMEDIAL</div>
+            </div>
           </div>
-          <div class="p-3 rounded-xl bg-indigo-50/60 border border-indigo-200 text-center">
-            <div class="text-[10px] text-indigo-700 font-bold uppercase tracking-wider">Nilai Poster Word</div>
-            <div id="card-siswa-poster" class="text-xl font-black text-indigo-700 mt-0.5">90</div>
-            <div id="card-siswa-poster-sub" class="text-[10px] text-indigo-500 font-semibold">1 Karya</div>
+        </div>
+
+        <!-- SEKTOR 2: PENILAIAN SEMESTER 2 (CODING SCRATCH & ROBOMIND AI) - HANYA AKTIF JIKA SEMESTER 2 DIBUKA GURU -->
+        <div id="sektor-rapor-sem2" class="space-y-2 pt-1 hidden" style="display: none;">
+          <div class="flex items-center justify-between text-xs px-1">
+            <span class="font-title font-black text-purple-950 flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
+              <i class="fa-solid fa-robot text-purple-600"></i> Capaian Nilai Semester 2 (Coding Scratch & RoboMind AI)
+            </span>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">KKM: 80</span>
           </div>
-          <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 text-center">
-            <div class="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Nilai Tabel Excel</div>
-            <div id="card-siswa-excel" class="text-xl font-black text-emerald-700 mt-0.5">88</div>
-            <div id="card-siswa-excel-sub" class="text-[10px] text-emerald-500 font-semibold">1 Latihan</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <!-- Kuis Sem 2 -->
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kuis Sem 2</div>
+              <div id="card-siswa-kuis2" class="text-xl font-black text-slate-900 my-0.5">0</div>
+              <div id="card-siswa-kuis2-status" class="text-[10px] text-rose-600 font-bold">REMEDIAL</div>
+            </div>
+            <!-- 1. Scratch Coding -->
+            <div class="p-2.5 rounded-xl bg-purple-50/70 border border-purple-200 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-purple-800 font-bold uppercase tracking-wider">1. Scratch Coding</div>
+              <div id="card-siswa-scratch" class="text-xl font-black text-purple-700 my-0.5">0</div>
+              <div id="card-siswa-scratch-sub" class="text-[10px] text-purple-600 font-semibold">0 Projek</div>
+            </div>
+            <!-- 2. RoboMind AI -->
+            <div class="p-2.5 rounded-xl bg-sky-50/70 border border-sky-200 text-center flex flex-col justify-between">
+              <div class="text-[10px] text-sky-800 font-bold uppercase tracking-wider">2. RoboMind & AI</div>
+              <div id="card-siswa-robo" class="text-xl font-black text-sky-700 my-0.5">0</div>
+              <div id="card-siswa-robo-sub" class="text-[10px] text-sky-600 font-semibold">0 Misi</div>
+            </div>
+            <!-- Nilai Sem 2 -->
+            <div class="p-2.5 rounded-xl bg-purple-50/80 border-2 border-purple-300 text-center flex flex-col justify-between shadow-2xs">
+              <div class="text-[10px] text-purple-900 font-black uppercase tracking-wider">Nilai Sem 2</div>
+              <div id="card-siswa-nilai-sem2" class="text-xl font-black text-purple-900 my-0.5">0</div>
+              <div id="card-siswa-nilai-sem2-status" class="text-[10px] text-rose-600 font-black">REMEDIAL</div>
+            </div>
           </div>
         </div>
 
         <!-- Poin Bintang & Capaian TP -->
-        <div class="p-3.5 bg-amber-50/80 rounded-xl border border-amber-200 flex items-center justify-between">
+        <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-star text-amber-500 text-lg"></i>
             <div>
@@ -12911,36 +12971,42 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
               <div class="text-[11px] text-amber-700">Dikumpulkan dari kuis dan latihan modul</div>
             </div>
           </div>
-          <div id="card-siswa-bintang" class="text-xl font-black text-amber-600">325 ⭐</div>
+          <div id="card-siswa-bintang" class="text-xl font-black text-amber-600">0 ⭐</div>
         </div>
 
         <!-- Catatan & Apresiasi Guru -->
-        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5">
+        <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
           <div class="flex items-center justify-between text-xs">
             <span class="font-bold text-slate-700 flex items-center gap-1.5">
               <i class="fa-solid fa-comment-dots text-indigo-600"></i> Catatan & Apresiasi Ibu Guru:
             </span>
-            <span class="text-[11px] text-slate-400">DARNINGSIH, ST</span>
+            <span class="text-[11px] font-bold text-slate-600">DARNINGSIH, S.T.</span>
           </div>
           <p id="card-siswa-catatan" class="text-xs text-slate-600 italic bg-white p-2.5 rounded-xl border border-slate-200/60 leading-relaxed">
-            "Sangat mandiri dan teliti merumuskan tabel Excel dan desain poster."
+            "Data resmi tersinkron dari Buku Nilai Google Sheet"
           </p>
         </div>
 
         <!-- Tombol Aksi di Tampilan Kartu -->
         <div class="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2">
           <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="tampilkanFormGantiSiswa()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5">
+            <button id="btn-rapor-ganti-akun" onclick="tampilkanFormGantiSiswa()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
               <i class="fa-solid fa-user-pen"></i> Ganti Akun
+            </button>
+            <button id="btn-rapor-edit-nilai" class="hidden px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-pen-to-square"></i> Edit Nilai Siswa
             </button>
             <button onclick="tutupModalProfilSiswa(); bukaKuisAtauSertifikatSiswa();" class="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
               <i class="fa-solid fa-award text-amber-900"></i> Sertifikat Kuis 🏆
             </button>
-            <button onclick="konfirmasiKeluarSiswa()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Keluar Akun Siswa">
+            <button onclick="cetakRaporDigitalSiswa()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Cetak Rapor Digital">
+              <i class="fa-solid fa-print"></i> Cetak
+            </button>
+            <button id="btn-rapor-keluar" onclick="konfirmasiKeluarSiswa()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Keluar Akun Siswa">
               <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
             </button>
           </div>
-          <button onclick="tutupModalProfilSiswa()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-title font-bold text-xs shadow-md transition">
+          <button onclick="tutupModalProfilSiswa()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-title font-bold text-xs shadow-md transition cursor-pointer">
             Lanjut Belajar
           </button>
         </div>
@@ -13119,33 +13185,60 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
           </div>
         </div>
 
-        <!-- 2 Penilaian Semester 1 -->
+        <!-- 3 Penilaian Semester 1 (Drive 7 Kebiasaan, Poster Word, Tabel Excel) -->
         <div class="border-t border-slate-200/80 pt-2.5">
-          <div class="text-[11px] font-bold text-indigo-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <i class="fa-solid fa-book-open"></i> Penilaian Semester 1 (2 Penilaian Praktik):
+          <div class="text-[11px] font-bold text-indigo-700 uppercase tracking-wider mb-2 flex items-center justify-between flex-wrap gap-1">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-book-open"></i> Penilaian Semester 1 (3 Praktik):</span>
+            <button type="button" onclick="bukaModalMonitoringDriveGuru(state.selectedStudentId)" class="px-2 py-0.5 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer" title="Lihat 7 gambar & nama file siswa">
+              <i class="fa-solid fa-folder-open text-purple-600"></i> Intip Drive 7 Kebiasaan Siswa
+            </button>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="p-2.5 rounded-xl bg-white border border-indigo-100 shadow-2xs">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <!-- 1. Drive 7 Kebiasaan (TP 2.1) -->
+            <div class="p-2.5 rounded-xl bg-white border border-purple-200 shadow-2xs">
               <div class="flex justify-between items-center mb-1">
-                <label class="text-[11px] font-bold text-indigo-950">1. Poster Word:</label>
-                <span class="text-[9px] text-slate-400 font-medium">Skala 0-100</span>
+                <label class="text-[11px] font-bold text-purple-950 truncate" title="Drive 7 Kebiasaan">Drive Kebiasaan:</label>
+                <span class="text-[9px] text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded">TP 2.1</span>
               </div>
-              <input type="number" id="modal-edit-nilai-poster" min="0" max="100" placeholder="Contoh: 90" class="w-full font-black text-indigo-700 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <input type="number" id="modal-edit-nilai-drive" min="0" max="100" placeholder="0-100" class="w-full font-black text-purple-700 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500">
               <div class="mt-1.5 flex items-center justify-between text-[10px] text-slate-500">
-                <span>Jumlah Poster:</span>
-                <input type="number" id="modal-edit-poster" min="0" max="99" class="w-14 text-center font-bold px-1.5 py-0.5 rounded border border-slate-200 bg-white text-[11px]">
+                <span>Koleksi:</span>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="modal-edit-drive-count" min="0" max="7" class="w-10 text-center font-bold px-1 py-0.5 rounded border border-slate-200 bg-white text-[11px]">
+                  <span>/7 Gbr</span>
+                </div>
               </div>
             </div>
 
+            <!-- 2. Poster Word (TP 2.2) -->
+            <div class="p-2.5 rounded-xl bg-white border border-indigo-100 shadow-2xs">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-[11px] font-bold text-indigo-950">1. Poster Word:</label>
+                <span class="text-[9px] text-indigo-600 font-bold bg-indigo-50 px-1.5 py-0.5 rounded">TP 2.2</span>
+              </div>
+              <input type="number" id="modal-edit-nilai-poster" min="0" max="100" placeholder="0-100" class="w-full font-black text-indigo-700 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <div class="mt-1.5 flex items-center justify-between text-[10px] text-slate-500">
+                <span>Jumlah:</span>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="modal-edit-poster" min="0" max="99" class="w-10 text-center font-bold px-1 py-0.5 rounded border border-slate-200 bg-white text-[11px]">
+                  <span>Poster</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Tabel Excel (TP 2.3) -->
             <div class="p-2.5 rounded-xl bg-white border border-emerald-100 shadow-2xs">
               <div class="flex justify-between items-center mb-1">
                 <label class="text-[11px] font-bold text-emerald-950">2. Tabel Excel:</label>
-                <span class="text-[9px] text-slate-400 font-medium">Skala 0-100</span>
+                <span class="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">TP 2.3</span>
               </div>
-              <input type="number" id="modal-edit-nilai-excel" min="0" max="100" placeholder="Contoh: 88" class="w-full font-black text-emerald-700 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <input type="number" id="modal-edit-nilai-excel" min="0" max="100" placeholder="0-100" class="w-full font-black text-emerald-700 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
               <div class="mt-1.5 flex items-center justify-between text-[10px] text-slate-500">
-                <span>Jumlah Latihan:</span>
-                <input type="number" id="modal-edit-excel" min="0" max="99" class="w-14 text-center font-bold px-1.5 py-0.5 rounded border border-slate-200 bg-white text-[11px]">
+                <span>Jumlah:</span>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="modal-edit-excel" min="0" max="99" class="w-10 text-center font-bold px-1 py-0.5 rounded border border-slate-200 bg-white text-[11px]">
+                  <span>Latihan</span>
+                </div>
               </div>
             </div>
           </div>
@@ -13198,18 +13291,120 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
       </div>
 
       <!-- Footer Tombol Aksi -->
-      <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-        <button onclick="hapusSiswaTerpilih()" class="px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5">
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2">
+        <button onclick="hapusSiswaTerpilih()" class="px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
           <i class="fa-solid fa-trash-can"></i> Hapus Siswa
         </button>
-        <div class="flex gap-2">
-          <button onclick="tutupModalDetailSiswa()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" onclick="bukaModalMonitoringDriveGuru(state.selectedStudentId)" class="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Lihat 7 Gambar & Penamaan File Siswa">
+            <i class="fa-solid fa-folder-open text-purple-600"></i> Monitoring Drive
+          </button>
+          <button type="button" onclick="bukaRaporDigitalDariGuru(state.selectedStudentId)" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Lihat Tampilan Kartu Pelajar & Rapor Digital Siswa ini">
+            <i class="fa-solid fa-id-card text-emerald-600"></i> Rapor Digital
+          </button>
+          <button onclick="tutupModalDetailSiswa()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition cursor-pointer">
             Batal
           </button>
-          <button onclick="simpanPerubahanDataSiswaModal()" class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-1.5">
+          <button onclick="simpanPerubahanDataSiswaModal()" class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ======================================================== -->
+  <!-- MODAL: PILIH SUMBER GAMBAR DRIVE 7 KEBIASAAN (TP 2.1)    -->
+  <!-- ======================================================== -->
+  <div id="modal-pilih-sumber-drive" class="fixed inset-0 z-[9995] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalPilihSumberSlot()">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border-2 border-purple-200 space-y-4">
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <div>
+            <h4 id="modal-pilih-slot-title" class="font-title font-black text-slate-800 text-base sm:text-lg leading-tight">Pilih Sumber Gambar</h4>
+            <p class="text-[11px] text-slate-500">Misi TP 2.1 • Masukkan gambar ke dalam slot Drive</p>
+          </div>
+        </div>
+        <button type="button" onclick="tutupModalPilihSumberSlot()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm transition cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Pilihan 5 Sumber Gambar -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- 1. Upload dari Komputer / HP -->
+        <button type="button" onclick="aksiPilihSumberSlot('upload')" class="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-2 border-blue-200 hover:border-blue-400 text-left transition flex items-center gap-3 group cursor-pointer shadow-2xs">
+          <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition shrink-0">
+            <i class="fa-solid fa-laptop-file"></i>
+          </div>
+          <div>
+            <div class="font-title font-bold text-xs sm:text-sm text-slate-800">Upload File Komputer</div>
+            <div class="text-[10px] text-slate-500">Pilih foto/gambar dari laptop atau galeri (.jpg, .png)</div>
+          </div>
+        </button>
+
+        <!-- 2. Vektor Edukasi HD (Instan) -->
+        <button type="button" onclick="aksiPilihSumberSlot('vektor_instan')" class="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border-2 border-emerald-200 hover:border-emerald-400 text-left transition flex items-center gap-3 group cursor-pointer shadow-2xs">
+          <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition shrink-0">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <div class="font-title font-bold text-xs sm:text-sm text-slate-800">Vektor Edukasi HD ⭐</div>
+            <div class="text-[10px] text-emerald-700 font-semibold">1-Klik Pasang Vektor Standar Resmi</div>
+          </div>
+        </button>
+
+        <!-- 3. Katalog Kartun Edukasi -->
+        <button type="button" onclick="aksiPilihSumberSlot('search')" class="p-3.5 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border-2 border-purple-200 hover:border-purple-400 text-left transition flex items-center gap-3 group cursor-pointer shadow-2xs">
+          <div class="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition shrink-0">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <div>
+            <div class="font-title font-bold text-xs sm:text-sm text-slate-800">Pencarian Kartun</div>
+            <div class="text-[10px] text-slate-500">Pilih dari 30+ ilustrasi kartun sopan ramah anak</div>
+          </div>
+        </button>
+
+        <!-- 4. Gambar Sendiri di Paint -->
+        <button type="button" onclick="aksiPilihSumberSlot('paint')" class="p-3.5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-2 border-amber-200 hover:border-amber-400 text-left transition flex items-center gap-3 group cursor-pointer shadow-2xs">
+          <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition shrink-0">
+            <i class="fa-solid fa-paintbrush"></i>
+          </div>
+          <div>
+            <div class="font-title font-bold text-xs sm:text-sm text-slate-800">Gambar Sendiri (Paint)</div>
+            <div class="text-[10px] text-slate-500">Lukis karya manual dengan kuas & warna di Lab Paint</div>
+          </div>
+        </button>
+
+        <!-- 5. Studio AI Generatif -->
+        <button type="button" onclick="aksiPilihSumberSlot('ai')" class="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-50 to-sky-50 hover:from-indigo-100 hover:to-sky-100 border-2 border-indigo-200 hover:border-indigo-400 text-left transition flex items-center gap-3 group cursor-pointer shadow-2xs sm:col-span-2">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition shrink-0">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <div class="font-title font-bold text-xs sm:text-sm text-slate-800 flex items-center gap-2">
+              <span>Studio Gambar AI Generatif</span>
+              <span class="px-2 py-0.2 rounded-full text-[9px] bg-purple-100 text-purple-700 font-extrabold uppercase">Otomatis</span>
+            </div>
+            <div class="text-[10px] text-slate-500">Buat gambar cerdas dengan kecerdasan buatan berbasis teks prompt</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span class="text-[11px] flex items-center gap-1.5 text-purple-700 font-medium">
+          <i class="fa-solid fa-shield-halved text-purple-500"></i> Gambar otomatis dikompresi agar hemat & cepat disimpan
+        </span>
+        <button type="button" onclick="tutupModalPilihSumberSlot()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs rounded-xl transition cursor-pointer">
+          Batal
+        </button>
       </div>
     </div>
   </div>
@@ -13432,6 +13627,86 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
   </div>
 
 
+
+  <!-- ======================================================== -->
+  <!-- MODAL: MONITORING DRIVE 7 KEBIASAAN SISWA OLEH GURU      -->
+  <!-- ======================================================== -->
+  <div id="modal-monitoring-drive-guru" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalMonitoringDriveGuru()">
+    <div class="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-purple-200 flex flex-col max-h-[92vh] overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-purple-700 via-indigo-700 to-sky-700 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="mon-drive-avatar" class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0">
+            👤
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white uppercase tracking-wider">Monitoring Guru</span>
+              <span id="mon-drive-status-kkm" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-300 text-slate-900">BELUM TUNTAS</span>
+            </div>
+            <h4 id="mon-drive-nama" class="font-title font-black text-base sm:text-lg leading-tight truncate">Nama Siswa</h4>
+            <div class="flex items-center gap-2 text-xs text-purple-100 mt-0.5 flex-wrap">
+              <span id="mon-drive-kelas" class="font-bold">Kelas 4A</span>
+              <span>•</span>
+              <span id="mon-drive-nis">NIS: -</span>
+              <span>•</span>
+              <span id="mon-drive-absen">Absen: -</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="tutupModalMonitoringDriveGuru()" class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-sm transition cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Summary KPI & Progress Bar -->
+      <div class="p-4 bg-purple-50/70 border-b border-purple-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+        <div class="w-full sm:w-1/2 space-y-1.5">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-folder-open text-purple-600"></i> Progres Koleksi Berkas:</span>
+            <span id="mon-drive-progress-text" class="text-purple-700 font-bold">0 dari 7 Terkumpul (0%)</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-slate-200 overflow-hidden shadow-inner">
+            <div id="mon-drive-progress-bar" class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500 transition-all duration-500" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="mon-drive-nilai-badge" class="px-3 py-1.5 rounded-xl text-xs font-black bg-purple-600 text-white shadow-2xs">
+            Nilai TP 2.1: 0
+          </span>
+          <span id="mon-drive-penamaan-badge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-indigo-900 border border-indigo-200 shadow-2xs">
+            0/7 Format Baku
+          </span>
+        </div>
+      </div>
+
+      <!-- 7 Cards Grid -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-3 bg-slate-50">
+        <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+          <span class="font-bold uppercase tracking-wider text-[11px]"><i class="fa-solid fa-images text-indigo-500 mr-1"></i> Koleksi 7 Slot Kebiasaan Baik:</span>
+          <span class="text-[10px]">Format Baku: <code>Kelas_Nama_Keterangan</code></span>
+        </div>
+        <div id="mon-drive-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <!-- 7 slots dynamically rendered -->
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between flex-wrap gap-2 shrink-0">
+        <span class="text-[11px] text-slate-500 flex items-center gap-1">
+          <i class="fa-solid fa-circle-info text-purple-600"></i> Data tersinkron dari penyimpanan akun belajar siswa
+        </span>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btn-mon-drive-edit-nilai" class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Nilai Siswa
+          </button>
+          <button type="button" onclick="tutupModalMonitoringDriveGuru()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition cursor-pointer">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================================================== -->
   <!-- MODAL PANDUAN SETUP GOOGLE SPREADSHEET & APPS SCRIPT      -->
@@ -13923,6 +14198,6 @@ Atau salin langsung dari Firebase Web App: const firebaseConfig = { apiKey: "...
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261103_default_pin_003734_v32"></script>
+  <script src="app.js?v=20261104_gdrive_sync_v38"></script>
 </body>
 </html>
