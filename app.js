@@ -18202,6 +18202,213 @@ const SEED_STUDENTS = [
     poinBintang: 0,
     statusKkm: 'Remedial',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3205',
+    nis: '3205',
+    nama: 'ALBERTO KURNIAWAN',
+    kelas: '4B',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Mei 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3206',
+    nis: '3206',
+    nama: 'ALVIN WIJAYA',
+    kelas: '4D',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '08 Juni 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3207',
+    nis: '3207',
+    nama: 'AMANDA CHARLOTTE',
+    kelas: '4E',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Juli 2017',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3101',
+    nis: '3101',
+    nama: 'BRYAN ALVINO',
+    kelas: '5D',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Agustus 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3001',
+    nis: '3001',
+    nama: 'CALVIN HARTONO',
+    kelas: '6A',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 September 2015',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-3002',
+    nis: '3002',
+    nama: 'DARRYL CHANDRA',
+    kelas: '6B',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 Oktober 2015',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3003',
+    nis: '3003',
+    nama: 'EUGENE TAN',
+    kelas: '6C',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '25 November 2015',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-3004',
+    nis: '3004',
+    nama: 'FELIX SURYA',
+    kelas: '6D',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 Desember 2015',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3005',
+    nis: '3005',
+    nama: 'GRACE ANGELINE',
+    kelas: '6E',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Januari 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   }
 ];
 
@@ -18272,15 +18479,25 @@ window.urutkanSiswaSesuaiNomorAbsen = urutkanSiswaSesuaiNomorAbsen;
 function hapusSemuaSiswaContohPermanen(quiet = false) {
   try {
     const raw = localStorage.getItem(DB_STORAGE_KEY);
-    if (!raw) return 0;
-    let list = JSON.parse(raw);
-    if (!Array.isArray(list)) return 0;
+    let list = [];
+    if (raw) {
+      try { list = JSON.parse(raw); } catch (e) { list = []; }
+    }
+    if (!Array.isArray(list) || list.length === 0) {
+      if (Array.isArray(SEED_STUDENTS) && SEED_STUDENTS.length > 0) {
+        list = JSON.parse(JSON.stringify(SEED_STUDENTS));
+        localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(list));
+      }
+      return 0;
+    }
 
     const countBefore = list.length;
     list = list.filter(s => !isSiswaContohDummy(s));
 
     if (list.length === 0 && Array.isArray(SEED_STUDENTS) && SEED_STUDENTS.length > 0) {
       list = JSON.parse(JSON.stringify(SEED_STUDENTS));
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(list));
+      return 0;
     }
 
     // Urutkan ulang siswa yang tersisa sesuai nomor absen
@@ -18499,17 +18716,31 @@ function getStudentDatabase() {
         if (s.kelas !== norm) { s.kelas = norm; changed = true; }
       }
       // Perbaiki jika absen rusak / terisi huruf
-      if (s.absen && /[a-zA-Z]/.test(s.absen)) {
-        s.absen = (s.absen.replace(/[^0-9]/g, '') || '01');
-        if (s.absen.length === 1) s.absen = '0' + s.absen;
-        changed = true;
+      if (s.absen !== undefined && s.absen !== null) {
+        let absStr = String(s.absen).trim();
+        if (/[a-zA-Z]/.test(absStr)) {
+          absStr = absStr.replace(/[^0-9]/g, '') || '01';
+          changed = true;
+        }
+        if (absStr.length === 1) absStr = '0' + absStr;
+        if (s.absen !== absStr) {
+          s.absen = absStr;
+          changed = true;
+        }
       }
       // Sinkronisasi nilai Drive 7 Kebiasaan (TP 2.1)
       if (s.nilaiDrive === undefined || s.koleksiDrive === undefined) {
-        const driveData = s.driveData || {};
-        const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
-        if (s.nilaiDrive === undefined) s.nilaiDrive = evalDrive.totalSkor;
-        if (s.koleksiDrive === undefined) s.koleksiDrive = evalDrive.filledCount;
+        try {
+          const driveData = s.driveData || {};
+          const evalDrive = (typeof hitungNilaiDrive7Kebiasaan === 'function')
+            ? hitungNilaiDrive7Kebiasaan(driveData)
+            : { totalSkor: 0, filledCount: 0 };
+          if (s.nilaiDrive === undefined) s.nilaiDrive = evalDrive.totalSkor || 0;
+          if (s.koleksiDrive === undefined) s.koleksiDrive = evalDrive.filledCount || 0;
+        } catch (eDrive) {
+          if (s.nilaiDrive === undefined) s.nilaiDrive = 0;
+          if (s.koleksiDrive === undefined) s.koleksiDrive = 0;
+        }
       }
       if (s.nilaiPoster === undefined) s.nilaiPoster = (s.posterWord > 0 ? 90 : 0);
       if (s.nilaiExcel === undefined) s.nilaiExcel = (s.excelTabel > 0 ? 88 : 0);
@@ -18554,7 +18785,9 @@ function getStudentDatabase() {
     return parsed;
   } catch (e) {
     console.error('Error membaca database siswa:', e);
-    return [];
+    return (Array.isArray(SEED_STUDENTS) && SEED_STUDENTS.length > 0)
+      ? JSON.parse(JSON.stringify(SEED_STUDENTS))
+      : [];
   }
 }
 
@@ -20730,18 +20963,23 @@ function setFilterKelasGuru(kelas) {
     renderGaleriGuru();
   }
 
-  // Jika kelas spesifik (seperti '4B') belum memiliki data di lokal, otomatis coba tarik dari Google Sheets
+  // Jika kelas spesifik (seperti '4B') belum memiliki data di lokal, otomatis coba tarik dari Google Sheets secara aman tanpa freeze
   if (kelas && kelas !== 'semua' && !kelas.startsWith('tingkat_')) {
     const db = getStudentDatabase();
     const studentsInClass = db.filter(s => s.kelas === kelas);
     if (studentsInClass.length === 0 && typeof sinkronkanDataSiswaPerKelas === 'function') {
-      sinkronkanDataSiswaPerKelas(kelas, true).then(res => {
-        if (res && res.length > 0) {
-          filterDanCariSiswa();
-          if (state.subTabGuru === 'drive7k') renderMonitoringDrive7KGuru();
-          if (state.subTabGuru === 'galeri') renderGaleriGuru();
-        }
-      }).catch(err => console.warn('Auto-sync kelas info:', err));
+      if (!window._isSyncingSheets && (!window._lastAutoSyncTime || (Date.now() - window._lastAutoSyncTime > 15000))) {
+        window._isSyncingSheets = true;
+        window._lastAutoSyncTime = Date.now();
+        sinkronkanDataSiswaPerKelas(kelas, true).then(res => {
+          if (res && res.length > 0) {
+            filterDanCariSiswa();
+            if (state.subTabGuru === 'drive7k') renderMonitoringDrive7KGuru();
+            if (state.subTabGuru === 'galeri') renderGaleriGuru();
+          }
+        }).catch(err => console.warn('Auto-sync kelas info:', err))
+          .finally(() => { window._isSyncingSheets = false; });
+      }
     }
   }
 }
@@ -23314,8 +23552,8 @@ function updateStatusKoneksiGoogleSheet() {
   renderRingkasanKoneksiKelas();
 }
 
-// Helper JSONP untuk Google Sheets (100% bebas hambatan CORS peramban)
-function queryGoogleSheetJsonp(sheetId, tabName, timeoutMs = 9000) {
+// Helper JSONP untuk Google Sheets (100% bebas hambatan CORS peramban & anti-freeze)
+function queryGoogleSheetJsonp(sheetId, tabName, timeoutMs = 3000) {
   return new Promise((resolve, reject) => {
     const callbackName = 'gviz_jsonp_cb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
     let timer = null;
@@ -23339,12 +23577,12 @@ function queryGoogleSheetJsonp(sheetId, tabName, timeoutMs = 9000) {
     
     script.onerror = function() {
       cleanup();
-      reject(new Error('Akses Google Sheet ditolak. Pastikan izin akses disetel ke "Siapa saja yang memiliki link dapat melihat".'));
+      reject(new Error('Akses Google Sheet ditolak.'));
     };
 
     timer = setTimeout(() => {
       cleanup();
-      reject(new Error('Waktu tunggu koneksi ke Google Sheet habis (Timeout).'));
+      reject(new Error('Waktu tunggu koneksi ke Google Sheet habis.'));
     }, timeoutMs);
 
     document.head.appendChild(script);
@@ -23542,26 +23780,14 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const primaryTab = (c.tabName || kelasKey).trim();
   let fetchedStudents = [];
 
-  // Daftar variasi nama tab yang sering dibuat guru di Google Sheets
+  // Daftar variasi nama tab ringkas & cepat (mencegah penumpukan request & freeze)
   const candidateTabs = [
     primaryTab,
     kelasKey,
-    `Kelas ${kelasKey}`,
-    `KELAS ${kelasKey}`,
-    `Kelas ${kelasKey.charAt(0)} ${kelasKey.charAt(1)}`,
-    `${kelasKey.charAt(0)} ${kelasKey.charAt(1)}`,
-    `${kelasKey.charAt(0)}-${kelasKey.charAt(1)}`,
-    `Kelas ${kelasKey.charAt(0)}-${kelasKey.charAt(1)}`,
-    kelasKey.toLowerCase(),
-    `DATA SISWA ${kelasKey}`,
-    `DATA SISWA KELAS ${kelasKey}`
+    `Kelas ${kelasKey}`
   ];
-
-  // Hanya izinkan tab generic seperti 'DATA SISWA LMS' atau tab pertama ('') jika kelasKey adalah '4A' (default awal)
-  // atau jika guru secara khusus mengetikkan nama tab tersebut di konfigurasi tabName.
-  // Ini mencegah kelas lain (seperti 5D atau 6A) keliru menyalin data siswa Kelas 4 dari tab pertama!
   if (kelasKey === '4A') {
-    candidateTabs.push('DATA SISWA LMS', 'Sheet1', 'Sheet 1', 'Lembar 1', '');
+    candidateTabs.push('DATA SISWA LMS');
   } else if (c.tabName && !candidateTabs.includes(c.tabName)) {
     candidateTabs.unshift(c.tabName);
   }
@@ -23569,15 +23795,14 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const uniqueTabs = [...new Set(candidateTabs.map(t => (t || '').trim()))];
   let resolvedTab = primaryTab;
 
-  // Coba query setiap variasi nama tab hingga berhasil menemukan siswa
+  // Coba query variasi nama tab dengan timeout cepat (2500ms)
   for (const tName of uniqueTabs) {
     try {
-      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 5000);
+      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 2500);
       const parsed = parseGoogleSheetTable(parsedData, kelasKey);
       if (parsed && parsed.length > 0) {
         fetchedStudents = parsed;
         resolvedTab = tName;
-        // Jika nama tab yang berhasil berbeda dengan konfigurasi awal, simpan nama tab yang valid
         if (tName && tName !== c.tabName) {
           c.tabName = tName;
           cfg[kelasKey].tabName = tName;

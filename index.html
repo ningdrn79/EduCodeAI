@@ -52,7 +52,65 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_menu_siswa_fix_v56">
+  <link rel="stylesheet" href="styles.css?v=20261105_anti_freeze_v58">
+
+  <!-- Early Global Navbar Mode Switcher (Tersedia Sejak Milidetik Pertama) -->
+  <script>
+    window.setHeaderNavMode = function(mode) {
+      try {
+        var u = document.getElementById('navbar-tampilan-utama');
+        var s1 = document.getElementById('navbar-tampilan-sem1');
+        var g = document.getElementById('navbar-tampilan-guru');
+        var mu = document.getElementById('m-navbar-utama');
+        var ms1 = document.getElementById('m-navbar-sem1');
+        var mg = document.getElementById('m-navbar-guru');
+
+        if (mode === 'guru') {
+          if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
+          if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
+          if (g) { g.classList.remove('hidden'); g.style.removeProperty('display'); g.style.setProperty('display', 'flex', 'important'); }
+          if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+          if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+          if (mg) { mg.classList.remove('hidden'); mg.style.removeProperty('display'); mg.style.setProperty('display', 'flex', 'important'); }
+        } else if (mode === 'sem1') {
+          if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
+          if (s1) { s1.classList.remove('hidden'); s1.style.removeProperty('display'); s1.style.setProperty('display', 'flex', 'important'); }
+          if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+          if (ms1) { ms1.classList.remove('hidden'); ms1.style.removeProperty('display'); ms1.style.setProperty('display', 'flex', 'important'); }
+          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+        } else {
+          if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
+          if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
+          if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
+          if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+        }
+      } catch (e) {}
+    };
+
+    // Universal definition of keluarModeGuru agar tombol keluar SELALU aktif dan responsif
+    window.keluarModeGuru = function() {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      try {
+        localStorage.removeItem('educode_teacher_session_v1');
+        sessionStorage.removeItem('educode_teacher_session_v1');
+        document.cookie = 'educode_teacher_session_v1=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.__TEACHER_SESSION_ACTIVE__ = false;
+      } catch (e) {}
+      try {
+        document.querySelectorAll('#style-early-teacher-session, style[id*="teacher"]').forEach(function(el) { el.remove(); });
+      } catch (e) {}
+      if (typeof state !== 'undefined') state.isGuruLoggedIn = false;
+      window.setHeaderNavMode('utama');
+      window.switchTab('beranda');
+      try { window.scrollTo(0, 0); } catch (e) {}
+      if (typeof showToast === 'function') {
+        try { showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info'); } catch (e) {}
+      }
+    };
+  </script>
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -94,40 +152,6 @@
             }
           `;
           document.head.appendChild(styleGuru);
-
-          // Early definition of keluarModeGuru agar tombol keluar selalu responsif dari detik pertama
-          window.keluarModeGuru = function() {
-            try {
-              localStorage.removeItem('educode_teacher_session_v1');
-              sessionStorage.removeItem('educode_teacher_session_v1');
-              document.cookie = 'educode_teacher_session_v1=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-              window.__TEACHER_SESSION_ACTIVE__ = false;
-            } catch (e) {}
-            try {
-              document.querySelectorAll('#style-early-teacher-session, style[id*="teacher"]').forEach(function(el) { el.remove(); });
-            } catch (e) {}
-            var tg = document.getElementById('tab-guru');
-            if (tg) { tg.classList.add('hidden'); tg.style.display = 'none'; }
-            var tb = document.getElementById('tab-beranda');
-            if (tb) { tb.classList.remove('hidden'); tb.style.display = 'block'; }
-            var ng = document.getElementById('navbar-tampilan-guru');
-            if (ng) { ng.classList.add('hidden'); ng.style.display = 'none'; }
-            var mng = document.getElementById('m-navbar-guru');
-            if (mng) { mng.classList.add('hidden'); mng.style.display = 'none'; }
-            var nu = document.getElementById('navbar-tampilan-utama');
-            if (nu) { nu.classList.remove('hidden'); nu.style.display = 'flex'; }
-            var mnu = document.getElementById('m-navbar-utama');
-            if (mnu) { mnu.classList.remove('hidden'); mnu.style.display = 'flex'; }
-            try { window.scrollTo(0, 0); } catch (e) {}
-            if (typeof state !== 'undefined') state.isGuruLoggedIn = false;
-            if (typeof switchTab === 'function') {
-              try { switchTab('beranda'); } catch (e) {}
-            }
-            if (typeof showToast === 'function') {
-              try { showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info'); } catch (e) {}
-            }
-          };
-
           return; // Jangan lanjutkan ke sesi siswa jika guru sedang aktif
         }
 
@@ -192,9 +216,35 @@
   <!-- Early Modal & Login Handlers: Menjamin Tombol Login Guru, Masuk Siswa & Tab Navigasi 100% Responsif Sejak Detik Pertama -->
   <script>
     (function initEarlyModalHandlers() {
-      // Early switchTab agar navigasi tab siswa langsung berfungsi mulus
+      // Early switchTab agar navigasi tab siswa & guru langsung berfungsi mulus 100%
       window.switchTab = function(tabId) {
         try { if (typeof playSound === 'function') playSound('click'); } catch(e) {}
+        try {
+          if (tabId === 'guru') {
+            if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('guru');
+          } else {
+            var isTeacher = false;
+            try { isTeacher = localStorage.getItem('educode_teacher_session_v1') === 'ACTIVE'; } catch(eTeacher){}
+            if (!isTeacher) {
+              var activeStd = null;
+              try { activeStd = localStorage.getItem('educode_active_student_v1'); } catch(eStd){}
+              if (activeStd && activeStd !== 'LOGGED_OUT' && activeStd !== 'null') {
+                if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
+                try {
+                  localStorage.setItem('educode_student_active_tab_v1', tabId);
+                  sessionStorage.setItem('educode_student_active_tab_v1', tabId);
+                } catch(eSave){}
+              } else {
+                if (tabId === 'beranda' || tabId === 'antariksa') {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('utama');
+                } else {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
+                }
+              }
+            }
+          }
+        } catch (eNav) {}
+
         var tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik'];
         for (var i = 0; i < tabs.length; i++) {
           var t = tabs[i];
@@ -377,20 +427,13 @@
           try {
             localStorage.setItem('educode_teacher_session_v1', 'ACTIVE');
             sessionStorage.setItem('educode_teacher_session_v1', 'ACTIVE');
+            document.cookie = 'educode_teacher_session_v1=ACTIVE;path=/;max-age=2592000';
+            window.__TEACHER_SESSION_ACTIVE__ = true;
+            if (typeof state !== 'undefined') state.isGuruLoggedIn = true;
           } catch(e) {}
           window.tutupModalLoginGuru();
-          if (typeof setHeaderNavMode === 'function') setHeaderNavMode('guru');
-          if (typeof switchTab === 'function') switchTab('guru');
-          else {
-            var tg = document.getElementById('tab-guru');
-            var tb = document.getElementById('tab-beranda');
-            if (tg) { tg.classList.remove('hidden'); tg.style.removeProperty('display'); tg.style.setProperty('display', 'block', 'important'); }
-            if (tb) { tb.classList.add('hidden'); tb.style.setProperty('display', 'none', 'important'); }
-            var ng = document.getElementById('navbar-tampilan-guru');
-            var nu = document.getElementById('navbar-tampilan-utama');
-            if (ng) { ng.classList.remove('hidden'); ng.style.removeProperty('display'); ng.style.setProperty('display', 'flex', 'important'); }
-            if (nu) { nu.classList.add('hidden'); nu.style.setProperty('display', 'none', 'important'); }
-          }
+          window.setHeaderNavMode('guru');
+          window.switchTab('guru');
           if (typeof pilihKelasGuruNav === 'function') pilihKelasGuruNav('4');
           if (typeof renderDasborGuru === 'function') renderDasborGuru();
         } else {
@@ -430,20 +473,16 @@
             var rawStd = JSON.stringify(student);
             localStorage.setItem('educode_active_student_v1', rawStd);
             sessionStorage.setItem('educode_active_student_v1', rawStd);
+            localStorage.setItem('educode_student_active_tab_v1', 'modul');
+            sessionStorage.setItem('educode_student_active_tab_v1', 'modul');
+            localStorage.setItem('educode_student_active_sem_v1', '1');
+            sessionStorage.setItem('educode_student_active_sem_v1', '1');
+            window.__ACTIVE_STUDENT_PROFILE__ = student;
+            window.__ACTIVE_STUDENT_RESTORED__ = student;
           } catch(e) {}
           window.tutupModalProfilSiswa();
-          if (typeof setHeaderNavMode === 'function') setHeaderNavMode('sem1');
-          if (typeof switchTab === 'function') switchTab('modul');
-          else {
-            var tm = document.getElementById('tab-modul');
-            var tb = document.getElementById('tab-beranda');
-            if (tm) { tm.classList.remove('hidden'); tm.style.removeProperty('display'); tm.style.setProperty('display', 'block', 'important'); }
-            if (tb) { tb.classList.add('hidden'); tb.style.setProperty('display', 'none', 'important'); }
-            var ns = document.getElementById('navbar-tampilan-sem1');
-            var nu = document.getElementById('navbar-tampilan-utama');
-            if (ns) { ns.classList.remove('hidden'); ns.style.removeProperty('display'); ns.style.setProperty('display', 'flex', 'important'); }
-            if (nu) { nu.classList.add('hidden'); nu.style.setProperty('display', 'none', 'important'); }
-          }
+          window.setHeaderNavMode('sem1');
+          window.switchTab('modul');
           if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
         } else {
           var err = document.getElementById('pesan-error-login-nis');
@@ -14779,6 +14818,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_menu_siswa_fix_v56"></script>
+  <script src="app.js?v=20261105_anti_freeze_v58"></script>
 </body>
 </html>
