@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_click_fix_v48">
+  <link rel="stylesheet" href="styles.css?v=20261105_logout_fix_v49">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -540,7 +540,7 @@
           </button>
 
           <!-- 5. Keluar -->
-          <button onclick="keluarModeGuru()" id="nav-guru-keluar" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-400 hover:text-white hover:bg-rose-600/30 shrink-0" title="Keluar dari Dasbor Guru">
+          <button type="button" onclick="keluarModeGuru()" id="nav-guru-keluar" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-400 hover:text-white hover:bg-rose-600/30 shrink-0 cursor-pointer" title="Keluar dari Dasbor Guru">
             <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i>
             <span>Keluar</span>
           </button>
@@ -650,7 +650,7 @@
         <i class="fa-solid fa-award text-lg"></i>
         <span>Kelas 6</span>
       </button>
-      <button onclick="keluarModeGuru()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-rose-400" id="m-nav-guru-keluar">
+      <button type="button" onclick="keluarModeGuru()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-rose-400 cursor-pointer" id="m-nav-guru-keluar" title="Keluar dari Dasbor Guru">
         <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
         <span>Keluar</span>
       </button>
@@ -11334,7 +11334,7 @@
             <button onclick="muatUlangDataDasbor()" title="Segarkan Data" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs transition">
               <i class="fa-solid fa-rotate"></i>
             </button>
-            <button onclick="keluarModeGuru()" class="px-3.5 py-2.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+            <button type="button" onclick="keluarModeGuru()" class="px-3.5 py-2.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Keluar dari Dasbor Guru">
               <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
             </button>
           </div>
@@ -14406,6 +14406,6 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_click_fix_v48"></script>
+  <script src="app.js?v=20261105_logout_fix_v49"></script>
 </body>
 </html>

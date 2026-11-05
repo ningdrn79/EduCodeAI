@@ -1157,6 +1157,18 @@ function switchTab(tabId) {
   if (typeof updateScrollNavVisibility === 'function') {
     updateScrollNavVisibility();
   }
+
+  // Pasang listener pengaman ganda untuk seluruh tombol Keluar Guru & Siswa
+  try {
+    const btnKeluarGuru1 = document.getElementById('nav-guru-keluar');
+    if (btnKeluarGuru1) btnKeluarGuru1.addEventListener('click', keluarModeGuru);
+    const btnKeluarGuru2 = document.getElementById('m-nav-guru-keluar');
+    if (btnKeluarGuru2) btnKeluarGuru2.addEventListener('click', keluarModeGuru);
+    const btnKeluarSiswa1 = document.getElementById('btn-welcome-logout');
+    if (btnKeluarSiswa1) btnKeluarSiswa1.addEventListener('click', konfirmasiKeluarSiswa);
+    const btnKeluarSiswa2 = document.getElementById('btn-rapor-keluar');
+    if (btnKeluarSiswa2) btnKeluarSiswa2.addEventListener('click', konfirmasiKeluarSiswa);
+  } catch (eBind) {}
   const currentActiveStudent = getActiveStudentProfile();
   if (currentActiveStudent && tabId !== 'guru') {
     try {
@@ -18877,20 +18889,86 @@ function pulihkanPinGuruDariLogin() {
 window.pulihkanPinGuruDariLogin = pulihkanPinGuruDariLogin;
 
 function keluarModeGuru() {
-  playSound('click');
-  if (typeof setTeacherSessionActive === 'function') {
-    setTeacherSessionActive(false); // Hapus persistensi sesi guru dari localStorage, sessionStorage, cookie
+  try { playSound('click'); } catch (e) {}
+  try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+
+  // 1. Bersihkan seluruh data persistensi sesi guru dari localStorage, sessionStorage, dan cookie
+  try {
+    if (typeof setTeacherSessionActive === 'function') {
+      setTeacherSessionActive(false);
+    }
+    localStorage.removeItem(TEACHER_SESSION_KEY);
+    sessionStorage.removeItem(TEACHER_SESSION_KEY);
+    localStorage.removeItem('educode_teacher_session_v1');
+    sessionStorage.removeItem('educode_teacher_session_v1');
+    document.cookie = `${TEACHER_SESSION_KEY}=LOGGED_OUT;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax`;
+    document.cookie = 'educode_teacher_session_v1=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
+    window.__TEACHER_SESSION_ACTIVE__ = false;
+  } catch (eClean) {
+    console.warn('Pembersihan sesi guru:', eClean);
   }
   state.isGuruLoggedIn = false;
+
+  // 2. Hancurkan seluruh tag style early session guru yang disuntikkan di awal
+  try {
+    document.querySelectorAll('#style-early-teacher-session, style[id*="teacher"]').forEach(el => el.remove());
+  } catch (eStyle) {}
+
+  // 3. Paksa transisi visual elemen DOM Dasbor Guru dan Beranda secara tegas
+  const tabGuru = document.getElementById('tab-guru');
+  if (tabGuru) {
+    tabGuru.classList.add('hidden');
+    tabGuru.style.display = 'none';
+  }
+
+  const tabBeranda = document.getElementById('tab-beranda');
+  if (tabBeranda) {
+    tabBeranda.classList.remove('hidden');
+    tabBeranda.style.display = 'block';
+  }
+
+  // 4. Paksa transisi dock navigasi
+  const navGuru = document.getElementById('navbar-tampilan-guru');
+  if (navGuru) {
+    navGuru.classList.add('hidden');
+    navGuru.style.display = 'none';
+  }
+  const mNavGuru = document.getElementById('m-navbar-guru');
+  if (mNavGuru) {
+    mNavGuru.classList.add('hidden');
+    mNavGuru.style.display = 'none';
+  }
+
   const student = getActiveStudentProfile();
   if (student) {
     setHeaderNavMode('sem1');
+    const navSem1 = document.getElementById('navbar-tampilan-sem1');
+    if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.display = 'flex'; }
   } else {
     setHeaderNavMode('utama');
+    const navUtama = document.getElementById('navbar-tampilan-utama');
+    if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.display = 'flex'; }
+    const mNavUtama = document.getElementById('m-navbar-utama');
+    if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.display = 'flex'; }
   }
-  switchTab('beranda');
+
+  // 5. Alihkan tab aktif ke beranda
+  if (typeof switchTab === 'function') {
+    switchTab('beranda');
+  }
+
+  // 6. Gulirkan layar ke puncak paling atas
+  try {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  } catch (eScroll) {}
+
+  // 7. Muat ulang status profil dan visibilitas tombol floating scroll
+  if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
+  if (typeof updateScrollNavVisibility === 'function') updateScrollNavVisibility();
+
   showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info');
 }
+window.keluarModeGuru = keluarModeGuru;
 
 // --------------------------------------------------------------------------
 // PENGATURAN & KEAMANAN PIN DASBOR GURU
@@ -19471,11 +19549,15 @@ function konfirmasiKeluarSiswa() {
 
   const nama = profile ? profile.nama : (elWelcomeNama ? elWelcomeNama.innerText.trim() : 'Siswa');
   const kelas = profile ? profile.kelas : (elWelcomeKelas ? elWelcomeKelas.innerText.trim() : '');
-
-  // Konfirmasi langsung dengan modal konfirmasi browser yang ramah anak
   const targetLabel = (kelas && !kelas.includes('Belum')) ? `${nama} (${kelas})` : nama;
-  const yakin = confirm(`Apakah kamu ingin keluar (Sign Out) dari akun ${targetLabel}?`);
-  if (yakin) {
+
+  const modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
+  if (modalLogout) {
+    const elNama = document.getElementById('logout-siswa-nama');
+    if (elNama) elNama.innerText = targetLabel;
+    modalLogout.classList.remove('hidden');
+    modalLogout.style.display = 'flex';
+  } else {
     eksekusiLogoutSiswa();
   }
 }
@@ -19528,11 +19610,21 @@ function eksekusiLogoutSiswa() {
   // Muat ulang tampilan ke mode Belum Masuk / Tamu
   muatProfilSiswa();
   setHeaderNavMode('utama');
+  const navUtama = document.getElementById('navbar-tampilan-utama');
+  if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.display = 'flex'; }
+  const navSem1 = document.getElementById('navbar-tampilan-sem1');
+  if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.display = 'none'; }
+  const mNavUtama = document.getElementById('m-navbar-utama');
+  if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.display = 'flex'; }
+  const mNavSem1 = document.getElementById('m-navbar-sem1');
+  if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.display = 'none'; }
+
   renderGaleriPosterWord();
   if (typeof renderDrive7KebiasaanGrid === 'function') {
     renderDrive7KebiasaanGrid();
   }
   switchTab('beranda');
+  try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) {}
 
   showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info');
 }
@@ -24180,6 +24272,18 @@ window.addEventListener('load', function() {
   if (typeof updateScrollNavVisibility === 'function') {
     updateScrollNavVisibility();
   }
+
+  // Pasang listener pengaman ganda untuk seluruh tombol Keluar Guru & Siswa
+  try {
+    const btnKeluarGuru1 = document.getElementById('nav-guru-keluar');
+    if (btnKeluarGuru1) btnKeluarGuru1.addEventListener('click', keluarModeGuru);
+    const btnKeluarGuru2 = document.getElementById('m-nav-guru-keluar');
+    if (btnKeluarGuru2) btnKeluarGuru2.addEventListener('click', keluarModeGuru);
+    const btnKeluarSiswa1 = document.getElementById('btn-welcome-logout');
+    if (btnKeluarSiswa1) btnKeluarSiswa1.addEventListener('click', konfirmasiKeluarSiswa);
+    const btnKeluarSiswa2 = document.getElementById('btn-rapor-keluar');
+    if (btnKeluarSiswa2) btnKeluarSiswa2.addEventListener('click', konfirmasiKeluarSiswa);
+  } catch (eBind) {}
 });
 
 // ========================================================
