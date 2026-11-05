@@ -1168,6 +1168,10 @@ function switchTab(tabId) {
     if (btnKeluarSiswa1) btnKeluarSiswa1.addEventListener('click', konfirmasiKeluarSiswa);
     const btnKeluarSiswa2 = document.getElementById('btn-rapor-keluar');
     if (btnKeluarSiswa2) btnKeluarSiswa2.addEventListener('click', konfirmasiKeluarSiswa);
+    const btnLoginGuru = document.getElementById('btn-main-login-guru');
+    if (btnLoginGuru) btnLoginGuru.addEventListener('click', bukaModalLoginGuru);
+    const btnLoginSiswa = document.getElementById('btn-welcome-login');
+    if (btnLoginSiswa) btnLoginSiswa.addEventListener('click', bukaPilihSiswaCepat);
   } catch (eBind) {}
   const currentActiveStudent = getActiveStudentProfile();
   if (currentActiveStudent && tabId !== 'guru') {
@@ -18638,18 +18642,24 @@ window.initTeacherDatabase = initTeacherDatabase;
 function bukaModalLoginGuru() {
   try { playSound('click'); } catch (e) {}
   const modal = document.getElementById('modal-login-guru');
-  const inputPin = document.getElementById('input-pin-guru');
-  const errorMsg = document.getElementById('pesan-error-pin');
-  if (errorMsg) errorMsg.classList.add('hidden');
-  if (inputPin) {
-    inputPin.value = '';
-    setTimeout(() => inputPin.focus(), 150);
-  }
-  try { perbaruiTampilanStatusPinGuru(); } catch (e) {}
   if (modal) {
     modal.classList.remove('hidden');
-    modal.style.display = 'flex';
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '99999', 'important');
   }
+  try {
+    const inputPin = document.getElementById('input-pin-guru');
+    const errorMsg = document.getElementById('pesan-error-pin');
+    if (errorMsg) errorMsg.classList.add('hidden');
+    if (inputPin) {
+      inputPin.value = '';
+      setTimeout(() => inputPin.focus(), 150);
+    }
+    if (typeof perbaruiTampilanStatusPinGuru === 'function') perbaruiTampilanStatusPinGuru();
+  } catch (e) {}
 }
 window.bukaModalLoginGuru = bukaModalLoginGuru;
 
@@ -18658,7 +18668,8 @@ function tutupModalLoginGuru() {
   const modal = document.getElementById('modal-login-guru');
   if (modal) {
     modal.classList.add('hidden');
-    modal.style.display = 'none';
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
   }
 }
 window.tutupModalLoginGuru = tutupModalLoginGuru;
@@ -19379,7 +19390,8 @@ function tutupModalProfilSiswa() {
   const modal = document.getElementById('modal-profil-siswa');
   if (modal) {
     modal.classList.add('hidden');
-    modal.style.display = 'none';
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
   }
 }
 window.tutupModalProfilSiswa = tutupModalProfilSiswa;
@@ -19389,11 +19401,12 @@ function tampilkanKartuSiswa() {
   const formView = document.getElementById('profil-view-form');
   if (cardView) {
     cardView.classList.remove('hidden');
-    cardView.style.display = 'block';
+    cardView.style.removeProperty('display');
+    cardView.style.setProperty('display', 'block', 'important');
   }
   if (formView) {
     formView.classList.add('hidden');
-    formView.style.display = 'none';
+    formView.style.setProperty('display', 'none', 'important');
   }
 }
 window.tampilkanKartuSiswa = tampilkanKartuSiswa;
@@ -19405,18 +19418,19 @@ function tampilkanFormGantiSiswa() {
   const errorEl = document.getElementById('pesan-error-login-nis');
   if (cardView) {
     cardView.classList.add('hidden');
-    cardView.style.display = 'none';
+    cardView.style.setProperty('display', 'none', 'important');
   }
   if (formView) {
     formView.classList.remove('hidden');
-    formView.style.display = 'block';
+    formView.style.removeProperty('display');
+    formView.style.setProperty('display', 'block', 'important');
   }
   if (errorEl) {
     errorEl.classList.add('hidden');
     errorEl.innerHTML = '';
   }
 
-  renderOpsiPilihSiswa();
+  try { renderOpsiPilihSiswa(); } catch (e) {}
 
   const inputNis = document.getElementById('input-login-nis');
   if (inputNis) {
@@ -19425,13 +19439,15 @@ function tampilkanFormGantiSiswa() {
     setTimeout(() => inputNis.focus(), 150);
   }
 
-  const profile = getActiveStudentProfile() || { nama: '', kelas: '4A', absen: '01' };
-  const inputNama = document.getElementById('input-profil-nama');
-  const inputKelas = document.getElementById('input-profil-kelas');
-  const inputAbsen = document.getElementById('input-profil-absen');
-  if (inputNama) inputNama.value = profile.nama || '';
-  if (inputKelas) inputKelas.value = profile.kelas || '4A';
-  if (inputAbsen) inputAbsen.value = profile.absen || '01';
+  try {
+    const profile = getActiveStudentProfile() || { nama: '', kelas: '4A', absen: '01' };
+    const inputNama = document.getElementById('input-profil-nama');
+    const inputKelas = document.getElementById('input-profil-kelas');
+    const inputAbsen = document.getElementById('input-profil-absen');
+    if (inputNama) inputNama.value = profile.nama || '';
+    if (inputKelas) inputKelas.value = profile.kelas || '4A';
+    if (inputAbsen) inputAbsen.value = profile.absen || '01';
+  } catch (e) {}
 }
 window.tampilkanFormGantiSiswa = tampilkanFormGantiSiswa;
 
@@ -19440,9 +19456,15 @@ function bukaPilihSiswaCepat() {
   const modal = document.getElementById('modal-profil-siswa');
   if (modal) {
     modal.classList.remove('hidden');
-    modal.style.display = 'flex';
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '99999', 'important');
   }
-  tampilkanFormGantiSiswa();
+  try {
+    tampilkanFormGantiSiswa();
+  } catch (e) {}
 }
 window.bukaPilihSiswaCepat = bukaPilihSiswaCepat;
 
@@ -24202,6 +24224,11 @@ window.pulihkanSemuaSiswaDefault = pulihkanSemuaSiswaDefault;
 window.urutkanSiswaSesuaiNomorAbsen = urutkanSiswaSesuaiNomorAbsen;
 
 // Global Window Exports untuk Seluruh Tombol Interaktif & Dasbor
+window.bukaModalLoginGuru = typeof bukaModalLoginGuru === 'function' ? bukaModalLoginGuru : function(){};
+window.tutupModalLoginGuru = typeof tutupModalLoginGuru === 'function' ? tutupModalLoginGuru : function(){};
+window.bukaPilihSiswaCepat = typeof bukaPilihSiswaCepat === 'function' ? bukaPilihSiswaCepat : function(){};
+window.tampilkanFormGantiSiswa = typeof tampilkanFormGantiSiswa === 'function' ? tampilkanFormGantiSiswa : function(){};
+window.tampilkanKartuSiswa = typeof tampilkanKartuSiswa === 'function' ? tampilkanKartuSiswa : function(){};
 window.eksporNilaiCSV = typeof eksporNilaiCSV === 'function' ? eksporNilaiCSV : function(){};
 window.muatUlangDataDasbor = typeof muatUlangDataDasbor === 'function' ? muatUlangDataDasbor : function(){};
 window.keluarModeGuru = typeof keluarModeGuru === 'function' ? keluarModeGuru : function(){};
@@ -24295,6 +24322,10 @@ window.addEventListener('load', function() {
     if (btnKeluarSiswa1) btnKeluarSiswa1.addEventListener('click', konfirmasiKeluarSiswa);
     const btnKeluarSiswa2 = document.getElementById('btn-rapor-keluar');
     if (btnKeluarSiswa2) btnKeluarSiswa2.addEventListener('click', konfirmasiKeluarSiswa);
+    const btnLoginGuru = document.getElementById('btn-main-login-guru');
+    if (btnLoginGuru) btnLoginGuru.addEventListener('click', bukaModalLoginGuru);
+    const btnLoginSiswa = document.getElementById('btn-welcome-login');
+    if (btnLoginSiswa) btnLoginSiswa.addEventListener('click', bukaPilihSiswaCepat);
   } catch (eBind) {}
 });
 

@@ -2277,6 +2277,25 @@ section.hidden {
   z-index: 60 !important;
 }
 
+/* Pastikan Tombol Login Guru & Masuk Siswa Selalu Interaktif & Berada di Layer Atas */
+#btn-main-login-guru,
+#btn-welcome-login {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 50 !important;
+}
+
+/* Pastikan Modal Login Guru & Modal Profil / Masuk Siswa Tampil Tegas di Layer Paling Depan */
+#modal-login-guru:not(.hidden),
+#modal-profil-siswa:not(.hidden),
+#modal-konfirmasi-logout-siswa:not(.hidden) {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 99999 !important;
+}
+
 
 
 
