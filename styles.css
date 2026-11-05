@@ -2341,6 +2341,18 @@ main {
   z-index: 999999 !important;
 }
 
+/* Jaminan Teks Form Konfigurasi Firebase Selalu Terbaca Jelas & Hitam Pekat */
+#firebase-config-input {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background-color: #ffffff !important;
+  caret-color: #d97706 !important;
+  font-family: Consolas, 'Courier New', monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  font-weight: 600 !important;
+}
+
 
 
 
