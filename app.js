@@ -330,6 +330,9 @@ let state = {
   // Dasbor Guru State
   isGuruLoggedIn: typeof isTeacherSessionActive === 'function' ? isTeacherSessionActive() : false,
   subTabGuru: 'gradebook',
+  filterKelasGuru: 'semua',
+  tingkatKelasGuru: '4',
+  filterKkmGuru: 'semua',
   modePenilaianGuru: 1, // 1: Semester 1 (Word & Excel), 2: Semester 2 (Scratch & RoboMind), 'semua': Rekap Gabungan
   galeriSemester: 1, // 1: Semester 1 (Hasil Karya Poster), 2: Semester 2 (Coding & AI saat aktif)
   modeTampilanPosterGuru: 'rekap', // 'rekap' (checklist siapa sudah/belum) vs 'galeri' (kartu visual poster)
@@ -2077,8 +2080,49 @@ function tutupModalGambarMateri() {
   const modal = document.getElementById('modal-gambar-materi');
   if (modal) {
     modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
   }
 }
+
+// Buka Tab Kuis & Ambil Sertifikat Resmi Siswa
+function bukaKuisAtauSertifikatSiswa() {
+  try { playSound('click'); } catch (e) {}
+  switchTab('kuis');
+  if (typeof showToast === 'function') {
+    showToast('Silakan ikuti Kuis untuk mendapatkan Sertifikat Digital Resmi! 🏆', 'info');
+  }
+}
+window.bukaKuisAtauSertifikatSiswa = bukaKuisAtauSertifikatSiswa;
+
+// Buka Simulator RoboMind 7.0
+function bukaRoboMindLangsung() {
+  try { playSound('click'); } catch (e) {}
+  if (state.currentSemester !== 2) {
+    pilihSemester(2);
+  }
+  switchTab('demo');
+  if (typeof initRoboMindSimulator === 'function') {
+    setTimeout(initRoboMindSimulator, 50);
+  }
+  if (typeof showToast === 'function') {
+    showToast('Simulator RoboMind 7.0 Aktif! 🤖', 'info');
+  }
+}
+window.bukaRoboMindLangsung = bukaRoboMindLangsung;
+
+// Navigasi Subtab Studio Praktik
+function setPraktikSubtab(pKey) {
+  try { playSound('click'); } catch (e) {}
+  if (typeof selectPraktik === 'function') {
+    selectPraktik(pKey);
+  } else if (typeof setModePraktik1 === 'function') {
+    if (pKey === 'praktik-tp1') setModePraktik1('word');
+  }
+}
+window.setPraktikSubtab = setPraktikSubtab;
 
 window.bukaModulDetail = bukaModulDetail;
 window.gulirKeTabelProta = gulirKeTabelProta;
@@ -17871,9 +17915,12 @@ const DEFAULT_CLASS_SHEETS_CONFIG = {
 };
 
 // Inisialisasi State Dasbor Guru
-state.isGuruLoggedIn = false;
-state.subTabGuru = 'gradebook';
-state.filterKelasGuru = 'semua';
+if (typeof state.isGuruLoggedIn === 'undefined' || !state.isGuruLoggedIn) {
+  state.isGuruLoggedIn = typeof isTeacherSessionActive === 'function' ? isTeacherSessionActive() : false;
+}
+if (!state.subTabGuru) state.subTabGuru = 'gradebook';
+if (!state.filterKelasGuru) state.filterKelasGuru = 'semua';
+if (!state.tingkatKelasGuru) state.tingkatKelasGuru = '4';
 state.selectedStudentId = null;
 
 // ==========================================
@@ -19315,7 +19362,14 @@ function bukaModalUbahPinGuru() {
   if (inNew) inNew.value = '';
   if (inConf) inConf.value = '';
 
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+  }
   setTimeout(() => { if (inOld) inOld.focus(); }, 150);
 }
 window.bukaModalUbahPinGuru = bukaModalUbahPinGuru;
@@ -19323,7 +19377,13 @@ window.bukaModalUbahPinGuru = bukaModalUbahPinGuru;
 function tutupModalUbahPinGuru() {
   playSound('click');
   const modal = document.getElementById('modal-ubah-pin-guru');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+  }
 }
 window.tutupModalUbahPinGuru = tutupModalUbahPinGuru;
 
@@ -21029,8 +21089,9 @@ function filterDanCariSiswa() {
 
   const filtered = db.filter(s => {
     // Filter Kelas / Tingkat (Disesuaikan dengan pengampu resmi Ibu Darningsih, S.T.)
-    if (state.filterKelasGuru && state.filterKelasGuru.startsWith('tingkat_')) {
-      const targetTingkat = state.filterKelasGuru.replace('tingkat_', '');
+    const activeFilter = state.filterKelasGuru || 'semua';
+    if (activeFilter && activeFilter.startsWith('tingkat_')) {
+      const targetTingkat = activeFilter.replace('tingkat_', '');
       const tingkatClassMap = {
         '4': ['4A', '4B', '4C', '4D', '4E'],
         '5': ['5D'], // Hanya Kelas 5D di Tingkat 5!
@@ -21038,7 +21099,7 @@ function filterDanCariSiswa() {
       };
       const allowedClasses = tingkatClassMap[targetTingkat] || [];
       if (!allowedClasses.includes(s.kelas)) return false;
-    } else if (state.filterKelasGuru !== 'semua' && s.kelas !== state.filterKelasGuru) {
+    } else if (activeFilter !== 'semua' && s.kelas !== activeFilter) {
       return false;
     }
 
@@ -21646,7 +21707,10 @@ function tutupModalMonitoringDriveGuru() {
   const modal = document.getElementById('modal-monitoring-drive-guru');
   if (modal) {
     modal.classList.add('hidden');
-    modal.style.display = 'none';
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
   }
 }
 window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
@@ -21704,13 +21768,26 @@ function bukaModalDetailSiswa(studentId) {
   if (inputBintang) inputBintang.value = student.poinBintang !== undefined ? student.poinBintang : 0;
   if (inputCatatan) inputCatatan.value = student.catatanGuru || '';
 
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+  }
 }
 
 function tutupModalDetailSiswa() {
   playSound('click');
   const modal = document.getElementById('modal-detail-siswa');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+  }
   state.selectedStudentId = null;
 }
 
@@ -21720,13 +21797,26 @@ function tutupModalDetailSiswa() {
 function bukaModalRubrikPenilaian() {
   playSound('click');
   const modal = document.getElementById('modal-rubrik-penilaian');
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+  }
 }
 
 function tutupModalRubrikPenilaian() {
   playSound('click');
   const modal = document.getElementById('modal-rubrik-penilaian');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+  }
 }
 
 function simpanPerubahanDataSiswaModal() {
@@ -21886,13 +21976,26 @@ function bukaModalTambahSiswa() {
   if (inputAbsen) inputAbsen.value = '';
 
   const modal = document.getElementById('modal-tambah-siswa');
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+  }
 }
 
 function tutupModalTambahSiswa() {
   playSound('click');
   const modal = document.getElementById('modal-tambah-siswa');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+  }
 }
 
 function simpanSiswaBaruManual() {
@@ -24565,6 +24668,16 @@ window.tutupModalSemester2 = typeof tutupModalSemester2 === 'function' ? tutupMo
 window.unggahSemuaKaryaLokalKeCloud = typeof unggahSemuaKaryaLokalKeCloud === 'function' ? unggahSemuaKaryaLokalKeCloud : function(){};
 window.simpanWebhookGuruForm = typeof simpanWebhookGuruForm === 'function' ? simpanWebhookGuruForm : function(){};
 window.ujiKirimWebhookGuru = typeof ujiKirimWebhookGuru === 'function' ? ujiKirimWebhookGuru : function(){};
+window.bukaKuisAtauSertifikatSiswa = typeof bukaKuisAtauSertifikatSiswa === 'function' ? bukaKuisAtauSertifikatSiswa : function(){};
+window.bukaRoboMindLangsung = typeof bukaRoboMindLangsung === 'function' ? bukaRoboMindLangsung : function(){};
+window.setPraktikSubtab = typeof setPraktikSubtab === 'function' ? setPraktikSubtab : function(){};
+window.bukaModulDetail = typeof bukaModulDetail === 'function' ? bukaModulDetail : function(){};
+window.gulirKeTabelProta = typeof gulirKeTabelProta === 'function' ? gulirKeTabelProta : function(){};
+window.bukaAplikasiPaintTerbaru = typeof bukaAplikasiPaintTerbaru === 'function' ? bukaAplikasiPaintTerbaru : function(){};
+window.bukaPraktikWordTP2_2 = typeof bukaPraktikWordTP2_2 === 'function' ? bukaPraktikWordTP2_2 : function(){};
+window.bukaGaleriHasilPosterSiswa = typeof bukaGaleriHasilPosterSiswa === 'function' ? bukaGaleriHasilPosterSiswa : function(){};
+window.pilihKelasGuruNav = typeof pilihKelasGuruNav === 'function' ? pilihKelasGuruNav : function(){};
+window.pulihkanSemuaSiswaDefault = typeof pulihkanSemuaSiswaDefault === 'function' ? pulihkanSemuaSiswaDefault : function(){};
 
 // Panggil inisialisasi Database Guru & Pemulihan Sesi saat skrip dieksekusi dan saat DOM siap
 try {
@@ -24592,6 +24705,9 @@ window.addEventListener('load', function() {
       if (student) {
         setHeaderNavMode('sem1');
         muatProfilSiswa();
+        let savedTab = 'beranda';
+        try { savedTab = localStorage.getItem('educode_student_active_tab_v1') || 'beranda'; } catch (eTab) {}
+        switchTab(savedTab);
       }
     }
   } catch (eLoad) {}

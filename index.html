@@ -52,7 +52,41 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_anti_freeze_v58">
+  <link rel="stylesheet" href="styles.css?v=20261106_smooth_v60">
+  <style>
+    /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
+    .hidden,
+    [id^="modal-"].hidden,
+    #modal-login-guru.hidden,
+    #modal-profil-siswa.hidden,
+    #modal-konfirmasi-logout-siswa.hidden,
+    #modal-detail-siswa.hidden,
+    #modal-pilih-sumber-drive.hidden,
+    #modal-tambah-siswa.hidden,
+    #modal-rubrik-penilaian.hidden,
+    #modal-monitoring-drive-guru.hidden,
+    #modal-ubah-pin-guru.hidden,
+    #modal-lupa-pin-email-guru.hidden,
+    #modal-gambar-materi.hidden,
+    #modal-mesin-pencari-kartun.hidden,
+    #modal-bank-soal-guru.hidden,
+    #modal-panduan-sheets.hidden,
+    #modal-panduan-firebase.hidden,
+    #modal-status-koneksi-firebase.hidden,
+    #modal-upload-soal.hidden,
+    #modal-konfirmasi-hapus-semua-poster.hidden {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      z-index: -9999 !important;
+      opacity: 0 !important;
+    }
+    [id^="modal-"]:not(.hidden) {
+      pointer-events: auto !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  </style>
 
   <!-- Early Global Navbar Mode Switcher (Tersedia Sejak Milidetik Pertama) -->
   <script>
@@ -402,6 +436,35 @@
           modalLogout.style.setProperty('visibility', 'hidden', 'important');
           modalLogout.style.setProperty('z-index', '-9999', 'important');
         }
+      };
+
+      window.bukaKuisAtauSertifikatSiswa = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('kuis');
+      };
+      window.bukaRoboMindLangsung = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('demo');
+      };
+      window.setPraktikSubtab = function(pKey) {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('praktik');
+      };
+      window.gulirKeTabelProta = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('modul');
+      };
+      window.bukaAplikasiPaintTerbaru = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('praktik');
+      };
+      window.bukaPraktikWordTP2_2 = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('msword');
+      };
+      window.bukaGaleriHasilPosterSiswa = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        window.switchTab('praktik');
       };
 
       window.eksekusiLogoutSiswa = function() {
@@ -13900,7 +13963,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: PILIH SUMBER GAMBAR DRIVE 7 KEBIASAAN (TP 2.1)    -->
   <!-- ======================================================== -->
-  <div id="modal-pilih-sumber-drive" class="fixed inset-0 z-[9995] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalPilihSumberSlot()">
+  <div id="modal-pilih-sumber-drive-alt" class="fixed inset-0 z-[9995] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalPilihSumberSlot()">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border-2 border-purple-200 space-y-4">
       <!-- Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -14818,6 +14881,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_anti_freeze_v58"></script>
+  <script src="app.js?v=20261106_smooth_v60"></script>
 </body>
 </html>

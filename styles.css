@@ -2404,6 +2404,40 @@ main {
   z-index: 999999 !important;
 }
 
+/* Jaminan Anti-Freeze Universal Seluruh Modal Popup */
+.hidden,
+[id^="modal-"].hidden,
+#modal-login-guru.hidden,
+#modal-profil-siswa.hidden,
+#modal-konfirmasi-logout-siswa.hidden,
+#modal-detail-siswa.hidden,
+#modal-pilih-sumber-drive.hidden,
+#modal-tambah-siswa.hidden,
+#modal-rubrik-penilaian.hidden,
+#modal-monitoring-drive-guru.hidden,
+#modal-ubah-pin-guru.hidden,
+#modal-lupa-pin-email-guru.hidden,
+#modal-gambar-materi.hidden,
+#modal-mesin-pencari-kartun.hidden,
+#modal-bank-soal-guru.hidden,
+#modal-panduan-sheets.hidden,
+#modal-panduan-firebase.hidden,
+#modal-status-koneksi-firebase.hidden,
+#modal-upload-soal.hidden,
+#modal-konfirmasi-hapus-semua-poster.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  opacity: 0 !important;
+}
+
+[id^="modal-"]:not(.hidden) {
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* Jaminan Teks Form Konfigurasi Firebase Selalu Terbaca Jelas & Hitam Pekat */
 #firebase-config-input {
   color: #0f172a !important;
