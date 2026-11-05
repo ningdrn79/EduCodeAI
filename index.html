@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_modal_login_fix_v51">
+  <link rel="stylesheet" href="styles.css?v=20261105_modal_root_fix_v52">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -200,7 +200,7 @@
           modal.style.setProperty('display', 'flex', 'important');
           modal.style.setProperty('pointer-events', 'auto', 'important');
           modal.style.setProperty('visibility', 'visible', 'important');
-          modal.style.setProperty('z-index', '99999', 'important');
+          modal.style.setProperty('z-index', '999999', 'important');
         }
         try {
           var inputPin = document.getElementById('input-pin-guru');
@@ -233,7 +233,7 @@
           modal.style.setProperty('display', 'flex', 'important');
           modal.style.setProperty('pointer-events', 'auto', 'important');
           modal.style.setProperty('visibility', 'visible', 'important');
-          modal.style.setProperty('z-index', '99999', 'important');
+          modal.style.setProperty('z-index', '999999', 'important');
         }
         try {
           var cardView = document.getElementById('profil-view-card');
@@ -575,9 +575,9 @@
       <!-- ======================================================== -->
       <div id="navbar-tampilan-utama" class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
         <!-- 1. Login Guru (Popup PIN Guru) -->
-        <button type="button" onclick="if(window.bukaModalLoginGuru){window.bukaModalLoginGuru();}else{var m=document.getElementById('modal-login-guru');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}}" id="btn-main-login-guru" class="btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition" title="Masuk Dasbor Guru (Proteksi PIN)">
-          <i class="fa-solid fa-chalkboard-user text-amber-400 text-sm"></i>
-          <span data-i18n="loginGuru" class="text-amber-200 font-title font-bold">Login Guru</span>
+        <button type="button" onclick="event.stopPropagation(); if(window.bukaModalLoginGuru){window.bukaModalLoginGuru();}else{var m=document.getElementById('modal-login-guru');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}}" id="btn-main-login-guru" class="btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition" title="Masuk Dasbor Guru (Proteksi PIN)">
+          <i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i>
+          <span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>
         </button>
 
         <!-- 3. Indonesian / English -->
@@ -844,8 +844,8 @@
           <button id="btn-welcome-logout" onclick="konfirmasiKeluarSiswa()" class="hidden px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Keluar dari Akun Siswa">
             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i> <span>Keluar</span>
           </button>
-          <button type="button" id="btn-welcome-login" onclick="if(window.bukaPilihSiswaCepat){window.bukaPilihSiswaCepat();}else{var m=document.getElementById('modal-profil-siswa');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}var f=document.getElementById('profil-view-form');if(f){f.classList.remove('hidden');f.style.setProperty('display','block','important');}var c=document.getElementById('profil-view-card');if(c){c.classList.add('hidden');c.style.setProperty('display','none','important');}}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/30 cursor-pointer">
-            <i class="fa-solid fa-right-to-bracket text-xs"></i> <span>Masuk / Pilih Siswa</span>
+          <button type="button" id="btn-welcome-login" onclick="event.stopPropagation(); if(window.bukaPilihSiswaCepat){window.bukaPilihSiswaCepat();}else{var m=document.getElementById('modal-profil-siswa');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}var f=document.getElementById('profil-view-form');if(f){f.classList.remove('hidden');f.style.setProperty('display','block','important');}var c=document.getElementById('profil-view-card');if(c){c.classList.add('hidden');c.style.setProperty('display','none','important');}}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/30 cursor-pointer">
+            <i class="fa-solid fa-right-to-bracket text-xs pointer-events-none"></i> <span class="pointer-events-none">Masuk / Pilih Siswa</span>
           </button>
         </div>
       </div>
@@ -12941,7 +12941,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: LOGIN / VERIFIKASI PIN GURU -->
   <!-- ======================================================== -->
-  <div id="modal-login-guru" class="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLoginGuru()">
+  <div id="modal-login-guru" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLoginGuru()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-5">
       <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto shadow-inner">
         <i class="fa-solid fa-lock"></i>
@@ -13145,7 +13145,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: KARTU PELAJAR & RAPOR DIGITAL SISWA (PROFIL SISWA) -->
   <!-- ======================================================== -->
-  <div id="modal-profil-siswa" class="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalProfilSiswa()">
+  <div id="modal-profil-siswa" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalProfilSiswa()">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 max-h-[92vh] overflow-y-auto">
       
       <!-- TAMPILAN 1: KARTU PELAJAR & RAPOR DIGITAL SISWA (AKTIF SAAT LOGIN) -->
@@ -13394,7 +13394,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: KONFIRMASI SIGN OUT SISWA -->
   <!-- ======================================================== -->
-  <div id="modal-konfirmasi-logout-siswa" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalKonfirmasiLogoutSiswa()">
+  <div id="modal-konfirmasi-logout-siswa" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalKonfirmasiLogoutSiswa()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
       <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl shadow-inner">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -14548,6 +14548,6 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_modal_login_fix_v51"></script>
+  <script src="app.js?v=20261105_modal_root_fix_v52"></script>
 </body>
 </html>

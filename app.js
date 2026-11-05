@@ -18648,7 +18648,7 @@ function bukaModalLoginGuru() {
     modal.style.setProperty('display', 'flex', 'important');
     modal.style.setProperty('pointer-events', 'auto', 'important');
     modal.style.setProperty('visibility', 'visible', 'important');
-    modal.style.setProperty('z-index', '99999', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
   }
   try {
     const inputPin = document.getElementById('input-pin-guru');
@@ -19460,7 +19460,7 @@ function bukaPilihSiswaCepat() {
     modal.style.setProperty('display', 'flex', 'important');
     modal.style.setProperty('pointer-events', 'auto', 'important');
     modal.style.setProperty('visibility', 'visible', 'important');
-    modal.style.setProperty('z-index', '99999', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
   }
   try {
     tampilkanFormGantiSiswa();

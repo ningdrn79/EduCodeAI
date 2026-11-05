@@ -2268,32 +2268,77 @@ section.hidden {
   pointer-events: none !important;
 }
 
-/* Pastikan tombol keluar dasbor guru selalu interaktif & responsif terhadap klik */
+/* KEAMANAN KLIK MUTLAK: BACKGROUND COSMIC & PLANET */
+/* Cegah planet antariksa menutupi tombol atau mencegat klik mouse/touch */
+#cosmic-universe-bg,
+#cosmic-universe-bg *,
+.planet-interactive,
+.earth-container-3d,
+.mars-container-3d,
+.mercury-container-3d,
+.moon-container-3d,
+.comet-object-1,
+.comet-object-2,
+.meteor-shooting-fast {
+  pointer-events: none !important;
+}
+
+/* Pastikan header dan tombol dasbor guru berada di layer atas */
+header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+#navbar-tampilan-utama,
+#btn-main-login-guru,
+#btn-main-lang,
+#btn-main-sound {
+  position: relative !important;
+  z-index: 1010 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
 #nav-guru-keluar,
 #m-nav-guru-keluar {
   pointer-events: auto !important;
   cursor: pointer !important;
   position: relative !important;
-  z-index: 60 !important;
+  z-index: 1010 !important;
 }
 
-/* Pastikan Tombol Login Guru & Masuk Siswa Selalu Interaktif & Berada di Layer Atas */
-#btn-main-login-guru,
-#btn-welcome-login {
-  cursor: pointer !important;
-  pointer-events: auto !important;
+/* Main container dan Bar Siswa di Beranda */
+main {
   position: relative !important;
-  z-index: 50 !important;
+  z-index: 100 !important;
 }
 
-/* Pastikan Modal Login Guru & Modal Profil / Masuk Siswa Tampil Tegas di Layer Paling Depan */
+#bar-siswa-aktif {
+  position: relative !important;
+  z-index: 105 !important;
+  pointer-events: auto !important;
+}
+
+#btn-welcome-login,
+#btn-welcome-rapor,
+#btn-welcome-ganti,
+#btn-welcome-logout,
+#btn-toggle-sem-siswa {
+  position: relative !important;
+  z-index: 110 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Pastikan Modal Login Guru, Modal Profil Siswa & Konfirmasi Tampil Tegas di Layer Paling Depan */
 #modal-login-guru:not(.hidden),
 #modal-profil-siswa:not(.hidden),
 #modal-konfirmasi-logout-siswa:not(.hidden) {
   display: flex !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  z-index: 99999 !important;
+  z-index: 999999 !important;
 }
 
 
