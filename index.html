@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_logout_fix_v49">
+  <link rel="stylesheet" href="styles.css?v=20261105_exit_guaranteed_v50">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -94,6 +94,40 @@
             }
           `;
           document.head.appendChild(styleGuru);
+
+          // Early definition of keluarModeGuru agar tombol keluar selalu responsif dari detik pertama
+          window.keluarModeGuru = function() {
+            try {
+              localStorage.removeItem('educode_teacher_session_v1');
+              sessionStorage.removeItem('educode_teacher_session_v1');
+              document.cookie = 'educode_teacher_session_v1=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+              window.__TEACHER_SESSION_ACTIVE__ = false;
+            } catch (e) {}
+            try {
+              document.querySelectorAll('#style-early-teacher-session, style[id*="teacher"]').forEach(function(el) { el.remove(); });
+            } catch (e) {}
+            var tg = document.getElementById('tab-guru');
+            if (tg) { tg.classList.add('hidden'); tg.style.display = 'none'; }
+            var tb = document.getElementById('tab-beranda');
+            if (tb) { tb.classList.remove('hidden'); tb.style.display = 'block'; }
+            var ng = document.getElementById('navbar-tampilan-guru');
+            if (ng) { ng.classList.add('hidden'); ng.style.display = 'none'; }
+            var mng = document.getElementById('m-navbar-guru');
+            if (mng) { mng.classList.add('hidden'); mng.style.display = 'none'; }
+            var nu = document.getElementById('navbar-tampilan-utama');
+            if (nu) { nu.classList.remove('hidden'); nu.style.display = 'flex'; }
+            var mnu = document.getElementById('m-navbar-utama');
+            if (mnu) { mnu.classList.remove('hidden'); mnu.style.display = 'flex'; }
+            try { window.scrollTo(0, 0); } catch (e) {}
+            if (typeof state !== 'undefined') state.isGuruLoggedIn = false;
+            if (typeof switchTab === 'function') {
+              try { switchTab('beranda'); } catch (e) {}
+            }
+            if (typeof showToast === 'function') {
+              try { showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info'); } catch (e) {}
+            }
+          };
+
           return; // Jangan lanjutkan ke sesi siswa jika guru sedang aktif
         }
 
@@ -540,7 +574,7 @@
           </button>
 
           <!-- 5. Keluar -->
-          <button type="button" onclick="keluarModeGuru()" id="nav-guru-keluar" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-400 hover:text-white hover:bg-rose-600/30 shrink-0 cursor-pointer" title="Keluar dari Dasbor Guru">
+          <button type="button" onclick="if(window.keluarModeGuru){window.keluarModeGuru();}else{localStorage.removeItem('educode_teacher_session_v1');sessionStorage.removeItem('educode_teacher_session_v1');location.reload();}" id="nav-guru-keluar" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-400 hover:text-white hover:bg-rose-600/30 shrink-0 cursor-pointer" title="Keluar dari Dasbor Guru">
             <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i>
             <span>Keluar</span>
           </button>
@@ -650,7 +684,7 @@
         <i class="fa-solid fa-award text-lg"></i>
         <span>Kelas 6</span>
       </button>
-      <button type="button" onclick="keluarModeGuru()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-rose-400 cursor-pointer" id="m-nav-guru-keluar" title="Keluar dari Dasbor Guru">
+      <button type="button" onclick="if(window.keluarModeGuru){window.keluarModeGuru();}else{localStorage.removeItem('educode_teacher_session_v1');sessionStorage.removeItem('educode_teacher_session_v1');location.reload();}" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-rose-400 cursor-pointer" id="m-nav-guru-keluar" title="Keluar dari Dasbor Guru">
         <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
         <span>Keluar</span>
       </button>
@@ -11334,7 +11368,7 @@
             <button onclick="muatUlangDataDasbor()" title="Segarkan Data" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs transition">
               <i class="fa-solid fa-rotate"></i>
             </button>
-            <button type="button" onclick="keluarModeGuru()" class="px-3.5 py-2.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Keluar dari Dasbor Guru">
+            <button type="button" onclick="if(window.keluarModeGuru){window.keluarModeGuru();}else{localStorage.removeItem('educode_teacher_session_v1');sessionStorage.removeItem('educode_teacher_session_v1');location.reload();}" class="px-3.5 py-2.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Keluar dari Dasbor Guru">
               <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
             </button>
           </div>
@@ -14406,6 +14440,6 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_logout_fix_v49"></script>
+  <script src="app.js?v=20261105_exit_guaranteed_v50"></script>
 </body>
 </html>

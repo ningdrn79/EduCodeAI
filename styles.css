@@ -2268,6 +2268,15 @@ section.hidden {
   pointer-events: none !important;
 }
 
+/* Pastikan tombol keluar dasbor guru selalu interaktif & responsif terhadap klik */
+#nav-guru-keluar,
+#m-nav-guru-keluar {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 60 !important;
+}
+
 
 
 

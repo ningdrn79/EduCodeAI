@@ -18897,6 +18897,8 @@ function keluarModeGuru() {
     if (typeof setTeacherSessionActive === 'function') {
       setTeacherSessionActive(false);
     }
+  } catch (e) {}
+  try {
     localStorage.removeItem(TEACHER_SESSION_KEY);
     sessionStorage.removeItem(TEACHER_SESSION_KEY);
     localStorage.removeItem('educode_teacher_session_v1');
@@ -18907,7 +18909,9 @@ function keluarModeGuru() {
   } catch (eClean) {
     console.warn('Pembersihan sesi guru:', eClean);
   }
-  state.isGuruLoggedIn = false;
+  if (typeof state !== 'undefined') {
+    state.isGuruLoggedIn = false;
+  }
 
   // 2. Hancurkan seluruh tag style early session guru yang disuntikkan di awal
   try {
@@ -18915,47 +18919,51 @@ function keluarModeGuru() {
   } catch (eStyle) {}
 
   // 3. Paksa transisi visual elemen DOM Dasbor Guru dan Beranda secara tegas
-  const tabGuru = document.getElementById('tab-guru');
-  if (tabGuru) {
-    tabGuru.classList.add('hidden');
-    tabGuru.style.display = 'none';
-  }
+  try {
+    const tabGuru = document.getElementById('tab-guru');
+    if (tabGuru) {
+      tabGuru.classList.add('hidden');
+      tabGuru.style.display = 'none';
+    }
 
-  const tabBeranda = document.getElementById('tab-beranda');
-  if (tabBeranda) {
-    tabBeranda.classList.remove('hidden');
-    tabBeranda.style.display = 'block';
-  }
+    const tabBeranda = document.getElementById('tab-beranda');
+    if (tabBeranda) {
+      tabBeranda.classList.remove('hidden');
+      tabBeranda.style.display = 'block';
+    }
 
-  // 4. Paksa transisi dock navigasi
-  const navGuru = document.getElementById('navbar-tampilan-guru');
-  if (navGuru) {
-    navGuru.classList.add('hidden');
-    navGuru.style.display = 'none';
-  }
-  const mNavGuru = document.getElementById('m-navbar-guru');
-  if (mNavGuru) {
-    mNavGuru.classList.add('hidden');
-    mNavGuru.style.display = 'none';
-  }
+    // 4. Paksa transisi dock navigasi
+    const navGuru = document.getElementById('navbar-tampilan-guru');
+    if (navGuru) {
+      navGuru.classList.add('hidden');
+      navGuru.style.display = 'none';
+    }
+    const mNavGuru = document.getElementById('m-navbar-guru');
+    if (mNavGuru) {
+      mNavGuru.classList.add('hidden');
+      mNavGuru.style.display = 'none';
+    }
 
-  const student = getActiveStudentProfile();
-  if (student) {
-    setHeaderNavMode('sem1');
-    const navSem1 = document.getElementById('navbar-tampilan-sem1');
-    if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.display = 'flex'; }
-  } else {
-    setHeaderNavMode('utama');
-    const navUtama = document.getElementById('navbar-tampilan-utama');
-    if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.display = 'flex'; }
-    const mNavUtama = document.getElementById('m-navbar-utama');
-    if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.display = 'flex'; }
-  }
+    const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (student) {
+      if (typeof setHeaderNavMode === 'function') setHeaderNavMode('sem1');
+      const navSem1 = document.getElementById('navbar-tampilan-sem1');
+      if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.display = 'flex'; }
+    } else {
+      if (typeof setHeaderNavMode === 'function') setHeaderNavMode('utama');
+      const navUtama = document.getElementById('navbar-tampilan-utama');
+      if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.display = 'flex'; }
+      const mNavUtama = document.getElementById('m-navbar-utama');
+      if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.display = 'flex'; }
+    }
+  } catch (eDom) {}
 
   // 5. Alihkan tab aktif ke beranda
-  if (typeof switchTab === 'function') {
-    switchTab('beranda');
-  }
+  try {
+    if (typeof switchTab === 'function') {
+      switchTab('beranda');
+    }
+  } catch (eSwitch) {}
 
   // 6. Gulirkan layar ke puncak paling atas
   try {
@@ -18963,10 +18971,14 @@ function keluarModeGuru() {
   } catch (eScroll) {}
 
   // 7. Muat ulang status profil dan visibilitas tombol floating scroll
-  if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
-  if (typeof updateScrollNavVisibility === 'function') updateScrollNavVisibility();
+  try {
+    if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
+    if (typeof updateScrollNavVisibility === 'function') updateScrollNavVisibility();
+  } catch (eStatus) {}
 
-  showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info');
+  try {
+    if (typeof showToast === 'function') showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info');
+  } catch (eToast) {}
 }
 window.keluarModeGuru = keluarModeGuru;
 
