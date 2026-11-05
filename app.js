@@ -18162,7 +18162,7 @@ const SEED_STUDENTS = [
 ];
 
 // Daftar Nama Siswa Contoh / Dummy Fiktif Bawaan (Hapus Permanen)
-const DAFTAR_NAMA_SISWA_CONTOH = new Set([
+const DAFTAR_NAMA_SISWA_CONTOH = [
   'aditya pratama', 'bella angelique', 'christian tan', 'devina putri', 'ethan lim',
   'felicia aurelia', 'gilbert chandra', 'helena wijaya', 'ignatius hartono', 'jonathan kusuma',
   'katherine setiawan', 'lucas surya', 'michelle natalie', 'nicholas alexander', 'olivia florencia',
@@ -18170,15 +18170,16 @@ const DAFTAR_NAMA_SISWA_CONTOH = new Set([
   'clarissa valerie', 'darren salim', 'gabriel christian', 'helena susanto', 'jonathan liu',
   'keisha natalie', 'leonhart surya', 'megan florencia', 'nathaniel hartono', 'patricia tan',
   'reinhard wijaya', 'sharon valerie'
-]);
+];
 
 // Helper: Memeriksa apakah data siswa adalah data dummy/contoh fiktif
 function isSiswaContohDummy(s) {
   if (!s || !s.nama) return true;
   const n = s.nama.trim().toLowerCase();
-  if (DAFTAR_NAMA_SISWA_CONTOH.has(n)) return true;
+  if (DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
+  if (DAFTAR_NAMA_SISWA_CONTOH.some(d => n.includes(d))) return true;
   if (n.startsWith('siswa ') && (n.includes('(') || n.includes('4') || n.includes('5') || n.includes('6'))) return true;
-  if (s.id && typeof s.id === 'string' && (s.id === 'STD-4A-01' || s.id === 'STD-4B-02' || s.id === 'STD-4C-09') && DAFTAR_NAMA_SISWA_CONTOH.has(n)) return true;
+  if (s.id && typeof s.id === 'string' && (s.id === 'STD-4A-01' || s.id === 'STD-4B-02' || s.id === 'STD-4C-09') && DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
   return false;
 }
 window.isSiswaContohDummy = isSiswaContohDummy;
@@ -18258,6 +18259,26 @@ function hapusSemuaSiswaContohPermanen(quiet = false) {
   }
 }
 window.hapusSemuaSiswaContohPermanen = hapusSemuaSiswaContohPermanen;
+
+// Helper: Pulihkan Seluruh Siswa Resmi Bawaan Sekolah (SDS Cinta Kasih Tzu Chi)
+function pulihkanSemuaSiswaDefault(quiet = false) {
+  try {
+    if (!quiet) playSound('success');
+    try { localStorage.removeItem(DELETED_STUDENTS_KEY); } catch (eDel) {}
+    const fresh = JSON.parse(JSON.stringify(SEED_STUDENTS));
+    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(fresh));
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (!quiet) {
+      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! 🎉`, 'success');
+    }
+    return fresh.length;
+  } catch (e) {
+    console.error('Gagal memulihkan siswa default:', e);
+    return 0;
+  }
+}
+window.pulihkanSemuaSiswaDefault = pulihkanSemuaSiswaDefault;
 
 // Helper: Normalisasi nama kelas ke standar (4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E)
 function normalisasiNamaKelas(raw, fallback = '4A') {
@@ -18397,6 +18418,16 @@ function getStudentDatabase() {
       }
     }
 
+    // Auto-Heal: Jika daftar siswa kosong (0 siswa), otomatis pulihkan dari data master sekolah
+    if (!parsed || parsed.length === 0) {
+      try {
+        localStorage.removeItem(DELETED_STUDENTS_KEY);
+      } catch (eDel) {}
+      parsed = JSON.parse(JSON.stringify(SEED_STUDENTS));
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(parsed));
+      changed = true;
+    }
+
     parsed.forEach(s => {
       // Pulihkan kelas jika tertimpa 4A padahal NIS atau ID berasal dari kelas lain
       if (s.id && s.id.includes('4B-')) {
@@ -18527,8 +18558,8 @@ function initTeacherDatabase() {
     state.zoomTabelGuru = localStorage.getItem('educode_table_zoom_v1') || 'besar';
 
     // Inisialisasi status Server Cloud Database Firebase
-    if (typeof initFirebaseClient === 'function') {
-      initFirebaseClient();
+    if (typeof perbaruiStatusFirebaseUI === 'function') {
+      perbaruiStatusFirebaseUI();
     }
   } catch (eSheet) {
     console.warn('Inisialisasi tampilan sheet guru:', eSheet);
@@ -19884,8 +19915,8 @@ function muatProfilSiswa() {
       renderGaleriPosterWord();
     }
 
-    // Sinkronkan portofolio karya poster & Drive siswa dari Cloud Firebase
-    if (profile && typeof sinkronkanKaryaSiswaDariCloud === 'function') {
+    // Sinkronkan portofolio karya poster & Drive siswa dari Cloud Firebase (Hanya jika Cloud Aktif)
+    if (profile && isFirebaseConnected && typeof sinkronkanKaryaSiswaDariCloud === 'function') {
       sinkronkanKaryaSiswaDariCloud(profile);
     }
 
@@ -21780,7 +21811,6 @@ function dapatkanDriveSiswa(student) {
   _driveDataCache.set(cacheKey, res);
   return res;
 }
-window.dapatkanDriveSiswa = dapatkanDriveSiswa;
 window.dapatkanDriveSiswa = dapatkanDriveSiswa;
 
 // --------------------------------------------------------------------------
@@ -24045,7 +24075,75 @@ window.tutupModalLupaPinEmailGuru = tutupModalLupaPinEmailGuru;
 window.eksekusiResetPinViaEmail = eksekusiResetPinViaEmail;
 window.kirimEmailNotifikasiReset = kirimEmailNotifikasiReset;
 window.hapusSemuaSiswaContohPermanen = hapusSemuaSiswaContohPermanen;
+
+// Helper: Pulihkan Seluruh Siswa Resmi Bawaan Sekolah (SDS Cinta Kasih Tzu Chi)
+function pulihkanSemuaSiswaDefault(quiet = false) {
+  try {
+    if (!quiet) playSound('success');
+    try { localStorage.removeItem(DELETED_STUDENTS_KEY); } catch (eDel) {}
+    const fresh = JSON.parse(JSON.stringify(SEED_STUDENTS));
+    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(fresh));
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (!quiet) {
+      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! 🎉`, 'success');
+    }
+    return fresh.length;
+  } catch (e) {
+    console.error('Gagal memulihkan siswa default:', e);
+    return 0;
+  }
+}
+window.pulihkanSemuaSiswaDefault = pulihkanSemuaSiswaDefault;
 window.urutkanSiswaSesuaiNomorAbsen = urutkanSiswaSesuaiNomorAbsen;
+
+// Global Window Exports untuk Seluruh Tombol Interaktif & Dasbor
+window.eksporNilaiCSV = typeof eksporNilaiCSV === 'function' ? eksporNilaiCSV : function(){};
+window.muatUlangDataDasbor = typeof muatUlangDataDasbor === 'function' ? muatUlangDataDasbor : function(){};
+window.keluarModeGuru = typeof keluarModeGuru === 'function' ? keluarModeGuru : function(){};
+window.renderDasborGuru = typeof renderDasborGuru === 'function' ? renderDasborGuru : function(){};
+window.filterDanCariSiswa = typeof filterDanCariSiswa === 'function' ? filterDanCariSiswa : function(){};
+window.setFilterKelasGuru = typeof setFilterKelasGuru === 'function' ? setFilterKelasGuru : function(){};
+window.setModePenilaianGuru = typeof setModePenilaianGuru === 'function' ? setModePenilaianGuru : function(){};
+window.setZoomTabelGuru = typeof setZoomTabelGuru === 'function' ? setZoomTabelGuru : function(){};
+window.bukaModalDetailSiswa = typeof bukaModalDetailSiswa === 'function' ? bukaModalDetailSiswa : function(){};
+window.tutupModalDetailSiswa = typeof tutupModalDetailSiswa === 'function' ? tutupModalDetailSiswa : function(){};
+window.simpanPerubahanDataSiswaModal = typeof simpanPerubahanDataSiswaModal === 'function' ? simpanPerubahanDataSiswaModal : function(){};
+window.simpanCatatanGuruModal = typeof simpanCatatanGuruModal === 'function' ? simpanCatatanGuruModal : function(){};
+window.hapusSiswaTerpilih = typeof hapusSiswaTerpilih === 'function' ? hapusSiswaTerpilih : function(){};
+window.hapusSiswaById = typeof hapusSiswaById === 'function' ? hapusSiswaById : function(){};
+window.bukaModalTambahSiswa = typeof bukaModalTambahSiswa === 'function' ? bukaModalTambahSiswa : function(){};
+window.tutupModalTambahSiswa = typeof tutupModalTambahSiswa === 'function' ? tutupModalTambahSiswa : function(){};
+window.tambahSiswaManual = typeof tambahSiswaManual === 'function' ? tambahSiswaManual : function(){};
+window.konfirmasiResetDatabase = typeof konfirmasiResetDatabase === 'function' ? konfirmasiResetDatabase : function(){};
+window.bukaModalUbahPinGuru = typeof bukaModalUbahPinGuru === 'function' ? bukaModalUbahPinGuru : function(){};
+window.tutupModalUbahPinGuru = typeof tutupModalUbahPinGuru === 'function' ? tutupModalUbahPinGuru : function(){};
+window.simpanPinGuruBaru = typeof simpanPinGuruBaru === 'function' ? simpanPinGuruBaru : function(){};
+window.toggleLihatInputPin = typeof toggleLihatInputPin === 'function' ? toggleLihatInputPin : function(){};
+window.toggleLihatPinGuru = typeof toggleLihatPinGuru === 'function' ? toggleLihatPinGuru : function(){};
+window.tekanKeypadGuru = typeof tekanKeypadGuru === 'function' ? tekanKeypadGuru : function(){};
+window.hapusKeypadGuru = typeof hapusKeypadGuru === 'function' ? hapusKeypadGuru : function(){};
+window.verifikasiPinGuru = typeof verifikasiPinGuru === 'function' ? verifikasiPinGuru : function(){};
+window.switchTab = typeof switchTab === 'function' ? switchTab : function(){};
+window.bukaTampilanUtama = typeof bukaTampilanUtama === 'function' ? bukaTampilanUtama : function(){};
+window.bukaSemesterDariUtama = typeof bukaSemesterDariUtama === 'function' ? bukaSemesterDariUtama : function(){};
+window.pilihSemester = typeof pilihSemester === 'function' ? pilihSemester : function(){};
+window.toggleSemesterSiswa = typeof toggleSemesterSiswa === 'function' ? toggleSemesterSiswa : function(){};
+window.toggleAudioNarration = typeof toggleAudioNarration === 'function' ? toggleAudioNarration : function(){};
+window.toggleBahasaAplikasi = typeof toggleBahasaAplikasi === 'function' ? toggleBahasaAplikasi : function(){};
+window.sapaRobotLucu = typeof sapaRobotLucu === 'function' ? sapaRobotLucu : function(){};
+window.sapaRobotHalo = typeof sapaRobotHalo === 'function' ? sapaRobotHalo : function(){};
+window.speakContent = typeof speakContent === 'function' ? speakContent : function(){};
+window.tambahPoin = typeof tambahPoin === 'function' ? tambahPoin : function(){};
+window.showToast = typeof showToast === 'function' ? showToast : function(){};
+window.playSound = typeof playSound === 'function' ? playSound : function(){};
+window.pilihSubTabGuru = typeof pilihSubTabGuru === 'function' ? pilihSubTabGuru : function(){};
+window.toggleAksesSemester2OlehGuru = typeof toggleAksesSemester2OlehGuru === 'function' ? toggleAksesSemester2OlehGuru : function(){};
+window.bukaModalSemester2 = typeof bukaModalSemester2 === 'function' ? bukaModalSemester2 : function(){};
+window.tutupModalSemester2 = typeof tutupModalSemester2 === 'function' ? tutupModalSemester2 : function(){};
+window.unggahSemuaKaryaLokalKeCloud = typeof unggahSemuaKaryaLokalKeCloud === 'function' ? unggahSemuaKaryaLokalKeCloud : function(){};
+window.simpanWebhookGuruForm = typeof simpanWebhookGuruForm === 'function' ? simpanWebhookGuruForm : function(){};
+window.ujiKirimWebhookGuru = typeof ujiKirimWebhookGuru === 'function' ? ujiKirimWebhookGuru : function(){};
 
 // Panggil inisialisasi Database Guru & Pemulihan Sesi saat skrip dieksekusi dan saat DOM siap
 try {
@@ -24276,11 +24374,68 @@ function parseFirebaseConfig(raw) {
 }
 window.parseFirebaseConfig = parseFirebaseConfig;
 
+// Loader Dinamis Asinkron: Memuat Firebase SDKs HANYA saat diperlukan (Non-blocking, anti-lag)
+let _firebaseSdkLoadingPromise = null;
+function loadFirebaseSDKs() {
+  if (typeof window.firebase !== 'undefined' && window.firebase.initializeApp) {
+    return Promise.resolve(true);
+  }
+  if (_firebaseSdkLoadingPromise) return _firebaseSdkLoadingPromise;
+
+  _firebaseSdkLoadingPromise = new Promise((resolve) => {
+    const urls = [
+      'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js',
+      'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js',
+      'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js'
+    ];
+    let loadedCount = 0;
+    let finished = false;
+
+    const timer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        resolve(typeof window.firebase !== 'undefined');
+      }
+    }, 4500);
+
+    const checkDone = () => {
+      loadedCount++;
+      if (loadedCount >= urls.length && !finished) {
+        finished = true;
+        clearTimeout(timer);
+        resolve(true);
+      }
+    };
+
+    urls.forEach(u => {
+      if (document.querySelector(`script[src="${u}"]`)) {
+        checkDone();
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = u;
+      s.async = true;
+      s.onload = checkDone;
+      s.onerror = () => {
+        if (!finished) {
+          finished = true;
+          clearTimeout(timer);
+          resolve(false);
+        }
+      };
+      document.head.appendChild(s);
+    });
+  });
+
+  return _firebaseSdkLoadingPromise;
+}
+window.loadFirebaseSDKs = loadFirebaseSDKs;
+
 // Inisialisasi Firebase Client
 function initFirebaseClient(customConfig = null) {
   try {
     if (typeof window.firebase === 'undefined') {
-      console.warn('Firebase SDK belum termuat di browser.');
+      isFirebaseConnected = false;
       return false;
     }
 
@@ -24339,9 +24494,12 @@ function pasangFirebaseTzuChiOtomatis() {
     appId: "1:1083820511307:web:4bd4f5933d6c061f1b7dce",
     measurementId: "G-KWEHGW5C0X"
   };
+  const jsonStr = JSON.stringify(tzuChiConfig, null, 2);
   if (inputEl) {
-    inputEl.value = JSON.stringify(tzuChiConfig, null, 2);
+    inputEl.value = jsonStr;
   }
+  localStorage.setItem(FIREBASE_CONFIG_KEY, jsonStr);
+  showToast('Kode proyek sd-tzuchi-kelas4 terpasang! Menguji koneksi...', 'info');
   simpanDanUjiFirebase();
 }
 window.pasangFirebaseTzuChiOtomatis = pasangFirebaseTzuChiOtomatis;
@@ -24438,12 +24596,23 @@ async function simpanDanUjiFirebase() {
   showToast(`🔄 Menguji sambungan ke Firebase (${parsed.projectId})...`, 'info');
 
   try {
-    const success = initFirebaseClient(parsed);
-    if (!success) {
-      throw new Error('Firebase SDK belum termuat di browser.');
+    // 1. Muat SDK Firebase secara dinamis jika belum termuat
+    const sdkLoaded = await loadFirebaseSDKs();
+    if (!sdkLoaded || typeof window.firebase === 'undefined') {
+      localStorage.setItem('educode_firebase_enabled_v1', 'false');
+      isFirebaseConnected = false;
+      perbaruiStatusFirebaseUI(parsed);
+      showToast(`⚡ Kunci ${parsed.projectId} tersimpan! Jaringan memblokir koneksi SDK Google, aplikasi tetap berjalan lancar di Mode Lokal.`, 'info');
+      tampilkanModalStatusFirebase(parsed, false, 'SDK Firebase tidak dapat diakses dari jaringan lab ini. Aplikasi otomatis berjalan cepat dan aman dalam Mode Lokal.');
+      return;
     }
 
-    // Ping Firestore dengan batas waktu (timeout) 6 detik agar tombol tidak pernah macet
+    const success = initFirebaseClient(parsed);
+    if (!success) {
+      throw new Error('Firebase SDK belum siap diinisialisasi.');
+    }
+
+    // Ping Firestore dengan batas waktu (timeout) 3.5 detik agar tombol tidak pernah macet
     let pingSuccess = false;
     let pingErrMsg = '';
 
@@ -24457,7 +24626,7 @@ async function simpanDanUjiFirebase() {
         }, { merge: true });
 
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('TIMEOUT')), 6000)
+          setTimeout(() => reject(new Error('TIMEOUT')), 3500)
         );
 
         await Promise.race([pingPromise, timeoutPromise]);
@@ -24465,7 +24634,7 @@ async function simpanDanUjiFirebase() {
       } catch (errPing) {
         console.warn('Ping Firestore warning:', errPing);
         if (errPing.message === 'TIMEOUT') {
-          pingErrMsg = 'Firestore belum merespons dalam 6 detik. Menu "Firestore Database" kemungkinan belum dibuat (Create database) di Firebase Console.';
+          pingErrMsg = 'Firestore belum merespons dalam 3.5 detik. Menu "Firestore Database" kemungkinan belum dibuat (Create database) di Firebase Console.';
         } else if (errPing.code === 'permission-denied' || (errPing.message && errPing.message.includes('permission'))) {
           pingErrMsg = 'Aturan keamanan (Security Rules) Firestore menolak akses. Harap ubah ke Test Mode: allow read, write: if true;';
         } else {
@@ -24837,7 +25006,16 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const isApproved = localStorage.getItem('educode_firebase_enabled_v1') === 'true';
     if (isApproved) {
-      initFirebaseClient();
+      if (typeof loadFirebaseSDKs === 'function') {
+        loadFirebaseSDKs().then(() => {
+          initFirebaseClient();
+        }).catch(() => {
+          isFirebaseConnected = false;
+          perbaruiStatusFirebaseUI();
+        });
+      } else {
+        initFirebaseClient();
+      }
     } else {
       isFirebaseConnected = false;
       perbaruiStatusFirebaseUI();

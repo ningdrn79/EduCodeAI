@@ -2247,7 +2247,27 @@ body.typing-screen-locked {
   background-color: #ffffff !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
   line-height: 1.5 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
 }
+
+#firebase-config-input::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* ======================================================== */
+/* ATURAN KEAMANAN MUTLAK: SEMUA MODAL & ELEMEN HIDDEN      */
+/* Mencegah layer transparan / backdrop mencegat klik mouse */
+/* ======================================================== */
+.hidden,
+[hidden],
+div.hidden,
+section.hidden {
+  display: none !important;
+  pointer-events: none !important;
+}
+
 
 
 

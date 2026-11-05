@@ -21,10 +21,7 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
   </script>
-  <!-- Google Firebase Compat SDKs (App, Firestore, Storage) untuk Server Cloud Database Siswa (Non-Blocking Deferred) -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <!-- Google Firebase Compat SDKs dimuat secara dinamis saat dibutuhkan (Zero-Blocking, Cepat & Bebas Lag) -->
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -55,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261104_firebase_contrast_v3">
+  <link rel="stylesheet" href="styles.css?v=20261105_click_fix_v48">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -11490,6 +11487,9 @@
             <button type="button" onclick="hapusSemuaSiswaContohPermanen()" class="px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Hapus permanen semua data siswa contoh fiktif bawaan">
               <i class="fa-solid fa-broom text-rose-600"></i> Hapus Siswa Contoh
             </button>
+            <button type="button" onclick="pulihkanSemuaSiswaDefault()" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Tampilkan dan pulihkan kembali seluruh 11 kelas siswa resmi SDS Cinta Kasih Tzu Chi">
+              <i class="fa-solid fa-arrows-rotate text-emerald-600"></i> Pulihkan Data Siswa
+            </button>
             <select id="guru-filter-kkm" onchange="filterDanCariSiswa()" class="text-xs font-medium px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="semua">Semua Status KKM</option>
               <option value="tuntas">✅ Tuntas KKM (≥ 80)</option>
@@ -11937,10 +11937,21 @@
                 </div>
               </div>
 
+              <!-- Banner Pilihan Mode Cepat -->
+              <div class="p-3 bg-indigo-50/80 rounded-xl border border-indigo-200 text-xs text-indigo-900 flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-bolt-lightning text-indigo-600 text-base"></i>
+                  <span><b>Mode Cepat Lokal Aktif Bawaan:</b> Aplikasi berjalan 100% cepat tanpa internet lab. Cloud Firebase opsional jika ingin sinkronisasi multi-komputer.</span>
+                </div>
+                <button type="button" onclick="aktifkanModeCepatLokal()" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                  <i class="fa-solid fa-gauge-high"></i> Pakai Mode Lokal Cepat
+                </button>
+              </div>
+
               <textarea id="firebase-config-input" rows="5" placeholder='Tempelkan (Paste) konfigurasi proyek Firebase di sini.
 Bisa salin seluruh blok dari Firebase Console:
 const firebaseConfig = { apiKey: "...", projectId: "...", ... };
-Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs font-mono p-3 bg-white text-slate-900 border-2 border-amber-300 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition resize-y font-semibold shadow-inner" style="color: #0f172a !important; background-color: #ffffff !important; caret-color: #d97706 !important;"></textarea>
+Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs font-mono p-3 bg-white text-slate-900 border-2 border-amber-300 rounded-xl focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition resize-y font-bold shadow-inner" style="color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; background-color: #ffffff !important; caret-color: #d97706 !important; font-size: 12px !important; font-family: ui-monospace, monospace !important;"></textarea>
 
               <div class="flex flex-wrap items-center gap-2 pt-1">
                 <button type="button" id="btn-simpan-firebase" onclick="simpanDanUjiFirebase()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
@@ -12339,7 +12350,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   </footer>
 
   <!-- MODAL INTERAKTIF: PREVIEW SEMESTER 2 -->
-  <div id="modal-semester-2" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="modal-semester-2" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-purple-200 space-y-5 animate-fadeIn">
       
       <div class="flex items-center justify-between border-b pb-4">
@@ -12553,7 +12564,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
 
   <!-- Modal Konfirmasi Hapus Satu Poster Word -->
-  <div id="modal-konfirmasi-hapus-poster" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fadeIn">
+  <div id="modal-konfirmasi-hapus-poster" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4 transform transition-all scale-100">
       <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-sm">
         <i class="fa-solid fa-trash-can"></i>
@@ -12582,7 +12593,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
 
   <!-- Modal Konfirmasi Hapus Semua Poster Word -->
-  <div id="modal-konfirmasi-hapus-semua-poster" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fadeIn">
+  <div id="modal-konfirmasi-hapus-semua-poster" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4 transform transition-all scale-100">
       <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-sm">
         <i class="fa-solid fa-dumpster-fire"></i>
@@ -12711,7 +12722,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: PILIH SUMBER GAMBAR UNTUK SLOT DRIVE 7 KEBIASAAN -->
   <!-- ======================================================== -->
-  <div id="modal-pilih-sumber-drive" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+  <div id="modal-pilih-sumber-drive" style="display: none;" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn flex flex-col max-h-[90vh]">
       <div class="p-4 sm:p-5 bg-gradient-to-r from-purple-700 via-indigo-700 to-sky-700 text-white flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
@@ -12788,7 +12799,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: LOGIN / VERIFIKASI PIN GURU -->
   <!-- ======================================================== -->
-  <div id="modal-login-guru" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLoginGuru()">
+  <div id="modal-login-guru" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalLoginGuru()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-5">
       <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto shadow-inner">
         <i class="fa-solid fa-lock"></i>
@@ -12923,7 +12934,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: UBAH PIN AKSES DASBOR GURU -->
   <!-- ======================================================== -->
-  <div id="modal-ubah-pin-guru" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalUbahPinGuru()">
+  <div id="modal-ubah-pin-guru" style="display: none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalUbahPinGuru()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -12992,7 +13003,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: KARTU PELAJAR & RAPOR DIGITAL SISWA (PROFIL SISWA) -->
   <!-- ======================================================== -->
-  <div id="modal-profil-siswa" class="fixed inset-0 z-[9000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalProfilSiswa()">
+  <div id="modal-profil-siswa" style="display: none;" class="fixed inset-0 z-[9000] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalProfilSiswa()">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 max-h-[92vh] overflow-y-auto">
       
       <!-- TAMPILAN 1: KARTU PELAJAR & RAPOR DIGITAL SISWA (AKTIF SAAT LOGIN) -->
@@ -13241,7 +13252,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: KONFIRMASI SIGN OUT SISWA -->
   <!-- ======================================================== -->
-  <div id="modal-konfirmasi-logout-siswa" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalKonfirmasiLogoutSiswa()">
+  <div id="modal-konfirmasi-logout-siswa" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalKonfirmasiLogoutSiswa()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center space-y-4">
       <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl shadow-inner">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -13272,7 +13283,7 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
   <!-- ======================================================== -->
   <!-- MODAL: EDIT DATA SISWA, NILAI, & CATATAN GURU -->
   <!-- ======================================================== -->
-  <div id="modal-detail-siswa" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalDetailSiswa()">
+  <div id="modal-detail-siswa" style="display: none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalDetailSiswa()">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto">
       
       <!-- Header Modal Edit -->
@@ -14395,6 +14406,6 @@ Teks akan terbaca hitam jelas dan otomatis diformat rapi.' class="w-full text-xs
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261104_speed_turbo_v45"></script>
+  <script src="app.js?v=20261105_click_fix_v48"></script>
 </body>
 </html>
