@@ -2291,6 +2291,12 @@ header {
 }
 
 #navbar-tampilan-utama,
+#navbar-tampilan-sem1,
+#navbar-tampilan-guru,
+#navbar-tampilan-sem1 *,
+#navbar-tampilan-guru *,
+.nav-dock-3d,
+.nav-btn-3d,
 #btn-main-login-guru,
 #btn-main-lang,
 #btn-main-sound {
@@ -2308,6 +2314,13 @@ header {
   z-index: 1010 !important;
 }
 
+/* Floating Scroll Navigation */
+#floating-scroll-nav,
+#floating-scroll-nav * {
+  z-index: 1020 !important;
+  pointer-events: auto !important;
+}
+
 /* Main container dan Bar Siswa di Beranda */
 main {
   position: relative !important;
@@ -2317,6 +2330,15 @@ main {
 #bar-siswa-aktif {
   position: relative !important;
   z-index: 105 !important;
+  pointer-events: auto !important;
+}
+
+#hero-banner,
+#hero-banner button,
+#hero-sem-buttons button,
+#hero-guest-btn button {
+  position: relative !important;
+  z-index: 106 !important;
   pointer-events: auto !important;
 }
 
@@ -2331,7 +2353,32 @@ main {
   cursor: pointer !important;
 }
 
-/* Pastikan Modal Login Guru, Modal Profil Siswa & Konfirmasi Tampil Tegas di Layer Paling Depan */
+/* Pastikan Seluruh Modal yang Berstatus Hidden 100% Mati & Tidak Menyerap Klik */
+.hidden,
+[hidden],
+#modal-login-guru.hidden,
+#modal-profil-siswa.hidden,
+#modal-konfirmasi-logout-siswa.hidden,
+#modal-detail-siswa.hidden,
+#modal-ubah-pin-guru.hidden,
+#modal-lupa-pin-email-guru.hidden,
+#modal-rubrik-penilaian.hidden,
+#modal-pilih-sumber-slot.hidden,
+#modal-pilih-sumber-drive.hidden,
+#modal-monitoring-drive-guru.hidden,
+#modal-panduan-sheets.hidden,
+#modal-panduan-firebase.hidden,
+#modal-status-koneksi-firebase.hidden,
+#modal-bank-soal-guru.hidden,
+#modal-upload-dokumen-soal.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  z-index: -9999 !important;
+}
+
+/* Pastikan Modal Login Guru, Modal Profil Siswa & Konfirmasi Tampil Tegas di Layer Paling Depan HANYA jika TIDAK hidden */
 #modal-login-guru:not(.hidden),
 #modal-profil-siswa:not(.hidden),
 #modal-konfirmasi-logout-siswa:not(.hidden) {

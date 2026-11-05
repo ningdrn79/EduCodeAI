@@ -18697,6 +18697,8 @@ function tutupModalLoginGuru() {
     modal.classList.add('hidden');
     modal.style.setProperty('display', 'none', 'important');
     modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
   }
 }
 window.tutupModalLoginGuru = tutupModalLoginGuru;
@@ -19423,6 +19425,8 @@ function tutupModalProfilSiswa() {
     modal.classList.add('hidden');
     modal.style.setProperty('display', 'none', 'important');
     modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
   }
 }
 window.tutupModalProfilSiswa = tutupModalProfilSiswa;
@@ -19634,7 +19638,10 @@ function tutupModalKonfirmasiLogoutSiswa() {
   const modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
   if (modalLogout) {
     modalLogout.classList.add('hidden');
-    modalLogout.style.display = 'none';
+    modalLogout.style.setProperty('display', 'none', 'important');
+    modalLogout.style.setProperty('pointer-events', 'none', 'important');
+    modalLogout.style.setProperty('visibility', 'hidden', 'important');
+    modalLogout.style.setProperty('z-index', '-9999', 'important');
   }
 }
 window.tutupModalKonfirmasiLogoutSiswa = tutupModalKonfirmasiLogoutSiswa;
@@ -24783,7 +24790,6 @@ async function simpanDanUjiFirebase() {
   let parsed = parseFirebaseConfig(raw);
   if (!parsed || !parsed.apiKey || !parsed.projectId) {
     parsed = DEFAULT_FIREBASE_CONFIG;
-  }
   }
 
   // Format ulang tampilan textarea menjadi JSON rapi agar tulisan nyaman dibaca

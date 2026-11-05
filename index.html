@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_firebase_tzuchi_v54">
+  <link rel="stylesheet" href="styles.css?v=20261105_fix_syntax_and_overlay_v55">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -221,6 +221,8 @@
           modal.classList.add('hidden');
           modal.style.setProperty('display', 'none', 'important');
           modal.style.setProperty('pointer-events', 'none', 'important');
+          modal.style.setProperty('visibility', 'hidden', 'important');
+          modal.style.setProperty('z-index', '-9999', 'important');
         }
       };
 
@@ -265,6 +267,8 @@
           modal.classList.add('hidden');
           modal.style.setProperty('display', 'none', 'important');
           modal.style.setProperty('pointer-events', 'none', 'important');
+          modal.style.setProperty('visibility', 'hidden', 'important');
+          modal.style.setProperty('z-index', '-9999', 'important');
         }
       };
 
@@ -692,11 +696,11 @@
         <!-- Navigation Tabs Siswa (1 Bar Dock Terpadu Sesuai Screenshot User) -->
         <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
           <!-- 1. Beranda -->
-          <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white shrink-0">
+          <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-white shrink-0">
             <i class="fa-solid fa-house text-[#38bdf8] icon-3d-glow"></i> <span data-i18n="beranda">Beranda</span>
           </button>
           <!-- 2. Modul Belajar -->
-          <button onclick="switchTab('modul')" id="nav-modul" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 shrink-0">
+          <button onclick="switchTab('modul')" id="nav-modul" class="nav-btn nav-btn-3d px-3.5 sm:px-4.5 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white shrink-0">
             <i class="fa-solid fa-book-open text-white icon-3d-glow"></i> <span data-i18n="modul">Modul Belajar</span>
           </button>
           <!-- 3. Lab MS Word -->
@@ -14644,6 +14648,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_firebase_tzuchi_v54"></script>
+  <script src="app.js?v=20261105_fix_syntax_and_overlay_v55"></script>
 </body>
 </html>
