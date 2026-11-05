@@ -1234,6 +1234,7 @@ function switchTab(tabId) {
     setTimeout(loadQuizQuestion, 50);
   }
 }
+window.switchTab = switchTab;
 
 // ==========================================
 // 6. ENGINE GAME ANTARIKSA (SPACE ADVENTURE)

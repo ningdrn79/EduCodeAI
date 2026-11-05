@@ -2293,10 +2293,10 @@ header {
 #navbar-tampilan-utama,
 #navbar-tampilan-sem1,
 #navbar-tampilan-guru,
-#navbar-tampilan-sem1 *,
-#navbar-tampilan-guru *,
 .nav-dock-3d,
 .nav-btn-3d,
+#navbar-tampilan-sem1 button,
+#navbar-tampilan-sem1 .nav-btn,
 #btn-main-login-guru,
 #btn-main-lang,
 #btn-main-sound {
@@ -2304,6 +2304,10 @@ header {
   z-index: 1010 !important;
   pointer-events: auto !important;
   cursor: pointer !important;
+}
+
+#navbar-tampilan-sem1 * {
+  pointer-events: auto !important;
 }
 
 #nav-guru-keluar,
@@ -2353,9 +2357,21 @@ main {
   cursor: pointer !important;
 }
 
-/* Pastikan Seluruh Modal yang Berstatus Hidden 100% Mati & Tidak Menyerap Klik */
-.hidden,
-[hidden],
+#bar-siswa-aktif button,
+#bar-siswa-aktif button * {
+  pointer-events: auto !important;
+}
+
+/* Standard utility hidden */
+.hidden {
+  display: none !important;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Khusus Modal Pop-up: saat tertutup (hidden) pastikan 100% di belakang layar & tidak menyerap klik */
 #modal-login-guru.hidden,
 #modal-profil-siswa.hidden,
 #modal-konfirmasi-logout-siswa.hidden,

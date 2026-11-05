@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261105_fix_syntax_and_overlay_v55">
+  <link rel="stylesheet" href="styles.css?v=20261105_menu_siswa_fix_v56">
 
   <!-- Early Session Guard (Anti-Flicker & Persistensi Sesi Guru & Siswa saat Reload / F5) -->
   <script>
@@ -162,14 +162,15 @@
             style.id = 'style-early-student-session';
             style.innerHTML = `
               #navbar-tampilan-utama { display: none !important; }
-              #navbar-tampilan-sem1 { display: flex !important; }
+              #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
+              #navbar-tampilan-sem1 * { pointer-events: auto !important; }
               #btn-welcome-login { display: none !important; }
-              #btn-welcome-logout { display: inline-flex !important; }
-              #btn-welcome-rapor { display: inline-flex !important; }
-              #btn-welcome-ganti { display: inline-flex !important; }
-              ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
+              #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+              #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+              #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+              ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
               #hero-guest-btn { display: none !important; }
-              #hero-sem-buttons { display: flex !important; }
+              #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
               ${isSem2Open ? '' : '#hero-btn-sem2 { display: none !important; } .sem2-feature-card { display: none !important; } #card-sem-grid-col1, #card-sem-grid-col2 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }'}
               #welcome-siswa-bintang-wrap { display: flex !important; }
               @media (max-width: 767px) {
@@ -188,9 +189,42 @@
     })();
   </script>
 
-  <!-- Early Modal & Login Handlers: Menjamin Tombol Login Guru & Masuk Siswa 100% Responsif Sejak Detik Pertama -->
+  <!-- Early Modal & Login Handlers: Menjamin Tombol Login Guru, Masuk Siswa & Tab Navigasi 100% Responsif Sejak Detik Pertama -->
   <script>
     (function initEarlyModalHandlers() {
+      // Early switchTab agar navigasi tab siswa langsung berfungsi mulus
+      window.switchTab = function(tabId) {
+        try { if (typeof playSound === 'function') playSound('click'); } catch(e) {}
+        var tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik'];
+        for (var i = 0; i < tabs.length; i++) {
+          var t = tabs[i];
+          var sec = document.getElementById('tab-' + t);
+          if (sec) {
+            if (t === tabId) {
+              sec.classList.remove('hidden');
+              sec.style.removeProperty('display');
+              sec.style.setProperty('display', 'block', 'important');
+            } else {
+              sec.classList.add('hidden');
+              sec.style.setProperty('display', 'none', 'important');
+            }
+          }
+          var nav = document.getElementById('nav-' + t);
+          if (nav) {
+            if (t === tabId) {
+              nav.classList.add('active-tab');
+              nav.classList.remove('text-slate-300');
+              nav.classList.add('text-white');
+            } else {
+              nav.classList.remove('active-tab');
+              nav.classList.remove('text-white');
+              nav.classList.add('text-slate-300');
+            }
+          }
+        }
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+      };
+
       window.bukaModalLoginGuru = function() {
         try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
         var modal = document.getElementById('modal-login-guru');
@@ -270,6 +304,63 @@
           modal.style.setProperty('visibility', 'hidden', 'important');
           modal.style.setProperty('z-index', '-9999', 'important');
         }
+      };
+
+      window.bukaModalProfilSiswa = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        var modal = document.getElementById('modal-profil-siswa');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.style.removeProperty('display');
+          modal.style.setProperty('display', 'flex', 'important');
+          modal.style.setProperty('pointer-events', 'auto', 'important');
+          modal.style.setProperty('visibility', 'visible', 'important');
+          modal.style.setProperty('z-index', '999999', 'important');
+        }
+        var cardView = document.getElementById('profil-view-card');
+        var formView = document.getElementById('profil-view-form');
+        if (cardView) { cardView.classList.remove('hidden'); cardView.style.setProperty('display', 'block', 'important'); }
+        if (formView) { formView.classList.add('hidden'); formView.style.setProperty('display', 'none', 'important'); }
+      };
+
+      window.konfirmasiKeluarSiswa = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        var modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
+        if (modalLogout) {
+          modalLogout.classList.remove('hidden');
+          modalLogout.style.removeProperty('display');
+          modalLogout.style.setProperty('display', 'flex', 'important');
+          modalLogout.style.setProperty('pointer-events', 'auto', 'important');
+          modalLogout.style.setProperty('visibility', 'visible', 'important');
+          modalLogout.style.setProperty('z-index', '999999', 'important');
+        } else {
+          if (confirm('Keluar dari Akun Siswa?')) {
+            localStorage.removeItem('educode_active_student_v1');
+            sessionStorage.removeItem('educode_active_student_v1');
+            location.reload();
+          }
+        }
+      };
+
+      window.tutupModalKonfirmasiLogoutSiswa = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        var modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
+        if (modalLogout) {
+          modalLogout.classList.add('hidden');
+          modalLogout.style.setProperty('display', 'none', 'important');
+          modalLogout.style.setProperty('pointer-events', 'none', 'important');
+          modalLogout.style.setProperty('visibility', 'hidden', 'important');
+          modalLogout.style.setProperty('z-index', '-9999', 'important');
+        }
+      };
+
+      window.eksekusiLogoutSiswa = function() {
+        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+        localStorage.removeItem('educode_active_student_v1');
+        sessionStorage.removeItem('educode_active_student_v1');
+        window.tutupModalKonfirmasiLogoutSiswa();
+        window.tutupModalProfilSiswa();
+        location.reload();
       };
 
       window.verifikasiPinGuru = function() {
@@ -378,6 +469,42 @@
           btnSiswa.addEventListener('click', function(e) {
             e.preventDefault();
             window.bukaPilihSiswaCepat();
+          });
+        }
+        var btnRapor = document.getElementById('btn-welcome-rapor');
+        if (btnRapor && !btnRapor.__earlyBound) {
+          btnRapor.__earlyBound = true;
+          btnRapor.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof window.bukaModalProfilSiswa === 'function') {
+              window.bukaModalProfilSiswa();
+            } else {
+              window.bukaPilihSiswaCepat();
+            }
+          });
+        }
+        var btnGanti = document.getElementById('btn-welcome-ganti');
+        if (btnGanti && !btnGanti.__earlyBound) {
+          btnGanti.__earlyBound = true;
+          btnGanti.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.bukaPilihSiswaCepat();
+          });
+        }
+        var btnLogout = document.getElementById('btn-welcome-logout');
+        if (btnLogout && !btnLogout.__earlyBound) {
+          btnLogout.__earlyBound = true;
+          btnLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof window.konfirmasiKeluarSiswa === 'function') {
+              window.konfirmasiKeluarSiswa();
+            } else {
+              if (confirm('Keluar dari Akun Siswa?')) {
+                localStorage.removeItem('educode_active_student_v1');
+                sessionStorage.removeItem('educode_active_student_v1');
+                location.reload();
+              }
+            }
           });
         }
       }
@@ -978,6 +1105,10 @@
             if (btnLogout) { btnLogout.classList.remove('hidden'); btnLogout.style.display = ''; }
             if (btnRapor) { btnRapor.classList.remove('hidden'); btnRapor.style.display = ''; }
             if (btnGanti) { btnGanti.classList.remove('hidden'); btnGanti.style.display = ''; }
+            var navSem1 = document.getElementById('navbar-tampilan-sem1');
+            if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); }
+            var navUtama = document.getElementById('navbar-tampilan-utama');
+            if (navUtama) { navUtama.classList.add('hidden'); }
             var isSem2Open = false;
             try { isSem2Open = localStorage.getItem('educode_semester_2_unlocked_v1') === 'true'; } catch(e) {}
             if (btnToggleSem) {
@@ -14648,6 +14779,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261105_fix_syntax_and_overlay_v55"></script>
+  <script src="app.js?v=20261105_menu_siswa_fix_v56"></script>
 </body>
 </html>
