@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_teacher_nav_fix_v75">
+  <link rel="stylesheet" href="styles.css?v=20261106_nis_login_fix_v77">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -90,6 +90,9 @@
     #modal-login-guru:not(.hidden),
     #modal-profil-siswa:not(.hidden),
     #modal-konfirmasi-logout-siswa:not(.hidden),
+    #modal-panduan-sheets:not(.hidden),
+    #modal-panduan-firebase:not(.hidden),
+    #modal-ubah-pin-guru:not(.hidden),
     #modal-bicara-robo:not(.hidden) {
       display: flex !important;
       z-index: 999999 !important;
@@ -14564,7 +14567,7 @@
   <!-- ======================================================== -->
   <!-- MODAL PANDUAN SETUP GOOGLE SPREADSHEET & APPS SCRIPT      -->
   <!-- ======================================================== -->
-  <div id="modal-panduan-sheets" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+  <div id="modal-panduan-sheets" onclick="if(event.target===this) tutupModalPanduanSheets()" class="fixed inset-0 z-[999999] bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto animate-fadeIn">
     <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-emerald-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
       <div class="p-5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-between">
@@ -15089,6 +15092,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_teacher_nav_fix_v75"></script>
+  <script src="app.js?v=20261106_nis_login_fix_v77"></script>
 </body>
 </html>

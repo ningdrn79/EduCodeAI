@@ -174,6 +174,9 @@ function getActiveStudentProfile() {
   try {
     // 1. Cek cache memori window
     if (window.__ACTIVE_STUDENT_PROFILE__ && (window.__ACTIVE_STUDENT_PROFILE__.nama || window.__ACTIVE_STUDENT_PROFILE__.nis || window.__ACTIVE_STUDENT_PROFILE__.id)) {
+      if (String(window.__ACTIVE_STUDENT_PROFILE__.nis || '').trim() === '3000') {
+        return window.__ACTIVE_STUDENT_PROFILE__;
+      }
       if (window.__ACTIVE_STUDENT_PROFILE__.nama && window.__ACTIVE_STUDENT_PROFILE__.nama.startsWith('Siswa ') && window.__ACTIVE_STUDENT_PROFILE__.nama.includes('(')) {
         clearActiveStudentSession();
         return null;
@@ -220,6 +223,10 @@ function getActiveStudentProfile() {
 
     const parsed = JSON.parse(raw);
     if (parsed && (parsed.nama || parsed.nis || parsed.id)) {
+      if (String(parsed.nis || '').trim() === '3000') {
+        window.__ACTIVE_STUDENT_PROFILE__ = parsed;
+        return parsed;
+      }
       if (parsed.nama && parsed.nama.startsWith('Siswa ') && parsed.nama.includes('(')) {
         clearActiveStudentSession();
         return null;
@@ -19073,6 +19080,7 @@ const DAFTAR_NAMA_SISWA_CONTOH = [
 // Helper: Memeriksa apakah data siswa adalah data dummy/contoh fiktif
 function isSiswaContohDummy(s) {
   if (!s || !s.nama) return true;
+  if (String(s.nis || '').trim() === '3000' || s.id === 'STD-4A-3000') return false;
   const n = s.nama.trim().toLowerCase();
   if (DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
   if (DAFTAR_NAMA_SISWA_CONTOH.some(d => n.includes(d))) return true;
@@ -19276,6 +19284,7 @@ function getStudentDatabase() {
     const preValidDummyLen = parsed.length;
     parsed = parsed.filter(s => {
       if (!s || !s.nama) return false;
+      if (String(s.nis || '').trim() === '3000' || s.id === 'STD-4A-3000') return true;
       if (s.nama.startsWith('Siswa ') && s.nama.includes('(')) return false;
       return true;
     });
@@ -20509,7 +20518,10 @@ async function loginDenganNis() {
     }
 
     // Berhasil masuk!
-    if (errorEl) errorEl.classList.add('hidden');
+    if (errorEl) {
+      errorEl.classList.add('hidden');
+      errorEl.innerHTML = '';
+    }
     playSound('fanfare');
     const profile = {
       id: student.id || `STD-${student.kelas || '4A'}-${student.absen || student.nis}`,
@@ -20526,19 +20538,30 @@ async function loginDenganNis() {
     if (p1) p1.innerText = state.userPoints;
     if (p2) p2.innerText = state.userPoints;
 
-    muatProfilSiswa();
-    setHeaderNavMode('sem1');
-    renderGaleriPosterWord();
+    // Tutup modal profil siswa langsung setelah verifikasi berhasil
     tutupModalProfilSiswa();
-    switchTab('modul');
+
+    // Jalankan pembaruan UI secara aman
+    try { muatProfilSiswa(); } catch (eUI) { console.warn('UI update muatProfilSiswa:', eUI); }
+    try { setHeaderNavMode('sem1'); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
+    try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (eUI) {}
+    try { switchTab('modul'); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
+
     showToast(`Selamat datang, ${student.nama}! (Kelas ${student.kelas} • NIS: ${student.nis}) 🎉`, 'success');
   } catch (err) {
     console.error('Error saat verifikasi NIS:', err);
-    if (errorEl) {
-      errorEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Terjadi gangguan saat memverifikasi NIS. Periksa koneksi internet Anda.';
-      errorEl.classList.remove('hidden');
+    // Jika sesi ternyata sudah tersimpan, tutup modal dan lanjutkan tanpa menampilkan error palsu
+    const activeSession = getActiveStudentProfile();
+    if (activeSession && String(activeSession.nis).trim() === String(nisVal).trim()) {
+      tutupModalProfilSiswa();
+      try { switchTab('modul'); } catch (e) {}
+    } else {
+      if (errorEl) {
+        errorEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Terjadi gangguan saat memverifikasi NIS. Periksa koneksi internet Anda.';
+        errorEl.classList.remove('hidden');
+      }
+      showToast('Terjadi gangguan saat memvalidasi NIS. Silakan coba kembali.', 'error');
     }
-    showToast('Terjadi gangguan saat memvalidasi NIS. Silakan coba kembali.', 'error');
   } finally {
     if (btnEl) {
       btnEl.disabled = false;
@@ -20880,7 +20903,7 @@ window.resetPaintCanvasUntukSiswa = resetPaintCanvasUntukSiswa;
 function muatProfilSiswa() {
   const profile = getActiveStudentProfile();
   const db = getStudentDatabase();
-  const student = profile ? db.find(s => s.id === profile.id || (s.nama.toLowerCase() === profile.nama.toLowerCase() && s.kelas === profile.kelas)) : null;
+  const student = profile ? db.find(s => s.id === profile.id || (String(s.nama || '').toLowerCase() === String(profile.nama || '').toLowerCase() && s.kelas === profile.kelas)) : null;
 
   const firstName = (profile && profile.nama) ? profile.nama.split(' ')[0] : 'Siswa';
   const labelUtama = document.getElementById('label-profil-siswa');
@@ -24758,36 +24781,78 @@ window.sinkronkanDataSiswaGoogleSheet = sinkronkanDataSiswaGoogleSheet;
 // 6. Cek NIS Siswa terhadap Database Lokal & Google Sheets Multi-Kelas
 async function cekNisGoogleSheet(nisVal) {
   if (!nisVal) return null;
-  const targetVal = nisVal.toString().trim().toLowerCase();
+  const targetVal = String(nisVal).trim().toLowerCase();
 
-  // 1. Cek di cache database lokal terlebih dahulu (sangat cepat & tanpa latensi jaringan)
+  // 1. Khusus test student NIS 3000 (Cepat, Tanpa Menunggu Jaringan Google Sheet)
+  if (targetVal === '3000') {
+    const testSiswa = {
+      id: 'STD-4A-3000',
+      nis: '3000',
+      nama: 'Pelajar Uji Coba (3000)',
+      kelas: '4A',
+      absen: '30',
+      statusKkm: 'Tuntas',
+      poinBintang: 50
+    };
+    try {
+      let db = getStudentDatabase();
+      const existIdx = db.findIndex(s => String(s.nis || '').trim() === '3000');
+      if (existIdx >= 0) {
+        db[existIdx] = { ...db[existIdx], ...testSiswa };
+      } else {
+        db.push(testSiswa);
+      }
+      saveStudentDatabase(db);
+    } catch (eDb) {}
+    return testSiswa;
+  }
+
+  // 2. Cek di cache database lokal terlebih dahulu (sangat cepat & tanpa latensi jaringan)
   let db = getStudentDatabase();
   let student = db.find(s => 
-    (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-    (s.nama && s.nama.toLowerCase().trim() === targetVal) ||
-    (s.id && s.id.toLowerCase().trim() === targetVal)
+    (s.nis && String(s.nis).trim().toLowerCase() === targetVal) ||
+    (s.nama && String(s.nama).trim().toLowerCase() === targetVal) ||
+    (s.id && String(s.id).trim().toLowerCase() === targetVal)
   );
   if (student) return student;
+
+  // 3. Fallback instan ke SEED_STUDENTS lokal (Daftar resmi seluruh siswa kelas 4, 5, 6 tanpa perlu internet)
+  if (Array.isArray(SEED_STUDENTS)) {
+    const matchSeed = SEED_STUDENTS.find(s => 
+      (s.nis && String(s.nis).trim().toLowerCase() === targetVal) ||
+      (s.nama && String(s.nama).trim().toLowerCase() === targetVal) ||
+      (s.id && String(s.id).trim().toLowerCase() === targetVal)
+    );
+    if (matchSeed) {
+      const freshSeedStudent = JSON.parse(JSON.stringify(matchSeed));
+      db = getStudentDatabase();
+      if (!db.some(s => String(s.nis || '').trim() === String(freshSeedStudent.nis || '').trim())) {
+        db.push(freshSeedStudent);
+        saveStudentDatabase(db);
+      }
+      return freshSeedStudent;
+    }
+  }
 
   // Cek nomor absen 1 atau 2 digit jika siswa memasukkan nomor absen
   if (/^\d{1,2}$/.test(targetVal)) {
     const padAbsen = targetVal.length === 1 ? '0' + targetVal : targetVal;
-    student = db.find(s => s.absen && (s.absen === targetVal || s.absen === padAbsen));
+    student = db.find(s => s.absen && (String(s.absen) === targetVal || String(s.absen) === padAbsen));
     if (student) return student;
   }
 
-  // Cek pencarian nama parsial (misal mengetik nama depan)
-  student = db.find(s => s.nama && s.nama.toLowerCase().includes(targetVal) && targetVal.length >= 3);
+  // Cek pencarian nama parsial (misal mengetik nama depan minimal 3 karakter)
+  student = db.find(s => s.nama && String(s.nama).toLowerCase().includes(targetVal) && targetVal.length >= 3);
   if (student) return student;
 
-  // 2. Jika tidak ada di lokal, lakukan sinkronisasi langsung ke Google Sheet Master "DATA SISWA LMS"
+  // 4. Jika tidak ada di lokal / SEED_STUDENTS, coba sinkronisasi ke Google Sheet Master "DATA SISWA LMS"
   try {
     const syncedAll = await sinkronkanMasterDataSiswaLMS(true);
     if (Array.isArray(syncedAll) && syncedAll.length > 0) {
       student = syncedAll.find(s => 
-        (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-        (s.nama && s.nama.toLowerCase().trim() === targetVal) ||
-        (s.id && s.id.toLowerCase().trim() === targetVal)
+        (s.nis && String(s.nis).trim().toLowerCase() === targetVal) ||
+        (s.nama && String(s.nama).trim().toLowerCase() === targetVal) ||
+        (s.id && String(s.id).trim().toLowerCase() === targetVal)
       );
       if (student) return student;
     }
@@ -24795,7 +24860,7 @@ async function cekNisGoogleSheet(nisVal) {
     console.warn('Live sync master sheet:', eSyncMaster);
   }
 
-  // 3. Fallback: Cek seluruh kelas spesifik jika spreadsheet memiliki tab terpisah
+  // 5. Fallback ke kelas spesifik jika spreadsheet memiliki tab per kelas terpisah
   try {
     const cfg = getClassSheetsConfig();
     const guessClass = (targetVal.startsWith('41') || targetVal.startsWith('31')) ? '4A' 
@@ -24814,47 +24879,12 @@ async function cekNisGoogleSheet(nisVal) {
     if (guessClass && cfg[guessClass] && cfg[guessClass].sheetUrl) {
       const synced = await sinkronkanDataSiswaPerKelas(guessClass, true);
       student = synced.find(s => 
-        (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-        (s.nama && s.nama.toLowerCase().trim() === targetVal)
+        (s.nis && String(s.nis).trim().toLowerCase() === targetVal) ||
+        (s.nama && String(s.nama).trim().toLowerCase() === targetVal)
       );
       if (student) return student;
     }
   } catch (eGuess) {}
-
-  // 4. Fallback ke SEED_STUDENTS jika server Google Sheets lambat atau sedang offline
-  if (Array.isArray(SEED_STUDENTS)) {
-    const matchSeed = SEED_STUDENTS.find(s => 
-      (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-      (s.nama && s.nama.toLowerCase().trim() === targetVal)
-    );
-    if (matchSeed) {
-      const freshSeedStudent = JSON.parse(JSON.stringify(matchSeed));
-      db = getStudentDatabase();
-      if (!db.some(s => s.nis === freshSeedStudent.nis)) {
-        db.push(freshSeedStudent);
-        saveStudentDatabase(db);
-      }
-      return freshSeedStudent;
-    }
-  }
-
-  // 5. Khusus test student NIS 3000
-  if (targetVal === '3000') {
-    const testSiswa = {
-      id: 'STD-4A-3000',
-      nis: '3000',
-      nama: 'Siswa Contoh (3000)',
-      kelas: '4A',
-      absen: '30',
-      statusKkm: 'Tuntas'
-    };
-    db = getStudentDatabase();
-    if (!db.some(s => s.nis === '3000')) {
-      db.push(testSiswa);
-      saveStudentDatabase(db);
-    }
-    return testSiswa;
-  }
 
   // Jika tetap tidak ditemukan: Tolak akses
   return null;
@@ -24886,7 +24916,11 @@ function bukaModalPanduanSheets() {
   const modal = document.getElementById('modal-panduan-sheets');
   if (modal) {
     modal.classList.remove('hidden');
-    modal.style.display = 'flex';
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
   }
 }
 window.bukaModalPanduanSheets = bukaModalPanduanSheets;
@@ -24896,7 +24930,10 @@ function tutupModalPanduanSheets() {
   const modal = document.getElementById('modal-panduan-sheets');
   if (modal) {
     modal.classList.add('hidden');
-    modal.style.display = 'none';
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
   }
 }
 window.tutupModalPanduanSheets = tutupModalPanduanSheets;
@@ -25149,13 +25186,28 @@ function simpanWebhookGuruForm() {
 window.simpanWebhookGuruForm = simpanWebhookGuruForm;
 
 function ujiKirimWebhookGuru() {
-  const url = getPersistentWebhookUrl();
+  playSound('click');
+  const input = document.getElementById('guru-webhook-url');
+  let url = input ? input.value.trim() : '';
   if (!url) {
-    showToast('Silakan masukkan dan simpan URL Webhook Google Apps Script terlebih dahulu.', 'error');
+    url = getPersistentWebhookUrl();
+  }
+
+  if (!url) {
+    playSound('warning');
+    if (input) {
+      input.classList.add('border-rose-500', 'animate-shake');
+      setTimeout(() => input.classList.remove('animate-shake', 'border-rose-500'), 600);
+      input.focus();
+    }
+    showToast('⚠️ Masukkan Link Webhook Google Apps Script terlebih dahulu di kolom sebelah kiri! (Klik "Cara Pasang" untuk melihat panduan)', 'warning');
     return;
   }
 
-  showToast('Mengirim data sampel ke Google Sheets...', 'info');
+  // Otomatis simpan URL jika ada di input
+  savePersistentWebhookUrl(url);
+
+  showToast('✈️ Mengirim data uji coba ke Google Sheets... Periksa tab "REKAP NILAI SISWA" di Spreadsheet Anda 📊', 'info');
   kirimKeWebhookSheets({
     event: 'uji_coba_koneksi',
     nis: '4101',
@@ -25167,6 +25219,7 @@ function ujiKirimWebhookGuru() {
     timestamp: new Date().toISOString()
   });
 }
+window.ujiKirimWebhookGuru = ujiKirimWebhookGuru;
 
 function kirimKeWebhookSheets(payload) {
   const url = getPersistentWebhookUrl();
@@ -25178,11 +25231,15 @@ function kirimKeWebhookSheets(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   }).then(() => {
-    showToast('Data berhasil disinkronkan ke Google Sheets! ✅', 'success');
+    playSound('success');
+    showToast('✅ Data uji coba terkirim ke Google Sheets! Silakan periksa Spreadsheet Anda.', 'success');
   }).catch(err => {
     console.warn('Gagal sinkronisasi Google Sheets:', err);
+    playSound('error');
+    showToast('❌ Gagal mengirim ke Webhook. Pastikan izin Deploy Web App disetel "Anyone" (Siapa Saja).', 'error');
   });
 }
+window.kirimKeWebhookSheets = kirimKeWebhookSheets;
 
 function eksporDatabaseJSON() {
   playSound('click');
