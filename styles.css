@@ -2546,6 +2546,20 @@ div[id^="m-navbar-"],
   font-weight: 600 !important;
 }
 
+/* Sembunyikan scrollbar bawaan browser tapi tetap bisa scroll atau fleksibel */
+.no-scrollbar::-webkit-scrollbar,
+#guru-filter-kelas-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar,
+#guru-filter-kelas-container {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
 
 
 

@@ -341,6 +341,7 @@ let state = {
   bankSoalSemester: 1, // 1: Semester 1 (Konten Digital & Word/Excel), 2: Semester 2 (Coding & AI)
   quizCorrectCount: 0
 };
+window.state = state;
 
 // Web Audio Effects (Synthesizer, tanpa butuh aset audio luar)
 let audioCtx = null;
@@ -21532,27 +21533,27 @@ function updateFilterKelasTabs(tingkat) {
   if (tingkat === 'all') {
     container.innerHTML = `
       <span class="text-xs font-bold text-slate-400 uppercase mr-1">Kelas:</span>
-      <button onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition">Semua</button>
-      <button onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4A</button>
-      <button onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4B</button>
-      <button onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4C</button>
-      <button onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4D</button>
-      <button onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4E</button>
-      <button onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">5D</button>
-      <button onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6A</button>
-      <button onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6B</button>
-      <button onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6C</button>
-      <button onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6D</button>
-      <button onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6E</button>
+      <button type="button" onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition cursor-pointer">Semua</button>
+      <button type="button" onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4A</button>
+      <button type="button" onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4B</button>
+      <button type="button" onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4C</button>
+      <button type="button" onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4D</button>
+      <button type="button" onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4E</button>
+      <button type="button" onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">5D</button>
+      <button type="button" onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6A</button>
+      <button type="button" onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6B</button>
+      <button type="button" onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6C</button>
+      <button type="button" onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6D</button>
+      <button type="button" onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6E</button>
     `;
   } else {
     const list = classMap[tingkat] || ['4A', '4B', '4C', '4D', '4E'];
     let btns = `
       <span class="text-xs font-bold text-slate-400 uppercase mr-1">Tingkat ${tingkat}:</span>
-      <button onclick="setFilterKelasGuru('tingkat_${tingkat}')" id="btn-filter-kelas-tingkat_${tingkat}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition">Semua Kelas ${tingkat}</button>
+      <button type="button" onclick="setFilterKelasGuru('tingkat_${tingkat}')" id="btn-filter-kelas-tingkat_${tingkat}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition cursor-pointer">Semua Kelas ${tingkat}</button>
     `;
     list.forEach(clsName => {
-      btns += `<button onclick="setFilterKelasGuru('${clsName}')" id="btn-filter-kelas-${clsName}" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">${clsName}</button>`;
+      btns += `<button type="button" onclick="setFilterKelasGuru('${clsName}')" id="btn-filter-kelas-${clsName}" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">${clsName}</button>`;
     });
     container.innerHTML = btns;
   }
@@ -21655,6 +21656,7 @@ function setFilterKelasGuru(kelas) {
     }
   }
 }
+window.setFilterKelasGuru = setFilterKelasGuru;
 
 // --------------------------------------------------------------------------
 // PENGATURAN MODE PENILAIAN GURU (SEMESTER 1 vs SEMESTER 2 vs REKAP LENGKAP)
@@ -21700,6 +21702,7 @@ function filterDanCariSiswa() {
   const mode = state.modePenilaianGuru || 1;
 
   const filtered = db.filter(s => {
+    if (!s) return false;
     // Filter Kelas / Tingkat (Disesuaikan dengan pengampu resmi Ibu Darningsih, S.T.)
     const activeFilter = state.filterKelasGuru || 'semua';
     if (activeFilter && activeFilter.startsWith('tingkat_')) {
@@ -21746,9 +21749,9 @@ function filterDanCariSiswa() {
 
     // Search query
     if (query) {
-      const matchNama = s.nama.toLowerCase().includes(query);
-      const matchAbsen = (s.absen || '').includes(query);
-      const matchNis = (s.nis || '').toLowerCase().includes(query);
+      const matchNama = (s.nama || '').toString().toLowerCase().includes(query);
+      const matchAbsen = (s.absen || '').toString().includes(query);
+      const matchNis = (s.nis || '').toString().toLowerCase().includes(query);
       if (!matchNama && !matchAbsen && !matchNis) return false;
     }
     return true;
@@ -21759,6 +21762,7 @@ function filterDanCariSiswa() {
 
   renderTabelGradebook(sortedFiltered, db.length);
 }
+window.filterDanCariSiswa = filterDanCariSiswa;
 
 function setZoomTabelGuru(level) {
   state.zoomTabelGuru = level;

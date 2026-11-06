@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_cloud_sync_v73">
+  <link rel="stylesheet" href="styles.css?v=20261106_gradebook_fix_v74">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -441,6 +441,69 @@
           m.classList.add('hidden');
           m.style.setProperty('display', 'none', 'important');
         }
+      };
+
+      // Early Dasbor Guru Filter & Mode Penilaian Handlers
+      window.setFilterKelasGuru = window.setFilterKelasGuru || function(kelas) {
+        try { if (typeof state !== 'undefined') state.filterKelasGuru = kelas; } catch(e){}
+        var container = document.getElementById('guru-filter-kelas-container');
+        if (container) {
+          container.querySelectorAll('button').forEach(function(btn) {
+            if (btn.id === 'btn-filter-kelas-' + kelas) {
+              btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition cursor-pointer';
+            } else {
+              btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer';
+            }
+          });
+        }
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      };
+
+      window.hapusSemuaSiswaContohPermanen = window.hapusSemuaSiswaContohPermanen || function() {
+        try {
+          if (typeof hapusSemuaSiswaContohPermanen === 'function') {
+            return hapusSemuaSiswaContohPermanen();
+          }
+        } catch(e){}
+      };
+
+      window.pulihkanSemuaSiswaDefault = window.pulihkanSemuaSiswaDefault || function() {
+        try {
+          if (typeof pulihkanSemuaSiswaDefault === 'function') {
+            return pulihkanSemuaSiswaDefault();
+          }
+        } catch(e){}
+      };
+
+      window.setModePenilaianGuru = window.setModePenilaianGuru || function(mode) {
+        try { if (typeof state !== 'undefined') state.modePenilaianGuru = mode; } catch(e){}
+        var btnSem1 = document.getElementById('btn-penilaian-sem1');
+        var btnSem2 = document.getElementById('btn-penilaian-sem2');
+        var btnSemua = document.getElementById('btn-penilaian-semua');
+        if (btnSem1) {
+          btnSem1.className = (mode === 1) ? 'px-3.5 py-1.5 rounded-lg text-xs font-title font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-xs cursor-pointer' : 'px-3.5 py-1.5 rounded-lg text-xs font-title font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer';
+        }
+        if (btnSem2) {
+          btnSem2.className = (mode === 2) ? 'px-3.5 py-1.5 rounded-lg text-xs font-title font-bold transition flex items-center gap-1.5 bg-purple-600 text-white shadow-xs cursor-pointer' : 'px-3.5 py-1.5 rounded-lg text-xs font-title font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer';
+        }
+        if (btnSemua) {
+          btnSemua.className = (mode === 'semua') ? 'px-3.5 py-1.5 rounded-lg text-xs font-title font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-xs cursor-pointer' : 'px-3.5 py-1.5 rounded-lg text-xs font-title font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer';
+        }
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      };
+
+      window.setZoomTabelGuru = window.setZoomTabelGuru || function(level) {
+        try {
+          if (typeof state !== 'undefined') state.zoomTabelGuru = level;
+          localStorage.setItem('educode_table_zoom_v1', level);
+        } catch(e){}
+        var bNormal = document.getElementById('btn-zoom-normal');
+        var bBesar = document.getElementById('btn-zoom-besar');
+        var bEkstra = document.getElementById('btn-zoom-ekstra');
+        if (bNormal) bNormal.className = (level === 'normal') ? 'px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer' : 'px-2.5 py-1 rounded-md text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer';
+        if (bBesar) bBesar.className = (level === 'besar') ? 'px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer' : 'px-2.5 py-1 rounded-md text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer';
+        if (bEkstra) bEkstra.className = (level === 'ekstra') ? 'px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer' : 'px-2.5 py-1 rounded-md text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer';
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
       };
 
       window.bukaModalLoginGuru = function() {
@@ -12016,20 +12079,20 @@
         <!-- Filter Bar & Search Box -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5">
           <!-- Filter Kelas Tabs -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" id="guru-filter-kelas-container">
+          <div class="flex flex-wrap items-center gap-1.5 no-scrollbar" id="guru-filter-kelas-container">
             <span class="text-xs font-bold text-slate-400 uppercase mr-1">Kelas:</span>
-            <button onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition">Semua</button>
-            <button onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4A</button>
-            <button onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4B</button>
-            <button onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4C</button>
-            <button onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4D</button>
-            <button onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">4E</button>
-            <button onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">5D</button>
-            <button onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6A</button>
-            <button onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6B</button>
-            <button onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6C</button>
-            <button onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6D</button>
-            <button onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">6E</button>
+            <button type="button" onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition cursor-pointer">Semua</button>
+            <button type="button" onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4A</button>
+            <button type="button" onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4B</button>
+            <button type="button" onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4C</button>
+            <button type="button" onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4D</button>
+            <button type="button" onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4E</button>
+            <button type="button" onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">5D</button>
+            <button type="button" onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6A</button>
+            <button type="button" onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6B</button>
+            <button type="button" onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6C</button>
+            <button type="button" onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6D</button>
+            <button type="button" onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6E</button>
           </div>
 
           <!-- Filter KKM & Search -->
@@ -14998,6 +15061,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_cloud_sync_v73"></script>
+  <script src="app.js?v=20261106_gradebook_fix_v74"></script>
 </body>
 </html>
