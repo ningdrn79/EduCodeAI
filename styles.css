@@ -2394,10 +2394,11 @@ main {
   z-index: -9999 !important;
 }
 
-/* Pastikan Modal Login Guru, Modal Profil Siswa & Konfirmasi Tampil Tegas di Layer Paling Depan HANYA jika TIDAK hidden */
+/* Pastikan Modal Login Guru, Modal Profil Siswa, Konfirmasi & Modal Bicara Robo Tampil Tegas di Layer Paling Depan HANYA jika TIDAK hidden */
 #modal-login-guru:not(.hidden),
 #modal-profil-siswa:not(.hidden),
-#modal-konfirmasi-logout-siswa:not(.hidden) {
+#modal-konfirmasi-logout-siswa:not(.hidden),
+#modal-bicara-robo:not(.hidden) {
   display: flex !important;
   visibility: visible !important;
   pointer-events: auto !important;

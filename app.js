@@ -462,48 +462,91 @@ function toggleAudioNarration() {
   state.ttsEnabled = !state.ttsEnabled;
   const icon = document.getElementById('tts-icon');
   const iconSem1 = document.getElementById('tts-icon-sem1');
+  const iconMobile = document.getElementById('tts-icon-m-utama');
   const soundLabel = document.getElementById('sound-status-label');
+
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  } catch (e) {}
 
   if (state.ttsEnabled) {
     if (icon) icon.className = 'fa-solid fa-volume-high text-amber-700';
     if (iconSem1) iconSem1.className = 'fa-solid fa-volume-high text-xs';
+    if (iconMobile) iconMobile.className = 'fa-solid fa-volume-high text-lg text-amber-400';
     if (soundLabel) soundLabel.innerText = (state.currentLang === 'en') ? 'Sound: ON' : 'Suara: ON';
     showToast(state.currentLang === 'en' ? 'Sound is now ON 🔊' : 'Suara narator diaktifkan 🔊');
   } else {
-    window.speechSynthesis && window.speechSynthesis.cancel();
+    try {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    } catch (e) {}
     if (icon) icon.className = 'fa-solid fa-volume-xmark text-amber-900';
     if (iconSem1) iconSem1.className = 'fa-solid fa-volume-xmark text-xs';
+    if (iconMobile) iconMobile.className = 'fa-solid fa-volume-xmark text-lg text-slate-500';
     if (soundLabel) soundLabel.innerText = (state.currentLang === 'en') ? 'Sound: OFF' : 'Suara: OFF';
     showToast(state.currentLang === 'en' ? 'Sound is now OFF 🔇' : 'Suara narator dimatikan 🔇');
   }
 }
+window.toggleAudioNarration = toggleAudioNarration;
 
-function speakContent(elementId, forceLang = null) {
+function speakContent(elementOrText, forceLang = null) {
   if (!('speechSynthesis' in window)) {
     showToast('Fitur suara tidak didukung di peramban ini.', 'error');
     return;
   }
+  
+  // Jika dipanggil langsung, pastikan sound aktif agar terdengar
   if (!state.ttsEnabled) {
-    showToast('Suara narator sedang dimatikan. Klik tombol volume di atas.', 'info');
-    return;
+    state.ttsEnabled = true;
+    const icon = document.getElementById('tts-icon');
+    const iconSem1 = document.getElementById('tts-icon-sem1');
+    const iconMobile = document.getElementById('tts-icon-m-utama');
+    if (icon) icon.className = 'fa-solid fa-volume-high text-amber-700';
+    if (iconSem1) iconSem1.className = 'fa-solid fa-volume-high text-xs';
+    if (iconMobile) iconMobile.className = 'fa-solid fa-volume-high text-lg text-amber-400';
   }
 
-  window.speechSynthesis.cancel();
-  const el = document.getElementById(elementId);
-  if (!el) return;
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+  } catch (e) {}
 
-  const textToRead = el.innerText;
-  const utterance = new SpeechSynthesisUtterance(textToRead);
-  
-  // Deteksi bahasa: jika forceLang diberikan, atau elementId mengandung '-en', atau bahasa global 'en'
-  const targetLang = forceLang || ((elementId.includes('-en') || state.currentLang === 'en') ? 'en-US' : 'id-ID');
+  let textToRead = '';
+  let targetLang = forceLang || (state.currentLang === 'en' ? 'en-US' : 'id-ID');
+
+  if (typeof elementOrText === 'string') {
+    const el = document.getElementById(elementOrText);
+    if (el) {
+      textToRead = el.innerText;
+      if (elementOrText.includes('-en')) targetLang = 'en-US';
+    } else {
+      textToRead = elementOrText;
+    }
+  }
+
+  if (!textToRead || !textToRead.trim()) return;
+
+  const utterance = new SpeechSynthesisUtterance(textToRead.trim());
   utterance.lang = targetLang;
   utterance.rate = 0.95; // Kecepatan ramah anak SD
   utterance.pitch = 1.1; // Nada bersahabat
 
+  try {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      const matchVoice = voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+      if (matchVoice) utterance.voice = matchVoice;
+    }
+  } catch (e) {}
+
   window.speechSynthesis.speak(utterance);
   showToast(targetLang === 'en-US' ? 'Reading material in English... 🎧' : 'Sedang membacakan materi Bahasa Indonesia... 🎧');
 }
+window.speakContent = speakContent;
 
 // ==========================================
 // 4. BILINGUAL TRANSLATION (ENGLISH / INDONESIAN)
@@ -895,32 +938,437 @@ function bukaSemesterDariUtama(semNumber) {
 }
 
 // ==========================================
-// INTERAKSI ROBOT MASKOT LUCU (ROBO-TZU CHI)
+// INTERAKSI ROBOT MASKOT LUCU & AI SUARA EDUKASI (ROBO-TZU CHI)
 // ==========================================
 const sapaanRobotList = [
-  '🤖 "Halo! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!" ✨',
-  '🎉 "Yey! Semangat belajar hari ini! Klik Semester 1 untuk mulai latihan!" 📘',
-  '💡 "Tahukah kamu? Komputer bekerja dengan instruksi logika yang runtut!" 🧠',
-  '🌟 "Kamu anak yang hebat, kreatif, dan berbudi pekerti luhur!" 💚',
-  '🚀 "Ayo kumpulkan banyak bintang poin dan selesaikan tantangannya!" ⭐'
+  '🤖 "Halo teman pintar! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!" ✨',
+  '🎉 "Yey! Semangat belajar hari ini! Buka Modul Belajar atau Lab Word untuk mulai berkarya!" 📘',
+  '💡 "Tahukah kamu? Komputer bekerja dengan instruksi logika yang runtut dan rapi!" 🧠',
+  '🌟 "Kamu anak yang hebat, kreatif, berbudi pekerti luhur, dan berhati penuh cinta kasih!" 💚',
+  '🚀 "Ayo kumpulkan banyak bintang poin dan selesaikan seluruh misi belajarmu hari ini!" ⭐',
+  '🌸 "Gan En! Selalu bersyukur atas setiap kesempatan belajar dan berbuat baik kepada sesama!" 🪷'
 ];
 let sapaanRobotIndex = 0;
+let _isRoboListening = false;
+let _roboSpeechRecog = null;
 
-function sapaRobotLucu() {
-  playSound('success');
-  sapaanRobotIndex = (sapaanRobotIndex + 1) % sapaanRobotList.length;
-  const bubbleText = document.getElementById('robot-speech-text');
-  if (bubbleText) {
-    bubbleText.innerText = sapaanRobotList[sapaanRobotIndex];
-  }
+// Engine Sintesis Suara Ramah Anak (TTS Audio Playback)
+function suarakanTeksRobo(teks, lang = null) {
+  if (!('speechSynthesis' in window)) return;
+
+  // Pastikan AudioContext & SpeechSynthesis aktif (terhindar dari suspend browser)
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+  } catch (e) {}
+
+  // Bersihkan karakter emoji, tanda petik, dan simbol markdown agar ucapan jernih dan lancar
+  let cleanTeks = String(teks || '')
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{2388}\u{200D}]/gu, '')
+    .replace(/["'*_#`~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleanTeks) return;
+
+  const targetLang = lang || (state.currentLang === 'en' ? 'en-US' : 'id-ID');
+  const utterance = new SpeechSynthesisUtterance(cleanTeks);
+  utterance.lang = targetLang;
+  utterance.rate = 0.98; // Kecepatan nyaman untuk anak-anak
+  utterance.pitch = 1.15; // Nada robotik ceria bersahabat
+
+  try {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      const bestVoice = voices.find(v => v.lang.startsWith(targetLang.split('-')[0]) && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Indonesian') || v.name.includes('Gadis') || v.name.includes('ID')));
+      if (bestVoice) utterance.voice = bestVoice;
+    }
+  } catch (e) {}
+
+  // Tampilkan visual indikator gelombang suara Robo sedang berbicara
+  const waveEl = document.getElementById('robo-speaking-wave');
+  const modalWaveEl = document.getElementById('voice-modal-speaking');
+  if (waveEl) waveEl.classList.remove('hidden');
+  if (modalWaveEl) modalWaveEl.classList.remove('hidden');
+
   const mascotImg = document.getElementById('robot-mascot-img');
   if (mascotImg) {
     mascotImg.classList.add('animate-bounce');
-    setTimeout(() => mascotImg.classList.remove('animate-bounce'), 800);
   }
-  tambahPoin(5);
-  showToast(state.currentLang === 'en' ? 'Robo-Tzu Chi smiles! (+5 Stars ⭐)' : 'Robo-Tzu Chi tersenyum senang! (+5 Bintang ⭐)', 'success');
+
+  const matikanWave = () => {
+    if (waveEl) waveEl.classList.add('hidden');
+    if (modalWaveEl) modalWaveEl.classList.add('hidden');
+    if (mascotImg) mascotImg.classList.remove('animate-bounce');
+  };
+
+  utterance.onend = matikanWave;
+  utterance.onerror = matikanWave;
+
+  try {
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
+    matikanWave();
+  }
 }
+window.suarakanTeksRobo = suarakanTeksRobo;
+
+// Fungsi Sapaan Utama Robot (Tombol "👋 Sapa")
+function sapaRobotHalo(teksOrEvent) {
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    playSound('success');
+  } catch (e) {}
+
+  let pesan = '';
+  if (typeof teksOrEvent === 'string' && teksOrEvent.trim()) {
+    pesan = teksOrEvent.trim();
+  } else {
+    sapaanRobotIndex = (sapaanRobotIndex + 1) % sapaanRobotList.length;
+    pesan = sapaanRobotList[sapaanRobotIndex];
+  }
+
+  // Simpan respons terakhir untuk tombol "Ulangi Suara"
+  window._jawabanTerakhirRobo = pesan;
+
+  // Update teks balon kata Robo di Beranda
+  const bubbleText = document.getElementById('robot-speech-text');
+  if (bubbleText) {
+    bubbleText.innerText = pesan;
+  }
+
+  // Sembunyikan kotak pertanyaan sebelumnya jika ada
+  const userBox = document.getElementById('speech-bubble-user-box');
+  if (userBox) userBox.classList.add('hidden');
+
+  // Update respons di modal bicara jika sedang dibuka
+  const voiceAnswer = document.getElementById('voice-robo-answer');
+  if (voiceAnswer) {
+    voiceAnswer.innerText = pesan;
+  }
+
+  // Animasi Maskot Robot Ceria
+  const mascotImg = document.getElementById('robot-mascot-img');
+  if (mascotImg) {
+    mascotImg.classList.remove('animate-bounce');
+    void mascotImg.offsetWidth;
+    mascotImg.classList.add('animate-bounce');
+    setTimeout(() => mascotImg.classList.remove('animate-bounce'), 1200);
+  }
+
+  tambahPoin(5);
+  showToast(state.currentLang === 'en' ? 'Robo greets you! (+5 Stars ⭐)' : 'Robo menyapa dengan ramah! (+5 Bintang ⭐)', 'success');
+
+  // Suarakan sapaan Robo
+  suarakanTeksRobo(pesan);
+}
+window.sapaRobotHalo = sapaRobotHalo;
+window.sapaRobotLucu = sapaRobotHalo;
+
+// Tombol "Ulangi Suara" (Dengarkan Kembali Jawaban Robo)
+function ulangiSuaraJawabanTerakhir() {
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    playSound('click');
+  } catch (e) {}
+
+  const bubbleText = document.getElementById('robot-speech-text');
+  let teks = window._jawabanTerakhirRobo || (bubbleText ? bubbleText.innerText : '');
+  if (!teks) {
+    teks = (state.currentLang === 'en')
+      ? "Hello smart friend! I am Robo. Let's learn coding and AI together!"
+      : "Halo teman pintar! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!";
+  }
+
+  const mascotImg = document.getElementById('robot-mascot-img');
+  if (mascotImg) {
+    mascotImg.classList.remove('animate-bounce');
+    void mascotImg.offsetWidth;
+    mascotImg.classList.add('animate-bounce');
+    setTimeout(() => mascotImg.classList.remove('animate-bounce'), 1200);
+  }
+
+  showToast('Memutar ulang suara Robo... 🔊', 'info');
+  suarakanTeksRobo(teks);
+}
+window.ulangiSuaraJawabanTerakhir = ulangiSuaraJawabanTerakhir;
+
+// Pembuka Modal Bicara ke Robo
+function bukaModalBicaraRobo(event) {
+  if (event && event.stopPropagation) event.stopPropagation();
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    playSound('click');
+  } catch (e) {}
+
+  const modal = document.getElementById('modal-bicara-robo');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.remove('pointer-events-none');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+  }
+
+  const voiceAnswer = document.getElementById('voice-robo-answer');
+  if (voiceAnswer) {
+    voiceAnswer.innerText = window._jawabanTerakhirRobo || "Halo teman pintar! Aku Robo! Senang sekali bisa mengobrol denganmu! Tanyakan apa saja padaku ya!";
+  }
+
+  const statusText = document.getElementById('voice-status-text');
+  if (statusText) {
+    statusText.innerText = '🎙️ Siap mendengarkan! Klik mikrofon atau pilih topik di bawah untuk bertanya!';
+  }
+
+  showToast('Bicara dengan Robo Aktif 🎙️✨', 'info');
+}
+window.bukaModalBicaraRobo = bukaModalBicaraRobo;
+
+// Penutup Modal Bicara ke Robo
+function tutupModalBicaraRobo() {
+  try { playSound('click'); } catch (e) {}
+  const modal = document.getElementById('modal-bicara-robo');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.add('pointer-events-none');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+  }
+  if (_roboSpeechRecog) {
+    try { _roboSpeechRecog.stop(); } catch (e) {}
+  }
+  if ('speechSynthesis' in window) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+  }
+}
+window.tutupModalBicaraRobo = tutupModalBicaraRobo;
+
+// Mesin Penjawab Pintar Pertanyaan Anak SD & Budi Pekerti Tzu Chi
+function cariJawabanPintarRobo(pertanyaan) {
+  const p = (pertanyaan || '').toLowerCase().trim();
+  if (!p) return "Halo teman pintar! Ada yang bisa aku bantu untuk belajarmu hari ini?";
+
+  // 1. Cek Operasi Matematika Cepat
+  const mathKali = p.match(/(\d+)\s*(?:dikali|kali|\*|x)\s*(\d+)/i);
+  if (mathKali) {
+    const a = parseInt(mathKali[1], 10);
+    const b = parseInt(mathKali[2], 10);
+    return `Hasil dari ${a} dikali ${b} adalah ${a * b}! Hebat sekali kamu suka berhitung matematika! 💡✨`;
+  }
+  const mathBagi = p.match(/(\d+)\s*(?:dibagi|bagi|\/)\s*(\d+)/i);
+  if (mathBagi) {
+    const a = parseInt(mathBagi[1], 10);
+    const b = parseInt(mathBagi[2], 10);
+    if (b === 0) return "Dalam matematika, suatu angka tidak bisa dibagi dengan nol ya teman pintar! 🧠";
+    return `Hasil dari ${a} dibagi ${b} adalah ${(a / b) % 1 === 0 ? (a / b) : (a / b).toFixed(2)}! Pintar sekali kamu! 💡`;
+  }
+  const mathTambah = p.match(/(\d+)\s*(?:ditambah|tambah|\+)\s*(\d+)/i);
+  if (mathTambah) {
+    const a = parseInt(mathTambah[1], 10);
+    const b = parseInt(mathTambah[2], 10);
+    return `Hasil dari ${a} ditambah ${b} adalah ${a + b}! Teruslah bersemangat belajar! 🌟`;
+  }
+  const mathKurang = p.match(/(\d+)\s*(?:dikurang|kurang|-)\s*(\d+)/i);
+  if (mathKurang) {
+    const a = parseInt(mathKurang[1], 10);
+    const b = parseInt(mathKurang[2], 10);
+    return `Hasil dari ${a} dikurang ${b} adalah ${a - b}! Luar biasa ketelitianmu! 🚀`;
+  }
+
+  // 2. Pertanyaan Topik Pembelajaran & Humanis Tzu Chi
+  if (p.includes('fotosintesis')) {
+    return "Fotosintesis adalah proses ajaib tumbuhan hijau membuat makanannya sendiri dengan bantuan cahaya matahari, air, dan karbon dioksida. Dari proses ini, tumbuhan menghasilkan oksigen segar yang kita hirup setiap saat! 🌿☀️";
+  }
+  if (p.includes('sepak bola') || p.includes('bulu tangkis') || p.includes('olahraga')) {
+    return "Sepak bola dimainkan 11 orang per tim yang bekerja sama menendang bola ke gawang lawan. Sedangkan bulu tangkis menggunakan raket dan kok, melatih kelincahan dan konsentrasi! Olahraga rutin membuat tubuh kita sehat dan bugar! ⚽🏸";
+  }
+  if (p.includes('cpu') || p.includes('komputer') || p.includes('hardware') || p.includes('perangkat')) {
+    return "CPU atau Central Processing Unit adalah otak utama komputer yang memproses semua instruksi. Komputer juga memiliki monitor sebagai layar tampilan, keyboard untuk mengetik, dan mouse untuk menggerakkan kursor! 💻🧠";
+  }
+  if (p.includes('bahasa inggris') || p.includes('selamat pagi') || p.includes('terima kasih') || p.includes('english')) {
+    return "Selamat pagi dalam bahasa Inggris adalah Good Morning! Terima kasih adalah Thank You! Dan sama-sama adalah You are welcome! Senang sekali berlatih bahasa Inggris bersamamu! 🇬🇧✨";
+  }
+  if (p.includes('islam') || p.includes('idul fitri') || p.includes('ramadan')) {
+    return "Agama Islam mengajarkan perdamaian, kasih sayang, dan beribadah kepada Allah SWT. Hari raya Idul Fitri dirayakan setelah berpuasa sebulan penuh di bulan Ramadan, momen indah untuk saling memaafkan dengan hati bersih! 🕌✨";
+  }
+  if (p.includes('buddha') || p.includes('waisak') || p.includes('teratai')) {
+    return "Agama Buddha mengajarkan welas asih tanpa batas, kebijaksanaan, dan jalan kebaikan. Hari raya Waisak memperingati tiga peristiwa suci Sang Buddha: kelahiran, mencapai penerangan sempurna, dan parinibbana. Bunga teratai melambangkan kesucian batin! 🪷🌸";
+  }
+  if (p.includes('kristen') || p.includes('katolik') || p.includes('natal') || p.includes('paskah')) {
+    return "Agama Kristen dan Katolik berlandaskan cinta kasih kepada Tuhan dan mengasihi sesama manusia seperti diri sendiri. Hari raya Natal merayakan kelahiran Yesus Kristus pembawa damai, dan Paskah merayakan kebangkitan-Nya penuh suka cita! ⛪🕊️";
+  }
+  if (p.includes('hindu') || p.includes('nyepi') || p.includes('tri hita karana')) {
+    return "Agama Hindu mengajarkan ajaran luhur Tri Hita Karana, yaitu keharmonisan manusia dengan Tuhan, sesama manusia, dan alam lingkungan. Pada hari raya Nyepi, umat Hindu berpuasa dan hening bermeditasi menyucikan batin! 🕉️🌿";
+  }
+  if (p.includes('samudra') || p.includes('benua') || p.includes('geografi') || p.includes('bumi')) {
+    return "Planet Bumi kita yang indah memiliki 5 samudra luas: Pasifik, Atlantik, Hindia, Arktik, dan Antartika. Serta 7 benua: Asia, Afrika, Amerika Utara, Amerika Selatan, Antartika, Eropa, dan Australia! Mari kita rawat bumi tercinta ini bersama! 🌍🌊";
+  }
+  if (p.includes('bhinneka') || p.includes('tunggal ika') || p.includes('pancasila')) {
+    return "Bhinneka Tunggal Ika artinya Berbeda-beda tetapi tetap satu jua! Walaupun kita memiliki beragam suku, bahasa, dan agama di Indonesia, kita adalah satu keluarga besar yang saling menghormati dan bersatu rukun! 🇮🇩❤️";
+  }
+  if (p.includes('apa itu ai') || p.includes('ai') || p.includes('artificial intelligence') || p.includes('kecerdasan buatan')) {
+    return "AI atau Artificial Intelligence adalah Kecerdasan Buatan! Program komputer pintar yang dirancang mampu mengenali suara, memproses gambar, dan membantu kita belajar dengan seru seperti aku, Robo! 🤖💡";
+  }
+  if (p.includes('humanis') || p.includes('tzu chi') || p.includes('gan en') || p.includes('da ai')) {
+    return "Budaya Humanis Tzu Chi mengajarkan Da Ai yaitu Cinta Kasih Universal tanpa membeda-bedakan. Gan En berarti selalu bersyukur dengan rendah hati, saling menghormati, dan gemar menolong yang membutuhkan! 🌸💚";
+  }
+  if (p.includes('celengan bambu') || p.includes('celengan')) {
+    return "Celengan Bambu Tzu Chi berawal dari 30 ibu rumah tangga yang menyisihkan 50 sen uang belanja setiap hari untuk menolong sesama. Mengajarkan kita bahwa berbuat kebajikan tidak perlu menunggu kaya, yang penting adalah ketulusan niat setiap hari! 🎋🪙";
+  }
+  if (p.includes('tata krama') || p.includes('duduk') || p.includes('berdiri') || p.includes('makan')) {
+    return "Tata krama Tzu Chi sangat anggun: duduk tegak dan tenang laksana genta, berdiri tegap lurus laksana pohon pinus, berjalan tertib laksana angin sejuk, dan makan dengan penuh rasa syukur memegang mangkuk dengan dua tangan! 🧘‍♂️✨";
+  }
+  if (p.includes('perenungan') || p.includes('kata bijak') || p.includes('master cheng yen')) {
+    return "Kata Perenungan Master Cheng Yen: Melakukan perbuatan baik jangan menunggu waktu luang, lakukanlah saat ada kesempatan. Hati yang bersyukur adalah berkah terbesar dalam hidup! 🌱⭐";
+  }
+  if (p.includes('siapa kamu') || p.includes('namamu') || p.includes('nama kamu')) {
+    return "Aku Robo! Maskot pintar dan sahabat belajar Coding, AI, MS Word, Excel, dan Budi Pekerti siswa-siswi SDS Cinta Kasih Tzu Chi! Senang sekali bisa berteman denganmu! 🤖✨";
+  }
+  if (p.includes('apa kabar') || p.includes('gimana kabarmu') || p.includes('sehat')) {
+    return "Kabarku sangat baik, bugar, dan ceria! Energi bateraiku 100 persen penuh dan siap menemanimu belajar hal-hal hebat hari ini! Bagaimana kabarmu hari ini? 🔋😄";
+  }
+  if (p.includes('terima kasih') || p.includes('makasih') || p.includes('thank')) {
+    return "Sama-sama teman pintar! Gan En ya! Tetap semangat belajar dan terus tebarkan senyuman manis serta budi pekerti luhur! 💖✨";
+  }
+  if (p.includes('word') || p.includes('ms word') || p.includes('poster')) {
+    return "Di Lab MS Word, kamu bisa membuat poster digital 7 Kebiasaan yang keren, menyusun teks slogan, memasang stiker kartun lucu, dan melatih kreativitas senimu! 📝🎨";
+  }
+  if (p.includes('excel') || p.includes('tabel') || p.includes('baris') || p.includes('kolom')) {
+    return "Microsoft Excel adalah lembar kerja ajaib berbentuk kotak-kotak sel dari baris dan kolom. Excel mempermudah kita membuat tabel rapi dan menghitung rumus angka secara otomatis! 📊🔢";
+  }
+  if (p.includes('coding') || p.includes('scratch') || p.includes('program')) {
+    return "Coding adalah seni menyusun balok logika instruksi agar komputer dan robot bergerak sesuai keinginan kita! Sangat seru dan melatih otak kita berpikir kreatif dan sistematis! 🚀💻";
+  }
+
+  return `Pertanyaan yang sangat bagus, teman pintar! Mengenai "${pertanyaan}", ini sangat menarik untuk dipelajari. Kamu anak yang cerdas dan berjiwa ingin tahu tinggi, terus semangat belajar ya! 🌟🤖`;
+}
+
+// Bertanya Langsung Lewat Topik atau Suara
+function tanyaVoiceLangsung(pertanyaan) {
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    playSound('success');
+  } catch (e) {}
+
+  const q = String(pertanyaan || '').trim();
+  if (!q) return;
+
+  const jawaban = cariJawabanPintarRobo(q);
+  window._jawabanTerakhirRobo = jawaban;
+
+  // Tampilkan pertanyaan siswa di Beranda & di Modal
+  const userBox = document.getElementById('speech-bubble-user-box');
+  const userText = document.getElementById('speech-bubble-user-text');
+  const modalUserText = document.getElementById('voice-user-transcript');
+  if (userBox) userBox.classList.remove('hidden');
+  if (userText) userText.innerText = `"${q}"`;
+  if (modalUserText) modalUserText.innerText = `"${q}"`;
+
+  // Tampilkan jawaban Robo di Beranda & di Modal
+  const bubbleText = document.getElementById('robot-speech-text');
+  const modalAnswer = document.getElementById('voice-robo-answer');
+  if (bubbleText) bubbleText.innerText = jawaban;
+  if (modalAnswer) modalAnswer.innerText = jawaban;
+
+  // Animasi Maskot Robot
+  const mascotImg = document.getElementById('robot-mascot-img');
+  if (mascotImg) {
+    mascotImg.classList.remove('animate-bounce');
+    void mascotImg.offsetWidth;
+    mascotImg.classList.add('animate-bounce');
+    setTimeout(() => mascotImg.classList.remove('animate-bounce'), 1200);
+  }
+
+  tambahPoin(5);
+  showToast('Robo menjawab pertanyaanmu! 🤖✨', 'success');
+
+  // Suarakan jawaban Robo
+  suarakanTeksRobo(jawaban);
+}
+window.tanyaVoiceLangsung = tanyaVoiceLangsung;
+
+// Toggle Pengenalan Suara Mikrofon (SpeechRecognition)
+function toggleMicMendengarkan() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const statusText = document.getElementById('voice-status-text');
+  const micBtn = document.getElementById('modal-mic-toggle-btn');
+
+  if (!SpeechRecognition) {
+    showToast('Mikrofon suara otomatis belum didukung di peramban ini. Silakan klik topik pertanyaan ramah anak di bawah ya! 🎙️👇', 'info');
+    if (statusText) statusText.innerText = 'Pilih salah satu topik pertanyaan di bawah untuk mendengar jawaban Robo:';
+    return;
+  }
+
+  if (_isRoboListening && _roboSpeechRecog) {
+    try { _roboSpeechRecog.stop(); } catch (e) {}
+    _isRoboListening = false;
+    if (micBtn) micBtn.classList.remove('ring-4', 'ring-rose-400');
+    if (statusText) statusText.innerText = 'Mikrofon dijeda. Klik ikon mikrofon untuk mulai bicara lagi!';
+    return;
+  }
+
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  } catch (e) {}
+
+  try {
+    const recognition = new SpeechRecognition();
+    recognition.lang = state.currentLang === 'en' ? 'en-US' : 'id-ID';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+      _isRoboListening = true;
+      if (micBtn) micBtn.classList.add('ring-4', 'ring-rose-400', 'animate-pulse');
+      if (statusText) statusText.innerText = '🎙️ Sedang mendengarkan... Katakan pertanyaanmu sekarang!';
+      playSound('click');
+    };
+
+    recognition.onresult = function(event) {
+      _isRoboListening = false;
+      if (micBtn) micBtn.classList.remove('ring-4', 'ring-rose-400', 'animate-pulse');
+      const transcript = event.results[0][0].transcript;
+      if (transcript && transcript.trim()) {
+        tanyaVoiceLangsung(transcript.trim());
+      }
+    };
+
+    recognition.onerror = function(event) {
+      _isRoboListening = false;
+      if (micBtn) micBtn.classList.remove('ring-4', 'ring-rose-400', 'animate-pulse');
+      if (statusText) statusText.innerText = 'Belum mendengar jelas suaramu. Klik mikrofon lagi atau pilih topik di bawah:';
+    };
+
+    recognition.onend = function() {
+      _isRoboListening = false;
+      if (micBtn) micBtn.classList.remove('ring-4', 'ring-rose-400', 'animate-pulse');
+    };
+
+    _roboSpeechRecog = recognition;
+    recognition.start();
+  } catch (err) {
+    console.warn('SpeechRecognition error:', err);
+    showToast('Klik salah satu topik pertanyaan ramah anak di bawah untuk mendengar suara Robo!', 'info');
+  }
+}
+window.toggleMicMendengarkan = toggleMicMendengarkan;
 
 function updateNavSemesterVisibility() {
   const navExcel = document.getElementById('nav-msexcel');

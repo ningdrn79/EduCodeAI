@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_smooth_v60">
+  <link rel="stylesheet" href="styles.css?v=20261106_smooth_v62">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -60,6 +60,7 @@
     #modal-login-guru.hidden,
     #modal-profil-siswa.hidden,
     #modal-konfirmasi-logout-siswa.hidden,
+    #modal-bicara-robo.hidden,
     #modal-detail-siswa.hidden,
     #modal-pilih-sumber-drive.hidden,
     #modal-tambah-siswa.hidden,
@@ -83,6 +84,17 @@
     }
     [id^="modal-"]:not(.hidden) {
       pointer-events: auto !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    #modal-login-guru:not(.hidden),
+    #modal-profil-siswa:not(.hidden),
+    #modal-konfirmasi-logout-siswa:not(.hidden),
+    #modal-bicara-robo:not(.hidden) {
+      display: flex !important;
+      z-index: 999999 !important;
+    }
+  </style>
       visibility: visible !important;
       opacity: 1 !important;
     }
@@ -12893,9 +12905,9 @@
 
 
   <!-- ======================================================== -->
-  <!-- MODAL BICARA LANGSUNG DENGAN ROBO (DISEMBUNYIKAN / MINIMALIS DI BALON ATAS MASKOT) -->
+  <!-- MODAL BICARA LANGSUNG DENGAN ROBO (SUARA & AI EDUKASI)   -->
   <!-- ======================================================== -->
-  <div id="modal-bicara-robo" class="hidden pointer-events-none" style="display:none !important;">
+  <div id="modal-bicara-robo" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalBicaraRobo()">
     <div class="bg-gradient-to-b from-slate-900 via-slate-900 to-[#0B0F19] border-2 border-sky-400/40 rounded-[36px] max-w-lg w-full p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden flex flex-col gap-4">
       
       <!-- Ambient Cosmic Glow -->
@@ -14881,6 +14893,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_smooth_v60"></script>
+  <script src="app.js?v=20261106_smooth_v62"></script>
 </body>
 </html>
