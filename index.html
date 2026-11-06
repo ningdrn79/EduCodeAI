@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_nis_login_fix_v77">
+  <link rel="stylesheet" href="styles.css?v=20261106_footer_1cm_v79">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -273,17 +273,28 @@
           return; // Jangan lanjutkan ke sesi siswa jika guru sedang aktif
         }
 
-        // 2. CEK PERSISTENSI SESI SISWA
+        // 2. CEK PERSISTENSI SESI SISWA (AUTO-LOGOUT PERSISTEN PADA RELOAD F5)
         var key = 'educode_active_student_v1';
-        var raw = null;
-        try { raw = localStorage.getItem(key); } catch (e) {}
-        if (!raw || raw === 'LOGGED_OUT' || raw === 'null' || raw === 'undefined') {
-          try { raw = sessionStorage.getItem(key); } catch (e) {}
+        var lsVal = null;
+        try { lsVal = localStorage.getItem(key); } catch (e) {}
+        if (lsVal === 'LOGGED_OUT') return; // User sudah keluar, jangan restore!
+
+        var ssVal = null;
+        try { ssVal = sessionStorage.getItem(key); } catch (e) {}
+        if (ssVal === 'LOGGED_OUT') return; // User sudah keluar, jangan restore!
+
+        var raw = lsVal;
+        if (!raw || raw === 'null' || raw === 'undefined') {
+          raw = ssVal;
         }
-        if (!raw || raw === 'LOGGED_OUT' || raw === 'null' || raw === 'undefined') {
+        if (!raw || raw === 'null' || raw === 'undefined') {
           try {
             var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + key + '=([^;]+)'));
-            if (m && m[1]) raw = decodeURIComponent(m[1]);
+            if (m && m[1]) {
+              var ck = decodeURIComponent(m[1]);
+              if (ck === 'LOGGED_OUT') return;
+              raw = ck;
+            }
           } catch (e) {}
         }
 
@@ -825,14 +836,14 @@
           btnLogout.__earlyBound = true;
           btnLogout.addEventListener('click', function(e) {
             e.preventDefault();
-            if (typeof window.konfirmasiKeluarSiswa === 'function') {
+            if (typeof window.eksekusiLogoutSiswa === 'function') {
+              window.eksekusiLogoutSiswa();
+            } else if (typeof window.konfirmasiKeluarSiswa === 'function') {
               window.konfirmasiKeluarSiswa();
             } else {
-              if (confirm('Keluar dari Akun Siswa?')) {
-                localStorage.removeItem('educode_active_student_v1');
-                sessionStorage.removeItem('educode_active_student_v1');
-                location.reload();
-              }
+              try { localStorage.setItem('educode_active_student_v1', 'LOGGED_OUT'); } catch(e){}
+              try { sessionStorage.setItem('educode_active_student_v1', 'LOGGED_OUT'); } catch(e){}
+              location.reload();
             }
           });
         }
@@ -1331,7 +1342,7 @@
           <button id="btn-welcome-ganti" onclick="bukaPilihSiswaCepat()" class="hidden px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Ganti Siswa / Masuk Akun Lain">
             <i class="fa-solid fa-arrow-right-arrow-left text-xs"></i> <span>Ganti</span>
           </button>
-          <button id="btn-welcome-logout" onclick="konfirmasiKeluarSiswa()" class="hidden px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Keluar dari Akun Siswa">
+          <button id="btn-welcome-logout" onclick="eksekusiLogoutSiswa()" class="hidden px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Keluar dari Akun Siswa">
             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i> <span>Keluar</span>
           </button>
           <button type="button" id="btn-welcome-login" onclick="event.stopPropagation(); if(window.bukaPilihSiswaCepat){window.bukaPilihSiswaCepat();}else{var m=document.getElementById('modal-profil-siswa');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}var f=document.getElementById('profil-view-form');if(f){f.classList.remove('hidden');f.style.setProperty('display','block','important');}var c=document.getElementById('profil-view-card');if(c){c.classList.add('hidden');c.style.setProperty('display','none','important');}}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/30 cursor-pointer">
@@ -13007,32 +13018,30 @@
 
   </main>
 
-  <!-- FOOTER DENGAN NILAI BUDAYA TZU CHI (Persis Desain) -->
-  <footer class="bg-white border-t border-slate-200 py-8 mt-12 text-center text-xs text-slate-500 space-y-3 relative overflow-hidden">
-    <!-- Daun Teratai Dekoratif Kiri Bawah -->
-    <div class="absolute left-6 bottom-3 text-emerald-600/15 text-5xl pointer-events-none">
-      <i class="fa-solid fa-leaf"></i>
-    </div>
-    <!-- Daun Teratai Dekoratif Kanan Bawah -->
-    <div class="absolute right-6 bottom-3 text-emerald-600/15 text-5xl pointer-events-none transform -scale-x-100">
-      <i class="fa-solid fa-leaf"></i>
-    </div>
+  <!-- FOOTER STATIS RAMPING 1 CM DENGAN NILAI BUDAYA TZU CHI -->
+  <footer id="app-footer" class="static w-full bg-white border-t border-slate-200 text-slate-600 text-[11px] z-10 select-none overflow-hidden" style="position: static !important; height: 1cm !important; min-height: 1cm !important; max-height: 1cm !important; line-height: 1 !important;">
+    <div class="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
+      <!-- Sisi Kiri: Logo Daun Tzu Chi, Nama Sekolah & Kutipan Nilai Budi Pekerti -->
+      <div class="flex items-center gap-2 truncate">
+        <span class="text-emerald-600 shrink-0 text-xs" title="SDS Cinta Kasih Tzu Chi">
+          <i class="fa-solid fa-leaf"></i>
+        </span>
+        <span class="font-title font-bold text-slate-800 shrink-0 text-xs">
+          SDS Cinta Kasih Tzu Chi
+        </span>
+        <span class="text-slate-300 hidden sm:inline">•</span>
+        <span class="italic text-slate-500 truncate hidden md:inline">
+          &ldquo;Teknologi adalah alat, tetapi nilai-nilai baik adalah tujuan kita.&rdquo;
+        </span>
+      </div>
 
-    <!-- Kutipan Kata Bijak Nilai Budi Pekerti Tzu Chi -->
-    <p class="text-sm sm:text-base font-medium text-slate-700 italic max-w-2xl mx-auto px-4">
-      &ldquo;Teknologi adalah alat, tetapi nilai-nilai baik adalah tujuan kita.&rdquo;
-    </p>
-
-    <!-- Garis Pemisah & Nama Sekolah -->
-    <div class="flex items-center justify-center gap-3 text-xs sm:text-sm font-bold text-slate-500">
-      <span class="w-12 h-0.5 bg-slate-300"></span>
-      <span class="text-slate-800 font-title">SDS Cinta Kasih Tzu Chi</span>
-      <span class="w-12 h-0.5 bg-slate-300"></span>
+      <!-- Sisi Kanan: Hak Cipta & Kurikulum -->
+      <div class="text-[10px] text-slate-400 shrink-0 flex items-center gap-1.5">
+        <span>LMS Coding & AI</span>
+        <span>•</span>
+        <span>Kurikulum Merdeka © 2026</span>
+      </div>
     </div>
-
-    <p class="text-[11px] text-slate-400">
-      LMS Coding & AI • Kurikulum Merdeka © 2026
-    </p>
   </footer>
 
   <!-- MODAL INTERAKTIF: PREVIEW SEMESTER 2 -->
@@ -13858,7 +13867,7 @@
             <button onclick="cetakRaporDigitalSiswa()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Cetak Rapor Digital">
               <i class="fa-solid fa-print"></i> Cetak
             </button>
-            <button id="btn-rapor-keluar" onclick="konfirmasiKeluarSiswa()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Keluar Akun Siswa">
+            <button id="btn-rapor-keluar" onclick="eksekusiLogoutSiswa()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer" title="Keluar Akun Siswa">
               <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
             </button>
           </div>
@@ -15092,6 +15101,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_nis_login_fix_v77"></script>
+  <script src="app.js?v=20261106_footer_1cm_v79"></script>
 </body>
 </html>

@@ -186,19 +186,21 @@ function getActiveStudentProfile() {
 
     let raw = null;
 
-    // 2. Cek localStorage secara terisolasi
+    // 2. Cek localStorage secara terisolasi (Jika bernilai LOGGED_OUT, langsung anggap keluar!)
     try {
       const ls = localStorage.getItem(ACTIVE_STUDENT_KEY);
-      if (ls && ls !== 'LOGGED_OUT' && ls !== 'null' && ls !== 'undefined') {
+      if (ls === 'LOGGED_OUT') return null;
+      if (ls && ls !== 'null' && ls !== 'undefined') {
         raw = ls;
       }
     } catch (eLs) {}
 
-    // 3. Cek sessionStorage secara terisolasi
+    // 3. Cek sessionStorage secara terisolasi (Jika bernilai LOGGED_OUT, langsung anggap keluar!)
     if (!raw) {
       try {
         const ss = sessionStorage.getItem(ACTIVE_STUDENT_KEY);
-        if (ss && ss !== 'LOGGED_OUT' && ss !== 'null' && ss !== 'undefined') {
+        if (ss === 'LOGGED_OUT') return null;
+        if (ss && ss !== 'null' && ss !== 'undefined') {
           raw = ss;
         }
       } catch (eSs) {}
@@ -210,7 +212,8 @@ function getActiveStudentProfile() {
         const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + ACTIVE_STUDENT_KEY + '=([^;]+)'));
         if (m && m[1]) {
           const ck = decodeURIComponent(m[1]);
-          if (ck && ck !== 'LOGGED_OUT' && ck !== 'null' && ck !== 'undefined') {
+          if (ck === 'LOGGED_OUT') return null;
+          if (ck && ck !== 'null' && ck !== 'undefined') {
             raw = ck;
           }
         }
@@ -271,7 +274,9 @@ function clearActiveStudentSession() {
   try { sessionStorage.removeItem(ACTIVE_STUDENT_KEY); } catch (e) {}
   try { localStorage.setItem(ACTIVE_STUDENT_KEY, 'LOGGED_OUT'); } catch (e) {}
   try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, 'LOGGED_OUT'); } catch (e) {}
-  try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; path=/; max-age=0'; } catch (e) {}
+  try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; } catch (e) {}
+  try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; path=/; max-age=0;'; } catch (e) {}
+  try { document.cookie = ACTIVE_STUDENT_KEY + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; } catch (e) {}
   try { localStorage.removeItem(ACTIVE_TAB_KEY); } catch (e) {}
   try { sessionStorage.removeItem(ACTIVE_TAB_KEY); } catch (e) {}
   try { localStorage.removeItem(ACTIVE_SEM_KEY); } catch (e) {}
@@ -20572,27 +20577,11 @@ async function loginDenganNis() {
 window.loginDenganNis = loginDenganNis;
 
 // ==========================================
-// SISTEM SIGN OUT / KELUAR AKUN SISWA
+// SISTEM SIGN OUT / KELUAR AKUN SISWA (AUTO-LOGOUT INSTAN & PERSISTEN DI RELOAD F5)
 // ==========================================
 function konfirmasiKeluarSiswa() {
-  try { playSound('click'); } catch (e) {}
-  const profile = getActiveStudentProfile();
-  const elWelcomeNama = document.getElementById('welcome-siswa-nama');
-  const elWelcomeKelas = document.getElementById('welcome-siswa-kelas');
-
-  const nama = profile ? profile.nama : (elWelcomeNama ? elWelcomeNama.innerText.trim() : 'Siswa');
-  const kelas = profile ? profile.kelas : (elWelcomeKelas ? elWelcomeKelas.innerText.trim() : '');
-  const targetLabel = (kelas && !kelas.includes('Belum')) ? `${nama} (${kelas})` : nama;
-
-  const modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
-  if (modalLogout) {
-    const elNama = document.getElementById('logout-siswa-nama');
-    if (elNama) elNama.innerText = targetLabel;
-    modalLogout.classList.remove('hidden');
-    modalLogout.style.display = 'flex';
-  } else {
-    eksekusiLogoutSiswa();
-  }
+  // Langsung eksekusi keluar otomatis tanpa dialog pop-up konfirmasi yang memperlambat
+  eksekusiLogoutSiswa();
 }
 window.konfirmasiKeluarSiswa = konfirmasiKeluarSiswa;
 
@@ -20616,22 +20605,32 @@ function eksekusiLogoutSiswa() {
   const nama = profile ? profile.nama : (elWelcomeNama ? elWelcomeNama.innerText.trim() : 'Siswa');
 
   // Simpan pekerjaan Word & Excel siswa yang sedang keluar terlebih dahulu
-  if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa();
-  if (typeof simpanExcelDraftSiswa === 'function') simpanExcelDraftSiswa();
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
+  try { if (typeof simpanExcelDraftSiswa === 'function') simpanExcelDraftSiswa(); } catch (e) {}
 
-  // Bersihkan data sesi siswa di seluruh lapisan penyimpanan secara tuntas
+  // 1. Bersihkan data sesi siswa di seluruh lapisan penyimpanan secara tuntas
   clearActiveStudentSession();
-  state.userPoints = 0;
+  if (typeof state !== 'undefined') {
+    state.userPoints = 0;
+  }
 
-  // Tutup semua modal terkait
-  tutupModalKonfirmasiLogoutSiswa();
+  // 2. Tutup semua modal siswa terkait
+  try { tutupModalKonfirmasiLogoutSiswa(); } catch (e) {}
   const modalProfil = document.getElementById('modal-profil-siswa');
   if (modalProfil) {
     modalProfil.classList.add('hidden');
-    modalProfil.style.display = 'none';
+    modalProfil.style.setProperty('display', 'none', 'important');
+    modalProfil.style.setProperty('visibility', 'hidden', 'important');
+    modalProfil.style.setProperty('pointer-events', 'none', 'important');
   }
 
-  // Reset poin di layar
+  // 3. Hapus style awal siswa agar peramban tidak lagi memaksa dock siswa
+  try {
+    const earlyStyle = document.getElementById('style-early-student-session');
+    if (earlyStyle) earlyStyle.remove();
+  } catch (e) {}
+
+  // 4. Reset poin di layar
   const p1 = document.getElementById('user-points');
   const p2 = document.getElementById('user-points-sem1');
   const pWelcome = document.getElementById('welcome-siswa-bintang');
@@ -20639,15 +20638,90 @@ function eksekusiLogoutSiswa() {
   if (p2) p2.innerText = '0';
   if (pWelcome) pWelcome.innerText = '0';
 
-  // Bersihkan kanvas Paint & kuis agar karya/sertifikat siswa tidak tertinggal untuk siswa berikutnya
-  if (typeof resetPaintCanvasUntukSiswa === 'function') resetPaintCanvasUntukSiswa();
-  if (typeof restartQuiz === 'function') restartQuiz();
+  // 5. Bersihkan kanvas Paint & kuis agar karya/sertifikat siswa tidak tertinggal untuk siswa berikutnya
+  try { if (typeof resetPaintCanvasUntukSiswa === 'function') resetPaintCanvasUntukSiswa(); } catch (e) {}
+  try { if (typeof restartQuiz === 'function') restartQuiz(); } catch (e) {}
 
-  // Muat ulang tampilan ke mode Belum Masuk / Tamu
-  muatProfilSiswa();
-  setHeaderNavMode('utama');
+  // 6. Muat ulang tampilan profil siswa ke status Tamu / Belum Masuk
+  try { muatProfilSiswa(); } catch (e) {}
+  try { setHeaderNavMode('utama'); } catch (e) {}
+
+  // 7. Perbarui elemen bar sambutan siswa secara eksplisit seketika
+  const elAvatar = document.getElementById('welcome-siswa-avatar');
+  const elNama = document.getElementById('welcome-siswa-nama');
+  const elKelas = document.getElementById('welcome-siswa-kelas');
+  const elSub = document.getElementById('welcome-siswa-sub-text');
+  const elPing = document.getElementById('welcome-siswa-ping');
+  const btnLogin = document.getElementById('btn-welcome-login');
+  const btnLogout = document.getElementById('btn-welcome-logout');
+  const btnRapor = document.getElementById('btn-welcome-rapor');
+  const btnGanti = document.getElementById('btn-welcome-ganti');
+  const btnSemToggle = document.getElementById('btn-toggle-sem-siswa');
+  const bintangWrap = document.getElementById('welcome-siswa-bintang-wrap');
+
+  if (elAvatar) {
+    elAvatar.innerText = '👤';
+    elAvatar.className = 'w-11 h-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center font-black text-lg shadow-inner flex-shrink-0';
+  }
+  if (elNama) elNama.innerText = 'Belum Ada Siswa Masuk';
+  if (elKelas) {
+    elKelas.innerText = 'Akun Belum Aktif';
+    elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-300';
+  }
+  if (elSub) elSub.innerText = 'Lab Komputer • Belum Masuk Akun';
+  if (elPing) elPing.classList.add('hidden');
+  if (bintangWrap) bintangWrap.classList.add('hidden');
+
+  if (btnLogin) { 
+    btnLogin.classList.remove('hidden'); 
+    btnLogin.style.removeProperty('display'); 
+    btnLogin.style.setProperty('display', 'inline-flex', 'important'); 
+  }
+  if (btnLogout) { 
+    btnLogout.classList.add('hidden'); 
+    btnLogout.style.setProperty('display', 'none', 'important'); 
+  }
+  if (btnRapor) { 
+    btnRapor.classList.add('hidden'); 
+    btnRapor.style.setProperty('display', 'none', 'important'); 
+  }
+  if (btnGanti) { 
+    btnGanti.classList.add('hidden'); 
+    btnGanti.style.setProperty('display', 'none', 'important'); 
+  }
+  if (btnSemToggle) { 
+    btnSemToggle.classList.add('hidden'); 
+    btnSemToggle.style.setProperty('display', 'none', 'important'); 
+  }
+
+  const heroGuest = document.getElementById('hero-guest-btn');
+  const heroSem = document.getElementById('hero-sem-buttons');
+  if (heroGuest) heroGuest.classList.remove('hidden');
+  if (heroSem) heroSem.classList.add('hidden');
+
+  const cardsSiswa = document.getElementById('beranda-fitur-cards-siswa');
+  if (cardsSiswa) cardsSiswa.classList.add('hidden');
+
   const navUtama = document.getElementById('navbar-tampilan-utama');
-  if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.display = 'flex'; }
+  if (navUtama) { 
+    navUtama.classList.remove('hidden'); 
+    navUtama.style.removeProperty('display');
+    navUtama.style.setProperty('display', 'flex', 'important'); 
+  }
+  const navSem1 = document.getElementById('navbar-tampilan-sem1');
+  if (navSem1) { 
+    navSem1.classList.add('hidden'); 
+    navSem1.style.setProperty('display', 'none', 'important'); 
+  }
+
+  try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (e) {}
+  try { if (typeof renderDrive7KebiasaanGrid === 'function') renderDrive7KebiasaanGrid(); } catch (e) {}
+  try { switchTab('beranda'); } catch (e) {}
+  try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) {}
+
+  showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info');
+}
+window.eksekusiLogoutSiswa = eksekusiLogoutSiswa;
   const navSem1 = document.getElementById('navbar-tampilan-sem1');
   if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.display = 'none'; }
   const mNavUtama = document.getElementById('m-navbar-utama');
