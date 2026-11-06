@@ -726,15 +726,15 @@ function setHeaderNavMode(mode) {
   const btnLoginGuru = document.getElementById('btn-main-login-guru');
 
   if (mode === 'guru') {
-    // Mode Dasbor Guru: Sembunyikan Dock Guru sesuai permintaan user (tampilan lebih bersih & lega)
+    // Mode Dasbor Guru: Sembunyikan Dock Guru & bar strip sekunder sesuai permintaan user
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
+    if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
 
     // Tampilkan header atas standar dengan tombol "Keluar Guru"
     if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
-    if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.removeProperty('display'); mNavUtama.style.setProperty('display', 'flex', 'important'); }
     if (btnLoginGuru) {
       btnLoginGuru.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i><span class="text-rose-200 font-title font-bold">Keluar Guru</span>';
       btnLoginGuru.onclick = function() { window.keluarModeGuru(); };
@@ -746,14 +746,14 @@ function setHeaderNavMode(mode) {
     if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); navSem1.style.setProperty('display', 'flex', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
-    if (mNavSem1) { mNavSem1.classList.remove('hidden'); mNavSem1.style.removeProperty('display'); mNavSem1.style.setProperty('display', 'flex', 'important'); }
+    if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
   } else {
     // Mode Utama (Tampilan Utama Bersih / Tamu)
     if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
-    if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.removeProperty('display'); mNavUtama.style.setProperty('display', 'flex', 'important'); }
+    if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
     if (btnLoginGuru) {
@@ -21563,8 +21563,8 @@ window.updateFilterKelasTabs = updateFilterKelasTabs;
 // KONTROL SUB-TAB DASBOR GURU
 // --------------------------------------------------------------------------
 function pilihSubTabGuru(tabName) {
-  playSound('click');
-  state.subTabGuru = tabName;
+  try { if (typeof playSound === 'function') playSound('click'); } catch(e) {}
+  try { if (typeof state !== 'undefined') state.subTabGuru = tabName; } catch(e) {}
 
   const tabs = ['gradebook', 'drive7k', 'galeri', 'analisis', 'cloud', 'bank-soal'];
   tabs.forEach(t => {
@@ -21573,35 +21573,42 @@ function pilihSubTabGuru(tabName) {
     if (view) {
       if (t === tabName) {
         view.classList.remove('hidden');
+        view.style.removeProperty('display');
+        view.style.setProperty('display', 'block', 'important');
       } else {
         view.classList.add('hidden');
+        view.style.setProperty('display', 'none', 'important');
       }
     }
     if (btn) {
       if (t === tabName) {
-        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold font-title transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs';
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold font-title transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs cursor-pointer';
       } else {
-        btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2';
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer';
       }
     }
   });
 
-  if (tabName === 'gradebook') {
-    filterDanCariSiswa();
-  } else if (tabName === 'drive7k') {
-    renderMonitoringDrive7KGuru();
-  } else if (tabName === 'galeri') {
-    renderGaleriGuru();
-  } else if (tabName === 'bank-soal') {
-    renderBankSoalGuru();
-  } else if (tabName === 'cloud') {
-    if (typeof renderTabsKelasSheet === 'function') renderTabsKelasSheet();
-    if (typeof renderRingkasanKoneksiKelas === 'function') renderRingkasanKoneksiKelas();
-    const inputWebhook = document.getElementById('guru-webhook-url');
-    if (inputWebhook) {
-      const savedWebhook = getPersistentWebhookUrl();
-      if (savedWebhook) inputWebhook.value = savedWebhook;
+  try {
+    if (tabName === 'gradebook') {
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    } else if (tabName === 'drive7k') {
+      if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+    } else if (tabName === 'galeri') {
+      if (typeof renderGaleriGuru === 'function') renderGaleriGuru();
+    } else if (tabName === 'bank-soal') {
+      if (typeof renderBankSoalGuru === 'function') renderBankSoalGuru();
+    } else if (tabName === 'cloud') {
+      if (typeof renderTabsKelasSheet === 'function') renderTabsKelasSheet();
+      if (typeof renderRingkasanKoneksiKelas === 'function') renderRingkasanKoneksiKelas();
+      const inputWebhook = document.getElementById('guru-webhook-url');
+      if (inputWebhook && typeof getPersistentWebhookUrl === 'function') {
+        const savedWebhook = getPersistentWebhookUrl();
+        if (savedWebhook) inputWebhook.value = savedWebhook;
+      }
     }
+  } catch(err) {
+    console.warn('Subtab render execution:', err);
   }
 }
 window.pilihSubTabGuru = pilihSubTabGuru;

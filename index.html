@@ -357,6 +357,58 @@
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
       };
 
+      // Early pilihSubTabGuru agar seluruh 6 tab Dasbor Guru langsung aktif & responsif
+      window.pilihSubTabGuru = function(tabName) {
+        try { if (typeof playSound === 'function') playSound('click'); } catch(e) {}
+        try {
+          if (typeof state !== 'undefined') { state.subTabGuru = tabName; }
+        } catch(e) {}
+        var tabs = ['gradebook', 'drive7k', 'galeri', 'analisis', 'cloud', 'bank-soal'];
+        for (var i = 0; i < tabs.length; i++) {
+          var t = tabs[i];
+          var view = document.getElementById('guru-view-' + t);
+          var btn = document.getElementById('guru-subtab-btn-' + t);
+          if (view) {
+            if (t === tabName) {
+              view.classList.remove('hidden');
+              view.style.removeProperty('display');
+              view.style.setProperty('display', 'block', 'important');
+            } else {
+              view.classList.add('hidden');
+              view.style.setProperty('display', 'none', 'important');
+            }
+          }
+          if (btn) {
+            if (t === tabName) {
+              btn.className = 'px-4 py-2 rounded-xl text-xs font-bold font-title transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs cursor-pointer';
+            } else {
+              btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer';
+            }
+          }
+        }
+        try {
+          if (tabName === 'gradebook') {
+            if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+          } else if (tabName === 'drive7k') {
+            if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+          } else if (tabName === 'galeri') {
+            if (typeof renderGaleriGuru === 'function') renderGaleriGuru();
+          } else if (tabName === 'bank-soal') {
+            if (typeof renderBankSoalGuru === 'function') renderBankSoalGuru();
+          } else if (tabName === 'cloud') {
+            if (typeof renderTabsKelasSheet === 'function') renderTabsKelasSheet();
+            if (typeof renderRingkasanKoneksiKelas === 'function') renderRingkasanKoneksiKelas();
+            var inputWebhook = document.getElementById('guru-webhook-url');
+            if (inputWebhook && typeof getPersistentWebhookUrl === 'function') {
+              var savedWebhook = getPersistentWebhookUrl();
+              if (savedWebhook) inputWebhook.value = savedWebhook;
+            }
+          }
+        } catch(err) {
+          console.warn('Subtab early render execution:', err);
+        }
+      };
+
       window.bukaModalLoginGuru = function() {
         try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
         var modal = document.getElementById('modal-login-guru');
@@ -11898,22 +11950,22 @@
       <!-- Navigation Bar Sub-Tab Guru -->
       <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
         <div class="flex flex-wrap gap-1.5">
-          <button onclick="pilihSubTabGuru('gradebook')" id="guru-subtab-btn-gradebook" class="px-4 py-2 rounded-xl text-xs font-bold font-title transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs">
+          <button type="button" onclick="pilihSubTabGuru('gradebook')" id="guru-subtab-btn-gradebook" class="px-4 py-2 rounded-xl text-xs font-bold font-title transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs cursor-pointer">
             <i class="fa-solid fa-table-list"></i> Buku Nilai & Progres Siswa
           </button>
-          <button onclick="pilihSubTabGuru('drive7k')" id="guru-subtab-btn-drive7k" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+          <button type="button" onclick="pilihSubTabGuru('drive7k')" id="guru-subtab-btn-drive7k" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-folder-open text-purple-600"></i> Drive 7 Kebiasaan (TP 2.1)
           </button>
-          <button onclick="pilihSubTabGuru('galeri')" id="guru-subtab-btn-galeri" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+          <button type="button" onclick="pilihSubTabGuru('galeri')" id="guru-subtab-btn-galeri" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-palette text-pink-500"></i> Hasil Poster Siswa (Sem 1)
           </button>
-          <button onclick="pilihSubTabGuru('analisis')" id="guru-subtab-btn-analisis" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+          <button type="button" onclick="pilihSubTabGuru('analisis')" id="guru-subtab-btn-analisis" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-chart-pie"></i> Analisis Capaian TP
           </button>
-          <button onclick="pilihSubTabGuru('cloud')" id="guru-subtab-btn-cloud" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+          <button type="button" onclick="pilihSubTabGuru('cloud')" id="guru-subtab-btn-cloud" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-cloud-arrow-up"></i> Sinkronisasi Cloud & Backup
           </button>
-          <button onclick="pilihSubTabGuru('bank-soal')" id="guru-subtab-btn-bank-soal" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+          <button type="button" onclick="pilihSubTabGuru('bank-soal')" id="guru-subtab-btn-bank-soal" class="px-4 py-2 rounded-xl text-xs font-semibold font-title text-slate-600 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-clipboard-question text-amber-500"></i> Bank Soal Kuis
           </button>
         </div>
@@ -14880,6 +14932,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_clean_nav_v71"></script>
+  <script src="app.js?v=20261106_patch_v72"></script>
 </body>
 </html>

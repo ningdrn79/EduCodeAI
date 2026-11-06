@@ -2213,30 +2213,57 @@ body.typing-screen-locked {
 }
 
 /* ======================================================== */
+/* PERMANEN SEMBUNYIKAN BAR MENU SEKUNDER DI BAWAH HEADER   */
+/* Memastikan hanya Header Utama yang bersih & rapi         */
+/* ======================================================== */
+#navbar-tampilan-guru,
+#m-navbar-utama,
+#m-navbar-sem1,
+#m-navbar-guru,
+div[id^="m-navbar-"],
+.m-navbar-strip {
+  display: none !important;
+  height: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* ======================================================== */
 /* PRINT STYLING KHUSUS CETAK RAPOR DIGITAL SISWA           */
 /* Menjamin 1 Halaman Pas (Zero Overflow / No Orphan Page)  */
 /* ======================================================== */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm 10mm;
+    margin: 6mm 8mm;
   }
   html, body {
     background: #ffffff !important;
     color: #000000 !important;
-    height: auto !important;
-    overflow: visible !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  body > * {
+  body > *:not(#modal-profil-siswa) {
     display: none !important;
     visibility: hidden !important;
+    height: 0 !important;
   }
   #modal-profil-siswa,
   #modal-profil-siswa * {
     visibility: visible !important;
   }
   #modal-profil-siswa {
-    position: static !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -2244,15 +2271,23 @@ body.typing-screen-locked {
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
+    page-break-before: avoid !important;
     page-break-after: avoid !important;
-    break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
   #modal-profil-siswa > div {
     max-width: 100% !important;
     box-shadow: none !important;
     border: 1px solid #cbd5e1 !important;
-    border-radius: 16px !important;
-    padding: 14px 18px !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    max-height: 98vh !important;
+    overflow: hidden !important;
+  }
+  #profil-view-card {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
@@ -2264,6 +2299,14 @@ body.typing-screen-locked {
   #floating-scroll-nav,
   #toast {
     display: none !important;
+  }
+  #profil-view-card .grid {
+    gap: 4px !important;
+  }
+  #profil-view-card .p-4,
+  #profil-view-card .p-3.5,
+  #profil-view-card .p-3 {
+    padding: 8px 10px !important;
   }
 }
 
