@@ -1007,8 +1007,37 @@ function getBestVoice(targetLang) {
   return voice;
 }
 
+// Melodi Nada Robotik Ceria (Web Audio Synthesizer - 100% Selalu Bersuara)
+function playRobotChimeMelody() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Nada Ceria Bintang)
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.06);
+      gain.gain.setValueAtTime(0.2, now + i * 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i * 0.06);
+      osc.stop(now + i * 0.06 + 0.18);
+    });
+  } catch (e) {}
+}
+window.playRobotChimeMelody = playRobotChimeMelody;
+
 // Engine Sintesis Suara Ramah Anak (TTS Audio Playback)
 function suarakanTeksRobo(teks, lang = null) {
+  // Selalu mainkan nada sapaan robotik ceria agar pengguna langsung mendengar feedback suara
+  playRobotChimeMelody();
+
   if (!('speechSynthesis' in window)) return;
 
   // Pastikan AudioContext & SpeechSynthesis tidak dalam kondisi suspended / paused
@@ -1060,7 +1089,10 @@ function suarakanTeksRobo(teks, lang = null) {
   };
 
   utterance.onend = matikanWave;
-  utterance.onerror = matikanWave;
+  utterance.onerror = function(err) {
+    console.warn('Speech synthesis utterance error:', err);
+    matikanWave();
+  };
 
   // PENTING: Cegah Garbage Collection Chromium yang mematikan suara secara tiba-tiba
   window._activeSpeechUtterance = utterance;
@@ -1076,7 +1108,7 @@ function suarakanTeksRobo(teks, lang = null) {
         } catch (errSpeak) {
           matikanWave();
         }
-      }, 60);
+      }, 50);
     } else {
       if (window.speechSynthesis.paused) window.speechSynthesis.resume();
       window.speechSynthesis.speak(utterance);
@@ -1089,9 +1121,13 @@ window.suarakanTeksRobo = suarakanTeksRobo;
 
 // Fungsi Sapaan Utama Robot (Tombol "👋 Sapa")
 function sapaRobotHalo(teksOrEvent) {
+  if (typeof unlockGlobalAudio === 'function') {
+    unlockGlobalAudio();
+  }
   try {
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
     }
     playSound('success');
   } catch (e) {}

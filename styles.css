@@ -2206,36 +2206,55 @@ body.typing-screen-locked {
 
 /* ======================================================== */
 /* PRINT STYLING KHUSUS CETAK RAPOR DIGITAL SISWA           */
+/* Menjamin 1 Halaman Pas (Zero Overflow / No Orphan Page)  */
 /* ======================================================== */
 @media print {
-  body {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+  html, body {
     background: #ffffff !important;
     color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   body > * {
+    display: none !important;
     visibility: hidden !important;
   }
-  #modal-profil-siswa, #modal-profil-siswa * {
+  #modal-profil-siswa,
+  #modal-profil-siswa * {
     visibility: visible !important;
   }
   #modal-profil-siswa {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+    position: static !important;
+    display: block !important;
     width: 100% !important;
     max-width: 100% !important;
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
-    display: block !important;
+    box-shadow: none !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
   #modal-profil-siswa > div {
     max-width: 100% !important;
     box-shadow: none !important;
-    border: none !important;
-    padding: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 16px !important;
+    padding: 14px 18px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
-  #profil-view-card button, #profil-view-form, .planet-interactive, nav, header {
+  #profil-view-card button,
+  #profil-view-form,
+  .planet-interactive,
+  nav,
+  header,
+  #floating-scroll-nav,
+  #toast {
     display: none !important;
   }
 }
