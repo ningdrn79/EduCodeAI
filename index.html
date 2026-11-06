@@ -188,8 +188,6 @@
             #navbar-tampilan-utama { display: flex !important; }
             #navbar-tampilan-sem1 { display: none !important; }
             #navbar-tampilan-guru { display: none !important; }
-            #tab-beranda { display: none !important; }
-            #tab-guru { display: block !important; }
             @media (max-width: 767px) {
               #m-navbar-utama { display: flex !important; }
               #m-navbar-sem1 { display: none !important; }
@@ -885,7 +883,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
       <!-- Logo Kiri: EduCodeAI - SDS Cinta Kasih Tzu Chi -->
-      <div class="flex items-center gap-3.5 cursor-pointer group select-none flex-shrink-0" onclick="switchTab('beranda')" title="EduCode AI - SDS Cinta Kasih Tzu Chi">
+      <div class="flex items-center gap-3.5 cursor-pointer group select-none flex-shrink-0" onclick="if(window.isTeacherSessionActive && window.isTeacherSessionActive()){switchTab('guru');}else{switchTab('beranda');}" title="EduCode AI - SDS Cinta Kasih Tzu Chi">
         <!-- Logo Kepala Maskot Robot Lucu (EduCode AI Mascot Head) -->
         <div class="relative flex-shrink-0 w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-b from-sky-50 via-white to-blue-50 rounded-2xl p-1 flex items-center justify-center border-2 border-sky-300 shadow-md shadow-sky-500/25 group-hover:scale-110 group-hover:rotate-3 transition-all duration-200">
           <img 
@@ -14905,6 +14903,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_audio_fix_v66"></script>
+  <script src="app.js?v=20261106_syntax_fix_v68"></script>
 </body>
 </html>

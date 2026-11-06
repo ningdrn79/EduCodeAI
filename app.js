@@ -1624,6 +1624,17 @@ function switchTab(tabId) {
   playSound('click');
   window.speechSynthesis && window.speechSynthesis.cancel();
 
+  // Jika guru sedang login dan memanggil beranda, otomatis arahkan ke Dasbor Guru
+  if (tabId === 'beranda' && (state.isGuruLoggedIn || (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()))) {
+    tabId = 'guru';
+  }
+
+  // Bersihkan style early teacher agar tidak menimpa display section
+  try {
+    const earlyGuruStyle = document.getElementById('style-early-teacher-session');
+    if (earlyGuruStyle) earlyGuruStyle.remove();
+  } catch (e) {}
+
   // Sinkronkan navbar: Jika membuka Dasbor Guru, tampilkan dock menu guru (Darningsih, S.T., Kelas 4, 5, 6, Keluar)
   if (tabId === 'guru' || (state.isGuruLoggedIn && tabId === 'guru')) {
     setHeaderNavMode('guru');
@@ -23270,146 +23281,6 @@ function renderGaleriGuru() {
     }
 
     allPosters.forEach(p => {
-      const posterImg = p.image || 'materi_word_tp2_1_poster.jpg';
-      const authorText = p.author || (p.studentName ? `${p.studentName} (${p.studentClass || 'Kelas 4'})` : 'Siswa Kelas 4');
-      const studentClassBadge = p.studentClass || (authorText.match(/\((.*?)\)/) ? authorText.match(/\((.*?)\)/)[1] : '4A');
-
-      const card = document.createElement('div');
-      card.className = 'bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col group';
-      card.innerHTML = `
-        <div class="h-52 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center cursor-pointer p-2" onclick="bukaModalGambarMateriDariSrc('${posterImg}', '${escapeXml(p.title)}')">
-          <img src="${posterImg}" alt="${escapeXml(p.title)}" class="max-h-full w-auto object-contain rounded-lg shadow-md group-hover:scale-105 transition duration-300">
-          <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 text-pink-300 text-[10px] font-black backdrop-blur-xs flex items-center gap-1.5 border border-white/10">
-            <i class="fa-solid fa-palette text-pink-400"></i> Poster TP 2.1 - 2.4
-          </div>
-          <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 text-amber-300 text-[10px] font-black backdrop-blur-xs flex items-center gap-1 border border-white/10">
-            <i class="fa-solid fa-star text-amber-400"></i> Bintang 5
-          </div>
-          <div class="absolute inset-0 bg-indigo-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-            <span class="px-3.5 py-1.5 rounded-xl bg-white text-indigo-900 font-title font-bold text-xs shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform">
-              <i class="fa-solid fa-expand text-indigo-600"></i> Perbesar Poster
-            </span>
-          </div>
-        </div>
-        <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3.5">
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-1.5">
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-pink-50 text-pink-700 border border-pink-200">
-                Kelas ${escapeXml(studentClassBadge)}
-              </span>
-              <span class="text-[11px] text-slate-400 font-medium">
-                <i class="fa-regular fa-calendar mr-1"></i>${escapeXml(p.date || 'Semester 1')}
-              </span>
-            </div>
-            <h4 class="font-title font-bold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2" title="${escapeXml(p.title)}">
-              ${escapeXml(p.title)}
-            </h4>
-            <div class="text-xs text-slate-600 mt-2 flex items-center gap-1.5 font-medium">
-              <i class="fa-solid fa-user-pen text-indigo-500"></i>
-              <span>${escapeXml(authorText)}</span>
-            </div>
-          </div>
-          <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-            <button type="button" onclick="bukaModalGambarMateriDariSrc('${posterImg}', '${escapeXml(p.title)}')" class="flex-1 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-              <i class="fa-solid fa-expand text-xs"></i> Pratinjau
-            </button>
-            <button type="button" onclick="beriNilaiKaryaGuru('${escapeXml(p.title)}', '${escapeXml(authorText)}', 'poster')" class="flex-1 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Beri Nilai Angka untuk dimasukkan ke Rapor Siswa">
-              <i class="fa-solid fa-award text-xs"></i> Beri Nilai
-            </button>
-          </div>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-  } else {
-    // ==========================================
-    // SEMESTER 2: HASIL PROJEK CODING & AI SISWA (TP 3.1 - TP 4.2)
-    // ==========================================
-    if (statsRow) statsRow.classList.add('hidden');
-    const rekapBox = document.getElementById('guru-poster-rekap-container');
-    if (rekapBox) rekapBox.classList.add('hidden');
-    if (grid) {
-      grid.classList.remove('hidden');
-      grid.classList.add('grid');
-    }
-
-    const semPill = document.getElementById('guru-galeri-sem-pill');
-    const galeriTitle = document.getElementById('guru-galeri-title');
-    const galeriDesc = document.getElementById('guru-galeri-desc');
-    const countBadge = document.getElementById('guru-galeri-count-badge');
-
-    if (semPill) {
-      semPill.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-700 border border-purple-200';
-      semPill.innerText = 'Semester 2 • TP 3.1 - TP 4.2';
-    }
-    if (galeriTitle) {
-      galeriTitle.innerHTML = '<i class="fa-solid fa-robot text-purple-600"></i> Galeri Hasil Karya Coding & AI Siswa (Semester 2)';
-    }
-    if (galeriDesc) {
-      galeriDesc.innerText = 'Kumpulan portofolio digital hasil projek visual coding Scratch 3.0 dan algoritma simulasi RoboMind 7.0 siswa Kelas 4.';
-    }
-
-    // Ambil poster tersimpan di browser komputer ini
-    let posters = [];
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key === 'kreator_cilik_word_posters' || key.startsWith('kreator_cilik_word_posters_'))) {
-          try {
-            const raw = localStorage.getItem(key);
-            if (raw) {
-              const list = JSON.parse(raw);
-              if (Array.isArray(list)) {
-                list.forEach(item => {
-                  if (item && item.title && !posters.some(p => p.id === item.id)) {
-                    posters.push(item);
-                  }
-                });
-              }
-            }
-          } catch (eParse) {}
-        }
-      }
-    } catch (e) {}
-
-    // Bersihkan dari author siswa fiktif dummy secara permanen
-    posters = posters.filter(p => {
-      if (!p) return false;
-      const author = (p.author || p.studentName || '').toLowerCase();
-      for (const dummy of DAFTAR_NAMA_SISWA_CONTOH) {
-        if (author.includes(dummy)) return false;
-      }
-      return true;
-    });
-
-    if (posters.length === 0) {
-      if (countBadge) countBadge.innerText = '0 Karya Poster';
-      grid.innerHTML = `
-        <div class="col-span-full py-12 px-4 text-center space-y-3 bg-slate-50 rounded-3xl border border-dashed border-slate-300">
-          <div class="w-16 h-16 rounded-3xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto text-2xl shadow-inner border border-pink-100">
-            <i class="fa-solid fa-palette"></i>
-          </div>
-          <div>
-            <h4 class="font-title font-bold text-slate-800 text-base">Belum Ada Karya Poster Siswa Tersimpan</h4>
-            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1 leading-relaxed">
-              Saat siswa mengerjakan proyek poster di <strong>Lab MS Word (TP 2.1 - TP 2.4)</strong> dan menekan <em>"Simpan ke Galeri"</em>, karya digital siswa resmi akan langsung otomatis terpajang di sini.
-            </p>
-          </div>
-          <div class="pt-2">
-            <button onclick="switchTab('msword')" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-title text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
-              <i class="fa-solid fa-file-word mr-1.5"></i> Buka Lab MS Word
-            </button>
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    if (countBadge) {
-      countBadge.innerText = `${posters.length} Karya Poster Terkumpul`;
-    }
-
-    posters.forEach(p => {
       const posterImg = p.image || 'materi_word_tp2_1_poster.jpg';
       const authorText = p.author || (p.studentName ? `${p.studentName} (${p.studentClass || 'Kelas 4'})` : 'Siswa Kelas 4');
       const studentClassBadge = p.studentClass || (authorText.match(/\((.*?)\)/) ? authorText.match(/\((.*?)\)/)[1] : '4A');
