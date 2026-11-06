@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_gradebook_fix_v74">
+  <link rel="stylesheet" href="styles.css?v=20261106_teacher_nav_fix_v75">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -130,6 +130,21 @@
 
     window.setHeaderNavMode = function(mode) {
       try {
+        var isGuru = (window.__TEACHER_SESSION_ACTIVE__ === true);
+        if (!isGuru && typeof isTeacherSessionActive === 'function') {
+          try { isGuru = isTeacherSessionActive(); } catch(err){}
+        }
+        if (!isGuru && typeof state !== 'undefined' && (state.isGuruLoggedIn || state.currentTab === 'guru')) isGuru = true;
+        if (!isGuru) {
+          try {
+            var s = localStorage.getItem('educode_teacher_session_v1') || sessionStorage.getItem('educode_teacher_session_v1');
+            if (s === 'ACTIVE') isGuru = true;
+          } catch(err){}
+        }
+        if (isGuru && mode !== 'guru') {
+          mode = 'guru';
+        }
+
         var u = document.getElementById('navbar-tampilan-utama');
         var s1 = document.getElementById('navbar-tampilan-sem1');
         var g = document.getElementById('navbar-tampilan-guru');
@@ -150,7 +165,8 @@
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
             btnLg.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
-            btnLg.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/60 border border-rose-500/50 hover:bg-rose-900/80 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+            btnLg.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/70 border border-rose-500/60 hover:bg-rose-900/90 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+            btnLg.title = 'Keluar dari Akun Guru';
           }
         } else if (mode === 'sem1') {
           if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
@@ -163,9 +179,10 @@
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
-            btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
+            btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
             btnLg.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
             btnLg.className = 'btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+            btnLg.title = 'Masuk Dasbor Guru';
           }
         }
       } catch (e) {}
@@ -239,6 +256,17 @@
             }
           `;
           document.head.appendChild(styleGuru);
+          var applyGuruHeaderEarly = function() {
+            if (typeof window.setHeaderNavMode === 'function') {
+              window.setHeaderNavMode('guru');
+            }
+          };
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyGuruHeaderEarly);
+          } else {
+            applyGuruHeaderEarly();
+          }
+          window.addEventListener('load', applyGuruHeaderEarly);
           return; // Jangan lanjutkan ke sesi siswa jika guru sedang aktif
         }
 
@@ -1097,7 +1125,7 @@
         <!-- 1. Login Guru / Keluar Guru (Unified Handler) -->
         <button type="button" onclick="window.aksiKlikTombolGuruUtama(event);" id="btn-main-login-guru" class="btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition" title="Masuk / Keluar Dasbor Guru">
           <i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i>
-          <span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>
+          <span class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>
         </button>
 
         <!-- 3. Indonesian / English -->
@@ -15061,6 +15089,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_gradebook_fix_v74"></script>
+  <script src="app.js?v=20261106_teacher_nav_fix_v75"></script>
 </body>
 </html>

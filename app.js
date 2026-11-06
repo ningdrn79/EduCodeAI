@@ -649,8 +649,11 @@ function terapkanBahasa() {
   const dict = i18nDict[lang] || i18nDict.id;
 
   // Update elemen ber-atribut data-i18n
+  const isGuruActive = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                       (typeof state !== 'undefined' && state.isGuruLoggedIn);
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
+    if (key === 'loginGuru' && isGuruActive) return; // Lindungi tombol Keluar Guru agar tidak tertimpa
     if (dict[key]) {
       el.innerHTML = dict[key];
     }
@@ -716,6 +719,13 @@ function terapkanBahasa() {
 state.headerNavMode = 'utama'; // 'utama', 'sem1', atau 'guru'
 
 function setHeaderNavMode(mode) {
+  const isGuru = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                 (typeof state !== 'undefined' && state.isGuruLoggedIn) || 
+                 (typeof state !== 'undefined' && state.currentTab === 'guru') ||
+                 (window.__TEACHER_SESSION_ACTIVE__ === true);
+  if (isGuru && mode !== 'guru') {
+    mode = 'guru';
+  }
   state.headerNavMode = mode;
   const navUtama = document.getElementById('navbar-tampilan-utama');
   const navSem1 = document.getElementById('navbar-tampilan-sem1');
@@ -737,9 +747,10 @@ function setHeaderNavMode(mode) {
     // Tampilkan header atas standar dengan tombol "Keluar Guru"
     if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
     if (btnLoginGuru) {
-      btnLoginGuru.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i><span class="text-rose-200 font-title font-bold">Keluar Guru</span>';
-      btnLoginGuru.onclick = function() { window.keluarModeGuru(); };
-      btnLoginGuru.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/60 border border-rose-500/50 hover:bg-rose-900/80 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+      btnLoginGuru.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
+      btnLoginGuru.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
+      btnLoginGuru.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/70 border border-rose-500/60 hover:bg-rose-900/90 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+      btnLoginGuru.title = 'Keluar dari Akun Guru';
     }
   } else if (mode === 'sem1') {
     // Mode Siswa
@@ -758,9 +769,10 @@ function setHeaderNavMode(mode) {
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
     if (btnLoginGuru) {
-      btnLoginGuru.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
-      btnLoginGuru.onclick = function() { window.bukaModalLoginGuru(); };
+      btnLoginGuru.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
+      btnLoginGuru.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
       btnLoginGuru.className = 'btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+      btnLoginGuru.title = 'Masuk Dasbor Guru';
     }
   }
 }
@@ -772,7 +784,14 @@ function bukaTampilanUtama() {
   if (student) {
     setHeaderNavMode('sem1');
   } else {
-    setHeaderNavMode('utama');
+    const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                      (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
+                      (window.__TEACHER_SESSION_ACTIVE__ === true);
+    if (!isTeacher) {
+      setHeaderNavMode('utama');
+    } else {
+      setHeaderNavMode('guru');
+    }
   }
   switchTab('beranda');
   if (spaceGame && spaceGame.isRunning) {
@@ -1645,7 +1664,14 @@ function switchTab(tabId) {
       setHeaderNavMode('sem1');
     } else {
       if (tabId === 'beranda' || tabId === 'antariksa') {
-        setHeaderNavMode('utama');
+        const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                      (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
+                      (window.__TEACHER_SESSION_ACTIVE__ === true);
+    if (!isTeacher) {
+      setHeaderNavMode('utama');
+    } else {
+      setHeaderNavMode('guru');
+    }
       } else {
         setHeaderNavMode('sem1');
       }
@@ -17721,7 +17747,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hash && ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa'].includes(hash)) {
     switchTab(hash);
   } else {
-    setHeaderNavMode('utama');
+    const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                      (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
+                      (window.__TEACHER_SESSION_ACTIVE__ === true);
+    if (!isTeacher) {
+      setHeaderNavMode('utama');
+    } else {
+      setHeaderNavMode('guru');
+    }
   }
 });
 
@@ -19510,7 +19543,14 @@ function initTeacherDatabase() {
       muatProfilSiswa();
     } else {
       // Mode Guest / Sudah Keluar: Tampilkan beranda utama dengan menu tamu
+      const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                      (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
+                      (window.__TEACHER_SESSION_ACTIVE__ === true);
+    if (!isTeacher) {
       setHeaderNavMode('utama');
+    } else {
+      setHeaderNavMode('guru');
+    }
       switchTab('beranda');
       muatProfilSiswa();
     }
@@ -19883,7 +19923,7 @@ function keluarModeGuru() {
 
     const btnLg = document.getElementById('btn-main-login-guru');
     if (btnLg) {
-      btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
+      btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
       btnLg.onclick = function(e) { if (typeof window.aksiKlikTombolGuruUtama === 'function') window.aksiKlikTombolGuruUtama(e); else bukaModalLoginGuru(); };
       btnLg.className = 'btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
     }
@@ -20929,7 +20969,14 @@ function muatProfilSiswa() {
     const p2 = document.getElementById('user-points-sem1');
     if (p1) p1.innerText = 0;
     if (p2) p2.innerText = 0;
-    setHeaderNavMode('utama');
+    const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                      (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
+                      (window.__TEACHER_SESSION_ACTIVE__ === true);
+    if (!isTeacher) {
+      setHeaderNavMode('utama');
+    } else {
+      setHeaderNavMode('guru');
+    }
   } else {
     // Mode Siswa Aktif (Tampilkan Dock Navigasi Siswa Sesuai Gambar User)
     if (heroSemBtns) heroSemBtns.classList.remove('hidden');
