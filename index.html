@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_sound_fixed_v63">
+  <link rel="stylesheet" href="styles.css?v=20261106_lms_sync_v64">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -12548,9 +12548,14 @@
               </div>
 
               <div class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/70">
-                <button onclick="sinkronkanDataSiswaKelasAktifForm()" id="btn-sync-single-class" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
-                  <i class="fa-solid fa-arrows-rotate"></i> Sinkronkan Data Kelas Ini Sekarang
-                </button>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button onclick="sinkronkanMasterDataSiswaLMS()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-md cursor-pointer" title="Tarik seluruh data siswa 11 kelas sekaligus dari sheet 'DATA SISWA LMS'">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Sinkron Master "DATA SISWA LMS"
+                  </button>
+                  <button onclick="sinkronkanDataSiswaKelasAktifForm()" id="btn-sync-single-class" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate"></i> Sinkron Kelas Ini Saja
+                  </button>
+                </div>
                 <div class="flex items-center gap-2">
                   <button onclick="ujiCekNisGuru()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-magnifying-glass"></i> Uji Cek NIS
@@ -13699,7 +13704,7 @@
 
           <!-- Input Box NIS Besar & Kontras -->
           <div class="relative max-w-xs mx-auto">
-            <input type="text" id="input-login-nis" maxlength="10" placeholder="Ketik NIS (Contoh: 4101)" 
+            <input type="text" id="input-login-nis" maxlength="10" placeholder="Ketik NIS (Contoh: 3201)" 
               oninput="const e=document.getElementById('pesan-error-login-nis'); if(e) e.classList.add('hidden');"
               onkeydown="if(event.key==='Enter') loginDenganNis()"
               class="w-full text-center text-2xl font-black font-mono tracking-widest px-4 py-3 rounded-2xl border-2 border-emerald-400 bg-white text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-4 focus:ring-emerald-400/30 focus:border-emerald-600 transition shadow-inner">
@@ -14893,6 +14898,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_sound_fixed_v63"></script>
+  <script src="app.js?v=20261106_lms_sync_v64"></script>
 </body>
 </html>

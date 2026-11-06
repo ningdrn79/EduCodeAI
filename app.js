@@ -18436,7 +18436,7 @@ const SEED_STUDENTS = [
   {
     id: 'STD-4A-3000',
     nis: '3000',
-    nama: 'anoname',
+    nama: 'Siswa Contoh (3000)',
     kelas: '4A',
     absen: '30',
     jenisKelamin: 'L',
@@ -19083,7 +19083,11 @@ function pulihkanSemuaSiswaDefault(quiet = false) {
     if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     if (typeof renderDasborGuru === 'function') renderDasborGuru();
     if (!quiet) {
-      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! 🎉`, 'success');
+      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... ☁️`, 'info');
+    }
+    // Otomatis sinkronkan juga dari tab "DATA SISWA LMS" di Google Sheets
+    if (typeof sinkronkanMasterDataSiswaLMS === 'function') {
+      sinkronkanMasterDataSiswaLMS(quiet).catch(e => console.warn('Sync live pulihkan default:', e));
     }
     return fresh.length;
   } catch (e) {
@@ -19362,7 +19366,12 @@ if (typeof window.getActiveStudentProfile !== 'function') {
 function initTeacherDatabase() {
   try {
     hapusSemuaSiswaContohPermanen(true); // Pembersihan otomatis seluruh siswa contoh/dummy fiktif bawaan
-    getStudentDatabase();
+    const curDb = getStudentDatabase();
+    if (!curDb || curDb.length === 0) {
+      if (typeof sinkronkanMasterDataSiswaLMS === 'function') {
+        sinkronkanMasterDataSiswaLMS(true).catch(() => {});
+      }
+    }
   } catch (eDb) {
     console.warn('Inisialisasi database siswa:', eDb);
   }
@@ -24294,15 +24303,16 @@ function parseGoogleSheetTable(parsed, defaultKelas = '4A') {
 
     const nama = getVal(colMap.nama) || `Siswa ${nis}`;
     let rawKelas = colMap.kelas !== -1 ? getVal(colMap.kelas) : '';
-    // Jika spreadsheet memiliki kolom Kelas eksplisit, pastikan baris ini milik kelas default yang diminta
+    // Jika spreadsheet memiliki kolom Kelas eksplisit, pastikan baris ini milik kelas default yang diminta (kecuali jika minta 'semua' / 'ALL')
     if (colMap.kelas !== -1 && rawKelas) {
       const rowKelasNorm = normalisasiNamaKelas(rawKelas, '');
-      if (defaultKelas && rowKelasNorm && rowKelasNorm !== defaultKelas.toUpperCase()) {
-        continue; // Lewati siswa kelas lain
+      const isAllMode = !defaultKelas || defaultKelas.toLowerCase() === 'semua' || defaultKelas.toLowerCase() === 'all';
+      if (!isAllMode && rowKelasNorm && rowKelasNorm !== defaultKelas.toUpperCase()) {
+        continue; // Lewati siswa kelas lain jika filter kelas spesifik aktif
       }
     }
-    let kelas = normalisasiNamaKelas(rawKelas, defaultKelas || '4A');
-    if (defaultKelas && (!rawKelas || rawKelas.length > 8)) {
+    let kelas = normalisasiNamaKelas(rawKelas, (defaultKelas && defaultKelas.toLowerCase() !== 'semua' && defaultKelas.toLowerCase() !== 'all') ? defaultKelas : '4A');
+    if (defaultKelas && defaultKelas.toLowerCase() !== 'semua' && defaultKelas.toLowerCase() !== 'all' && (!rawKelas || rawKelas.length > 8)) {
       kelas = defaultKelas.toUpperCase();
     }
 
@@ -24339,6 +24349,132 @@ function parseGoogleSheetTable(parsed, defaultKelas = '4A') {
 // --------------------------------------------------------------------------
 // SINKRONISASI DATA SISWA GOOGLE SHEETS MULTI-KELAS (PENYIMPANAN BERBEDA PER KELAS)
 // --------------------------------------------------------------------------
+
+// 0. SINKRONISASI TERPUSAT MASTER TAB "DATA SISWA LMS" (Semua Kelas Sekaligus dalam 1 Permintaan JSONP Super Cepat)
+async function sinkronkanMasterDataSiswaLMS(silent = false) {
+  const masterUrl = (localStorage.getItem(SPREADSHEET_ID_KEY) || DEFAULT_MASTER_SPREADSHEET_URL || '').trim();
+  if (!masterUrl) {
+    if (!silent) {
+      playSound('error');
+      showToast('Link Google Spreadsheet belum diatur!', 'warning');
+    }
+    return [];
+  }
+
+  const sheetId = extractGoogleSpreadsheetId(masterUrl);
+  if (!sheetId) return [];
+
+  const masterTabs = [
+    (localStorage.getItem(SHEET_TAB_NAME_KEY) || DEFAULT_SHEET_TAB_NAME || 'DATA SISWA LMS').trim(),
+    'DATA SISWA LMS',
+    'DATA SISWA',
+    'DATA_SISWA',
+    'DATA SISWA 4A',
+    '4A',
+    '' // Fallback ke tab lembar pertama
+  ];
+  const uniqueMasterTabs = [...new Set(masterTabs.map(t => (t || '').trim()))];
+
+  let fetchedAll = [];
+  let resolvedTabName = '';
+
+  for (const tName of uniqueMasterTabs) {
+    try {
+      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 3000);
+      const parsed = parseGoogleSheetTable(parsedData, 'semua');
+      if (parsed && parsed.length > 0) {
+        fetchedAll = parsed;
+        resolvedTabName = tName || 'Sheet Utama';
+        break;
+      }
+    } catch (e) {
+      // Coba variasi tab berikutnya
+    }
+  }
+
+  if (fetchedAll.length === 0) {
+    if (!silent) {
+      playSound('error');
+      showToast('Data siswa di Google Sheets belum berhasil ditarik. Pastikan sheet dibagikan publik ("Anyone with the link can view").', 'warning');
+    }
+    return [];
+  }
+
+  // Gabungkan ke database lokal secara aman dengan mempertahankan nilai/progres yang sudah dicapai
+  let existingDb = [];
+  try {
+    const raw = localStorage.getItem(DB_STORAGE_KEY);
+    if (raw) existingDb = JSON.parse(raw);
+  } catch (eDb) {}
+  if (!Array.isArray(existingDb)) existingDb = [];
+
+  const existingMap = new Map();
+  existingDb.forEach(s => {
+    if (s.nis) existingMap.set(s.nis.toString().toLowerCase().trim(), s);
+    if (s.id) existingMap.set(s.id.toLowerCase().trim(), s);
+  });
+
+  const mergedDb = [];
+  const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const classCountMap = {};
+  validClasses.forEach(cls => { classCountMap[cls] = 0; });
+
+  fetchedAll.forEach(newS => {
+    const keyNis = newS.nis ? newS.nis.toString().toLowerCase().trim() : '';
+    const keyId = newS.id ? newS.id.toLowerCase().trim() : '';
+    const existing = (keyNis && existingMap.get(keyNis)) || (keyId && existingMap.get(keyId));
+
+    const finalStudent = existing ? {
+      ...newS,
+      kuisSem1: existing.kuisSem1 || 0,
+      kuisSem2: existing.kuisSem2 || 0,
+      posterWord: existing.posterWord || 0,
+      nilaiPoster: existing.nilaiPoster !== undefined ? existing.nilaiPoster : 0,
+      excelTabel: existing.excelTabel || 0,
+      nilaiExcel: existing.nilaiExcel !== undefined ? existing.nilaiExcel : 0,
+      nilaiDrive: existing.nilaiDrive !== undefined ? existing.nilaiDrive : 0,
+      koleksiDrive: existing.koleksiDrive !== undefined ? existing.koleksiDrive : 0,
+      nilaiScratch: existing.nilaiScratch !== undefined ? existing.nilaiScratch : 0,
+      nilaiRoboMind: existing.nilaiRoboMind !== undefined ? existing.nilaiRoboMind : 0,
+      poinBintang: existing.poinBintang || 0,
+      statusKkm: existing.statusKkm || 'Tuntas',
+      catatanGuru: existing.catatanGuru || newS.catatanGuru,
+      driveData: existing.driveData || newS.driveData
+    } : newS;
+
+    mergedDb.push(finalStudent);
+    if (classCountMap[finalStudent.kelas] !== undefined) {
+      classCountMap[finalStudent.kelas]++;
+    }
+  });
+
+  saveStudentDatabase(mergedDb);
+
+  // Perbarui konfigurasi sheet kelas
+  const cfg = getClassSheetsConfig();
+  const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+  Object.keys(cfg).forEach(cls => {
+    if (classCountMap[cls] !== undefined && classCountMap[cls] > 0) {
+      cfg[cls].count = classCountMap[cls];
+      cfg[cls].lastSynced = nowStr;
+      if (!cfg[cls].sheetUrl) cfg[cls].sheetUrl = masterUrl;
+    }
+  });
+  saveClassSheetsConfig(cfg);
+
+  renderTabsKelasSheet();
+  renderRingkasanKoneksiKelas();
+  if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+  if (typeof renderDasborGuru === 'function') renderDasborGuru();
+
+  if (!silent) {
+    playSound('success');
+    showToast(`✅ Berhasil menyinkronkan ${mergedDb.length} data siswa dari Google Sheet "${resolvedTabName}"! 🎉`, 'success');
+  }
+
+  return mergedDb;
+}
+window.sinkronkanMasterDataSiswaLMS = sinkronkanMasterDataSiswaLMS;
 
 // 1. Sinkronisasi Data Siswa Per Kelas Spesifik
 async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
@@ -24388,15 +24524,17 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const primaryTab = (c.tabName || kelasKey).trim();
   let fetchedStudents = [];
 
-  // Daftar variasi nama tab ringkas & cepat (mencegah penumpukan request & freeze)
+  // Daftar variasi nama tab ringkas & cepat (Mendukung Tab Master "DATA SISWA LMS" untuk Semua Rombel)
   const candidateTabs = [
     primaryTab,
+    'DATA SISWA LMS',
+    'DATA SISWA',
+    'DATA_SISWA',
     kelasKey,
-    `Kelas ${kelasKey}`
+    `Kelas ${kelasKey}`,
+    '' // fallback lembar pertama
   ];
-  if (kelasKey === '4A') {
-    candidateTabs.push('DATA SISWA LMS');
-  } else if (c.tabName && !candidateTabs.includes(c.tabName)) {
+  if (c.tabName && !candidateTabs.includes(c.tabName)) {
     candidateTabs.unshift(c.tabName);
   }
 
@@ -24566,6 +24704,12 @@ async function sinkronkanDataSiswaGoogleSheetAktif() {
     return await sinkronkanDataSiswaPerKelas(f);
   }
 
+  // Jika filter 'Semua' aktif, prioritaskan sinkronisasi master tab "DATA SISWA LMS" (Sangat Cepat & 100% Menjangkau Semua Kelas)
+  if (f === 'semua') {
+    const masterRes = await sinkronkanMasterDataSiswaLMS(false);
+    if (masterRes && masterRes.length > 0) return masterRes;
+  }
+
   if (t === '4') {
     return await sinkronkanRombelTingkat('4');
   } else if (t === '5') {
@@ -24608,15 +24752,15 @@ async function cekNisGoogleSheet(nisVal) {
   const targetVal = nisVal.toString().trim().toLowerCase();
 
   // 1. Cek di cache database lokal terlebih dahulu (sangat cepat & tanpa latensi jaringan)
-  const db = getStudentDatabase();
+  let db = getStudentDatabase();
   let student = db.find(s => 
     (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-    (s.nama && s.nama.toLowerCase() === targetVal) ||
-    (s.id && s.id.toLowerCase() === targetVal)
+    (s.nama && s.nama.toLowerCase().trim() === targetVal) ||
+    (s.id && s.id.toLowerCase().trim() === targetVal)
   );
   if (student) return student;
 
-  // Cek nomor absen 1 atau 2 digit
+  // Cek nomor absen 1 atau 2 digit jika siswa memasukkan nomor absen
   if (/^\d{1,2}$/.test(targetVal)) {
     const padAbsen = targetVal.length === 1 ? '0' + targetVal : targetVal;
     student = db.find(s => s.absen && (s.absen === targetVal || s.absen === padAbsen));
@@ -24627,62 +24771,85 @@ async function cekNisGoogleSheet(nisVal) {
   student = db.find(s => s.nama && s.nama.toLowerCase().includes(targetVal) && targetVal.length >= 3);
   if (student) return student;
 
-  // Khusus test student NIS 3000 (anoname)
-  if (targetVal === '3000') {
-    const anoname = {
-      id: 'STD-4A-3000',
-      nis: '3000',
-      nama: 'anoname',
-      kelas: '4A',
-      absen: '30',
-      statusKkm: 'Remedial'
-    };
-    db.push(anoname);
-    saveStudentDatabase(db);
-    return anoname;
+  // 2. Jika tidak ada di lokal, lakukan sinkronisasi langsung ke Google Sheet Master "DATA SISWA LMS"
+  try {
+    const syncedAll = await sinkronkanMasterDataSiswaLMS(true);
+    if (Array.isArray(syncedAll) && syncedAll.length > 0) {
+      student = syncedAll.find(s => 
+        (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
+        (s.nama && s.nama.toLowerCase().trim() === targetVal) ||
+        (s.id && s.id.toLowerCase().trim() === targetVal)
+      );
+      if (student) return student;
+    }
+  } catch (eSyncMaster) {
+    console.warn('Live sync master sheet:', eSyncMaster);
   }
 
-  // 2. Jika tidak ada di lokal, tebak kelas dari awalan NIS dan lakukan sinkronisasi live
-  const cfg = getClassSheetsConfig();
-  const guessClass = (targetVal.startsWith('41') || targetVal.startsWith('31')) ? '4A' 
-    : (targetVal.startsWith('42') || targetVal.startsWith('32')) ? '4B' 
-    : (targetVal.startsWith('43') || targetVal.startsWith('33')) ? '4C'
-    : (targetVal.startsWith('44') || targetVal.startsWith('34')) ? '4D'
-    : (targetVal.startsWith('45') || targetVal.startsWith('35')) ? '4E'
-    : (targetVal.startsWith('54') || targetVal.startsWith('51') || targetVal.startsWith('52')) ? '5D'
-    : targetVal.startsWith('61') ? '6A'
-    : targetVal.startsWith('62') ? '6B'
-    : targetVal.startsWith('63') ? '6C'
-    : targetVal.startsWith('64') ? '6D'
-    : targetVal.startsWith('65') ? '6E'
-    : null;
+  // 3. Fallback: Cek seluruh kelas spesifik jika spreadsheet memiliki tab terpisah
+  try {
+    const cfg = getClassSheetsConfig();
+    const guessClass = (targetVal.startsWith('41') || targetVal.startsWith('31')) ? '4A' 
+      : (targetVal.startsWith('42') || targetVal.startsWith('32')) ? '4B' 
+      : (targetVal.startsWith('43') || targetVal.startsWith('33')) ? '4C'
+      : (targetVal.startsWith('44') || targetVal.startsWith('34')) ? '4D'
+      : (targetVal.startsWith('45') || targetVal.startsWith('35')) ? '4E'
+      : (targetVal.startsWith('54') || targetVal.startsWith('51') || targetVal.startsWith('52')) ? '5D'
+      : targetVal.startsWith('61') ? '6A'
+      : targetVal.startsWith('62') ? '6B'
+      : targetVal.startsWith('63') ? '6C'
+      : targetVal.startsWith('64') ? '6D'
+      : targetVal.startsWith('65') ? '6E'
+      : null;
 
-  if (guessClass && cfg[guessClass] && cfg[guessClass].sheetUrl) {
-    try {
+    if (guessClass && cfg[guessClass] && cfg[guessClass].sheetUrl) {
       const synced = await sinkronkanDataSiswaPerKelas(guessClass, true);
       student = synced.find(s => 
         (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-        (s.nama && s.nama.toLowerCase() === targetVal)
+        (s.nama && s.nama.toLowerCase().trim() === targetVal)
       );
       if (student) return student;
-    } catch (e) {}
+    }
+  } catch (eGuess) {}
+
+  // 4. Fallback ke SEED_STUDENTS jika server Google Sheets lambat atau sedang offline
+  if (Array.isArray(SEED_STUDENTS)) {
+    const matchSeed = SEED_STUDENTS.find(s => 
+      (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
+      (s.nama && s.nama.toLowerCase().trim() === targetVal)
+    );
+    if (matchSeed) {
+      const freshSeedStudent = JSON.parse(JSON.stringify(matchSeed));
+      db = getStudentDatabase();
+      if (!db.some(s => s.nis === freshSeedStudent.nis)) {
+        db.push(freshSeedStudent);
+        saveStudentDatabase(db);
+      }
+      return freshSeedStudent;
+    }
   }
 
-  // 3. Sinkronisasi dengan batas waktu aman (timeout 3.5 detik) agar UI tidak pernah freeze
-  try {
-    const syncPromise = sinkronkanSemuaKelasGoogleSheet(true);
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3500));
-    await Promise.race([syncPromise, timeoutPromise]);
-    const freshDb = getStudentDatabase();
-    student = freshDb.find(s => 
-      (s.nis && s.nis.toString().trim().toLowerCase() === targetVal) ||
-      (s.nama && s.nama.toLowerCase() === targetVal)
-    );
-    if (student) return student;
-  } catch (e) {}
+  // 5. Khusus test student NIS 3000
+  if (targetVal === '3000') {
+    const testSiswa = {
+      id: 'STD-4A-3000',
+      nis: '3000',
+      nama: 'Siswa Contoh (3000)',
+      kelas: '4A',
+      absen: '30',
+      statusKkm: 'Tuntas'
+    };
+    db = getStudentDatabase();
+    if (!db.some(s => s.nis === '3000')) {
+      db.push(testSiswa);
+      saveStudentDatabase(db);
+    }
+    return testSiswa;
+  }
 
-  // 4. Jika NIS tidak ditemukan di cache lokal maupun Google Sheet resmi sekolah: Tolak akses!
+  // Jika tetap tidak ditemukan: Tolak akses
   return null;
+}
 }
 window.cekNisGoogleSheet = cekNisGoogleSheet;
 
@@ -25065,6 +25232,7 @@ window.hitungRubrikOtomatisExcel = hitungRubrikOtomatisExcel;
 window.loginDenganNis = loginDenganNis;
 window.simpanPengaturanGoogleSheet = simpanPengaturanGoogleSheet;
 window.sinkronkanDataSiswaGoogleSheet = sinkronkanDataSiswaGoogleSheet;
+window.sinkronkanMasterDataSiswaLMS = sinkronkanMasterDataSiswaLMS;
 window.ujiCekNisGuru = ujiCekNisGuru;
 window.salinKodeAppsScript = salinKodeAppsScript;
 window.bukaModalProfilSiswa = bukaModalProfilSiswa;
@@ -25110,7 +25278,11 @@ function pulihkanSemuaSiswaDefault(quiet = false) {
     if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     if (typeof renderDasborGuru === 'function') renderDasborGuru();
     if (!quiet) {
-      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! 🎉`, 'success');
+      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... ☁️`, 'info');
+    }
+    // Otomatis sinkronkan juga dari tab "DATA SISWA LMS" di Google Sheets
+    if (typeof sinkronkanMasterDataSiswaLMS === 'function') {
+      sinkronkanMasterDataSiswaLMS(quiet).catch(e => console.warn('Sync live pulihkan default:', e));
     }
     return fresh.length;
   } catch (e) {
