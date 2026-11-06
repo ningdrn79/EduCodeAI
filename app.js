@@ -723,14 +723,23 @@ function setHeaderNavMode(mode) {
   const mNavSem1 = document.getElementById('m-navbar-sem1');
   const mNavGuru = document.getElementById('m-navbar-guru');
 
+  const btnLoginGuru = document.getElementById('btn-main-login-guru');
+
   if (mode === 'guru') {
-    // Mode Dasbor Guru: Tampilkan Dock Guru (Darningsih, S.T., Kelas 4, 5, 6, Keluar)
-    if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
+    // Mode Dasbor Guru: Sembunyikan Dock Guru sesuai permintaan user (tampilan lebih bersih & lega)
+    if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
+    if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
-    if (navGuru) { navGuru.classList.remove('hidden'); navGuru.style.removeProperty('display'); navGuru.style.setProperty('display', 'flex', 'important'); }
-    if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
-    if (mNavGuru) { mNavGuru.classList.remove('hidden'); mNavGuru.style.removeProperty('display'); mNavGuru.style.setProperty('display', 'flex', 'important'); }
+
+    // Tampilkan header atas standar dengan tombol "Keluar Guru"
+    if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
+    if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.removeProperty('display'); mNavUtama.style.setProperty('display', 'flex', 'important'); }
+    if (btnLoginGuru) {
+      btnLoginGuru.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i><span class="text-rose-200 font-title font-bold">Keluar Guru</span>';
+      btnLoginGuru.onclick = function() { window.keluarModeGuru(); };
+      btnLoginGuru.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/60 border border-rose-500/50 hover:bg-rose-900/80 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+    }
   } else if (mode === 'sem1') {
     // Mode Siswa
     if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
@@ -747,6 +756,11 @@ function setHeaderNavMode(mode) {
     if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.removeProperty('display'); mNavUtama.style.setProperty('display', 'flex', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
+    if (btnLoginGuru) {
+      btnLoginGuru.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
+      btnLoginGuru.onclick = function() { window.bukaModalLoginGuru(); };
+      btnLoginGuru.className = 'btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+    }
   }
 }
 window.setHeaderNavMode = setHeaderNavMode;
