@@ -2,8 +2,16 @@
 
 
 
-/* Font Family Defaults */
+/* Font Family Defaults & Global Resets */
+html {
+  margin: 0 !important;
+  padding: 0 !important;
+  scroll-behavior: smooth;
+}
+
 body {
+  margin: 0 !important;
+  padding: 0 !important;
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
   background-color: #050714;
@@ -2302,10 +2310,16 @@ section.hidden {
   pointer-events: none !important;
 }
 
-/* Pastikan header dan tombol dasbor guru berada di layer atas */
+/* Pastikan header dan tombol dasbor guru berada di layer atas & menempel presisi di paling atas */
 header {
   position: sticky !important;
   top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
   z-index: 1000 !important;
 }
 
