@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_header_top_v67">
+  <link rel="stylesheet" href="styles.css?v=20261106_teacher_flow_v69">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -98,6 +98,30 @@
 
   <!-- Early Global Navbar Mode Switcher (Tersedia Sejak Milidetik Pertama) -->
   <script>
+    // Universal Handler untuk tombol Guru Utama (Login vs Keluar)
+    window.aksiKlikTombolGuruUtama = function(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
+      }
+      var isGuru = false;
+      if (window.__TEACHER_SESSION_ACTIVE__ === true) isGuru = true;
+      if (!isGuru && typeof isTeacherSessionActive === 'function') {
+        try { isGuru = isTeacherSessionActive(); } catch (err) {}
+      }
+      if (!isGuru && typeof state !== 'undefined' && state.isGuruLoggedIn) isGuru = true;
+      if (!isGuru) {
+        try {
+          var s = localStorage.getItem('educode_teacher_session_v1') || sessionStorage.getItem('educode_teacher_session_v1');
+          if (s === 'ACTIVE') isGuru = true;
+        } catch (err) {}
+      }
+      if (isGuru) {
+        if (typeof window.keluarModeGuru === 'function') window.keluarModeGuru();
+      } else {
+        if (typeof window.bukaModalLoginGuru === 'function') window.bukaModalLoginGuru();
+      }
+    };
+
     window.setHeaderNavMode = function(mode) {
       try {
         var u = document.getElementById('navbar-tampilan-utama');
@@ -106,34 +130,60 @@
         var mu = document.getElementById('m-navbar-utama');
         var ms1 = document.getElementById('m-navbar-sem1');
         var mg = document.getElementById('m-navbar-guru');
+        var isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
         if (mode === 'guru') {
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
-          if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          if (isMobile) {
+            if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          } else {
+            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
-            btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i><span class="text-rose-200 font-title font-bold">Keluar Guru</span>';
-            btnLg.onclick = function() { window.keluarModeGuru(); };
+            btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
+            btnLg.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
             btnLg.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/60 border border-rose-500/50 hover:bg-rose-900/80 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
           }
         } else if (mode === 'sem1') {
           if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
           if (s1) { s1.classList.remove('hidden'); s1.style.removeProperty('display'); s1.style.setProperty('display', 'flex', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
-          if (ms1) { ms1.classList.remove('hidden'); ms1.style.removeProperty('display'); ms1.style.setProperty('display', 'flex', 'important'); }
-          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          if (isMobile) {
+            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+            if (ms1) { ms1.classList.remove('hidden'); ms1.style.removeProperty('display'); ms1.style.setProperty('display', 'flex', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          } else {
+            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          }
         } else {
+          // Mode Utama (Tamu / Guest)
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
-          if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          if (isMobile) {
+            if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          } else {
+            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          }
+          var btnLg = document.getElementById('btn-main-login-guru');
+          if (btnLg) {
+            btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
+            btnLg.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
+            btnLg.className = 'btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
+          }
         }
       } catch (e) {}
     };
@@ -151,8 +201,13 @@
         document.querySelectorAll('#style-early-teacher-session, style[id*="teacher"]').forEach(function(el) { el.remove(); });
       } catch (e) {}
       if (typeof state !== 'undefined') state.isGuruLoggedIn = false;
+      if (typeof window.tutupModalLoginGuru === 'function') window.tutupModalLoginGuru();
       window.setHeaderNavMode('utama');
       window.switchTab('beranda');
+      var tabB = document.getElementById('tab-beranda');
+      var tabG = document.getElementById('tab-guru');
+      if (tabG) { tabG.classList.add('hidden'); tabG.style.setProperty('display', 'none', 'important'); }
+      if (tabB) { tabB.classList.remove('hidden'); tabB.style.removeProperty('display'); tabB.style.setProperty('display', 'block', 'important'); }
       try { window.scrollTo(0, 0); } catch (e) {}
       if (typeof showToast === 'function') {
         try { showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info'); } catch (e) {}
@@ -185,6 +240,8 @@
           var styleGuru = document.createElement('style');
           styleGuru.id = 'style-early-teacher-session';
           styleGuru.innerHTML = `
+            #tab-beranda { display: none !important; }
+            #tab-guru { display: block !important; }
             #navbar-tampilan-utama { display: flex !important; }
             #navbar-tampilan-sem1 { display: none !important; }
             #navbar-tampilan-guru { display: none !important; }
@@ -573,8 +630,7 @@
         if (btnGuru && !btnGuru.__earlyBound) {
           btnGuru.__earlyBound = true;
           btnGuru.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.bukaModalLoginGuru();
+            window.aksiKlikTombolGuruUtama(e);
           });
         }
         var btnSiswa = document.getElementById('btn-welcome-login');
@@ -910,8 +966,8 @@
       <!-- Menu: Beranda | Login Siswa | Login Guru | Indonesian/English | Sound -->
       <!-- ======================================================== -->
       <div id="navbar-tampilan-utama" class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
-        <!-- 1. Login Guru (Popup PIN Guru) -->
-        <button type="button" onclick="event.stopPropagation(); if(window.bukaModalLoginGuru){window.bukaModalLoginGuru();}else{var m=document.getElementById('modal-login-guru');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}}" id="btn-main-login-guru" class="btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition" title="Masuk Dasbor Guru (Proteksi PIN)">
+        <!-- 1. Login Guru / Keluar Guru (Unified Handler) -->
+        <button type="button" onclick="window.aksiKlikTombolGuruUtama(event);" id="btn-main-login-guru" class="btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition" title="Masuk / Keluar Dasbor Guru">
           <i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i>
           <span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>
         </button>
@@ -1035,16 +1091,31 @@
           var mu = document.getElementById('m-navbar-utama');
           var ms1 = document.getElementById('m-navbar-sem1');
           var mg = document.getElementById('m-navbar-guru');
+          var isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
-          if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+
+          if (isMobile) {
+            if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          } else {
+            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
+          }
+
+          var tabB = document.getElementById('tab-beranda');
+          var tabG = document.getElementById('tab-guru');
+          if (tabB) { tabB.classList.add('hidden'); tabB.style.setProperty('display', 'none', 'important'); }
+          if (tabG) { tabG.classList.remove('hidden'); tabG.style.removeProperty('display'); tabG.style.setProperty('display', 'block', 'important'); }
+
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
-            btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i><span class="text-rose-200 font-title font-bold">Keluar Guru</span>';
-            btnLg.onclick = function() { window.keluarModeGuru(); };
+            btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
+            btnLg.onclick = function(e) { window.aksiKlikTombolGuruUtama(e); };
             btnLg.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/60 border border-rose-500/50 hover:bg-rose-900/80 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
           }
           return;
@@ -14903,6 +14974,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_syntax_fix_v68"></script>
+  <script src="app.js?v=20261106_teacher_flow_v69"></script>
 </body>
 </html>

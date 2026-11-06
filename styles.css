@@ -2404,6 +2404,23 @@ main {
   display: none !important;
 }
 
+/* JAMINAN MUTLAK DESKTOP: Sembunyikan Seluruh Mobile Bottom Navbar di Layar Desktop (>= 768px) */
+@media (min-width: 768px) {
+  #m-navbar-utama,
+  #m-navbar-sem1,
+  #m-navbar-guru,
+  div[id^="m-navbar-"],
+  .md\:hidden {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+}
+
 /* Khusus Modal Pop-up: saat tertutup (hidden) pastikan 100% di belakang layar & tidak menyerap klik */
 #modal-login-guru.hidden,
 #modal-profil-siswa.hidden,

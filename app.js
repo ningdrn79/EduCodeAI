@@ -1742,7 +1742,7 @@ function switchTab(tabId) {
     const btnKeluarSiswa2 = document.getElementById('btn-rapor-keluar');
     if (btnKeluarSiswa2) btnKeluarSiswa2.addEventListener('click', konfirmasiKeluarSiswa);
     const btnLoginGuru = document.getElementById('btn-main-login-guru');
-    if (btnLoginGuru) btnLoginGuru.addEventListener('click', bukaModalLoginGuru);
+    if (btnLoginGuru) btnLoginGuru.onclick = function(e) { if (typeof window.aksiKlikTombolGuruUtama === 'function') { window.aksiKlikTombolGuruUtama(e); } else { bukaModalLoginGuru(); } };
     const btnLoginSiswa = document.getElementById('btn-welcome-login');
     if (btnLoginSiswa) btnLoginSiswa.addEventListener('click', bukaPilihSiswaCepat);
   } catch (eBind) {}
@@ -19635,6 +19635,10 @@ function verifikasiPinGuru() {
     tutupModalLoginGuru();
     setHeaderNavMode('guru');
     switchTab('guru');
+    var tabB = document.getElementById('tab-beranda');
+    var tabG = document.getElementById('tab-guru');
+    if (tabB) { tabB.classList.add('hidden'); tabB.style.setProperty('display', 'none', 'important'); }
+    if (tabG) { tabG.classList.remove('hidden'); tabG.style.removeProperty('display'); tabG.style.setProperty('display', 'block', 'important'); }
     if (typeof pilihKelasGuruNav === 'function') {
       pilihKelasGuruNav('4');
     }
@@ -19820,41 +19824,70 @@ function keluarModeGuru() {
 
   // 3. Paksa transisi visual elemen DOM Dasbor Guru dan Beranda secara tegas
   try {
+    if (typeof tutupModalLoginGuru === 'function') tutupModalLoginGuru();
+
     const tabGuru = document.getElementById('tab-guru');
     if (tabGuru) {
       tabGuru.classList.add('hidden');
-      tabGuru.style.display = 'none';
+      tabGuru.style.setProperty('display', 'none', 'important');
     }
 
     const tabBeranda = document.getElementById('tab-beranda');
     if (tabBeranda) {
       tabBeranda.classList.remove('hidden');
-      tabBeranda.style.display = 'block';
+      tabBeranda.style.removeProperty('display');
+      tabBeranda.style.setProperty('display', 'block', 'important');
     }
 
     // 4. Paksa transisi dock navigasi
     const navGuru = document.getElementById('navbar-tampilan-guru');
     if (navGuru) {
       navGuru.classList.add('hidden');
-      navGuru.style.display = 'none';
+      navGuru.style.setProperty('display', 'none', 'important');
     }
     const mNavGuru = document.getElementById('m-navbar-guru');
     if (mNavGuru) {
       mNavGuru.classList.add('hidden');
-      mNavGuru.style.display = 'none';
+      mNavGuru.style.setProperty('display', 'none', 'important');
     }
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     if (student) {
       if (typeof setHeaderNavMode === 'function') setHeaderNavMode('sem1');
       const navSem1 = document.getElementById('navbar-tampilan-sem1');
-      if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.display = 'flex'; }
+      if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); navSem1.style.setProperty('display', 'flex', 'important'); }
+      const mNavSem1 = document.getElementById('m-navbar-sem1');
+      if (mNavSem1) {
+        if (isMobile) {
+          mNavSem1.classList.remove('hidden');
+          mNavSem1.style.setProperty('display', 'flex', 'important');
+        } else {
+          mNavSem1.classList.add('hidden');
+          mNavSem1.style.setProperty('display', 'none', 'important');
+        }
+      }
     } else {
       if (typeof setHeaderNavMode === 'function') setHeaderNavMode('utama');
       const navUtama = document.getElementById('navbar-tampilan-utama');
-      if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.display = 'flex'; }
+      if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
       const mNavUtama = document.getElementById('m-navbar-utama');
-      if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.display = 'flex'; }
+      if (mNavUtama) {
+        if (isMobile) {
+          mNavUtama.classList.remove('hidden');
+          mNavUtama.style.setProperty('display', 'flex', 'important');
+        } else {
+          mNavUtama.classList.add('hidden');
+          mNavUtama.style.setProperty('display', 'none', 'important');
+        }
+      }
+    }
+
+    const btnLg = document.getElementById('btn-main-login-guru');
+    if (btnLg) {
+      btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
+      btnLg.onclick = function(e) { if (typeof window.aksiKlikTombolGuruUtama === 'function') window.aksiKlikTombolGuruUtama(e); else bukaModalLoginGuru(); };
+      btnLg.className = 'btn-login-guru-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
     }
   } catch (eDom) {}
 
@@ -25292,6 +25325,10 @@ window.addEventListener('load', function() {
       state.isGuruLoggedIn = true;
       setHeaderNavMode('guru');
       switchTab('guru');
+      var tabB = document.getElementById('tab-beranda');
+      var tabG = document.getElementById('tab-guru');
+      if (tabB) { tabB.classList.add('hidden'); tabB.style.setProperty('display', 'none', 'important'); }
+      if (tabG) { tabG.classList.remove('hidden'); tabG.style.removeProperty('display'); tabG.style.setProperty('display', 'block', 'important'); }
       if (typeof pilihKelasGuruNav === 'function') {
         pilihKelasGuruNav(state.tingkatKelasGuru || '4');
       }
@@ -25327,7 +25364,7 @@ window.addEventListener('load', function() {
     const btnKeluarSiswa2 = document.getElementById('btn-rapor-keluar');
     if (btnKeluarSiswa2) btnKeluarSiswa2.addEventListener('click', konfirmasiKeluarSiswa);
     const btnLoginGuru = document.getElementById('btn-main-login-guru');
-    if (btnLoginGuru) btnLoginGuru.addEventListener('click', bukaModalLoginGuru);
+    if (btnLoginGuru) btnLoginGuru.onclick = function(e) { if (typeof window.aksiKlikTombolGuruUtama === 'function') { window.aksiKlikTombolGuruUtama(e); } else { bukaModalLoginGuru(); } };
     const btnLoginSiswa = document.getElementById('btn-welcome-login');
     if (btnLoginSiswa) btnLoginSiswa.addEventListener('click', bukaPilihSiswaCepat);
   } catch (eBind) {}
