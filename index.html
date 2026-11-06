@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_footer_1cm_v79">
+  <link rel="stylesheet" href="styles.css?v=20261106_footer_2cm_sticky_v80">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -1301,7 +1301,7 @@
   </header>
 
   <!-- MAIN CONTAINER (Di atas Background Antariksa) -->
-  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 relative z-10">
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-[2.6cm] relative z-10">
 
     <!-- ======================================================== -->
     <!-- TAB 1: BERANDA (TEMPLATE UTAMA SESUAI GAMBAR) -->
@@ -13018,28 +13018,22 @@
 
   </main>
 
-  <!-- FOOTER STATIS RAMPING 1 CM DENGAN NILAI BUDAYA TZU CHI -->
-  <footer id="app-footer" class="static w-full bg-white border-t border-slate-200 text-slate-600 text-[11px] z-10 select-none overflow-hidden" style="position: static !important; height: 1cm !important; min-height: 1cm !important; max-height: 1cm !important; line-height: 1 !important;">
-    <div class="h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
-      <!-- Sisi Kiri: Logo Daun Tzu Chi, Nama Sekolah & Kutipan Nilai Budi Pekerti -->
-      <div class="flex items-center gap-2 truncate">
-        <span class="text-emerald-600 shrink-0 text-xs" title="SDS Cinta Kasih Tzu Chi">
-          <i class="fa-solid fa-leaf"></i>
-        </span>
-        <span class="font-title font-bold text-slate-800 shrink-0 text-xs">
-          SDS Cinta Kasih Tzu Chi
-        </span>
-        <span class="text-slate-300 hidden sm:inline">•</span>
-        <span class="italic text-slate-500 truncate hidden md:inline">
-          &ldquo;Teknologi adalah alat, tetapi nilai-nilai baik adalah tujuan kita.&rdquo;
-        </span>
-      </div>
+  <!-- FOOTER STATIS (MENEMPEL DI BAWAH SEPERTI HEADER) TINGGI 2 CM -->
+  <footer id="app-footer" class="fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] text-slate-700 z-30 select-none overflow-hidden" style="position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 2cm !important; min-height: 2cm !important; max-height: 2cm !important; z-index: 30 !important;">
+    <div class="h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center items-center text-center gap-1">
+      <!-- Baris 1: Kutipan Nilai Luhur Budaya Humanis Tzu Chi -->
+      <p class="text-xs sm:text-sm font-medium text-slate-700 italic truncate max-w-3xl leading-snug">
+        &ldquo;Teknologi adalah alat, tetapi nilai-nilai baik adalah tujuan kita.&rdquo;
+      </p>
 
-      <!-- Sisi Kanan: Hak Cipta & Kurikulum -->
-      <div class="text-[10px] text-slate-400 shrink-0 flex items-center gap-1.5">
-        <span>LMS Coding & AI</span>
-        <span>•</span>
-        <span>Kurikulum Merdeka © 2026</span>
+      <!-- Baris 2: Identitas Sekolah & Hak Cipta Kurikulum Merdeka -->
+      <div class="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-semibold leading-none flex-wrap">
+        <span class="text-emerald-600 text-xs inline-flex items-center gap-1">
+          <i class="fa-solid fa-leaf"></i>
+          <strong class="text-slate-800 font-title">SDS Cinta Kasih Tzu Chi</strong>
+        </span>
+        <span class="text-slate-300">•</span>
+        <span class="text-slate-400 font-normal">LMS Coding & AI • Kurikulum Merdeka © 2026</span>
       </div>
     </div>
   </footer>
@@ -15081,7 +15075,7 @@
   </div>
 
   <!-- FLOATING SCROLL NAVIGATION (KE ATAS / KE TABEL / KE BAWAH) -->
-  <div id="floating-scroll-nav" class="fixed right-4 sm:right-6 bottom-6 z-40 flex flex-col gap-2">
+  <div id="floating-scroll-nav" class="fixed right-4 sm:right-6 bottom-[2.3cm] z-40 flex flex-col gap-2">
     <button type="button" onclick="gulirKeAtas()" class="px-3.5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-title font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition cursor-pointer">
       <i class="fa-solid fa-arrow-up"></i> <span>Ke Atas</span>
     </button>
@@ -15101,6 +15095,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_footer_1cm_v79"></script>
+  <script src="app.js?v=20261106_footer_2cm_sticky_v80"></script>
 </body>
 </html>
