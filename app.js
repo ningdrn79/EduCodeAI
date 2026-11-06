@@ -343,66 +343,95 @@ let state = {
 };
 
 // Web Audio Effects (Synthesizer, tanpa butuh aset audio luar)
-const audioCtx = (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')
-  ? new (window.AudioContext || window.webkitAudioContext)()
-  : null;
+let audioCtx = null;
+function getAudioContext() {
+  try {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  } catch (e) {}
+  return audioCtx;
+}
+
+// Global User Gesture Audio Unlocker (Memastikan Suara Langsung Terdengar di Browser Modern)
+function unlockGlobalAudio() {
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+  if ('speechSynthesis' in window) {
+    try {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    } catch (e) {}
+  }
+}
+window.addEventListener('click', unlockGlobalAudio, { passive: true });
+window.addEventListener('pointerdown', unlockGlobalAudio, { passive: true });
+window.addEventListener('keydown', unlockGlobalAudio, { passive: true });
 
 function playSound(type) {
   try {
-    if (!audioCtx) return;
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    const ctx = getAudioContext();
+    if (!ctx) return;
 
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(ctx.destination);
 
     if (type === 'click') {
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+      osc.frequency.setValueAtTime(520, now);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
       osc.start(now);
-      osc.stop(now + 0.08);
+      osc.stop(now + 0.1);
     } else if (type === 'success') {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-      osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+      osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
       osc.start(now);
-      osc.stop(now + 0.35);
+      osc.stop(now + 0.38);
     } else if (type === 'error') {
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(260, now);
-      osc.frequency.setValueAtTime(200, now + 0.1);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.frequency.setValueAtTime(280, now);
+      osc.frequency.setValueAtTime(210, now + 0.08);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
       osc.start(now);
       osc.stop(now + 0.25);
     } else if (type === 'fanfare') {
       // Kemenangan sertifikat
       [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
         o.connect(g);
-        g.connect(audioCtx.destination);
+        g.connect(ctx.destination);
         o.type = 'triangle';
         o.frequency.setValueAtTime(freq, now + idx * 0.12);
-        g.gain.setValueAtTime(0.15, now + idx * 0.12);
-        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.25);
+        g.gain.setValueAtTime(0.3, now + idx * 0.12);
+        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.28);
         o.start(now + idx * 0.12);
-        o.stop(now + idx * 0.12 + 0.25);
+        o.stop(now + idx * 0.12 + 0.28);
       });
     }
   } catch (err) {
     // Audio context error safe fallback
   }
 }
+window.playSound = playSound;
 
 // ==========================================
 // 2. SISTEM POIN & NOTIFIKASI TOAST
@@ -507,14 +536,6 @@ function speakContent(elementOrText, forceLang = null) {
     if (iconMobile) iconMobile.className = 'fa-solid fa-volume-high text-lg text-amber-400';
   }
 
-  try {
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
-  } catch (e) {}
-
   let textToRead = '';
   let targetLang = forceLang || (state.currentLang === 'en' ? 'en-US' : 'id-ID');
 
@@ -530,21 +551,8 @@ function speakContent(elementOrText, forceLang = null) {
 
   if (!textToRead || !textToRead.trim()) return;
 
-  const utterance = new SpeechSynthesisUtterance(textToRead.trim());
-  utterance.lang = targetLang;
-  utterance.rate = 0.95; // Kecepatan ramah anak SD
-  utterance.pitch = 1.1; // Nada bersahabat
-
-  try {
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      const matchVoice = voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
-      if (matchVoice) utterance.voice = matchVoice;
-    }
-  } catch (e) {}
-
-  window.speechSynthesis.speak(utterance);
   showToast(targetLang === 'en-US' ? 'Reading material in English... 🎧' : 'Sedang membacakan materi Bahasa Indonesia... 🎧');
+  suarakanTeksRobo(textToRead, targetLang);
 }
 window.speakContent = speakContent;
 
@@ -682,13 +690,6 @@ function terapkanBahasa() {
     ? "Hello smart friend! I am Robo, your friendly coding buddy! Click Talk to Robo to ask me anything!"
     : "Halo teman pintar! Aku Robo! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara untuk bertanya padaku!";
 
-  // Sapa langsung dengan suara jika narator aktif
-  if (state.ttsEnabled && 'speechSynthesis' in window) {
-    const greetingMsg = (lang === 'en')
-      ? "Hello! I am Robo. Let's learn coding and AI together!"
-      : "Halo teman pintar! Aku Robo. Ayo belajar coding dan AI bersama!";
-    sapaRobotHalo(greetingMsg);
-  }
 
   // Sinkronkan modul TP 1.1 - TP 1.4 & TP 2.1 jika sedang dibuka
   if (typeof gantiBahasaModulTP1_1 === 'function') {
@@ -952,17 +953,59 @@ let sapaanRobotIndex = 0;
 let _isRoboListening = false;
 let _roboSpeechRecog = null;
 
+let _cachedVoices = [];
+function populateVoices() {
+  if ('speechSynthesis' in window) {
+    try {
+      _cachedVoices = window.speechSynthesis.getVoices() || [];
+    } catch (e) {}
+  }
+}
+populateVoices();
+if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+  window.speechSynthesis.onvoiceschanged = populateVoices;
+}
+
+function getBestVoice(targetLang) {
+  populateVoices();
+  if (!_cachedVoices || _cachedVoices.length === 0) return null;
+  const langCode = (targetLang || 'id-ID').toLowerCase();
+  const shortLang = langCode.split('-')[0];
+
+  // 1. Natural / Google / Microsoft Indonesian voices
+  let voice = _cachedVoices.find(v => {
+    const vLang = (v.lang || '').toLowerCase();
+    const vName = (v.name || '').toLowerCase();
+    return (vLang.startsWith(shortLang) || vName.includes('indonesia')) &&
+           (vName.includes('natural') || vName.includes('google') || vName.includes('gadis') || vName.includes('ardi') || vName.includes('andika'));
+  });
+
+  // 2. Sembarang voice dengan kode bahasa yang cocok
+  if (!voice) {
+    voice = _cachedVoices.find(v => (v.lang || '').toLowerCase().startsWith(shortLang) || (v.name || '').toLowerCase().includes('indonesia'));
+  }
+
+  // 3. Fallback ke voice default sistem agar audio tetap bersuara jika PC belum memasang paket bahasa ID
+  if (!voice) {
+    voice = _cachedVoices.find(v => v.default) || _cachedVoices[0] || null;
+  }
+
+  return voice;
+}
+
 // Engine Sintesis Suara Ramah Anak (TTS Audio Playback)
 function suarakanTeksRobo(teks, lang = null) {
   if (!('speechSynthesis' in window)) return;
 
-  // Pastikan AudioContext & SpeechSynthesis aktif (terhindar dari suspend browser)
+  // Pastikan AudioContext & SpeechSynthesis tidak dalam kondisi suspended / paused
   try {
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
     }
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
   } catch (e) {}
 
   // Bersihkan karakter emoji, tanda petik, dan simbol markdown agar ucapan jernih dan lancar
@@ -980,36 +1023,50 @@ function suarakanTeksRobo(teks, lang = null) {
   utterance.rate = 0.98; // Kecepatan nyaman untuk anak-anak
   utterance.pitch = 1.15; // Nada robotik ceria bersahabat
 
-  try {
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      const bestVoice = voices.find(v => v.lang.startsWith(targetLang.split('-')[0]) && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Indonesian') || v.name.includes('Gadis') || v.name.includes('ID')));
-      if (bestVoice) utterance.voice = bestVoice;
-    }
-  } catch (e) {}
+  const chosenVoice = getBestVoice(targetLang);
+  if (chosenVoice) {
+    utterance.voice = chosenVoice;
+    if (chosenVoice.lang) utterance.lang = chosenVoice.lang;
+  }
 
   // Tampilkan visual indikator gelombang suara Robo sedang berbicara
   const waveEl = document.getElementById('robo-speaking-wave');
   const modalWaveEl = document.getElementById('voice-modal-speaking');
+  const mascotImg = document.getElementById('robot-mascot-img');
+
   if (waveEl) waveEl.classList.remove('hidden');
   if (modalWaveEl) modalWaveEl.classList.remove('hidden');
-
-  const mascotImg = document.getElementById('robot-mascot-img');
-  if (mascotImg) {
-    mascotImg.classList.add('animate-bounce');
-  }
+  if (mascotImg) mascotImg.classList.add('animate-bounce');
 
   const matikanWave = () => {
     if (waveEl) waveEl.classList.add('hidden');
     if (modalWaveEl) modalWaveEl.classList.add('hidden');
     if (mascotImg) mascotImg.classList.remove('animate-bounce');
+    window._activeSpeechUtterance = null;
   };
 
   utterance.onend = matikanWave;
   utterance.onerror = matikanWave;
 
+  // PENTING: Cegah Garbage Collection Chromium yang mematikan suara secara tiba-tiba
+  window._activeSpeechUtterance = utterance;
+
+  // Jalankan bicara dengan proteksi cancel Chromium bug
   try {
-    window.speechSynthesis.speak(utterance);
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        try {
+          if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+          window.speechSynthesis.speak(utterance);
+        } catch (errSpeak) {
+          matikanWave();
+        }
+      }, 60);
+    } else {
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utterance);
+    }
   } catch (e) {
     matikanWave();
   }
