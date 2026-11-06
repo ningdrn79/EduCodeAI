@@ -24808,7 +24808,6 @@ async function cekNisGoogleSheet(nisVal) {
   // Jika tetap tidak ditemukan: Tolak akses
   return null;
 }
-}
 window.cekNisGoogleSheet = cekNisGoogleSheet;
 
 // Uji Cek NIS oleh Guru di Dasbor Guru

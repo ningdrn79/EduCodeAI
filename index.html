@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_clean_nav_v71">
+  <link rel="stylesheet" href="styles.css?v=20261106_cloud_sync_v73">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -406,6 +406,40 @@
           }
         } catch(err) {
           console.warn('Subtab early render execution:', err);
+        }
+      };
+
+      // Early Cloud & Sheets Handlers
+      window.pilihKelasSheetConfigTab = window.pilihKelasSheetConfigTab || function(cls) {
+        try { localStorage.setItem('educode_class_sheet_active_tab_v1', cls); } catch(e){}
+        if (typeof renderTabsKelasSheet === 'function') {
+          renderTabsKelasSheet();
+        } else {
+          var lbl = document.getElementById('label-active-class-config');
+          if (lbl) lbl.innerText = 'Mengatur: Kelas ' + cls;
+          var tCls = document.getElementById('form-target-class-label');
+          if (tCls) tCls.innerText = 'Kelas ' + cls;
+          var tTab = document.getElementById('form-target-tab-label');
+          if (tTab) tTab.innerText = 'Kelas ' + cls;
+          var inputTab = document.getElementById('guru-sheet-tab-name-kelas');
+          if (inputTab) inputTab.value = cls;
+        }
+      };
+
+      window.bukaModalPanduanSheets = window.bukaModalPanduanSheets || function() {
+        var m = document.getElementById('modal-panduan-sheets');
+        if (m) {
+          m.classList.remove('hidden');
+          m.style.setProperty('display', 'flex', 'important');
+          m.style.setProperty('z-index', '999999', 'important');
+        }
+      };
+
+      window.tutupModalPanduanSheets = window.tutupModalPanduanSheets || function() {
+        var m = document.getElementById('modal-panduan-sheets');
+        if (m) {
+          m.classList.add('hidden');
+          m.style.setProperty('display', 'none', 'important');
         }
       };
 
@@ -12545,7 +12579,39 @@
               </div>
               
               <div class="flex flex-wrap gap-1.5 p-1.5 bg-slate-100 rounded-2xl" id="sheet-class-tabs-container">
-                <!-- Diisi otomatis oleh renderTabsKelasSheet() -->
+                <button type="button" onclick="pilihKelasSheetConfigTab('4A')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-emerald-600 text-white font-bold shadow-xs">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Kelas 4A</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('4B')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 4B</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('4C')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 4C</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('4D')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 4D</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('4E')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 4E</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('5D')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 5D</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('6A')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 6A</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('6B')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 6B</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('6C')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 6C</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('6D')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 6D</span>
+                </button>
+                <button type="button" onclick="pilihKelasSheetConfigTab('6E')" class="px-3 py-1.5 rounded-xl text-xs font-title transition flex items-center gap-1.5 cursor-pointer bg-white hover:bg-slate-200 text-slate-700 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span><span>Kelas 6E</span>
+                </button>
               </div>
             </div>
 
@@ -14932,6 +14998,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_patch_v72"></script>
+  <script src="app.js?v=20261106_cloud_sync_v73"></script>
 </body>
 </html>
