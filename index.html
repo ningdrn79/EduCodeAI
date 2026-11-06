@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261106_teacher_flow_v69">
+  <link rel="stylesheet" href="styles.css?v=20261106_clean_nav_v71">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -99,10 +99,16 @@
   <!-- Early Global Navbar Mode Switcher (Tersedia Sejak Milidetik Pertama) -->
   <script>
     // Universal Handler untuk tombol Guru Utama (Login vs Keluar)
+    window.__lastGuruActionTime = 0;
     window.aksiKlikTombolGuruUtama = function(e) {
       if (e) {
         try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
       }
+      var now = Date.now();
+      if (window.__lastGuruActionTime && (now - window.__lastGuruActionTime < 750)) {
+        return false;
+      }
+      window.__lastGuruActionTime = now;
       var isGuru = false;
       if (window.__TEACHER_SESSION_ACTIVE__ === true) isGuru = true;
       if (!isGuru && typeof isTeacherSessionActive === 'function') {
@@ -130,21 +136,16 @@
         var mu = document.getElementById('m-navbar-utama');
         var ms1 = document.getElementById('m-navbar-sem1');
         var mg = document.getElementById('m-navbar-guru');
-        var isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+        // Pastikan bar menu strip sekunder di bawah header selalu tersembunyi total (Single Clean Header)
+        if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+        if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+        if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
 
         if (mode === 'guru') {
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (isMobile) {
-            if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          } else {
-            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
@@ -155,29 +156,11 @@
           if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
           if (s1) { s1.classList.remove('hidden'); s1.style.removeProperty('display'); s1.style.setProperty('display', 'flex', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (isMobile) {
-            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
-            if (ms1) { ms1.classList.remove('hidden'); ms1.style.removeProperty('display'); ms1.style.setProperty('display', 'flex', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          } else {
-            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          }
         } else {
           // Mode Utama (Tamu / Guest)
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
-          if (isMobile) {
-            if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          } else {
-            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span data-i18n="loginGuru" class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
@@ -191,6 +174,7 @@
     // Universal definition of keluarModeGuru agar tombol keluar SELALU aktif dan responsif
     window.keluarModeGuru = function() {
       try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      window.__lastGuruActionTime = Date.now() + 800; // Cooldown proteksi agar event tidak memantul membuka modal PIN lagi
       try {
         localStorage.removeItem('educode_teacher_session_v1');
         sessionStorage.removeItem('educode_teacher_session_v1');
@@ -202,6 +186,11 @@
       } catch (e) {}
       if (typeof state !== 'undefined') state.isGuruLoggedIn = false;
       if (typeof window.tutupModalLoginGuru === 'function') window.tutupModalLoginGuru();
+      var modalLoginGuru = document.getElementById('modal-login-guru');
+      if (modalLoginGuru) {
+        modalLoginGuru.classList.add('hidden');
+        modalLoginGuru.style.setProperty('display', 'none', 'important');
+      }
       window.setHeaderNavMode('utama');
       window.switchTab('beranda');
       var tabB = document.getElementById('tab-beranda');
@@ -245,13 +234,8 @@
             #navbar-tampilan-utama { display: flex !important; }
             #navbar-tampilan-sem1 { display: none !important; }
             #navbar-tampilan-guru { display: none !important; }
-            @media (max-width: 767px) {
-              #m-navbar-utama { display: flex !important; }
-              #m-navbar-sem1 { display: none !important; }
-              #m-navbar-guru { display: none !important; }
-            }
-            @media (min-width: 768px) {
-              #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru { display: none !important; }
+            #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
+              display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
             }
           `;
           document.head.appendChild(styleGuru);
@@ -300,13 +284,8 @@
               #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
               ${isSem2Open ? '' : '#hero-btn-sem2 { display: none !important; } .sem2-feature-card { display: none !important; } #card-sem-grid-col1, #card-sem-grid-col2 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }'}
               #welcome-siswa-bintang-wrap { display: flex !important; }
-              @media (max-width: 767px) {
-                #m-navbar-utama { display: none !important; }
-                #m-navbar-sem1 { display: flex !important; }
-                #m-navbar-guru { display: none !important; }
-              }
-              @media (min-width: 768px) {
-                #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru { display: none !important; }
+              #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
+                display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
               }
             `;
             document.head.appendChild(style);
@@ -629,9 +608,9 @@
         var btnGuru = document.getElementById('btn-main-login-guru');
         if (btnGuru && !btnGuru.__earlyBound) {
           btnGuru.__earlyBound = true;
-          btnGuru.addEventListener('click', function(e) {
+          btnGuru.onclick = function(e) {
             window.aksiKlikTombolGuruUtama(e);
-          });
+          };
         }
         var btnSiswa = document.getElementById('btn-welcome-login');
         if (btnSiswa && !btnSiswa.__earlyBound) {
@@ -1097,15 +1076,9 @@
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
 
-          if (isMobile) {
-            if (mu) { mu.classList.remove('hidden'); mu.style.removeProperty('display'); mu.style.setProperty('display', 'flex', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          } else {
-            if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
-            if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
-            if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
-          }
+          if (mu) { mu.classList.add('hidden'); mu.style.setProperty('display', 'none', 'important'); }
+          if (ms1) { ms1.classList.add('hidden'); ms1.style.setProperty('display', 'none', 'important'); }
+          if (mg) { mg.classList.add('hidden'); mg.style.setProperty('display', 'none', 'important'); }
 
           var tabB = document.getElementById('tab-beranda');
           var tabG = document.getElementById('tab-guru');
@@ -1130,85 +1103,10 @@
       })();
     </script>
 
-    <!-- Mobile Bottom Navigation Bar (Menu Utama) -->
-    <div id="m-navbar-utama" class="md:hidden flex justify-around bg-[#0B0F19]/95 border-t border-slate-800 py-2.5 px-2">
-      <button onclick="bukaModalLoginGuru()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-amber-400">
-        <i class="fa-solid fa-chalkboard-user text-lg text-amber-400"></i>
-        <span>Login Guru</span>
-      </button>
-      <button onclick="toggleBahasaAplikasi()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-300">
-        <i class="fa-solid fa-globe text-lg text-sky-400"></i>
-        <span>ID / EN</span>
-      </button>
-      <button onclick="toggleAudioNarration()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-amber-300">
-        <i id="tts-icon-m-utama" class="fa-solid fa-volume-high text-lg text-amber-400"></i>
-        <span>Sound</span>
-      </button>
-    </div>
-
-    <!-- Mobile Sub Navbar Semester 1 -->
-    <div id="m-navbar-sem1" class="hidden md:hidden flex justify-around bg-[#0B0F19]/95 border-t border-slate-800 py-2 px-1">
-      <button onclick="bukaTampilanUtama()" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span>Beranda</span>
-      </button>
-      <button onclick="switchTab('modul')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-blue-400" id="m-nav-modul">
-        <i class="fa-solid fa-book-open text-lg"></i>
-        <span>Modul</span>
-      </button>
-      <button onclick="switchTab('msword')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-msword">
-        <i id="m-nav-lab-icon" class="fa-solid fa-file-word text-lg text-blue-400"></i>
-        <span id="m-nav-lab-text">Lab Word</span>
-      </button>
-      <button onclick="switchTab('msexcel')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-msexcel">
-        <i class="fa-solid fa-file-excel text-lg text-emerald-400"></i>
-        <span>Lab Excel</span>
-      </button>
-      <button onclick="bukaRoboMindLangsung()" class="hidden nav-btn-mobile flex flex-col items-center text-xs font-semibold text-cyan-400" id="m-nav-demo">
-        <i class="fa-solid fa-robot text-lg text-cyan-400"></i>
-        <span>RoboMind</span>
-      </button>
-      <button onclick="switchTab('praktik')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-praktik">
-        <i class="fa-solid fa-palette text-lg"></i>
-        <span>Praktik</span>
-      </button>
-      <button onclick="switchTab('kuis')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-kuis">
-        <i class="fa-solid fa-trophy text-lg"></i>
-        <span>Kuis</span>
-      </button>
-      <button onclick="switchTab('labirin')" class="hidden nav-btn-mobile flex flex-col items-center text-xs font-semibold text-purple-400" id="m-nav-labirin" title="Game Robo (Semester 2)">
-        <i class="fa-solid fa-gamepad text-lg text-purple-400"></i>
-        <span>Game</span>
-      </button>
-      <button onclick="switchTab('ketik')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-amber-400" id="m-nav-ketik" title="Ketik Cepat (Semester 1)">
-        <i class="fa-solid fa-keyboard text-lg text-amber-400"></i>
-        <span>Ketik</span>
-      </button>
-    </div>
-
-    <!-- Mobile Sub Navbar Guru (Disembunyikan Sesuai Permintaan User) -->
-    <div id="m-navbar-guru" class="hidden md:hidden flex justify-around bg-[#0B0F19]/95 border-t border-slate-800 py-2 px-1" style="display: none !important;">
-      <button onclick="pilihKelasGuruNav('all')" class="nav-btn-mobile flex flex-col items-center text-xs font-bold text-amber-300" id="m-nav-guru-profil">
-        <i class="fa-solid fa-chalkboard-user text-lg text-amber-400"></i>
-        <span class="truncate max-w-[70px]">Darningsih</span>
-      </button>
-      <button onclick="pilihKelasGuruNav('4')" class="nav-btn-mobile flex flex-col items-center text-xs font-bold text-blue-400" id="m-nav-guru-k4">
-        <i class="fa-solid fa-graduation-cap text-lg"></i>
-        <span>Kelas 4</span>
-      </button>
-      <button onclick="pilihKelasGuruNav('5')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-guru-k5">
-        <i class="fa-solid fa-shapes text-lg"></i>
-        <span>Kelas 5</span>
-      </button>
-      <button onclick="pilihKelasGuruNav('6')" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-slate-400" id="m-nav-guru-k6">
-        <i class="fa-solid fa-award text-lg"></i>
-        <span>Kelas 6</span>
-      </button>
-      <button type="button" onclick="if(window.keluarModeGuru){window.keluarModeGuru();}else{localStorage.removeItem('educode_teacher_session_v1');sessionStorage.removeItem('educode_teacher_session_v1');location.reload();}" class="nav-btn-mobile flex flex-col items-center text-xs font-semibold text-rose-400 cursor-pointer" id="m-nav-guru-keluar" title="Keluar dari Dasbor Guru">
-        <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
-        <span>Keluar</span>
-      </button>
-    </div>
+    <!-- Bar Menu Bawah Header Dihilangkan Total Sesuai Permintaan User (Hanya Header Tunggal yang Bersih & Rapi) -->
+    <div id="m-navbar-utama" class="hidden" style="display: none !important;"></div>
+    <div id="m-navbar-sem1" class="hidden" style="display: none !important;"></div>
+    <div id="m-navbar-guru" class="hidden" style="display: none !important;"></div>
   </header>
 
   <!-- MAIN CONTAINER (Di atas Background Antariksa) -->
@@ -11847,6 +11745,14 @@
     <!-- TAB 9: DASBOR GURU (DATABASE & MONITORING LATIHAN SISWA) -->
     <!-- ======================================================== -->
     <section id="tab-guru" class="tab-content hidden max-w-7xl mx-auto space-y-6 pb-12 animate-fadeIn">
+      <script>
+        if (window.__TEACHER_SESSION_ACTIVE__) {
+          var elTg = document.getElementById('tab-guru');
+          if (elTg) { elTg.classList.remove('hidden'); elTg.style.removeProperty('display'); elTg.style.setProperty('display', 'block', 'important'); }
+          var elTb = document.getElementById('tab-beranda');
+          if (elTb) { elTb.classList.add('hidden'); elTb.style.setProperty('display', 'none', 'important'); }
+        }
+      </script>
       
       <!-- Top Banner Header Guru -->
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 p-6 sm:p-8 text-white shadow-2xl">
@@ -14974,6 +14880,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_teacher_flow_v69"></script>
+  <script src="app.js?v=20261106_clean_nav_v71"></script>
 </body>
 </html>

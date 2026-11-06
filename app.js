@@ -19824,7 +19824,15 @@ function keluarModeGuru() {
 
   // 3. Paksa transisi visual elemen DOM Dasbor Guru dan Beranda secara tegas
   try {
+    if (typeof window.__lastGuruActionTime !== 'undefined') {
+      window.__lastGuruActionTime = Date.now() + 800; // Cooldown agar tidak langsung re-trigger modal PIN
+    }
     if (typeof tutupModalLoginGuru === 'function') tutupModalLoginGuru();
+    const modalLoginGuru = document.getElementById('modal-login-guru');
+    if (modalLoginGuru) {
+      modalLoginGuru.classList.add('hidden');
+      modalLoginGuru.style.setProperty('display', 'none', 'important');
+    }
 
     const tabGuru = document.getElementById('tab-guru');
     if (tabGuru) {
@@ -19839,7 +19847,7 @@ function keluarModeGuru() {
       tabBeranda.style.setProperty('display', 'block', 'important');
     }
 
-    // 4. Paksa transisi dock navigasi
+    // 4. Paksa transisi dock navigasi (Hilangkan bar strip sekunder di bawah header secara permanen)
     const navGuru = document.getElementById('navbar-tampilan-guru');
     if (navGuru) {
       navGuru.classList.add('hidden');
@@ -19851,7 +19859,6 @@ function keluarModeGuru() {
       mNavGuru.style.setProperty('display', 'none', 'important');
     }
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     if (student) {
       if (typeof setHeaderNavMode === 'function') setHeaderNavMode('sem1');
@@ -19859,13 +19866,8 @@ function keluarModeGuru() {
       if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); navSem1.style.setProperty('display', 'flex', 'important'); }
       const mNavSem1 = document.getElementById('m-navbar-sem1');
       if (mNavSem1) {
-        if (isMobile) {
-          mNavSem1.classList.remove('hidden');
-          mNavSem1.style.setProperty('display', 'flex', 'important');
-        } else {
-          mNavSem1.classList.add('hidden');
-          mNavSem1.style.setProperty('display', 'none', 'important');
-        }
+        mNavSem1.classList.add('hidden');
+        mNavSem1.style.setProperty('display', 'none', 'important');
       }
     } else {
       if (typeof setHeaderNavMode === 'function') setHeaderNavMode('utama');
@@ -19873,13 +19875,8 @@ function keluarModeGuru() {
       if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
       const mNavUtama = document.getElementById('m-navbar-utama');
       if (mNavUtama) {
-        if (isMobile) {
-          mNavUtama.classList.remove('hidden');
-          mNavUtama.style.setProperty('display', 'flex', 'important');
-        } else {
-          mNavUtama.classList.add('hidden');
-          mNavUtama.style.setProperty('display', 'none', 'important');
-        }
+        mNavUtama.classList.add('hidden');
+        mNavUtama.style.setProperty('display', 'none', 'important');
       }
     }
 
