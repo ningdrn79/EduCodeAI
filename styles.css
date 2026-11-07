@@ -2560,6 +2560,23 @@ div[id^="m-navbar-"],
   scrollbar-width: none !important;
 }
 
+/* Jaminan Footer Statis Background Hitam Elegan (Tinggi 2cm) */
+#app-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 2cm !important;
+  min-height: 2cm !important;
+  max-height: 2cm !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
+  border-top: 1px solid #1e293b !important;
+  color: #f1f5f9 !important;
+  z-index: 30 !important;
+}
+
 
 
 
