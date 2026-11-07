@@ -1,12 +1,16 @@
 /* Custom Styling untuk Aplikasi Pembelajaran Kelas 4 SD */
 
-
+/* ======================================================== */
+/* 0. HIGH-PERFORMANCE ENGINE & ZERO-DELAY OPTIMIZATION     */
+/* ======================================================== */
 
 /* Font Family Defaults & Global Resets */
 html {
   margin: 0 !important;
   padding: 0 !important;
   scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -14,23 +18,49 @@ body {
   padding: 0 !important;
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: #050714;
   color: #f1f5f9;
+  overflow-x: hidden;
 }
 
+/* Zero-Delay Tap & Click Response (Menghilangkan jeda klik 300ms pada peramban) */
+button, a, input, select, textarea, [role="button"], .nav-btn, .nav-btn-3d, .cursor-pointer {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 
+/* GPU Hardware Acceleration & Off-screen DOM Containment (Meniadakan Lag pada DOM 16.000+ baris) */
+section[id^="tab-"] {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Tab yang tersembunyi dilepas total dari kalkulasi layout browser (Zero CPU/GPU Overhead) */
+section[id^="tab-"].hidden,
+div.hidden {
+  content-visibility: hidden !important;
+  contain: strict !important;
+}
+
+/* Tab aktif dioptimalkan rendering-nya */
+section[id^="tab-"]:not(.hidden) {
+  content-visibility: visible !important;
+  contain: layout style;
+}
 
 h1, h2, h3, h4, h5, h6, .font-title {
   font-family: 'Fredoka', 'Nunito', sans-serif;
 }
 
-
-
-/* Animations */
+/* Ultra-Fast Snappy Animations (0.15s cubic-bezier untuk respon instan) */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -38,10 +68,9 @@ h1, h2, h3, h4, h5, h6, .font-title {
   }
 }
 
-
-
 .animate-fadeIn {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.15s cubic-bezier(0, 0, 0.2, 1) forwards;
+  will-change: opacity, transform;
 }
 
 
@@ -70,10 +99,13 @@ h1, h2, h3, h4, h5, h6, .font-title {
     0 6px 12px rgba(0, 0, 0, 0.6),
     inset 0 1px 1px rgba(255, 255, 255, 0.25),
     inset 0 -2px 5px rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 
