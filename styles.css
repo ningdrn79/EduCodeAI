@@ -2560,16 +2560,16 @@ div[id^="m-navbar-"],
   scrollbar-width: none !important;
 }
 
-/* Jaminan Footer Statis Background Hitam Elegan (Tinggi 2cm) - SELALU DI DEPAN TAMPILAN UTAMA SAAT SCROLL */
+/* Jaminan Footer Statis Background Hitam Elegan (Tinggi 1cm) - SELALU DI DEPAN TAMPILAN UTAMA SAAT SCROLL */
 #app-footer {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
-  height: 2cm !important;
-  min-height: 2cm !important;
-  max-height: 2cm !important;
+  height: 1cm !important;
+  min-height: 1cm !important;
+  max-height: 1cm !important;
   background-color: #000000 !important;
   background: #000000 !important;
   opacity: 1 !important;
