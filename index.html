@@ -277,33 +277,30 @@
         var key = 'educode_active_student_v1';
         var lsVal = null;
         try { lsVal = localStorage.getItem(key); } catch (e) {}
-        if (lsVal === 'LOGGED_OUT') return; // User sudah keluar, jangan restore!
 
         var ssVal = null;
         try { ssVal = sessionStorage.getItem(key); } catch (e) {}
-        if (ssVal === 'LOGGED_OUT') return; // User sudah keluar, jangan restore!
 
-        var raw = lsVal;
-        if (!raw || raw === 'null' || raw === 'undefined') {
+        var raw = null;
+        if (lsVal && lsVal !== 'LOGGED_OUT' && lsVal !== 'null' && lsVal !== 'undefined' && lsVal.indexOf('{') !== -1) {
+          raw = lsVal;
+        } else if (ssVal && ssVal !== 'LOGGED_OUT' && ssVal !== 'null' && ssVal !== 'undefined' && ssVal.indexOf('{') !== -1) {
           raw = ssVal;
-        }
-        if (!raw || raw === 'null' || raw === 'undefined') {
+        } else {
           try {
             var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + key + '=([^;]+)'));
             if (m && m[1]) {
               var ck = decodeURIComponent(m[1]);
-              if (ck === 'LOGGED_OUT') return;
-              raw = ck;
+              if (ck && ck !== 'LOGGED_OUT' && ck.indexOf('{') !== -1) {
+                raw = ck;
+              }
             }
           } catch (e) {}
         }
 
-        if (raw && raw !== 'LOGGED_OUT' && raw !== 'null' && raw !== 'undefined') {
+        if (raw) {
           var s = JSON.parse(raw);
           if (s && (s.nama || s.nis || s.id)) {
-            if (s.nama && s.nama.indexOf('Siswa ') === 0 && s.nama.indexOf('(') !== -1) {
-              return; // Abaikan sesi dummy
-            }
             window.__ACTIVE_STUDENT_RESTORED__ = s;
             window.__ACTIVE_STUDENT_PROFILE__ = s;
 
@@ -394,6 +391,37 @@
               nav.classList.remove('text-white');
               nav.classList.add('text-slate-300');
             }
+          }
+        }
+        // Sinkronkan status kartu sambutan siswa jika tab beranda dibuka
+        if (tabId === 'beranda') {
+          if (typeof window.muatProfilSiswa === 'function') {
+            try { window.muatProfilSiswa(); } catch(e) {}
+          } else {
+            try {
+              var rawStd = localStorage.getItem('educode_active_student_v1');
+              if (rawStd && rawStd !== 'LOGGED_OUT' && rawStd.indexOf('{') !== -1) {
+                var s = JSON.parse(rawStd);
+                if (s && (s.nama || s.nis)) {
+                  var elAvatar = document.getElementById('welcome-siswa-avatar');
+                  var elNama = document.getElementById('welcome-siswa-nama');
+                  var elKelas = document.getElementById('welcome-siswa-kelas');
+                  var elSub = document.getElementById('welcome-siswa-sub-text');
+                  var btnLogin = document.getElementById('btn-welcome-login');
+                  var btnLogout = document.getElementById('btn-welcome-logout');
+                  var btnRapor = document.getElementById('btn-welcome-rapor');
+                  var btnGanti = document.getElementById('btn-welcome-ganti');
+                  if (elAvatar) { elAvatar.innerText = s.nama ? s.nama.charAt(0).toUpperCase() : 'S'; }
+                  if (elSub) elSub.innerText = 'Selamat Belajar di Tzu Chi';
+                  if (elNama) elNama.innerText = s.nama || 'Siswa';
+                  if (elKelas) elKelas.innerText = 'Kelas ' + (s.kelas || '4A') + ' • Absen ' + (s.absen || '-');
+                  if (btnLogin) { btnLogin.classList.add('hidden'); btnLogin.style.setProperty('display', 'none', 'important'); }
+                  if (btnLogout) { btnLogout.classList.remove('hidden'); btnLogout.style.setProperty('display', 'inline-flex', 'important'); }
+                  if (btnRapor) { btnRapor.classList.remove('hidden'); btnRapor.style.setProperty('display', 'inline-flex', 'important'); }
+                  if (btnGanti) { btnGanti.classList.remove('hidden'); btnGanti.style.setProperty('display', 'inline-flex', 'important'); }
+                }
+              }
+            } catch(e) {}
           }
         }
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
@@ -775,16 +803,35 @@
             var rawStd = JSON.stringify(student);
             localStorage.setItem('educode_active_student_v1', rawStd);
             sessionStorage.setItem('educode_active_student_v1', rawStd);
-            localStorage.setItem('educode_student_active_tab_v1', 'modul');
-            sessionStorage.setItem('educode_student_active_tab_v1', 'modul');
+            localStorage.setItem('educode_student_active_tab_v1', 'beranda');
+            sessionStorage.setItem('educode_student_active_tab_v1', 'beranda');
             localStorage.setItem('educode_student_active_sem_v1', '1');
             sessionStorage.setItem('educode_student_active_sem_v1', '1');
             window.__ACTIVE_STUDENT_PROFILE__ = student;
             window.__ACTIVE_STUDENT_RESTORED__ = student;
+
+            var earlyStyle = document.getElementById('style-early-student-session');
+            if (!earlyStyle) {
+              earlyStyle = document.createElement('style');
+              earlyStyle.id = 'style-early-student-session';
+              document.head.appendChild(earlyStyle);
+            }
+            earlyStyle.innerHTML = `
+              #navbar-tampilan-utama { display: none !important; }
+              #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
+              #navbar-tampilan-sem1 * { pointer-events: auto !important; }
+              #btn-welcome-login { display: none !important; }
+              #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+              #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+              #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+              #hero-guest-btn { display: none !important; }
+              #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
+              #welcome-siswa-bintang-wrap { display: flex !important; }
+            `;
           } catch(e) {}
           window.tutupModalProfilSiswa();
           window.setHeaderNavMode('sem1');
-          window.switchTab('modul');
+          window.switchTab('beranda');
           if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
         } else {
           var err = document.getElementById('pesan-error-login-nis');
@@ -1354,8 +1401,14 @@
       <!-- Inline Script Pemulih Sambutan & Profil Siswa saat Reload -->
       <script>
         (function() {
-          var s = window.__ACTIVE_STUDENT_RESTORED__;
-          if (s) {
+          var s = window.__ACTIVE_STUDENT_RESTORED__ || window.__ACTIVE_STUDENT_PROFILE__;
+          if (!s) {
+            try {
+              var raw = localStorage.getItem('educode_active_student_v1');
+              if (raw && raw !== 'LOGGED_OUT' && raw.indexOf('{') !== -1) s = JSON.parse(raw);
+            } catch(e) {}
+          }
+          if (s && (s.nama || s.nis || s.id)) {
             var elAvatar = document.getElementById('welcome-siswa-avatar');
             var elNama = document.getElementById('welcome-siswa-nama');
             var elKelas = document.getElementById('welcome-siswa-kelas');
@@ -1375,15 +1428,31 @@
             }
             if (elSub) elSub.innerText = 'Selamat Belajar di Tzu Chi';
             if (elPing) elPing.classList.remove('hidden');
-            if (elNama) elNama.innerText = s.nama;
+            if (elNama) elNama.innerText = s.nama || 'Siswa';
             if (elKelas) {
-              elKelas.innerText = 'Kelas ' + s.kelas + ' • Absen ' + (s.absen || '-');
+              elKelas.innerText = 'Kelas ' + (s.kelas || '4A') + ' • Absen ' + (s.absen || '-');
               elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
             }
-            if (btnLogin) { btnLogin.classList.add('hidden'); btnLogin.style.display = 'none'; }
-            if (btnLogout) { btnLogout.classList.remove('hidden'); btnLogout.style.display = ''; }
-            if (btnRapor) { btnRapor.classList.remove('hidden'); btnRapor.style.display = ''; }
-            if (btnGanti) { btnGanti.classList.remove('hidden'); btnGanti.style.display = ''; }
+            if (btnLogin) { 
+              btnLogin.classList.add('hidden'); 
+              btnLogin.style.removeProperty('display');
+              btnLogin.style.setProperty('display', 'none', 'important'); 
+            }
+            if (btnLogout) { 
+              btnLogout.classList.remove('hidden'); 
+              btnLogout.style.removeProperty('display');
+              btnLogout.style.setProperty('display', 'inline-flex', 'important'); 
+            }
+            if (btnRapor) { 
+              btnRapor.classList.remove('hidden'); 
+              btnRapor.style.removeProperty('display');
+              btnRapor.style.setProperty('display', 'inline-flex', 'important'); 
+            }
+            if (btnGanti) { 
+              btnGanti.classList.remove('hidden'); 
+              btnGanti.style.removeProperty('display');
+              btnGanti.style.setProperty('display', 'inline-flex', 'important'); 
+            }
             var navSem1 = document.getElementById('navbar-tampilan-sem1');
             if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); }
             var navUtama = document.getElementById('navbar-tampilan-utama');
@@ -1393,10 +1462,12 @@
             if (btnToggleSem) {
               if (isSem2Open) {
                 btnToggleSem.classList.remove('hidden');
-                btnToggleSem.style.display = '';
+                btnToggleSem.style.removeProperty('display');
+                btnToggleSem.style.setProperty('display', 'inline-flex', 'important');
               } else {
                 btnToggleSem.classList.add('hidden');
-                btnToggleSem.style.display = 'none';
+                btnToggleSem.style.removeProperty('display');
+                btnToggleSem.style.setProperty('display', 'none', 'important');
               }
             }
             if (heroGuest) { heroGuest.classList.add('hidden'); }
@@ -15095,6 +15166,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261106_footer_2cm_sticky_v80"></script>
+  <script src="app.js?v=20261107_student_instant_sync_v83"></script>
 </body>
 </html>

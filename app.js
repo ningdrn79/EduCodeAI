@@ -174,33 +174,24 @@ function getActiveStudentProfile() {
   try {
     // 1. Cek cache memori window
     if (window.__ACTIVE_STUDENT_PROFILE__ && (window.__ACTIVE_STUDENT_PROFILE__.nama || window.__ACTIVE_STUDENT_PROFILE__.nis || window.__ACTIVE_STUDENT_PROFILE__.id)) {
-      if (String(window.__ACTIVE_STUDENT_PROFILE__.nis || '').trim() === '3000') {
-        return window.__ACTIVE_STUDENT_PROFILE__;
-      }
-      if (window.__ACTIVE_STUDENT_PROFILE__.nama && window.__ACTIVE_STUDENT_PROFILE__.nama.startsWith('Siswa ') && window.__ACTIVE_STUDENT_PROFILE__.nama.includes('(')) {
-        clearActiveStudentSession();
-        return null;
-      }
       return window.__ACTIVE_STUDENT_PROFILE__;
     }
 
     let raw = null;
 
-    // 2. Cek localStorage secara terisolasi (Jika bernilai LOGGED_OUT, langsung anggap keluar!)
+    // 2. Cek localStorage secara terisolasi (Abaikan jika nilai penanda keluar LOGGED_OUT)
     try {
       const ls = localStorage.getItem(ACTIVE_STUDENT_KEY);
-      if (ls === 'LOGGED_OUT') return null;
-      if (ls && ls !== 'null' && ls !== 'undefined') {
+      if (ls && ls !== 'LOGGED_OUT' && ls !== 'null' && ls !== 'undefined' && ls.indexOf('{') !== -1) {
         raw = ls;
       }
     } catch (eLs) {}
 
-    // 3. Cek sessionStorage secara terisolasi (Jika bernilai LOGGED_OUT, langsung anggap keluar!)
+    // 3. Cek sessionStorage jika belum dapat dari localStorage
     if (!raw) {
       try {
         const ss = sessionStorage.getItem(ACTIVE_STUDENT_KEY);
-        if (ss === 'LOGGED_OUT') return null;
-        if (ss && ss !== 'null' && ss !== 'undefined') {
+        if (ss && ss !== 'LOGGED_OUT' && ss !== 'null' && ss !== 'undefined' && ss.indexOf('{') !== -1) {
           raw = ss;
         }
       } catch (eSs) {}
@@ -212,29 +203,21 @@ function getActiveStudentProfile() {
         const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + ACTIVE_STUDENT_KEY + '=([^;]+)'));
         if (m && m[1]) {
           const ck = decodeURIComponent(m[1]);
-          if (ck === 'LOGGED_OUT') return null;
-          if (ck && ck !== 'null' && ck !== 'undefined') {
+          if (ck && ck !== 'LOGGED_OUT' && ck !== 'null' && ck !== 'undefined' && ck.indexOf('{') !== -1) {
             raw = ck;
           }
         }
       } catch (eCk) {}
     }
 
-    if (!raw || raw === 'LOGGED_OUT' || raw === 'null' || raw === 'undefined') {
+    if (!raw) {
       return null;
     }
 
     const parsed = JSON.parse(raw);
     if (parsed && (parsed.nama || parsed.nis || parsed.id)) {
-      if (String(parsed.nis || '').trim() === '3000') {
-        window.__ACTIVE_STUDENT_PROFILE__ = parsed;
-        return parsed;
-      }
-      if (parsed.nama && parsed.nama.startsWith('Siswa ') && parsed.nama.includes('(')) {
-        clearActiveStudentSession();
-        return null;
-      }
       window.__ACTIVE_STUDENT_PROFILE__ = parsed;
+      window.__ACTIVE_STUDENT_RESTORED__ = parsed;
       // Sinkronkan ke seluruh penyimpanan agar selalu persisten di reload (F5)
       try { localStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
       try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
@@ -248,10 +231,40 @@ function getActiveStudentProfile() {
 }
 window.getActiveStudentProfile = getActiveStudentProfile;
 
+// Helper: Injeksi / Perbarui Style CSS Sesi Siswa agar Instan Tampil Tanpa Refresh (F5)
+function injectOrUpdateStudentStyle(profile) {
+  if (!profile) return;
+  let style = document.getElementById('style-early-student-session');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'style-early-student-session';
+    document.head.appendChild(style);
+  }
+  const isSem2Open = (typeof isSemester2Unlocked === 'function') ? isSemester2Unlocked() : (localStorage.getItem('educode_semester_2_unlocked_v1') === 'true');
+  style.innerHTML = `
+    #navbar-tampilan-utama { display: none !important; }
+    #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
+    #navbar-tampilan-sem1 * { pointer-events: auto !important; }
+    #btn-welcome-login { display: none !important; }
+    #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+    #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+    #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+    ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
+    #hero-guest-btn { display: none !important; }
+    #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
+    #welcome-siswa-bintang-wrap { display: flex !important; }
+    #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
+      display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
+    }
+  `;
+}
+window.injectOrUpdateStudentStyle = injectOrUpdateStudentStyle;
+
 // Helper: Simpan Sesi Siswa Aktif ke Seluruh Lapisan Penyimpanan
 function saveActiveStudentSession(profile, targetTab = null) {
   if (!profile) return;
   window.__ACTIVE_STUDENT_PROFILE__ = profile;
+  window.__ACTIVE_STUDENT_RESTORED__ = profile;
   const raw = JSON.stringify(profile);
   try { localStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
   try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
@@ -261,8 +274,18 @@ function saveActiveStudentSession(profile, targetTab = null) {
     try { localStorage.setItem(ACTIVE_TAB_KEY, targetTab); } catch (e) {}
     try { sessionStorage.setItem(ACTIVE_TAB_KEY, targetTab); } catch (e) {}
   }
-  try { localStorage.setItem(ACTIVE_SEM_KEY, String(state.currentSemester || 1)); } catch (e) {}
-  try { sessionStorage.setItem(ACTIVE_SEM_KEY, String(state.currentSemester || 1)); } catch (e) {}
+  try { localStorage.setItem(ACTIVE_SEM_KEY, String((typeof state !== 'undefined' && state.currentSemester) ? state.currentSemester : 1)); } catch (e) {}
+  try { sessionStorage.setItem(ACTIVE_SEM_KEY, String((typeof state !== 'undefined' && state.currentSemester) ? state.currentSemester : 1)); } catch (e) {}
+
+  // Injeksi style CSS agar instan sembunyikan login dan tampilkan logout seketika tanpa perlu refresh (F5)
+  try { injectOrUpdateStudentStyle(profile); } catch (eStyle) {}
+
+  // Sinkronkan tampilan bar profil siswa seketika ke DOM
+  try {
+    if (typeof muatProfilSiswa === 'function') {
+      muatProfilSiswa();
+    }
+  } catch (eMuat) {}
 }
 window.saveActiveStudentSession = saveActiveStudentSession;
 
@@ -1659,6 +1682,15 @@ function switchTab(tabId) {
   // Jika guru sedang login dan memanggil beranda, otomatis arahkan ke Dasbor Guru
   if (tabId === 'beranda' && (state.isGuruLoggedIn || (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()))) {
     tabId = 'guru';
+  }
+
+  // Sinkronkan status profil siswa di kartu sambutan saat membuka tab beranda secara seketika
+  if (tabId === 'beranda') {
+    try {
+      if (typeof muatProfilSiswa === 'function') {
+        muatProfilSiswa();
+      }
+    } catch (eProfilEarly) {}
   }
 
   // Bersihkan style early teacher agar tidak menimpa display section
@@ -20535,7 +20567,8 @@ async function loginDenganNis() {
       kelas: student.kelas || '4A',
       absen: student.absen || '01'
     };
-    saveActiveStudentSession(profile, 'modul');
+    const targetTab = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+    saveActiveStudentSession(profile, targetTab);
 
     state.userPoints = student.poinBintang || 0;
     const p1 = document.getElementById('user-points');
@@ -20550,7 +20583,7 @@ async function loginDenganNis() {
     try { muatProfilSiswa(); } catch (eUI) { console.warn('UI update muatProfilSiswa:', eUI); }
     try { setHeaderNavMode('sem1'); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
     try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (eUI) {}
-    try { switchTab('modul'); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
+    try { switchTab(targetTab); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
 
     showToast(`Selamat datang, ${student.nama}! (Kelas ${student.kelas} • NIS: ${student.nis}) 🎉`, 'success');
   } catch (err) {
@@ -20559,7 +20592,10 @@ async function loginDenganNis() {
     const activeSession = getActiveStudentProfile();
     if (activeSession && String(activeSession.nis).trim() === String(nisVal).trim()) {
       tutupModalProfilSiswa();
-      try { switchTab('modul'); } catch (e) {}
+      try {
+        const targetTab = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+        switchTab(targetTab);
+      } catch (e) {}
     } else {
       if (errorEl) {
         errorEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Terjadi gangguan saat memverifikasi NIS. Periksa koneksi internet Anda.';
@@ -20722,23 +20758,6 @@ function eksekusiLogoutSiswa() {
   showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info');
 }
 window.eksekusiLogoutSiswa = eksekusiLogoutSiswa;
-  const navSem1 = document.getElementById('navbar-tampilan-sem1');
-  if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.display = 'none'; }
-  const mNavUtama = document.getElementById('m-navbar-utama');
-  if (mNavUtama) { mNavUtama.classList.remove('hidden'); mNavUtama.style.display = 'flex'; }
-  const mNavSem1 = document.getElementById('m-navbar-sem1');
-  if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.display = 'none'; }
-
-  renderGaleriPosterWord();
-  if (typeof renderDrive7KebiasaanGrid === 'function') {
-    renderDrive7KebiasaanGrid();
-  }
-  switchTab('beranda');
-  try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) {}
-
-  showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info');
-}
-window.eksekusiLogoutSiswa = eksekusiLogoutSiswa;
 
 function renderOpsiPilihSiswa() {
   const dropdown = document.getElementById('pilih-cepat-siswa-dropdown');
@@ -20784,7 +20803,8 @@ function pilihSiswaDariDropdown(studentId) {
     kelas: student.kelas,
     absen: student.absen
   };
-  saveActiveStudentSession(profile, 'modul');
+  const targetTab = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+  saveActiveStudentSession(profile, targetTab);
 
   // Perbarui poin aktif sesuai poin tersimpan siswa
   state.userPoints = student.poinBintang || 0;
@@ -20797,7 +20817,7 @@ function pilihSiswaDariDropdown(studentId) {
   setHeaderNavMode('sem1');
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
-  switchTab('modul');
+  switchTab(targetTab);
   showToast(`Berhasil masuk sebagai ${student.nama} (${student.kelas} • NIS: ${student.nis})! 🎉`, 'success');
 }
 
@@ -20825,7 +20845,8 @@ function simpanProfilSiswa() {
 
   const id = `STD-${kelas}-${absen}`;
   const profile = { id, nis, nama, kelas, absen };
-  saveActiveStudentSession(profile, 'modul');
+  const targetTabSimpan = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+  saveActiveStudentSession(profile, targetTabSimpan);
 
   // Pastikan siswa ini ada di database guru
   const db = getStudentDatabase();
@@ -20861,7 +20882,7 @@ function simpanProfilSiswa() {
   setHeaderNavMode('sem1');
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
-  switchTab('modul');
+  switchTab(targetTabSimpan);
   showToast(`Halo ${nama}! Profilmu (${kelas} • NIS: ${nis}) berhasil disimpan & aktif 🎉`, 'success');
 }
 
@@ -20988,36 +21009,7 @@ function muatProfilSiswa() {
     el.innerText = profile ? `${firstName} (${profile.kelas})` : 'Belum Masuk';
   });
 
-  // Perbarui Badge Profil Siswa di Title Bar Lab MS Word
-  const wordAvatar = document.getElementById('word-account-avatar');
-  const wordName = document.getElementById('word-account-name');
-  if (wordAvatar && wordName) {
-    if (profile && profile.nama) {
-      const parts = profile.nama.trim().split(/\s+/);
-      const initials = parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].substring(0, 2).toUpperCase();
-      wordAvatar.innerText = initials;
-      wordName.innerText = profile.nama;
-    } else {
-      wordAvatar.innerText = '👤';
-      wordName.innerText = 'Tamu (Belum Masuk)';
-    }
-  }
-
-  // Muat draft dokumen Word & tabel Excel mandiri milik siswa yang sedang aktif
-  muatWordDraftSiswa();
-  muatExcelDraftSiswa();
-
-  // Perbarui nama di Sertifikat Kuis sesuai siswa yang sedang login
-  const certStudentName = document.getElementById('cert-student-name');
-  if (certStudentName) {
-    if (profile && profile.nama) {
-      certStudentName.value = `${profile.nama} (${profile.kelas || 'Kelas 4'})`;
-    } else {
-      certStudentName.value = 'Siswa Berbakat Kelas 4';
-    }
-  }
-
-  // Perbarui Bar Sambutan Siswa di Beranda
+  // Perbarui Bar Sambutan Siswa di Beranda Seketika & Prioritas Utama
   const welcomeAvatar = document.getElementById('welcome-siswa-avatar');
   const welcomeNama = document.getElementById('welcome-siswa-nama');
   const welcomeKelas = document.getElementById('welcome-siswa-kelas');
@@ -21032,7 +21024,6 @@ function muatProfilSiswa() {
 
   const heroSemBtns = document.getElementById('hero-sem-buttons');
   const heroGuestBtn = document.getElementById('hero-guest-btn');
-
   const btnSemToggle = document.getElementById('btn-toggle-sem-siswa');
 
   if (!profile) {
@@ -21052,11 +21043,31 @@ function muatProfilSiswa() {
     }
     if (welcomeBintang) welcomeBintang.innerText = '0';
     if (bintangWrap) bintangWrap.classList.add('hidden');
-    if (btnSemToggle) btnSemToggle.classList.add('hidden');
-    if (btnRapor) { btnRapor.classList.add('hidden'); btnRapor.style.display = 'none'; }
-    if (btnGanti) { btnGanti.classList.add('hidden'); btnGanti.style.display = 'none'; }
-    if (btnLogout) { btnLogout.classList.add('hidden'); btnLogout.style.display = 'none'; }
-    if (btnLogin) { btnLogin.classList.remove('hidden'); btnLogin.style.display = ''; }
+    if (btnSemToggle) {
+      btnSemToggle.classList.add('hidden');
+      btnSemToggle.style.removeProperty('display');
+      btnSemToggle.style.setProperty('display', 'none', 'important');
+    }
+    if (btnRapor) { 
+      btnRapor.classList.add('hidden'); 
+      btnRapor.style.removeProperty('display');
+      btnRapor.style.setProperty('display', 'none', 'important'); 
+    }
+    if (btnGanti) { 
+      btnGanti.classList.add('hidden'); 
+      btnGanti.style.removeProperty('display');
+      btnGanti.style.setProperty('display', 'none', 'important'); 
+    }
+    if (btnLogout) { 
+      btnLogout.classList.add('hidden'); 
+      btnLogout.style.removeProperty('display');
+      btnLogout.style.setProperty('display', 'none', 'important'); 
+    }
+    if (btnLogin) { 
+      btnLogin.classList.remove('hidden'); 
+      btnLogin.style.removeProperty('display');
+      btnLogin.style.setProperty('display', 'inline-flex', 'important'); 
+    }
 
     const cardsSiswa = document.getElementById('beranda-fitur-cards-siswa');
     if (cardsSiswa) cardsSiswa.classList.add('hidden');
@@ -21075,7 +21086,8 @@ function muatProfilSiswa() {
       setHeaderNavMode('guru');
     }
   } else {
-    // Mode Siswa Aktif (Tampilkan Dock Navigasi Siswa Sesuai Gambar User)
+    // Mode Siswa Aktif (Tampilkan Profil, Tombol Keluar & Dock Navigasi Siswa)
+    try { injectOrUpdateStudentStyle(profile); } catch (eSt) {}
     if (heroSemBtns) heroSemBtns.classList.remove('hidden');
     if (heroGuestBtn) heroGuestBtn.classList.add('hidden');
     const cardsSiswa = document.getElementById('beranda-fitur-cards-siswa');
@@ -21087,9 +21099,9 @@ function muatProfilSiswa() {
     }
     if (welcomeSubText) welcomeSubText.innerText = 'Selamat Belajar di Tzu Chi';
     if (welcomePing) welcomePing.classList.remove('hidden');
-    if (welcomeNama) welcomeNama.innerText = profile.nama;
+    if (welcomeNama) welcomeNama.innerText = profile.nama || 'Siswa';
     if (welcomeKelas) {
-      welcomeKelas.innerText = `Kelas ${profile.kelas} • Absen ${profile.absen || '-'}`;
+      welcomeKelas.innerText = `Kelas ${profile.kelas || '4A'} • Absen ${profile.absen || '-'}`;
       welcomeKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
     }
     const activePoints = student ? (student.poinBintang || 0) : (state.userPoints || 0);
@@ -21103,33 +21115,92 @@ function muatProfilSiswa() {
     if (btnSemToggle) {
       if (isSemester2Unlocked()) {
         btnSemToggle.classList.remove('hidden');
-        btnSemToggle.style.display = '';
+        btnSemToggle.style.removeProperty('display');
+        btnSemToggle.style.setProperty('display', 'inline-flex', 'important');
       } else {
         btnSemToggle.classList.add('hidden');
-        btnSemToggle.style.display = 'none';
+        btnSemToggle.style.removeProperty('display');
+        btnSemToggle.style.setProperty('display', 'none', 'important');
       }
     }
-    if (btnRapor) { btnRapor.classList.remove('hidden'); btnRapor.style.display = ''; }
-    if (btnGanti) { btnGanti.classList.remove('hidden'); btnGanti.style.display = ''; }
-    if (btnLogout) { btnLogout.classList.remove('hidden'); btnLogout.style.display = ''; }
-    if (btnLogin) { btnLogin.classList.add('hidden'); btnLogin.style.display = 'none'; }
+    if (btnRapor) { 
+      btnRapor.classList.remove('hidden'); 
+      btnRapor.style.removeProperty('display');
+      btnRapor.style.setProperty('display', 'inline-flex', 'important'); 
+    }
+    if (btnGanti) { 
+      btnGanti.classList.remove('hidden'); 
+      btnGanti.style.removeProperty('display');
+      btnGanti.style.setProperty('display', 'inline-flex', 'important'); 
+    }
+    if (btnLogout) { 
+      btnLogout.classList.remove('hidden'); 
+      btnLogout.style.removeProperty('display');
+      btnLogout.style.setProperty('display', 'inline-flex', 'important'); 
+    }
+    if (btnLogin) { 
+      btnLogin.classList.add('hidden'); 
+      btnLogin.style.removeProperty('display');
+      btnLogin.style.setProperty('display', 'none', 'important'); 
+    }
     updateNavSemesterVisibility();
     updateLabelSemesterSiswa();
+  }
 
-    // Segarkan tampilan grid Drive 7 Kebiasaan & Galeri Poster khusus milik akun siswa yang aktif
+  // Perbarui Badge Profil Siswa di Title Bar Lab MS Word
+  try {
+    const wordAvatar = document.getElementById('word-account-avatar');
+    const wordName = document.getElementById('word-account-name');
+    if (wordAvatar && wordName) {
+      if (profile && profile.nama) {
+        const parts = profile.nama.trim().split(/\s+/);
+        const initials = parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].substring(0, 2).toUpperCase();
+        wordAvatar.innerText = initials;
+        wordName.innerText = profile.nama;
+      } else {
+        wordAvatar.innerText = '👤';
+        wordName.innerText = 'Tamu (Belum Masuk)';
+      }
+    }
+  } catch (eWordBadge) {}
+
+  // Muat draft dokumen Word & tabel Excel mandiri milik siswa yang sedang aktif secara aman
+  try { muatWordDraftSiswa(); } catch (eDraftW) {}
+  try { muatExcelDraftSiswa(); } catch (eDraftE) {}
+
+  // Perbarui nama di Sertifikat Kuis sesuai siswa yang sedang login
+  try {
+    const certStudentName = document.getElementById('cert-student-name');
+    if (certStudentName) {
+      if (profile && profile.nama) {
+        certStudentName.value = `${profile.nama} (${profile.kelas || 'Kelas 4'})`;
+      } else {
+        certStudentName.value = 'Siswa Berbakat Kelas 4';
+      }
+    }
+  } catch (eCert) {}
+
+  // Segarkan tampilan grid Drive 7 Kebiasaan & Galeri Poster khusus milik akun siswa yang aktif
+  try {
     if (typeof renderDrive7KebiasaanGrid === 'function') {
       renderDrive7KebiasaanGrid();
     }
+  } catch (eDrive) {}
+  try {
     if (typeof renderGaleriPosterWord === 'function') {
       renderGaleriPosterWord();
     }
+  } catch (ePoster) {}
 
-    // Sinkronkan portofolio karya poster & Drive siswa dari Cloud Firebase (Hanya jika Cloud Aktif)
+  // Sinkronkan portofolio karya poster & Drive siswa dari Cloud Firebase (Hanya jika Cloud Aktif)
+  try {
     if (profile && isFirebaseConnected && typeof sinkronkanKaryaSiswaDariCloud === 'function') {
       sinkronkanKaryaSiswaDariCloud(profile);
     }
+  } catch (eCloud) {}
 
-    // Perbarui tombol sertifikat di Kuis & Banner Modul
+  // Perbarui tombol sertifikat di Kuis & Banner Modul
+  try {
     const btnLihatSertifikatTop = document.getElementById('btn-lihat-sertifikat-top');
     const btnTextSertifikatModul = document.getElementById('btn-text-sertifikat-modul');
     const hasFinishedKuis = student && ((state.currentSemester === 2 ? student.kuisSem2 : student.kuisSem1) > 0);
@@ -21149,7 +21220,7 @@ function muatProfilSiswa() {
         btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat 🏆';
       }
     }
-  }
+  } catch (eKuisCert) {}
 }
 window.muatProfilSiswa = muatProfilSiswa;
 
