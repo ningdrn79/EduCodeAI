@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261107_footer_1cm_v88">
+  <link rel="stylesheet" href="styles.css?v=20261107_kelas5_fix_v90">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -151,6 +151,7 @@
         var u = document.getElementById('navbar-tampilan-utama');
         var s1 = document.getElementById('navbar-tampilan-sem1');
         var g = document.getElementById('navbar-tampilan-guru');
+        var k5 = document.getElementById('navbar-tampilan-kelas5');
         var mu = document.getElementById('m-navbar-utama');
         var ms1 = document.getElementById('m-navbar-sem1');
         var mg = document.getElementById('m-navbar-guru');
@@ -164,6 +165,7 @@
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
@@ -171,15 +173,22 @@
             btnLg.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/70 border border-rose-500/60 hover:bg-rose-900/90 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
             btnLg.title = 'Keluar dari Akun Guru';
           }
+        } else if (mode === 'kelas5') {
+          if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
+          if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
+          if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (k5) { k5.classList.remove('hidden'); k5.style.removeProperty('display'); k5.style.setProperty('display', 'flex', 'important'); }
         } else if (mode === 'sem1') {
           if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
           if (s1) { s1.classList.remove('hidden'); s1.style.removeProperty('display'); s1.style.setProperty('display', 'flex', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
         } else {
           // Mode Utama (Tamu / Guest)
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
@@ -304,29 +313,49 @@
             window.__ACTIVE_STUDENT_RESTORED__ = s;
             window.__ACTIVE_STUDENT_PROFILE__ = s;
 
+            var isKelas5 = String(s.kelas || '').indexOf('5') !== -1;
             var isSem2Open = false;
             try { isSem2Open = localStorage.getItem('educode_semester_2_unlocked_v1') === 'true'; } catch(e) {}
 
             // Injeksi style seawal mungkin ke <head> agar peramban langsung menampilkan dock siswa dan menyembunyikan menu tamu sejak frame pertama reload F5
             var style = document.createElement('style');
             style.id = 'style-early-student-session';
-            style.innerHTML = `
-              #navbar-tampilan-utama { display: none !important; }
-              #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
-              #navbar-tampilan-sem1 * { pointer-events: auto !important; }
-              #btn-welcome-login { display: none !important; }
-              #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-              #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-              #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-              ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
-              #hero-guest-btn { display: none !important; }
-              #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
-              ${isSem2Open ? '' : '#hero-btn-sem2 { display: none !important; } .sem2-feature-card { display: none !important; } #card-sem-grid-col1, #card-sem-grid-col2 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }'}
-              #welcome-siswa-bintang-wrap { display: flex !important; }
-              #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
-                display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
-              }
-            `;
+            if (isKelas5) {
+              style.innerHTML = `
+                #navbar-tampilan-utama { display: none !important; }
+                #navbar-tampilan-sem1 { display: none !important; }
+                #navbar-tampilan-kelas5 { display: flex !important; pointer-events: auto !important; }
+                #navbar-tampilan-kelas5 * { pointer-events: auto !important; }
+                #tab-beranda { display: none !important; }
+                #tab-petualangan5 { display: block !important; }
+                #btn-welcome-login { display: none !important; }
+                #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
+                  display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
+                }
+              `;
+            } else {
+              style.innerHTML = `
+                #navbar-tampilan-utama { display: none !important; }
+                #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
+                #navbar-tampilan-sem1 * { pointer-events: auto !important; }
+                #navbar-tampilan-kelas5 { display: none !important; }
+                #btn-welcome-login { display: none !important; }
+                #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
+                #hero-guest-btn { display: none !important; }
+                #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
+                ${isSem2Open ? '' : '#hero-btn-sem2 { display: none !important; } .sem2-feature-card { display: none !important; } #card-sem-grid-col1, #card-sem-grid-col2 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }'}
+                #welcome-siswa-bintang-wrap { display: flex !important; }
+                #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
+                  display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
+                }
+              `;
+            }
             document.head.appendChild(style);
           }
         }
@@ -348,15 +377,27 @@
             try { isTeacher = localStorage.getItem('educode_teacher_session_v1') === 'ACTIVE'; } catch(eTeacher){}
             if (!isTeacher) {
               var activeStd = null;
-              try { activeStd = localStorage.getItem('educode_active_student_v1'); } catch(eStd){}
-              if (activeStd && activeStd !== 'LOGGED_OUT' && activeStd !== 'null') {
-                if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
+              try { 
+                var rawStd = localStorage.getItem('educode_active_student_v1');
+                if (rawStd && rawStd !== 'LOGGED_OUT' && rawStd !== 'null') {
+                  activeStd = JSON.parse(rawStd);
+                }
+              } catch(eStd){}
+              if (activeStd && (activeStd.nama || activeStd.nis || activeStd.id)) {
+                var isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1;
+                if (isKelas5 || tabId === 'petualangan5') {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas5');
+                } else {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
+                }
                 try {
                   localStorage.setItem('educode_student_active_tab_v1', tabId);
                   sessionStorage.setItem('educode_student_active_tab_v1', tabId);
                 } catch(eSave){}
               } else {
-                if (tabId === 'beranda' || tabId === 'antariksa') {
+                if (tabId === 'petualangan5') {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas5');
+                } else if (tabId === 'beranda' || tabId === 'antariksa') {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('utama');
                 } else {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
@@ -366,7 +407,7 @@
           }
         } catch (eNav) {}
 
-        var tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik'];
+        var tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5'];
         for (var i = 0; i < tabs.length; i++) {
           var t = tabs[i];
           var sec = document.getElementById('tab-' + t);
@@ -1258,6 +1299,61 @@
       </div>
 
       <!-- ======================================================== -->
+      <!-- TAMPILAN MENU KHUSUS KELAS 5 SD (3D TACTILE FLOATING DOCK) -->
+      <!-- Menggantikan menu Kelas 4 saat siswa membuka tab Kelas 5 -->
+      <!-- 4 Misi: 1. Presentasi | 2. Sertifikat | 3. Poster | 4. Scratch -->
+      <!-- ======================================================== -->
+      <div id="navbar-tampilan-kelas5" class="hidden flex items-center justify-end">
+        <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
+          <!-- 1. Tombol Kembali ke Beranda -->
+          <button type="button" onclick="switchTab('beranda')" id="nav-p5-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kembali ke Beranda LMS">
+            <i class="fa-solid fa-arrow-left text-[#38bdf8] icon-3d-glow"></i> <span>Beranda</span>
+          </button>
+
+          <!-- Label Kelas 5 SD -->
+          <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-200 font-title font-black text-[11px] uppercase border border-cyan-400/40 shrink-0 hidden md:inline-flex items-center gap-1">
+            <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kelas 5 SD
+          </span>
+
+          <!-- Menu 1: Presentasi -->
+          <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" id="nav-p5-presentasi" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-white shrink-0 cursor-pointer" title="Menu 1: Presentasi (PPT Manual & Gemini AI)">
+            <i class="fa-solid fa-file-powerpoint text-amber-300 icon-3d-glow"></i> <span>1. Presentasi</span>
+          </button>
+
+          <!-- Menu 2: Sertifikat Hour of Code -->
+          <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" id="nav-p5-sertifikat" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 2: Sertifikat Hour of Code">
+            <i class="fa-solid fa-award text-yellow-300 icon-3d-glow"></i> <span>2. Sertifikat</span>
+          </button>
+
+          <!-- Menu 3: Poster Lingkungan Canva -->
+          <button type="button" onclick="bukaPetualanganZona('zona-poster')" id="nav-p5-poster" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 3: Poster Pelestarian Lingkungan (Canva .PNG)">
+            <i class="fa-solid fa-image text-emerald-300 icon-3d-glow"></i> <span>3. Poster</span>
+          </button>
+
+          <!-- Menu 4: Scratch Game / Animasi -->
+          <button type="button" onclick="bukaPetualanganZona('zona-scratch')" id="nav-p5-scratch" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 4: Scratch (Aplikasi Game & Animasi)">
+            <i class="fa-solid fa-gamepad text-purple-300 icon-3d-glow"></i> <span>4. Scratch</span>
+          </button>
+
+          <!-- Sound Orb -->
+          <button type="button" onclick="toggleAudioNarration()" title="Suara Narator" class="btn-sound-3d shrink-0">
+            <i class="fa-solid fa-volume-high text-xs"></i>
+          </button>
+
+          <!-- Poin Bintang 3D Badge -->
+          <div class="badge-points-3d shrink-0" title="Total Portofolio Kelas 5">
+            <i class="fa-solid fa-star text-yellow-300 text-xs"></i>
+            <span id="user-points-kelas5">4 Misi</span>
+          </div>
+
+          <!-- Tombol Keluar Siswa Kelas 5 -->
+          <button type="button" onclick="konfirmasiKeluarSiswa()" id="nav-p5-keluar" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-300 hover:text-white shrink-0 cursor-pointer" title="Keluar dari Akun Siswa">
+            <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> <span class="hidden sm:inline">Keluar</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- ======================================================== -->
       <!-- 3. TAMPILAN MENU GURU (DISEMBUNYIKAN SESUAI PERMINTAAN USER) -->
       <!-- Navigasi & filter kelas lengkap sudah tersedia di dalam Dasbor Guru -->
       <!-- ======================================================== -->
@@ -2057,10 +2153,1168 @@
           </div>
         </div>
 
-
-
       </div>
     </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB KHUSUS: PORTOFOLIO & PROYEK DIGITAL KELAS 5 SD (FASE C) -->
+    <!-- Menu 1: Presentasi (PPT Manual & Gemini AI)               -->
+    <!-- Menu 2: Sertifikat Hour of Code                           -->
+    <!-- Menu 3: Poster Pelestarian Lingkungan (Canva .PNG)        -->
+    <!-- Menu 4: Scratch (Aplikasi Game & Animasi Interaktif)      -->
+    <!-- ======================================================== -->
+    <section id="tab-petualangan5" class="hidden space-y-6 animate-fadeIn select-none">
+      
+      <!-- HERO HEADER: PROYEK DIGITAL SISWA KELAS 5 SD -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-950 via-purple-900 to-slate-900 border-2 border-indigo-400/40 p-6 sm:p-8 text-white shadow-2xl">
+        <!-- Ornamen Kosmik -->
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-gradient-to-tr from-cyan-400/20 to-purple-400/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-4 right-1/4 text-yellow-300 text-xl pointer-events-none animate-pulse">✨</div>
+        <div class="absolute bottom-6 left-1/3 text-cyan-300 text-lg pointer-events-none animate-bounce">💻</div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-3 max-w-3xl">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="switchTab('beranda')" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-title font-bold text-xs border border-white/20 transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-arrow-left"></i> <span>Kembali ke Beranda</span>
+              </button>
+              <span class="px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 border border-cyan-400/40 text-cyan-200 text-xs font-title font-black uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kelas 5 SD • Fase C Kurikulum Merdeka
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/30 border border-emerald-400/40 text-emerald-300 text-[11px] font-title font-bold">
+                🌱 SDS Cinta Kasih Tzu Chi
+              </span>
+            </div>
+
+            <h1 class="font-title font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight leading-snug">
+              Portofolio Karya Digital Siswa: <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-amber-300">4 Misi Utama Kelas 5 SD</span> 🚀
+            </h1>
+
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl font-medium">
+              Eksplorasi pembuatan presentasi ganda (PowerPoint &amp; Gemini AI), raih sertifikat Hour of Code, publikasikan poster pelestarian lingkungan Canva, dan ciptakan game interaktif Scratch!
+            </p>
+
+            <div class="flex items-center gap-3 pt-1 flex-wrap">
+              <button type="button" onclick="suarakanMisiKelas5()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-title font-black text-xs transition flex items-center gap-2 shadow-md shadow-amber-500/30 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-volume-high text-slate-950"></i>
+                <span>Robo Jelaskan 4 Menu 🎙️</span>
+              </button>
+
+              <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-title font-bold text-xs border border-white/20 transition flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-file-powerpoint text-amber-300"></i>
+                <span>Mulai dari Presentasi 📊</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- HUD Status Portofolio Siswa -->
+          <div class="bg-slate-900/80 backdrop-blur-md border border-cyan-400/30 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center min-w-[210px] text-center shadow-xl">
+            <span class="text-[10px] text-cyan-300 font-bold uppercase tracking-wider">Status Portofolio Kelas 5</span>
+            <div class="flex items-center gap-2 my-1">
+              <i class="fa-solid fa-award text-yellow-300 text-3xl"></i>
+              <span id="p5-skor-total" class="font-title font-black text-3xl sm:text-4xl text-yellow-300">4</span>
+              <span class="text-xs text-slate-400 font-bold self-end mb-1">Misi</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-2 overflow-hidden border border-slate-700">
+              <div id="p5-progress-bar" class="bg-gradient-to-r from-cyan-400 via-amber-400 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 25%;"></div>
+            </div>
+            <span id="p5-level-label" class="text-[10px] text-emerald-400 font-bold mt-2">Kreator Digital Cilik Tzu Chi ✨</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCK PILIHAN 4 MENU KHUSUS KELAS 5 SD (SESUAI VERSI USER) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Menu 1: Presentasi -->
+        <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" id="btn-p5-tab-zona-presentasi" class="p-4 rounded-2xl bg-indigo-600 text-white border-2 border-indigo-400 shadow-lg text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">📊</span>
+            <span class="text-[10px] font-mono font-bold bg-white/20 px-2 py-0.5 rounded-full">Menu 1</span>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Presentasi</h4>
+            <p class="text-[11px] opacity-80 mt-0.5">2 File: PowerPoint Manual &amp; Gemini AI</p>
+          </div>
+        </button>
+
+        <!-- Menu 2: Sertifikat Hour of Code -->
+        <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" id="btn-p5-tab-zona-sertifikat" class="p-4 rounded-2xl bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-amber-400 hover:text-white shadow text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">🏆</span>
+            <span class="text-[10px] font-mono font-bold bg-slate-800 px-2 py-0.5 rounded-full">Menu 2</span>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Sertifikat Hour of Code</h4>
+            <p class="text-[11px] opacity-80 mt-0.5">Sertifikat resmi kelulusan coding</p>
+          </div>
+        </button>
+
+        <!-- Menu 3: Poster -->
+        <button type="button" onclick="bukaPetualanganZona('zona-poster')" id="btn-p5-tab-zona-poster" class="p-4 rounded-2xl bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-emerald-400 hover:text-white shadow text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">🎨</span>
+            <span class="text-[10px] font-mono font-bold bg-slate-800 px-2 py-0.5 rounded-full">Menu 3</span>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Poster</h4>
+            <p class="text-[11px] opacity-80 mt-0.5">Gambar PNG Canva tema Lingkungan</p>
+          </div>
+        </button>
+
+        <!-- Menu 4: Scratch -->
+        <button type="button" onclick="bukaPetualanganZona('zona-scratch')" id="btn-p5-tab-zona-scratch" class="p-4 rounded-2xl bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-purple-400 hover:text-white shadow text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">🎮</span>
+            <span class="text-[10px] font-mono font-bold bg-slate-800 px-2 py-0.5 rounded-full">Menu 4</span>
+          </div>
+          <div>
+            <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Scratch</h4>
+            <p class="text-[11px] opacity-80 mt-0.5">Aplikasi game &amp; animasi interaktif</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 1: PRESENTASI (2 FILE: PPT MANUAL & GEMINI AI)      -->
+      <!-- ======================================================== -->
+      <div id="p5-zona-presentasi" class="p5-zona-content space-y-4">
+        <div class="bg-white rounded-3xl border border-indigo-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl font-black">
+              📊
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-2.5 py-0.5 rounded-full">Menu 1 • Presentasi Digital</span>
+              <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">Laboratorium Presentasi: Komparasi PowerPoint Manual vs Gemini AI</h3>
+              <p class="text-xs text-slate-500">Kirimkan 2 berkas presentasi: File 1 dibuat mandiri di Microsoft PowerPoint, dan File 2 dibuat dengan bantuan kecerdasan buatan (Gemini AI).</p>
+            </div>
+          </div>
+
+          <!-- Petunjuk Pengerjaan -->
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-50 via-amber-50 to-sky-50 border border-orange-200 text-xs text-slate-700 leading-relaxed mb-6">
+            <span class="font-bold text-orange-800 flex items-center gap-1.5 mb-1 text-sm">
+              <i class="fa-solid fa-circle-info text-orange-600"></i> Ketentuan Pengiriman Tugas Presentasi (2 File):
+            </span>
+            <ol class="list-decimal list-inside space-y-1 text-slate-700 font-medium">
+              <li><strong>File 1 (PowerPoint Manual)</strong>: Disusun menggunakan Microsoft PowerPoint asli (mengatur teks, bentuk bangun, gambar, dan transisi slide secara manual).</li>
+              <li><strong>File 2 (PowerPoint Berbantuan AI)</strong>: Disusun dengan bantuan kecerdasan buatan seperti <em>Google Gemini AI</em> (misal menyusun rancangan materi/outline slide, ringkasan poin, atau format presentasi AI).</li>
+              <li>Format berkas yang diterima: Dokumen PowerPoint (<strong>.pptx</strong>, <strong>.ppt</strong>) atau dokumen ekspor PDF (<strong>.pdf</strong>).</li>
+            </ol>
+          </div>
+
+          <!-- 2 Kolom Upload Berkas (File 1 & File 2) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            
+            <!-- KARTU FILE 1: POWERPOINT MANUAL -->
+            <div class="bg-slate-50 border-2 border-dashed border-orange-300 rounded-3xl p-5 flex flex-col justify-between hover:border-orange-500 transition shadow-2xs">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-orange-700 bg-orange-100 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-file-powerpoint text-orange-600"></i> File 1: PPT Manual
+                  </span>
+                  <span id="badge-status-ppt1" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Belum Diunggah</span>
+                </div>
+                <h4 class="font-title font-bold text-base text-slate-800">Microsoft PowerPoint Mandiri</h4>
+                <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Berkas presentasi yang kamu buat sendiri langsung menggunakan fitur Microsoft PowerPoint.</p>
+
+                <!-- Box File Upload -->
+                <div class="p-4 bg-white rounded-2xl border border-slate-200 text-center space-y-2">
+                  <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                  </div>
+                  <div class="text-xs font-semibold text-slate-700" id="label-file-ppt1">Pilih berkas PowerPoint (.pptx / .ppt)</div>
+                  <div class="text-[10px] text-slate-400" id="info-file-ppt1">Maksimal 25MB • Tersimpan aman di akunmu</div>
+                  
+                  <input type="file" id="input-file-ppt1" accept=".pptx,.ppt,.pdf" onchange="window.handleUploadPpt1(event)" class="hidden">
+                  <button type="button" onclick="document.getElementById('input-file-ppt1').click()" class="mt-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
+                    <i class="fa-solid fa-folder-open"></i> <span>Pilih Berkas File 1</span>
+                  </button>
+                </div>
+
+                <!-- Detail Berkas Terunggah -->
+                <div id="detail-ppt1-box" class="hidden mt-3 p-3 bg-orange-50/70 border border-orange-200 rounded-xl text-xs space-y-1">
+                  <div class="font-bold text-orange-950 truncate flex items-center gap-1.5">
+                    <i class="fa-solid fa-check text-emerald-600"></i> <span id="nama-file-ppt1">Tugas_Presentasi_Manual.pptx</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex items-center justify-between">
+                    <span id="ukuran-file-ppt1">Ukuran: -</span>
+                    <span id="waktu-file-ppt1">Tanggal: -</span>
+                  </div>
+                  <div class="pt-2 flex items-center gap-2">
+                    <a id="link-unduh-ppt1" href="#" download class="text-[11px] font-bold text-orange-600 hover:underline flex items-center gap-1">
+                      <i class="fa-solid fa-download"></i> Unduh File
+                    </a>
+                    <span class="text-slate-300">•</span>
+                    <button type="button" onclick="window.hapusFilePpt1()" class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
+                      Hapus / Ganti
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KARTU FILE 2: POWERPOINT BERBANTUAN AI GEMINI -->
+            <div class="bg-slate-50 border-2 border-dashed border-sky-300 rounded-3xl p-5 flex flex-col justify-between hover:border-sky-500 transition shadow-2xs">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-sky-700 bg-sky-100 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-wand-magic-sparkles text-sky-600"></i> File 2: Berbantuan Gemini AI
+                  </span>
+                  <span id="badge-status-ppt2" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Belum Diunggah</span>
+                </div>
+                <h4 class="font-title font-bold text-base text-slate-800">Presentasi dengan Bantuan AI</h4>
+                <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Berkas presentasi yang kamu susun dengan memanfaatkan kecerdasan buatan seperti Gemini AI.</p>
+
+                <!-- Box File Upload -->
+                <div class="p-4 bg-white rounded-2xl border border-slate-200 text-center space-y-2">
+                  <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-robot"></i>
+                  </div>
+                  <div class="text-xs font-semibold text-slate-700" id="label-file-ppt2">Pilih berkas PowerPoint AI (.pptx / .ppt)</div>
+                  <div class="text-[10px] text-slate-400" id="info-file-ppt2">Maksimal 25MB • Tersimpan aman di akunmu</div>
+                  
+                  <input type="file" id="input-file-ppt2" accept=".pptx,.ppt,.pdf" onchange="window.handleUploadPpt2(event)" class="hidden">
+                  <button type="button" onclick="document.getElementById('input-file-ppt2').click()" class="mt-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
+                    <i class="fa-solid fa-folder-open"></i> <span>Pilih Berkas File 2</span>
+                  </button>
+                </div>
+
+                <!-- Input Prompt AI yang Digunakan -->
+                <div class="mt-3 text-left">
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">
+                    <i class="fa-solid fa-comment-dots text-sky-500"></i> Prompt / Pertanyaan yang kamu ketik ke Gemini AI:
+                  </label>
+                  <textarea id="prompt-gemini-ai" rows="2" placeholder="Contoh: 'Tolong buatkan 5 ide slide presentasi hemat energi listrik untuk kelas 5 SD'..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-sans"></textarea>
+                </div>
+
+                <!-- Detail Berkas Terunggah -->
+                <div id="detail-ppt2-box" class="hidden mt-3 p-3 bg-sky-50/70 border border-sky-200 rounded-xl text-xs space-y-1">
+                  <div class="font-bold text-sky-950 truncate flex items-center gap-1.5">
+                    <i class="fa-solid fa-check text-emerald-600"></i> <span id="nama-file-ppt2">Tugas_Presentasi_GeminiAI.pptx</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex items-center justify-between">
+                    <span id="ukuran-file-ppt2">Ukuran: -</span>
+                    <span id="waktu-file-ppt2">Tanggal: -</span>
+                  </div>
+                  <div class="pt-2 flex items-center gap-2">
+                    <a id="link-unduh-ppt2" href="#" download class="text-[11px] font-bold text-sky-600 hover:underline flex items-center gap-1">
+                      <i class="fa-solid fa-download"></i> Unduh File
+                    </a>
+                    <span class="text-slate-300">•</span>
+                    <button type="button" onclick="window.hapusFilePpt2()" class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
+                      Hapus / Ganti
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tombol Final Kirim Tugas Presentasi -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
+            <div class="text-xs text-slate-500" id="status-keseluruhan-ppt">
+              <span class="font-bold text-slate-700">Status Tugas:</span> Pastikan kedua berkas (PPT Manual &amp; PPT Gemini AI) terunggah lengkap.
+            </div>
+            <button type="button" onclick="window.simpanTugasPresentasiP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-paper-plane"></i> <span>Kirim 2 Berkas Presentasi ke Guru 🚀</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 2: SERTIFIKAT HOUR OF CODE                         -->
+      <!-- Siswa mengunduh (download) sertifikat dari situs        -->
+      <!-- Hour of Code (Code.org) lalu memasukkannya ke aplikasi   -->
+      <!-- ======================================================== -->
+      <div id="p5-zona-sertifikat" class="p5-zona-content hidden space-y-4">
+        <div class="bg-white rounded-3xl border border-amber-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          
+          <!-- Header Menu 2 -->
+          <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-black shrink-0">
+                🏆
+              </div>
+              <div>
+                <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider bg-amber-50 px-2.5 py-0.5 rounded-full">Menu 2 • Hour of Code</span>
+                <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">Pengumpulan Sertifikat Hour of Code (Code.org)</h3>
+                <p class="text-xs text-slate-500">Unggah berkas sertifikat yang telah kamu unduh (download) dari situs resmi Code.org sebagai bukti kelulusan 1 jam belajar coding.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <a href="https://hourofcode.com/id/learn" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-title font-bold text-xs transition flex items-center gap-1.5 shadow-2xs" title="Buka website resmi Hour of Code untuk belajar coding & unduh sertifikat">
+                <i class="fa-solid fa-arrow-up-right-from-square text-amber-600"></i>
+                <span>Buka Situs Code.org 🌐</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Petunjuk Langkah Praktis Bagi Siswa -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5 text-xs">
+            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 flex items-start gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 font-black text-xs flex items-center justify-center shrink-0">1</span>
+              <div>
+                <b class="text-amber-950">Ikuti Aktivitas Coding</b>
+                <p class="text-[11px] text-slate-600 mt-0.5">Selesaikan salah satu aktivitas di code.org (misal: Minecraft, Dance Party, atau AI for Oceans).</p>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 flex items-start gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 font-black text-xs flex items-center justify-center shrink-0">2</span>
+              <div>
+                <b class="text-amber-950">Unduh Sertifikatmu</b>
+                <p class="text-[11px] text-slate-600 mt-0.5">Ketik namamu di akhir sesi lalu <b>Download</b> sertifikatnya ke komputer (format PNG, JPG, atau PDF).</p>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 flex items-start gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 font-black text-xs flex items-center justify-center shrink-0">3</span>
+              <div>
+                <b class="text-amber-950">Masukkan ke Aplikasi Ini</b>
+                <p class="text-[11px] text-slate-600 mt-0.5">Klik tombol di bawah untuk memasukkan file sertifikat tersebut agar tersimpan di portofoliomu.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kotak Unggah Sertifikat (Dropzone) -->
+          <div class="border-2 border-dashed border-amber-300 hover:border-amber-500 bg-amber-50/30 rounded-3xl p-6 sm:p-8 text-center transition space-y-3">
+            <div class="w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 mx-auto flex items-center justify-center text-3xl shadow-inner">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            
+            <div class="max-w-md mx-auto">
+              <h4 class="font-title font-bold text-base sm:text-lg text-slate-800">
+                Pilih Berkas Sertifikat Hour of Code
+              </h4>
+              <p class="text-xs text-slate-500 mt-1">
+                Format file yang didukung: <b>Gambar (.PNG / .JPG / .JPEG)</b> atau dokumen <b>PDF (.PDF)</b>.
+              </p>
+            </div>
+
+            <input type="file" id="input-sertifikat-file" accept=".png,.jpg,.jpeg,.pdf" onchange="window.handleUploadSertifikatHourOfCode(event)" class="hidden">
+            
+            <div class="flex items-center justify-center gap-3 pt-1 flex-wrap">
+              <button type="button" onclick="document.getElementById('input-sertifikat-file').click()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-folder-open text-slate-950"></i>
+                <span>Pilih File Sertifikat Hasil Download 📁</span>
+              </button>
+            </div>
+
+            <div class="text-[11px] text-slate-400">
+              Maksimal ukuran file: 15 MB • Sertifikat akan otomatis tampil di bawah setelah dipilih
+            </div>
+          </div>
+
+          <!-- PRATINJAU LANGSUNG SERTIFIKAT YANG DIMASUKKAN (LIVE CERTIFICATE PREVIEW) -->
+          <div id="container-preview-sertifikat" class="hidden mt-6 space-y-4">
+            <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 flex-wrap gap-2">
+              <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
+                <div>
+                  <span id="badge-status-sertifikat" class="font-title font-bold text-xs sm:text-sm text-emerald-950">
+                    Berkas Sertifikat Berhasil Dimasukkan!
+                  </span>
+                  <div class="text-[11px] text-emerald-800" id="info-meta-sertifikat">
+                    Nama File: - • Ukuran: - • Waktu: -
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <a id="link-unduh-sertifikat" href="#" download class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-title font-bold text-xs transition flex items-center gap-1.5 shadow-xs">
+                  <i class="fa-solid fa-download"></i> <span>Unduh Berkas</span>
+                </a>
+                <button type="button" onclick="window.hapusBerkasSertifikatP5()" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-title font-bold text-xs transition cursor-pointer">
+                  Hapus / Ganti
+                </button>
+              </div>
+            </div>
+
+            <!-- Tampilan Visual Sertifikat: Jika Gambar tampil gambar, jika PDF tampil dokumen card -->
+            <div class="bg-slate-900 rounded-3xl p-4 sm:p-6 text-center shadow-xl border-2 border-amber-400/50 flex flex-col items-center justify-center min-h-[250px]">
+              <!-- Wadah Pratinjau Gambar Sertifikat -->
+              <img id="img-preview-sertifikat" src="" alt="Pratinjau Sertifikat Hour of Code" class="hidden max-h-[500px] w-auto max-w-full rounded-2xl shadow-2xl border-4 border-white/80 object-contain mx-auto">
+              
+              <!-- Wadah Pratinjau PDF Sertifikat -->
+              <div id="pdf-preview-sertifikat" class="hidden flex flex-col items-center justify-center p-6 space-y-3 text-white">
+                <div class="w-20 h-20 rounded-3xl bg-rose-600/20 border-2 border-rose-500 text-rose-400 flex items-center justify-center text-4xl shadow-lg">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <div class="space-y-1">
+                  <h4 class="font-title font-bold text-base text-white" id="pdf-nama-file-label">Sertifikat_Hour_of_Code.pdf</h4>
+                  <p class="text-xs text-slate-300">Dokumen PDF resmi tersimpan dan siap diperiksa oleh Guru.</p>
+                </div>
+                <a id="pdf-buka-tab-link" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-title font-bold text-xs border border-white/20 transition flex items-center gap-2">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-amber-300"></i>
+                  <span>Buka &amp; Baca Dokumen PDF di Tab Baru</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Input Catatan Aktivitas / Judul Game Hour of Code -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  <i class="fa-solid fa-gamepad text-amber-600"></i> Aktivitas Hour of Code yang Diselesaikan:
+                </label>
+                <input type="text" id="nama-aktivitas-hoc" placeholder="Misal: Minecraft Voyage Aquatic, Dance Party, AI for Oceans..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  <i class="fa-solid fa-comment-dots text-emerald-600"></i> Kesan / Hal Menarik yang Dipelajari:
+                </label>
+                <input type="text" id="kesan-aktivitas-hoc" placeholder="Misal: Saya belajar membuat perulangan repeat dan logika if-else di coding!" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Aksi Simpan Tugas Sertifikat -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100 mt-4">
+            <span class="text-xs text-slate-500">
+              <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Berkas tersimpan aman dan terhubung dengan akun siswa aktif.
+            </span>
+            <button type="button" onclick="window.simpanSertifikatHourOfCodeP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-paper-plane text-slate-950"></i> <span>Kirim Sertifikat ke Guru 🚀 (+25 Bintang)</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 3: POSTER PELESTARIAN LINGKUNGAN (CANVA .PNG)      -->
+      <!-- ======================================================== -->
+      <div id="p5-zona-poster" class="p5-zona-content hidden space-y-4">
+        <div class="bg-white rounded-3xl border border-emerald-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-black">
+              🎨
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-full">Menu 3 • Desain Grafis Canva</span>
+              <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">Poster Pelestarian Lingkungan Hidup Tzu Chi</h3>
+              <p class="text-xs text-slate-500">File berupa gambar (PNG) bertemakan pelestarian lingkungan yang dirancang menggunakan aplikasi Canva.</p>
+            </div>
+          </div>
+
+          <!-- Petunjuk Pengerjaan Poster Canva -->
+          <div class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-950 space-y-1 mb-5 leading-relaxed">
+            <div class="font-bold flex items-center gap-1.5 text-sm text-emerald-800">
+              <i class="fa-solid fa-leaf text-emerald-600"></i> Ketentuan Pembuatan Poster:
+            </div>
+            <ul class="list-disc list-inside space-y-0.5 text-emerald-900 font-medium">
+              <li><strong>Alat Desain</strong>: Dibuat menggunakan aplikasi <strong>Canva</strong> (versi web atau aplikasi).</li>
+              <li><strong>Tema Poster</strong>: <em>Pelestarian Lingkungan &amp; Menyayangi Bumi</em> (Memilah Sampah Plastik, Menanam Pohon, Hemat Air, Kurangi Sampah / 5R).</li>
+              <li><strong>Format File</strong>: Unduh dari Canva dalam format gambar <strong>PNG (.png)</strong> berkualitas tinggi.</li>
+            </ul>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Sisi Kiri: Form Detail Poster & Upload Berkas (6 Kolom) -->
+            <div class="lg:col-span-6 space-y-4">
+              <!-- Upload Box -->
+              <div class="p-5 bg-slate-50 border-2 border-dashed border-emerald-300 rounded-3xl text-center space-y-2 hover:border-emerald-500 transition">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-solid fa-image"></i>
+                </div>
+                <div class="font-title font-bold text-sm text-slate-800">Unggah Gambar Poster PNG dari Canva</div>
+                <p class="text-xs text-slate-500">Pilih berkas format .png atau .jpg yang telah kamu download dari Canva</p>
+
+                <input type="file" id="input-file-poster-canva" accept="image/png, image/jpeg, image/jpg, image/webp" onchange="window.handleUploadPosterCanva(event)" class="hidden">
+                <button type="button" onclick="document.getElementById('input-file-poster-canva').click()" class="mt-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-2 mx-auto cursor-pointer">
+                  <i class="fa-solid fa-file-image"></i> <span>Pilih Gambar Poster Canva (.PNG)</span>
+                </button>
+                <div id="info-poster-upload" class="text-[11px] text-slate-400 mt-1">Ukuran maksimal 15MB</div>
+              </div>
+
+              <!-- Input Judul & Deskripsi Pesan -->
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Judul Karya Poster Canva:</label>
+                  <input type="text" id="judul-poster-canva" placeholder="Contoh: 'Pilah Sampah Jadi Emas demi Bumi Lestari'" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Kata Perenungan / Pesan Lingkungan Hidup Tzu Chi:</label>
+                  <textarea id="pesan-poster-canva" rows="2" placeholder="Tuliskan pesan ajakan atau kata perenungan yang ada di dalam postermu..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans"></textarea>
+                </div>
+              </div>
+
+              <!-- Tombol Simpan & Publikasi -->
+              <div class="flex items-center gap-2 pt-2">
+                <button type="button" onclick="window.simpanPosterCanvaP5()" class="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> <span>Publikasikan Poster Lingkungan 🌿</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sisi Kanan: Live Preview Poster PNG (6 Kolom) -->
+            <div class="lg:col-span-6 bg-slate-900 rounded-3xl p-5 border-2 border-emerald-500/30 text-white flex flex-col items-center justify-center min-h-[360px] text-center shadow-xl">
+              <span class="text-xs font-mono font-bold text-emerald-400 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-eye"></i> Pratinjau Poster Canva (Live Preview)
+              </span>
+
+              <!-- Wadah Bingkai Gambar Poster -->
+              <div class="relative w-full max-w-sm aspect-[4/5] rounded-2xl bg-slate-950 border-2 border-slate-700 overflow-hidden flex items-center justify-center shadow-inner" id="preview-poster-frame">
+                <img id="img-preview-poster-canva" src="" alt="Pratinjau Poster Canva" class="hidden w-full h-full object-contain">
+                <div id="placeholder-preview-poster" class="p-6 text-center space-y-2 text-slate-500">
+                  <span class="text-4xl">🖼️</span>
+                  <div class="text-xs font-semibold">Gambar poster PNG Canva akan tampil di sini setelah kamu memilih file.</div>
+                </div>
+              </div>
+
+              <div id="meta-poster-preview" class="hidden mt-3 text-xs font-medium text-slate-300 space-y-0.5">
+                <div class="font-title font-bold text-sm text-emerald-300" id="label-preview-judul">-</div>
+                <div class="text-[11px] text-slate-400" id="label-preview-ukuran">-</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 4: SCRATCH (APLIKASI GAME ATAU ANIMASI)             -->
+      <!-- ======================================================== -->
+      <div id="p5-zona-scratch" class="p5-zona-content hidden space-y-4">
+        <div class="bg-white rounded-3xl border border-purple-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl font-black">
+              🎮
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-600 uppercase tracking-wider bg-purple-50 px-2.5 py-0.5 rounded-full">Menu 4 • Pemrograman Visual</span>
+              <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">Studio Kreativitas Scratch: Aplikasi Game &amp; Animasi</h3>
+              <p class="text-xs text-slate-500">File berupa aplikasi game atau cerita animasi interaktif yang dibuat menggunakan Scratch (Unggah berkas .sb3 atau tautan proyek Scratch daring).</p>
+            </div>
+          </div>
+
+          <!-- Petunjuk Pengerjaan Scratch -->
+          <div class="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 text-xs text-purple-950 space-y-1 mb-5 leading-relaxed">
+            <div class="font-bold flex items-center gap-1.5 text-sm text-purple-800">
+              <i class="fa-solid fa-code text-purple-600"></i> Ketentuan Pengumpulan Proyek Scratch:
+            </div>
+            <p class="text-purple-900 font-medium">
+              Kamu dapat mengumpulkan karyamu melalui salah satu dari <strong>2 metode fleksibel</strong> di bawah ini:
+            </p>
+            <ul class="list-disc list-inside space-y-0.5 text-purple-900 font-medium">
+              <li><strong>Metode 1 (Unggah File .sb3)</strong>: Simpan proyek dari Scratch ke komputermu (File &gt; Save to your computer) lalu unggah berkasnya di sini.</li>
+              <li><strong>Metode 2 (Tautan / Link Scratch Online)</strong>: Salin link proyek dari web <em>scratch.mit.edu/projects/...</em> yang sudah kamu bagikan (Share).</li>
+            </ul>
+          </div>
+
+          <!-- Form Input Proyek Scratch (2 Metode) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            
+            <!-- METODE 1: UPLOAD BERKAS .SB3 -->
+            <div class="bg-slate-50 border-2 border-dashed border-purple-300 rounded-3xl p-5 flex flex-col justify-between hover:border-purple-500 transition shadow-2xs">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-purple-700 bg-purple-100 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-file-arrow-up text-purple-600"></i> Metode 1: File .sb3
+                  </span>
+                  <span id="badge-status-scratch-file" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Belum Diunggah</span>
+                </div>
+                <h4 class="font-title font-bold text-base text-slate-800">Unggah Berkas Proyek Scratch</h4>
+                <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Unggah file (.sb3) aplikasi game atau animasi yang tersimpan di laptop/komputermu.</p>
+
+                <!-- Box File Upload -->
+                <div class="p-4 bg-white rounded-2xl border border-slate-200 text-center space-y-2">
+                  <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-cat"></i>
+                  </div>
+                  <div class="text-xs font-semibold text-slate-700" id="label-file-scratch">Pilih berkas Scratch (.sb3)</div>
+                  <div class="text-[10px] text-slate-400" id="info-file-scratch">Format resmi Scratch 3.0</div>
+                  
+                  <input type="file" id="input-file-scratch" accept=".sb3" onchange="window.handleUploadScratchFile(event)" class="hidden">
+                  <button type="button" onclick="document.getElementById('input-file-scratch').click()" class="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
+                    <i class="fa-solid fa-folder-open"></i> <span>Pilih Berkas .sb3</span>
+                  </button>
+                </div>
+
+                <!-- Detail File Scratch -->
+                <div id="detail-scratch-file-box" class="hidden mt-3 p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-xs space-y-1">
+                  <div class="font-bold text-purple-950 truncate flex items-center gap-1.5">
+                    <i class="fa-solid fa-check text-emerald-600"></i> <span id="nama-file-scratch">Game_Petualangan_Robo.sb3</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 flex items-center justify-between">
+                    <span id="ukuran-file-scratch">Ukuran: -</span>
+                    <span id="waktu-file-scratch">Tanggal: -</span>
+                  </div>
+                  <div class="pt-2 flex items-center gap-2">
+                    <a id="link-unduh-scratch" href="#" download class="text-[11px] font-bold text-purple-600 hover:underline flex items-center gap-1">
+                      <i class="fa-solid fa-download"></i> Unduh Berkas .sb3
+                    </a>
+                    <span class="text-slate-300">•</span>
+                    <button type="button" onclick="window.hapusFileScratch()" class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
+                      Hapus / Ganti
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- METODE 2: TAUTAN / LINK PROYEK SCRATCH ONLINE -->
+            <div class="bg-slate-50 border-2 border-dashed border-indigo-300 rounded-3xl p-5 flex flex-col justify-between hover:border-indigo-500 transition shadow-2xs">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-link text-indigo-600"></i> Metode 2: Link Scratch Online
+                  </span>
+                  <span id="badge-status-scratch-link" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Tautan Web</span>
+                </div>
+                <h4 class="font-title font-bold text-base text-slate-800">Tautan Proyek Scratch Online</h4>
+                <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Tempelkan tautan URL proyek game atau animasimu yang sudah kamu publikasikan di website Scratch.</p>
+
+                <div class="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
+                  <label class="block text-xs font-bold text-slate-700">Tautan / URL Proyek Scratch:</label>
+                  <div class="flex gap-2">
+                    <input type="url" id="input-link-scratch" placeholder="https://scratch.mit.edu/projects/123456789/" class="flex-1 px-3 py-2 rounded-xl text-xs border border-slate-300 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-800">
+                    <button type="button" onclick="window.ujiBukaLinkScratch()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Buka dan uji coba game Scratch di tab baru">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Uji Link</span>
+                    </button>
+                  </div>
+                  <p class="text-[10px] text-slate-400">Contoh: https://scratch.mit.edu/projects/987654321/</p>
+                </div>
+
+                <!-- Input Detail Game -->
+                <div class="mt-4 space-y-2 text-left">
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Judul Game / Animasi:</label>
+                    <input type="text" id="judul-game-scratch" placeholder="Contoh: Game Labirin Pemilah Sampah Bersama Robo" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-bold focus:ring-2 focus:ring-purple-500">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Petunjuk Cara Bermain (Instruksi Tombol):</label>
+                    <textarea id="cara-main-scratch" rows="2" placeholder="Contoh: Tekan Spasi untuk melompat, gunakan panah kiri/kanan untuk menggerakkan karakter..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-sans"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tombol Final Kirim Proyek Scratch -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
+            <div class="text-xs text-slate-500" id="status-keseluruhan-scratch">
+              <span class="font-bold text-slate-700">Status Scratch:</span> Siap dikumpulkan melalui berkas .sb3 atau tautan proyek daring.
+            </div>
+            <button type="button" onclick="window.simpanProyekScratchP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-paper-plane"></i> <span>Kirim Proyek Scratch ke Guru 🎮</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POJOK BUDAYA HUMANIS TZU CHI KELAS 5 -->
+      <div class="bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 rounded-3xl p-6 border-2 border-emerald-500/40 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-3xl shrink-0">
+            🪷
+          </div>
+          <div class="space-y-1">
+            <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-leaf"></i> Kata Perenungan Master Cheng Yen • Kelas 5 SD
+            </span>
+            <p class="font-title text-sm sm:text-base text-slate-100 italic leading-snug">
+              &ldquo;Kecerdasan tanpa budi pekerti bagaikan perahu tanpa dayung. Gunakan teknologi, presentasi, dan kreasimu untuk menolong sesama serta menyayangi bumi.&rdquo;
+            </p>
+          </div>
+        </div>
+
+        <button type="button" onclick="window.klaimLencanaKaryaP5()" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-amber-500/30 transition transform hover:scale-105 active:scale-95 flex items-center gap-2 shrink-0 cursor-pointer">
+          <i class="fa-solid fa-award text-base"></i> <span>Klaim Lencana Karya 🏅</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- INLINE SCRIPT INTERAKTIF KHUSUS 4 MENU KELAS 5 SD (PERSISTENSI & HANDLERS) -->
+    <script>
+      (function initKelas5Modules() {
+        var KEY_P5 = 'educode_kelas5_karya_v1';
+
+        // State Penyimpanan Lokal Data Portofolio Kelas 5
+        window._p5Data = {
+          ppt1: null, // { name, size, time, dataUrl }
+          ppt2: null, // { name, size, time, dataUrl, prompt }
+          sertifikat: null, // { name, isPdf, type, size, time, dataUrl, aktivitas, kesan }
+          poster: null, // { name, size, time, dataUrl, judul, pesan }
+          scratch: null // { type: 'file'|'link', name, size, time, link, judul, caraMain }
+        };
+
+        // Muat Data Tersimpan dari localStorage
+        try {
+          var raw = localStorage.getItem(KEY_P5);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              window._p5Data = Object.assign(window._p5Data, parsed);
+            }
+          }
+        } catch(e) {}
+
+        function simpanKeStorage() {
+          try {
+            localStorage.setItem(KEY_P5, JSON.stringify(window._p5Data));
+          } catch(e) {}
+        }
+
+        // Navigasi Antara 4 Menu
+        window.bukaPetualanganZona = function(zonaKey) {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          // Pastikan tab petualangan5 terbuka aktif dan dock kelas 5 tampil
+          if (typeof window.switchTab === 'function') {
+            window.switchTab('petualangan5');
+          }
+          if (typeof window.setHeaderNavMode === 'function') {
+            window.setHeaderNavMode('kelas5');
+          }
+          var zones = ['zona-presentasi', 'zona-sertifikat', 'zona-poster', 'zona-scratch'];
+          zones.forEach(function(z) {
+            var el = document.getElementById('p5-' + z);
+            var btn = document.getElementById('btn-p5-tab-' + z);
+            if (el) {
+              if (z === zonaKey) {
+                el.classList.remove('hidden');
+                el.style.removeProperty('display');
+                el.style.setProperty('display', 'block', 'important');
+              } else {
+                el.classList.add('hidden');
+                el.style.setProperty('display', 'none', 'important');
+              }
+            }
+            if (btn) {
+              if (z === zonaKey) {
+                btn.className = 'p-4 rounded-2xl bg-indigo-600 text-white border-2 border-indigo-400 shadow-lg text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between';
+              } else {
+                btn.className = 'p-4 rounded-2xl bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-indigo-400 hover:text-white shadow text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between';
+              }
+            }
+            var navBtn = document.getElementById('nav-p5-' + z.replace('zona-', ''));
+            if (navBtn) {
+              if (z === zonaKey) {
+                navBtn.className = 'nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-white shrink-0 cursor-pointer';
+              } else {
+                navBtn.className = 'nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer';
+              }
+            }
+          });
+          // Gulir halus ke zona konten yang dipilih
+          try {
+            var targetEl = document.getElementById('p5-' + zonaKey);
+            if (targetEl) {
+              var rect = targetEl.getBoundingClientRect();
+              var offset = window.pageYOffset + rect.top - 90;
+              window.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+            }
+          } catch(eScroll) {}
+          // Render pratinjau sertifikat jika tab sertifikat dibuka
+          if (zonaKey === 'zona-sertifikat' && typeof window.renderSertifikatView === 'function') {
+            window.renderSertifikatView();
+          }
+        };
+
+        window.suarakanMisiKelas5 = function() {
+          var narasi = "Halo siswa kreatif kelas 5 SDS Cinta Kasih Tzu Chi! Selamat datang di portofolio proyek digital! Di sini kamu memiliki 4 misi utama: Membuat 2 versi presentasi PowerPoint mandiri dan berbantuan Gemini AI, meraih sertifikat Hour of Code, merancang poster pelestarian lingkungan di Canva, dan menciptakan game atau animasi di Scratch! Ayo selesaikan dan raih bintang prestasimu!";
+          if (typeof speakContent === 'function') {
+            speakContent(narasi);
+          } else if ('speechSynthesis' in window) {
+            try {
+              window.speechSynthesis.cancel();
+              var u = new SpeechSynthesisUtterance(narasi);
+              u.lang = 'id-ID';
+              window.speechSynthesis.speak(u);
+            } catch(e){}
+          }
+        };
+
+        // --- MENU 1: PRESENTASI (PPT MANUAL & GEMINI AI) ---
+        window.handleUploadPpt1 = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            window._p5Data.ppt1 = {
+              name: file.name,
+              size: (file.size / 1024).toFixed(1) + ' KB',
+              time: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+              dataUrl: evt.target.result
+            };
+            simpanKeStorage();
+            window.renderStatusPpt();
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Berkas File 1 (PPT Manual) berhasil dipilih: ' + file.name, 'success');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        window.handleUploadPpt2 = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            var promptVal = document.getElementById('prompt-gemini-ai') ? document.getElementById('prompt-gemini-ai').value : '';
+            window._p5Data.ppt2 = {
+              name: file.name,
+              size: (file.size / 1024).toFixed(1) + ' KB',
+              time: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+              dataUrl: evt.target.result,
+              prompt: promptVal
+            };
+            simpanKeStorage();
+            window.renderStatusPpt();
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Berkas File 2 (Gemini AI PPT) berhasil dipilih: ' + file.name, 'success');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        window.hapusFilePpt1 = function() {
+          window._p5Data.ppt1 = null;
+          simpanKeStorage();
+          window.renderStatusPpt();
+          if (typeof showToast === 'function') showToast('Berkas File 1 dihapus.', 'info');
+        };
+
+        window.hapusFilePpt2 = function() {
+          window._p5Data.ppt2 = null;
+          simpanKeStorage();
+          window.renderStatusPpt();
+          if (typeof showToast === 'function') showToast('Berkas File 2 dihapus.', 'info');
+        };
+
+        window.renderStatusPpt = function() {
+          // File 1 PPT Manual
+          var b1 = document.getElementById('badge-status-ppt1');
+          var d1 = document.getElementById('detail-ppt1-box');
+          var n1 = document.getElementById('nama-file-ppt1');
+          var u1 = document.getElementById('ukuran-file-ppt1');
+          var w1 = document.getElementById('waktu-file-ppt1');
+          var l1 = document.getElementById('link-unduh-ppt1');
+          if (window._p5Data.ppt1) {
+            if (b1) { b1.innerText = '✅ Siap Dikirim'; b1.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; }
+            if (d1) d1.classList.remove('hidden');
+            if (n1) n1.innerText = window._p5Data.ppt1.name;
+            if (u1) u1.innerText = 'Ukuran: ' + window._p5Data.ppt1.size;
+            if (w1) w1.innerText = 'Waktu: ' + window._p5Data.ppt1.time;
+            if (l1) { l1.href = window._p5Data.ppt1.dataUrl; l1.download = window._p5Data.ppt1.name; }
+          } else {
+            if (b1) { b1.innerText = 'Belum Diunggah'; b1.className = 'text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full'; }
+            if (d1) d1.classList.add('hidden');
+          }
+
+          // File 2 PPT Gemini AI
+          var b2 = document.getElementById('badge-status-ppt2');
+          var d2 = document.getElementById('detail-ppt2-box');
+          var n2 = document.getElementById('nama-file-ppt2');
+          var u2 = document.getElementById('ukuran-file-ppt2');
+          var w2 = document.getElementById('waktu-file-ppt2');
+          var l2 = document.getElementById('link-unduh-ppt2');
+          var p2 = document.getElementById('prompt-gemini-ai');
+          if (window._p5Data.ppt2) {
+            if (b2) { b2.innerText = '✅ Siap Dikirim'; b2.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; }
+            if (d2) d2.classList.remove('hidden');
+            if (n2) n2.innerText = window._p5Data.ppt2.name;
+            if (u2) u2.innerText = 'Ukuran: ' + window._p5Data.ppt2.size;
+            if (w2) w2.innerText = 'Waktu: ' + window._p5Data.ppt2.time;
+            if (l2) { l2.href = window._p5Data.ppt2.dataUrl; l2.download = window._p5Data.ppt2.name; }
+            if (p2 && window._p5Data.ppt2.prompt && !p2.value) p2.value = window._p5Data.ppt2.prompt;
+          } else {
+            if (b2) { b2.innerText = 'Belum Diunggah'; b2.className = 'text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full'; }
+            if (d2) d2.classList.add('hidden');
+          }
+        };
+
+        window.simpanTugasPresentasiP5 = function() {
+          if (!window._p5Data.ppt1 && !window._p5Data.ppt2) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Unggah minimal salah satu berkas presentasi terlebih dahulu!', 'warning');
+            return;
+          }
+          var promptVal = document.getElementById('prompt-gemini-ai') ? document.getElementById('prompt-gemini-ai').value : '';
+          if (window._p5Data.ppt2) {
+            window._p5Data.ppt2.prompt = promptVal;
+          }
+          simpanKeStorage();
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof showToast === 'function') showToast('Tugas Presentasi (PowerPoint & Gemini AI) berhasil dikirim ke Guru! 📊✨ (+25 Bintang)', 'success');
+          if (typeof tambahPoin === 'function') tambahPoin(25);
+        };
+
+        // --- MENU 2: SERTIFIKAT HOUR OF CODE (FILE HASIL DOWNLOAD) ---
+        window.handleUploadSertifikatHourOfCode = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            var isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            window._p5Data.sertifikat = {
+              name: file.name,
+              isPdf: isPdf,
+              type: file.type || (isPdf ? 'application/pdf' : 'image/png'),
+              size: (file.size / 1024).toFixed(1) + ' KB',
+              time: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+              dataUrl: evt.target.result,
+              aktivitas: document.getElementById('nama-aktivitas-hoc') ? document.getElementById('nama-aktivitas-hoc').value : '',
+              kesan: document.getElementById('kesan-aktivitas-hoc') ? document.getElementById('kesan-aktivitas-hoc').value : ''
+            };
+            simpanKeStorage();
+            window.renderSertifikatView();
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Berkas sertifikat Hour of Code berhasil dimuat: ' + file.name, 'success');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        window.hapusBerkasSertifikatP5 = function() {
+          window._p5Data.sertifikat = null;
+          simpanKeStorage();
+          window.renderSertifikatView();
+          var input = document.getElementById('input-sertifikat-file');
+          if (input) input.value = '';
+          if (typeof showToast === 'function') showToast('Berkas sertifikat Hour of Code telah dihapus.', 'info');
+        };
+
+        window.renderSertifikatView = function() {
+          var container = document.getElementById('container-preview-sertifikat');
+          var img = document.getElementById('img-preview-sertifikat');
+          var pdfBox = document.getElementById('pdf-preview-sertifikat');
+          var pdfLabel = document.getElementById('pdf-nama-file-label');
+          var pdfLink = document.getElementById('pdf-buka-tab-link');
+          var infoMeta = document.getElementById('info-meta-sertifikat');
+          var linkUnduh = document.getElementById('link-unduh-sertifikat');
+          var inAktif = document.getElementById('nama-aktivitas-hoc');
+          var inKesan = document.getElementById('kesan-aktivitas-hoc');
+
+          if (window._p5Data.sertifikat && window._p5Data.sertifikat.dataUrl) {
+            if (container) container.classList.remove('hidden');
+            if (infoMeta) infoMeta.innerText = 'Nama File: ' + window._p5Data.sertifikat.name + ' • Ukuran: ' + window._p5Data.sertifikat.size + ' • Waktu: ' + window._p5Data.sertifikat.time;
+            if (linkUnduh) {
+              linkUnduh.href = window._p5Data.sertifikat.dataUrl;
+              linkUnduh.download = window._p5Data.sertifikat.name;
+            }
+            if (window._p5Data.sertifikat.isPdf) {
+              if (img) img.classList.add('hidden');
+              if (pdfBox) pdfBox.classList.remove('hidden');
+              if (pdfLabel) pdfLabel.innerText = window._p5Data.sertifikat.name;
+              if (pdfLink) pdfLink.href = window._p5Data.sertifikat.dataUrl;
+            } else {
+              if (pdfBox) pdfBox.classList.add('hidden');
+              if (img) {
+                img.src = window._p5Data.sertifikat.dataUrl;
+                img.classList.remove('hidden');
+              }
+            }
+            if (inAktif && !inAktif.value && window._p5Data.sertifikat.aktivitas) {
+              inAktif.value = window._p5Data.sertifikat.aktivitas;
+            }
+            if (inKesan && !inKesan.value && window._p5Data.sertifikat.kesan) {
+              inKesan.value = window._p5Data.sertifikat.kesan;
+            }
+          } else {
+            if (container) container.classList.add('hidden');
+            if (img) img.classList.add('hidden');
+            if (pdfBox) pdfBox.classList.add('hidden');
+          }
+        };
+
+        window.simpanSertifikatHourOfCodeP5 = function() {
+          if (!window._p5Data.sertifikat || !window._p5Data.sertifikat.dataUrl) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Pilih dan unggah berkas sertifikat yang telah kamu unduh terlebih dahulu!', 'warning');
+            return;
+          }
+          var akt = document.getElementById('nama-aktivitas-hoc') ? document.getElementById('nama-aktivitas-hoc').value.trim() : '';
+          var ksn = document.getElementById('kesan-aktivitas-hoc') ? document.getElementById('kesan-aktivitas-hoc').value.trim() : '';
+          window._p5Data.sertifikat.aktivitas = akt;
+          window._p5Data.sertifikat.kesan = ksn;
+          simpanKeStorage();
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof showToast === 'function') showToast('Sertifikat Hour of Code berhasil disimpan dan dikirim ke Guru! 🏆✨ (+25 Bintang)', 'success');
+          if (typeof tambahPoin === 'function') tambahPoin(25);
+        };
+
+        // --- MENU 3: POSTER LINGKUNGAN (CANVA .PNG) ---
+        window.handleUploadPosterCanva = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            var dataUrl = evt.target.result;
+            window._p5Data.poster = {
+              name: file.name,
+              size: (file.size / 1024).toFixed(1) + ' KB',
+              time: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+              dataUrl: dataUrl,
+              judul: document.getElementById('judul-poster-canva') ? document.getElementById('judul-poster-canva').value : '',
+              pesan: document.getElementById('pesan-poster-canva') ? document.getElementById('pesan-poster-canva').value : ''
+            };
+            simpanKeStorage();
+            window.renderPosterPreview();
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Poster Canva PNG berhasil dimuat ke pratinjau! 🌿', 'success');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        window.renderPosterPreview = function() {
+          var img = document.getElementById('img-preview-poster-canva');
+          var ph = document.getElementById('placeholder-preview-poster');
+          var meta = document.getElementById('meta-poster-preview');
+          var lj = document.getElementById('label-preview-judul');
+          var lu = document.getElementById('label-preview-ukuran');
+          var ij = document.getElementById('judul-poster-canva');
+          var ip = document.getElementById('pesan-poster-canva');
+
+          if (window._p5Data.poster && window._p5Data.poster.dataUrl) {
+            if (img) { img.src = window._p5Data.poster.dataUrl; img.classList.remove('hidden'); }
+            if (ph) ph.classList.add('hidden');
+            if (meta) meta.classList.remove('hidden');
+            if (lj) lj.innerText = window._p5Data.poster.judul || window._p5Data.poster.name;
+            if (lu) lu.innerText = 'Ukuran: ' + window._p5Data.poster.size + ' • Waktu: ' + window._p5Data.poster.time;
+            if (ij && !ij.value && window._p5Data.poster.judul) ij.value = window._p5Data.poster.judul;
+            if (ip && !ip.value && window._p5Data.poster.pesan) ip.value = window._p5Data.poster.pesan;
+          } else {
+            if (img) img.classList.add('hidden');
+            if (ph) ph.classList.remove('hidden');
+            if (meta) meta.classList.add('hidden');
+          }
+        };
+
+        window.simpanPosterCanvaP5 = function() {
+          if (!window._p5Data.poster || !window._p5Data.poster.dataUrl) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Pilih dan unggah gambar poster PNG dari Canva terlebih dahulu!', 'warning');
+            return;
+          }
+          var j = document.getElementById('judul-poster-canva') ? document.getElementById('judul-poster-canva').value.trim() : '';
+          var p = document.getElementById('pesan-poster-canva') ? document.getElementById('pesan-poster-canva').value.trim() : '';
+          window._p5Data.poster.judul = j || 'Poster Pelestarian Lingkungan';
+          window._p5Data.poster.pesan = p;
+          simpanKeStorage();
+          window.renderPosterPreview();
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof showToast === 'function') showToast('Poster Canva berhasil disimpan dan dipublikasikan ke Galeri! 🎨🌿 (+25 Bintang)', 'success');
+          if (typeof tambahPoin === 'function') tambahPoin(25);
+        };
+
+        // --- MENU 4: SCRATCH (GAME ATAU ANIMASI) ---
+        window.handleUploadScratchFile = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            window._p5Data.scratch = window._p5Data.scratch || {};
+            window._p5Data.scratch.type = 'file';
+            window._p5Data.scratch.name = file.name;
+            window._p5Data.scratch.size = (file.size / 1024).toFixed(1) + ' KB';
+            window._p5Data.scratch.time = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            window._p5Data.scratch.dataUrl = evt.target.result;
+            simpanKeStorage();
+            window.renderScratchView();
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Berkas proyek Scratch (.sb3) berhasil dimuat: ' + file.name, 'success');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        window.hapusFileScratch = function() {
+          if (window._p5Data.scratch) {
+            window._p5Data.scratch.name = null;
+            window._p5Data.scratch.dataUrl = null;
+          }
+          simpanKeStorage();
+          window.renderScratchView();
+          if (typeof showToast === 'function') showToast('Berkas Scratch dihapus.', 'info');
+        };
+
+        window.ujiBukaLinkScratch = function() {
+          var input = document.getElementById('input-link-scratch');
+          var url = input ? input.value.trim() : '';
+          if (!url) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Masukkan link proyek Scratch terlebih dahulu!', 'warning');
+            return;
+          }
+          if (url.indexOf('http') !== 0) url = 'https://' + url;
+          window.open(url, '_blank');
+        };
+
+        window.renderScratchView = function() {
+          var b = document.getElementById('badge-status-scratch-file');
+          var d = document.getElementById('detail-scratch-file-box');
+          var n = document.getElementById('nama-file-scratch');
+          var u = document.getElementById('ukuran-file-scratch');
+          var w = document.getElementById('waktu-file-scratch');
+          var l = document.getElementById('link-unduh-scratch');
+          var inLink = document.getElementById('input-link-scratch');
+          var inJudul = document.getElementById('judul-game-scratch');
+          var inCara = document.getElementById('cara-main-scratch');
+
+          if (window._p5Data.scratch) {
+            if (window._p5Data.scratch.dataUrl) {
+              if (b) { b.innerText = '✅ Berkas Siap'; b.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; }
+              if (d) d.classList.remove('hidden');
+              if (n) n.innerText = window._p5Data.scratch.name || 'Proyek_Scratch.sb3';
+              if (u) u.innerText = 'Ukuran: ' + (window._p5Data.scratch.size || '-');
+              if (w) w.innerText = 'Waktu: ' + (window._p5Data.scratch.time || '-');
+              if (l) { l.href = window._p5Data.scratch.dataUrl; l.download = window._p5Data.scratch.name || 'Proyek_Scratch.sb3'; }
+            } else {
+              if (b) { b.innerText = 'Belum Diunggah'; b.className = 'text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full'; }
+              if (d) d.classList.add('hidden');
+            }
+            if (inLink && !inLink.value && window._p5Data.scratch.link) inLink.value = window._p5Data.scratch.link;
+            if (inJudul && !inJudul.value && window._p5Data.scratch.judul) inJudul.value = window._p5Data.scratch.judul;
+            if (inCara && !inCara.value && window._p5Data.scratch.caraMain) inCara.value = window._p5Data.scratch.caraMain;
+          }
+        };
+
+        window.simpanProyekScratchP5 = function() {
+          var inLink = document.getElementById('input-link-scratch') ? document.getElementById('input-link-scratch').value.trim() : '';
+          var inJudul = document.getElementById('judul-game-scratch') ? document.getElementById('judul-game-scratch').value.trim() : '';
+          var inCara = document.getElementById('cara-main-scratch') ? document.getElementById('cara-main-scratch').value.trim() : '';
+
+          var hasFile = window._p5Data.scratch && window._p5Data.scratch.dataUrl;
+          if (!hasFile && !inLink) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Unggah file .sb3 atau masukkan link proyek Scratch terlebih dahulu!', 'warning');
+            return;
+          }
+
+          window._p5Data.scratch = window._p5Data.scratch || {};
+          window._p5Data.scratch.link = inLink;
+          window._p5Data.scratch.judul = inJudul || 'Proyek Game/Animasi Scratch';
+          window._p5Data.scratch.caraMain = inCara;
+          simpanKeStorage();
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof showToast === 'function') showToast('Proyek Game/Animasi Scratch berhasil disimpan & dikirim ke Guru! 🎮✨ (+25 Bintang)', 'success');
+          if (typeof tambahPoin === 'function') tambahPoin(25);
+        };
+
+        window.klaimLencanaKaryaP5 = function() {
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof showToast === 'function') {
+            showToast('Selamat! Kamu resmi meraih Lencana "Kreator Digital Unggul Tzu Chi" Kelas 5 SD! 🏅⭐', 'success');
+          }
+        };
+
+        // Inisialisasi awal saat halaman dimuat
+        function initRenderAll() {
+          window.renderStatusPpt();
+          window.renderSertifikatView();
+          window.renderPosterPreview();
+          window.renderScratchView();
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initRenderAll);
+        } else {
+          setTimeout(initRenderAll, 100);
+        }
+        window.addEventListener('load', initRenderAll);
+      })();
+    </script>
 
     <!-- ======================================================== -->
     <!-- TAB 2: MODUL PEMBELAJARAN LENGKAP (TP 2.1 - 2.4) -->
@@ -15166,6 +16420,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261107_footer_1cm_v88"></script>
+  <script src="app.js?v=20261107_auto_kelas5_v100"></script>
 </body>
 </html>

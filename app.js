@@ -751,7 +751,7 @@ function terapkanBahasa() {
 // ==========================================
 // 5. NAVIGASI TAMPILAN UTAMA VS SEMESTER 1 VS DASBOR GURU
 // ==========================================
-state.headerNavMode = 'utama'; // 'utama', 'sem1', atau 'guru'
+state.headerNavMode = 'utama'; // 'utama', 'sem1', 'guru', atau 'kelas5'
 
 function setHeaderNavMode(mode) {
   const isGuru = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
@@ -765,6 +765,7 @@ function setHeaderNavMode(mode) {
   const navUtama = document.getElementById('navbar-tampilan-utama');
   const navSem1 = document.getElementById('navbar-tampilan-sem1');
   const navGuru = document.getElementById('navbar-tampilan-guru');
+  const navKelas5 = document.getElementById('navbar-tampilan-kelas5');
   const mNavUtama = document.getElementById('m-navbar-utama');
   const mNavSem1 = document.getElementById('m-navbar-sem1');
   const mNavGuru = document.getElementById('m-navbar-guru');
@@ -772,8 +773,9 @@ function setHeaderNavMode(mode) {
   const btnLoginGuru = document.getElementById('btn-main-login-guru');
 
   if (mode === 'guru') {
-    // Mode Dasbor Guru: Sembunyikan Dock Guru & bar strip sekunder sesuai permintaan user
+    // Mode Dasbor Guru: Sembunyikan Dock Guru, Sem1, Kelas 5 & bar strip sekunder
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
+    if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
@@ -787,11 +789,21 @@ function setHeaderNavMode(mode) {
       btnLoginGuru.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/70 border border-rose-500/60 hover:bg-rose-900/90 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
       btnLoginGuru.title = 'Keluar dari Akun Guru';
     }
+  } else if (mode === 'kelas5') {
+    // Mode Khusus Kelas 5 SD (4 Misi: Presentasi, Sertifikat, Poster, Scratch)
+    if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
+    if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
+    if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
+    if (navKelas5) { navKelas5.classList.remove('hidden'); navKelas5.style.removeProperty('display'); navKelas5.style.setProperty('display', 'flex', 'important'); }
+    if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
+    if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
+    if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
   } else if (mode === 'sem1') {
-    // Mode Siswa
+    // Mode Siswa Kelas 4 SD
     if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
     if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); navSem1.style.setProperty('display', 'flex', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
+    if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
@@ -800,6 +812,7 @@ function setHeaderNavMode(mode) {
     if (navUtama) { navUtama.classList.remove('hidden'); navUtama.style.removeProperty('display'); navUtama.style.setProperty('display', 'flex', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
+    if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
@@ -1699,31 +1712,45 @@ function switchTab(tabId) {
     if (earlyGuruStyle) earlyGuruStyle.remove();
   } catch (e) {}
 
-  // Sinkronkan navbar: Jika membuka Dasbor Guru, tampilkan dock menu guru (Darningsih, S.T., Kelas 4, 5, 6, Keluar)
+  // Sinkronkan navbar:
+  // 1. Jika membuka Dasbor Guru, tampilkan dock menu guru (Darningsih, S.T., Kelas 4, 5, 6, Keluar)
+  // 2. Jika membuka Portofolio Kelas 5 SD / siswa Kelas 5 aktif, tampilkan dock khusus menu Kelas 5 SD
+  // 3. Jika siswa kelas 4 login, tampilkan dock menu semester 1
+  // 4. Jika di beranda dan belum login, tampilkan navbar utama
   if (tabId === 'guru' || (state.isGuruLoggedIn && tabId === 'guru')) {
     setHeaderNavMode('guru');
+  } else if (tabId === 'petualangan5') {
+    setHeaderNavMode('kelas5');
   } else {
     const student = getActiveStudentProfile();
     if (student) {
-      setHeaderNavMode('sem1');
+      const isKelas5 = String(student.kelas || '').includes('5');
+      if (isKelas5) {
+        setHeaderNavMode('kelas5');
+      } else {
+        setHeaderNavMode('sem1');
+      }
     } else {
       if (tabId === 'beranda' || tabId === 'antariksa') {
         const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
                       (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
                       (window.__TEACHER_SESSION_ACTIVE__ === true);
-    if (!isTeacher) {
-      setHeaderNavMode('utama');
-    } else {
-      setHeaderNavMode('guru');
-    }
+        if (!isTeacher) {
+          setHeaderNavMode('utama');
+        } else {
+          setHeaderNavMode('guru');
+        }
       } else {
         setHeaderNavMode('sem1');
       }
     }
   }
 
-  // Daftar semua tab
-  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik'];
+  // Daftar semua tab (termasuk Tab Petualangan Berpikir Kelas 5 SD)
+  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5'];
+  if (!tabs.includes(tabId)) {
+    tabId = 'beranda';
+  }
   tabs.forEach(tab => {
     const section = document.getElementById(`tab-${tab}`);
     if (section) {
@@ -1741,7 +1768,7 @@ function switchTab(tabId) {
     const navBtn = document.getElementById(`nav-${tab}`);
     if (navBtn) {
       if (tab === tabId) {
-        navBtn.className = 'nav-btn nav-btn-3d active-tab px-4.5 sm:px-5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2';
+        navBtn.className = 'nav-btn nav-btn-3d active-tab px-4.5 sm:px-5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-white';
       } else {
         navBtn.className = 'nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white';
       }
@@ -20567,7 +20594,8 @@ async function loginDenganNis() {
       kelas: student.kelas || '4A',
       absen: student.absen || '01'
     };
-    const targetTab = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+    const isKelas5 = String(profile.kelas || '').includes('5');
+    const targetTab = isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
     saveActiveStudentSession(profile, targetTab);
 
     state.userPoints = student.poinBintang || 0;
@@ -20581,7 +20609,7 @@ async function loginDenganNis() {
 
     // Jalankan pembaruan UI secara aman
     try { muatProfilSiswa(); } catch (eUI) { console.warn('UI update muatProfilSiswa:', eUI); }
-    try { setHeaderNavMode('sem1'); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
+    try { setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1'); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
     try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (eUI) {}
     try { switchTab(targetTab); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
 
@@ -20593,7 +20621,9 @@ async function loginDenganNis() {
     if (activeSession && String(activeSession.nis).trim() === String(nisVal).trim()) {
       tutupModalProfilSiswa();
       try {
-        const targetTab = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+        const isK5 = String(activeSession.kelas || '').includes('5');
+        const targetTab = isK5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
+        setHeaderNavMode(isK5 ? 'kelas5' : 'sem1');
         switchTab(targetTab);
       } catch (e) {}
     } else {
@@ -20749,6 +20779,11 @@ function eksekusiLogoutSiswa() {
     navSem1.classList.add('hidden'); 
     navSem1.style.setProperty('display', 'none', 'important'); 
   }
+  const navKelas5 = document.getElementById('navbar-tampilan-kelas5');
+  if (navKelas5) { 
+    navKelas5.classList.add('hidden'); 
+    navKelas5.style.setProperty('display', 'none', 'important'); 
+  }
 
   try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (e) {}
   try { if (typeof renderDrive7KebiasaanGrid === 'function') renderDrive7KebiasaanGrid(); } catch (e) {}
@@ -20803,7 +20838,8 @@ function pilihSiswaDariDropdown(studentId) {
     kelas: student.kelas,
     absen: student.absen
   };
-  const targetTab = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+  const isKelas5 = String(profile.kelas || '').includes('5');
+  const targetTab = isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
   saveActiveStudentSession(profile, targetTab);
 
   // Perbarui poin aktif sesuai poin tersimpan siswa
@@ -20814,7 +20850,7 @@ function pilihSiswaDariDropdown(studentId) {
   if (p2) p2.innerText = state.userPoints;
 
   muatProfilSiswa();
-  setHeaderNavMode('sem1');
+  setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1');
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTab);
@@ -20845,7 +20881,8 @@ function simpanProfilSiswa() {
 
   const id = `STD-${kelas}-${absen}`;
   const profile = { id, nis, nama, kelas, absen };
-  const targetTabSimpan = (typeof state !== 'undefined' && state.currentTab) ? state.currentTab : 'beranda';
+  const isKelas5 = String(kelas || '').includes('5');
+  const targetTabSimpan = isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
   saveActiveStudentSession(profile, targetTabSimpan);
 
   // Pastikan siswa ini ada di database guru
@@ -20879,7 +20916,7 @@ function simpanProfilSiswa() {
   saveStudentDatabase(db);
 
   muatProfilSiswa();
-  setHeaderNavMode('sem1');
+  setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1');
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTabSimpan);
@@ -21105,7 +21142,8 @@ function muatProfilSiswa() {
     if (heroGuestBtn) heroGuestBtn.classList.add('hidden');
     const cardsSiswa = document.getElementById('beranda-fitur-cards-siswa');
     if (cardsSiswa) cardsSiswa.classList.remove('hidden');
-    setHeaderNavMode('sem1');
+    const isKelas5 = String(profile.kelas || '').includes('5');
+    setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1');
     if (welcomeAvatar) {
       welcomeAvatar.innerText = profile.nama ? profile.nama.charAt(0).toUpperCase() : 'S';
       welcomeAvatar.className = 'w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center font-black text-base shadow-md flex-shrink-0';
@@ -21114,7 +21152,7 @@ function muatProfilSiswa() {
     if (welcomePing) welcomePing.classList.remove('hidden');
     if (welcomeNama) welcomeNama.innerText = profile.nama || 'Siswa';
     if (welcomeKelas) {
-      welcomeKelas.innerText = `Kelas ${profile.kelas || '4A'} • Absen ${profile.absen || '-'}`;
+      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas5 ? '5D' : '4A')} • Absen ${profile.absen || '-'}`;
       welcomeKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
     }
 
@@ -25628,6 +25666,7 @@ window.simpanWebhookGuruForm = typeof simpanWebhookGuruForm === 'function' ? sim
 window.ujiKirimWebhookGuru = typeof ujiKirimWebhookGuru === 'function' ? ujiKirimWebhookGuru : function(){};
 window.bukaKuisAtauSertifikatSiswa = typeof bukaKuisAtauSertifikatSiswa === 'function' ? bukaKuisAtauSertifikatSiswa : function(){};
 window.bukaRoboMindLangsung = typeof bukaRoboMindLangsung === 'function' ? bukaRoboMindLangsung : function(){};
+window.bukaPetualanganZona = typeof bukaPetualanganZona === 'function' ? bukaPetualanganZona : function(z){ if(typeof switchTab==='function')switchTab('petualangan5'); };
 window.setPraktikSubtab = typeof setPraktikSubtab === 'function' ? setPraktikSubtab : function(){};
 window.bukaModulDetail = typeof bukaModulDetail === 'function' ? bukaModulDetail : function(){};
 window.gulirKeTabelProta = typeof gulirKeTabelProta === 'function' ? gulirKeTabelProta : function(){};
@@ -25665,11 +25704,22 @@ window.addEventListener('load', function() {
     } else {
       const student = getActiveStudentProfile();
       if (student) {
-        setHeaderNavMode('sem1');
-        muatProfilSiswa();
-        let savedTab = 'beranda';
-        try { savedTab = localStorage.getItem('educode_student_active_tab_v1') || 'beranda'; } catch (eTab) {}
-        switchTab(savedTab);
+        const isKelas5 = String(student.kelas || '').includes('5');
+        if (isKelas5) {
+          setHeaderNavMode('kelas5');
+          muatProfilSiswa();
+          switchTab('petualangan5');
+        } else {
+          setHeaderNavMode('sem1');
+          muatProfilSiswa();
+          let savedTab = 'beranda';
+          try { savedTab = localStorage.getItem('educode_student_active_tab_v1') || 'beranda'; } catch (eTab) {}
+          if (!savedTab || savedTab === 'guru' || savedTab === 'petualangan5') savedTab = 'beranda';
+          switchTab(savedTab);
+        }
+      } else {
+        setHeaderNavMode('utama');
+        switchTab('beranda');
       }
     }
   } catch (eLoad) {}
