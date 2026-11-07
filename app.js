@@ -18577,7 +18577,11 @@ const DEFAULT_CLASS_SHEETS_CONFIG = {
   '4C': { label: 'Kelas 4C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4C', tingkat: '4', count: 0 },
   '4D': { label: 'Kelas 4D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4D', tingkat: '4', count: 0 },
   '4E': { label: 'Kelas 4E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4E', tingkat: '4', count: 0 },
+  '5A': { label: 'Kelas 5A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5A', tingkat: '5', count: 0 },
+  '5B': { label: 'Kelas 5B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5B', tingkat: '5', count: 0 },
+  '5C': { label: 'Kelas 5C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5C', tingkat: '5', count: 0 },
   '5D': { label: 'Kelas 5D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5D', tingkat: '5', count: 0 },
+  '5E': { label: 'Kelas 5E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5E', tingkat: '5', count: 0 },
   '6A': { label: 'Kelas 6A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6A', tingkat: '6', count: 0 },
   '6B': { label: 'Kelas 6B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6B', tingkat: '6', count: 0 },
   '6C': { label: 'Kelas 6C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6C', tingkat: '6', count: 0 },
@@ -19284,7 +19288,7 @@ function normalisasiNamaKelas(raw, fallback = '4A') {
     return `${tgk}${clean}`;
   }
 
-  const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const validClasses = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
   if (validClasses.includes(clean)) {
     return clean;
   }
@@ -19357,8 +19361,8 @@ function getStudentDatabase() {
     }
 
     // 3. Bersihkan kelas yang tidak diajar oleh Ibu Darningsih, S.T.
-    // Pengampu resmi HANYA 11 kelas: 4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E.
-    const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+    // Pengampu resmi: Kelas 4 (4A-4E), Kelas 5 (5A-5E), dan Kelas 6 (6A-6E).
+    const validClasses = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
     const preValidLen = parsed.length;
     parsed = parsed.filter(s => {
       if (!s.kelas) return false;
@@ -19369,13 +19373,13 @@ function getStudentDatabase() {
       changed = true;
     }
 
-    // 4. Bersihkan data silang: Siswa Kelas 4 yang keliru tercatat ke Kelas 5D atau Kelas 6
+    // 4. Bersihkan data silang: Siswa Kelas 4 yang keliru tercatat ke Kelas 5 atau Kelas 6
     const k4NamaSet = new Set(
       parsed.filter(s => s.kelas && s.kelas.startsWith('4')).map(s => (s.nama || '').toLowerCase().trim())
     );
     const preCrossLen = parsed.length;
     parsed = parsed.filter(s => {
-      if (s.kelas === '5D' || (s.kelas && s.kelas.startsWith('6'))) {
+      if ((s.kelas && s.kelas.startsWith('5')) || (s.kelas && s.kelas.startsWith('6'))) {
         const isK4Id = s.id && (s.id.includes('4A-') || s.id.includes('4B-') || s.id.includes('4C-') || s.id.includes('4D-') || s.id.includes('4E-'));
         const isK4Nis = s.nis && (s.nis.startsWith('31') || s.nis.startsWith('32') || s.nis.startsWith('41') || s.nis.startsWith('42') || s.nis.startsWith('43') || s.nis.startsWith('44') || s.nis.startsWith('45'));
         const isK4Name = k4NamaSet.has((s.nama || '').toLowerCase().trim());
@@ -20803,7 +20807,7 @@ function renderOpsiPilihSiswa() {
 
   dropdown.innerHTML = '<option value="">-- Pilih Nama Siswa dari Database Kelas --</option>';
 
-  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
   classes.forEach(cls => {
     const group = document.createElement('optgroup');
     group.label = `Kelas ${cls}`;
@@ -20869,7 +20873,7 @@ function simpanProfilSiswa() {
   if (absen.length === 1) absen = '0' + absen;
   let nis = inputNis ? inputNis.value.trim() : '';
   if (!nis) {
-    const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5D': '54', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
+    const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5A': '51', '5B': '52', '5C': '53', '5D': '54', '5E': '55', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
     const clsCode = clsMap[kelas] || '41';
     nis = `${clsCode}${absen}`;
   }
@@ -21848,39 +21852,56 @@ function updateFilterKelasTabs(tingkat) {
   const container = document.getElementById('guru-filter-kelas-container');
   if (!container) return;
 
+  const currentTingkat = tingkat || state.tingkatKelasGuru || '4';
+  const currentFilter = state.filterKelasGuru || (currentTingkat === 'all' ? 'semua' : `tingkat_${currentTingkat}`);
+
   const classMap = {
     '4': ['4A', '4B', '4C', '4D', '4E'],
-    '5': ['5D'],
+    '5': ['5A', '5B', '5C', '5D', '5E'],
     '6': ['6A', '6B', '6C', '6D', '6E']
   };
 
-  if (tingkat === 'all') {
-    container.innerHTML = `
-      <span class="text-xs font-bold text-slate-400 uppercase mr-1">Kelas:</span>
-      <button type="button" onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition cursor-pointer">Semua</button>
-      <button type="button" onclick="setFilterKelasGuru('4A')" id="btn-filter-kelas-4A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4A</button>
-      <button type="button" onclick="setFilterKelasGuru('4B')" id="btn-filter-kelas-4B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4B</button>
-      <button type="button" onclick="setFilterKelasGuru('4C')" id="btn-filter-kelas-4C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4C</button>
-      <button type="button" onclick="setFilterKelasGuru('4D')" id="btn-filter-kelas-4D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4D</button>
-      <button type="button" onclick="setFilterKelasGuru('4E')" id="btn-filter-kelas-4E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">4E</button>
-      <button type="button" onclick="setFilterKelasGuru('5D')" id="btn-filter-kelas-5D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">5D</button>
-      <button type="button" onclick="setFilterKelasGuru('6A')" id="btn-filter-kelas-6A" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6A</button>
-      <button type="button" onclick="setFilterKelasGuru('6B')" id="btn-filter-kelas-6B" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6B</button>
-      <button type="button" onclick="setFilterKelasGuru('6C')" id="btn-filter-kelas-6C" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6C</button>
-      <button type="button" onclick="setFilterKelasGuru('6D')" id="btn-filter-kelas-6D" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6D</button>
-      <button type="button" onclick="setFilterKelasGuru('6E')" id="btn-filter-kelas-6E" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">6E</button>
+  const tingkatBtn = (t, label, icon) => {
+    const isActive = (currentTingkat === t);
+    return `<button type="button" onclick="pilihKelasGuruNav('${t}')" id="btn-tingkat-${t}" class="px-2.5 py-1 rounded-md text-xs font-title font-bold transition-all cursor-pointer flex items-center gap-1.5 ${isActive ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white'}">
+      ${icon ? `<i class="${icon} text-[10px]"></i>` : ''}<span>${label}</span>
+    </button>`;
+  };
+
+  let html = `
+    <!-- Selector Tingkat: Semua, Kelas 4, Kelas 5, Kelas 6 -->
+    <div class="inline-flex items-center p-0.5 bg-slate-100 rounded-lg border border-slate-200 mr-1.5 shrink-0">
+      ${tingkatBtn('all', 'Semua', 'fa-solid fa-users')}
+      ${tingkatBtn('4', 'Kelas 4', 'fa-solid fa-graduation-cap')}
+      ${tingkatBtn('5', 'Kelas 5', 'fa-solid fa-brain')}
+      ${tingkatBtn('6', 'Kelas 6', 'fa-solid fa-school')}
+    </div>
+  `;
+
+  if (currentTingkat === 'all') {
+    const isSemua = (currentFilter === 'semua');
+    html += `
+      <button type="button" onclick="setFilterKelasGuru('semua')" id="btn-filter-kelas-semua" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isSemua ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Semua Siswa</button>
     `;
+    const allClasses = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
+    allClasses.forEach(clsName => {
+      const isSel = (currentFilter === clsName);
+      html += `<button type="button" onclick="setFilterKelasGuru('${clsName}')" id="btn-filter-kelas-${clsName}" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${isSel ? 'bg-indigo-100 text-indigo-700 border border-indigo-300 font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${clsName}</button>`;
+    });
   } else {
-    const list = classMap[tingkat] || ['4A', '4B', '4C', '4D', '4E'];
-    let btns = `
-      <span class="text-xs font-bold text-slate-400 uppercase mr-1">Tingkat ${tingkat}:</span>
-      <button type="button" onclick="setFilterKelasGuru('tingkat_${tingkat}')" id="btn-filter-kelas-tingkat_${tingkat}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition cursor-pointer">Semua Kelas ${tingkat}</button>
+    const list = classMap[currentTingkat] || ['4A', '4B', '4C', '4D', '4E'];
+    const isAllTingkat = (currentFilter === `tingkat_${currentTingkat}`);
+    html += `
+      <span class="text-xs font-bold text-slate-400 uppercase mr-1">Tingkat ${currentTingkat}:</span>
+      <button type="button" onclick="setFilterKelasGuru('tingkat_${currentTingkat}')" id="btn-filter-kelas-tingkat_${currentTingkat}" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isAllTingkat ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Semua Kelas ${currentTingkat}</button>
     `;
     list.forEach(clsName => {
-      btns += `<button type="button" onclick="setFilterKelasGuru('${clsName}')" id="btn-filter-kelas-${clsName}" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">${clsName}</button>`;
+      const isSel = (currentFilter === clsName);
+      html += `<button type="button" onclick="setFilterKelasGuru('${clsName}')" id="btn-filter-kelas-${clsName}" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${isSel ? 'bg-indigo-100 text-indigo-700 border border-indigo-300 font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${clsName}</button>`;
     });
-    container.innerHTML = btns;
   }
+
+  container.innerHTML = html;
 }
 window.updateFilterKelasTabs = updateFilterKelasTabs;
 
@@ -21944,11 +21965,11 @@ function setFilterKelasGuru(kelas) {
 
   const container = document.getElementById('guru-filter-kelas-container');
   if (container) {
-    container.querySelectorAll('button').forEach(btn => {
+    container.querySelectorAll('button[id^="btn-filter-kelas-"]').forEach(btn => {
       if (btn.id === `btn-filter-kelas-${kelas}`) {
-        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 transition';
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-700 border border-indigo-300 transition cursor-pointer';
       } else {
-        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+        btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer';
       }
     });
   }
@@ -22033,11 +22054,12 @@ function filterDanCariSiswa() {
       const targetTingkat = activeFilter.replace('tingkat_', '');
       const tingkatClassMap = {
         '4': ['4A', '4B', '4C', '4D', '4E'],
-        '5': ['5D'], // Hanya Kelas 5D di Tingkat 5!
+        '5': ['5A', '5B', '5C', '5D', '5E'],
         '6': ['6A', '6B', '6C', '6D', '6E']
       };
       const allowedClasses = tingkatClassMap[targetTingkat] || [];
-      if (!allowedClasses.includes(s.kelas)) return false;
+      const sCls = String(s.kelas || '').toUpperCase();
+      if (!allowedClasses.includes(s.kelas) && !sCls.startsWith(targetTingkat)) return false;
     } else if (activeFilter !== 'semua' && s.kelas !== activeFilter) {
       return false;
     }
@@ -22952,7 +22974,7 @@ function simpanSiswaBaruManual() {
   if (absen.length === 1) absen = '0' + absen;
   let nis = inputNis ? inputNis.value.trim() : '';
   if (!nis) {
-    const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5D': '54', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
+    const clsMap = { '4A': '41', '4B': '42', '4C': '43', '4D': '44', '4E': '45', '5A': '51', '5B': '52', '5C': '53', '5D': '54', '5E': '55', '6A': '61', '6B': '62', '6C': '63', '6D': '64', '6E': '65' };
     const clsCode = clsMap[kelas] || '41';
     nis = `${clsCode}${absen}`;
   }
@@ -24303,7 +24325,7 @@ function renderTabsKelasSheet() {
 
   const cfg = getClassSheetsConfig();
   const activeKey = getActiveSheetClassKey();
-  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
 
   container.innerHTML = classes.map(cls => {
     const isActive = cls === activeKey;
@@ -24363,7 +24385,7 @@ function renderRingkasanKoneksiKelas() {
 
   const cfg = getClassSheetsConfig();
   const db = getStudentDatabase();
-  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
 
   container.innerHTML = classes.map(cls => {
     const c = cfg[cls] || DEFAULT_CLASS_SHEETS_CONFIG[cls] || { sheetUrl: '', tabName: cls };
@@ -24433,7 +24455,7 @@ function terapkanLinkKeSemuaKelas() {
   }
 
   const cfg = getClassSheetsConfig();
-  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
   classes.forEach(cls => {
     if (!cfg[cls]) cfg[cls] = { ...DEFAULT_CLASS_SHEETS_CONFIG[cls] };
     cfg[cls].sheetUrl = rawUrl;
@@ -24701,7 +24723,7 @@ async function sinkronkanMasterDataSiswaLMS(silent = false) {
   });
 
   const mergedDb = [];
-  const validClasses = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const validClasses = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
   const classCountMap = {};
   validClasses.forEach(cls => { classCountMap[cls] = 0; });
 
@@ -24914,7 +24936,7 @@ window.sinkronkanDataSiswaPerKelas = sinkronkanDataSiswaPerKelas;
 
 // 2. Sinkronkan Rombel per Tingkat (Contoh: Tingkat 4 -> 4A-4E, Tingkat 5 -> 5D, Tingkat 6 -> 6A-6E)
 async function sinkronkanRombelTingkat(tingkat, silent = false) {
-  const rombels = (tingkat === '4') ? ['4A', '4B', '4C', '4D', '4E'] : (tingkat === '5') ? ['5D'] : ['6A', '6B', '6C', '6D', '6E'];
+  const rombels = (tingkat === '4') ? ['4A', '4B', '4C', '4D', '4E'] : (tingkat === '5') ? ['5A', '5B', '5C', '5D', '5E'] : ['6A', '6B', '6C', '6D', '6E'];
   let total = 0;
   for (const r of rombels) {
     const res = await sinkronkanDataSiswaPerKelas(r, true);
@@ -24939,7 +24961,7 @@ window.sinkronkanRombelTingkat = sinkronkanRombelTingkat;
 // 3. Sinkronkan Semua Kelas Sekaligus dari Google Sheets Masing-Masing
 async function sinkronkanSemuaKelasGoogleSheet(silent = false) {
   const cfg = getClassSheetsConfig();
-  const classes = ['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'];
+  const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
   let totalSynced = 0;
   let syncedClasses = [];
 
