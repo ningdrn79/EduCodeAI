@@ -1210,7 +1210,7 @@
         <!-- Navigation Tabs Siswa (1 Bar Dock Terpadu Sesuai Screenshot User) -->
         <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
           <!-- 1. Beranda -->
-          <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-white shrink-0">
+          <button onclick="switchTab('beranda'); if(window.muatProfilSiswa) { window.muatProfilSiswa(); }" id="nav-beranda" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 text-white shrink-0">
             <i class="fa-solid fa-house text-[#38bdf8] icon-3d-glow"></i> <span data-i18n="beranda">Beranda</span>
           </button>
           <!-- 2. Modul Belajar -->
@@ -15166,6 +15166,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261107_student_instant_sync_v83"></script>
+  <script src="app.js?v=20261107_student_instant_sync_v84"></script>
 </body>
 </html>
