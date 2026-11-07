@@ -2560,7 +2560,7 @@ div[id^="m-navbar-"],
   scrollbar-width: none !important;
 }
 
-/* Jaminan Footer Statis Background Hitam Elegan (Tinggi 2cm) - SELALU DI DEPAN TAMPILAN UTAMA */
+/* Jaminan Footer Statis Background Hitam Elegan (Tinggi 2cm) - SELALU DI DEPAN TAMPILAN UTAMA SAAT SCROLL */
 #app-footer {
   position: fixed !important;
   bottom: 0 !important;
@@ -2572,10 +2572,15 @@ div[id^="m-navbar-"],
   max-height: 2cm !important;
   background-color: #000000 !important;
   background: #000000 !important;
+  opacity: 1 !important;
   border-top: 1px solid #1e293b !important;
   color: #f1f5f9 !important;
-  z-index: 50 !important;
-  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.85) !important;
+  z-index: 100 !important; /* Di depan seluruh konten tampilan utama yang bergulir */
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.95) !important;
+}
+
+#floating-scroll-nav {
+  z-index: 105 !important; /* Di atas footer agar tombol scroll tetap dapat diklik */
 }
 
 

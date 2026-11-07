@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261107_footer_front_z50_v86">
+  <link rel="stylesheet" href="styles.css?v=20261107_footer_front_z100_v87">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -1348,7 +1348,7 @@
   </header>
 
   <!-- MAIN CONTAINER (Di atas Background Antariksa) -->
-  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-[2.6cm] relative z-10">
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-[3cm] relative z-10">
 
     <!-- ======================================================== -->
     <!-- TAB 1: BERANDA (TEMPLATE UTAMA SESUAI GAMBAR) -->
@@ -13089,8 +13089,8 @@
 
   </main>
 
-  <!-- FOOTER STATIS (MENEMPEL DI BAWAH SEPERTI HEADER) TINGGI 2 CM DENGAN BACKGROUND HITAM - SELALU DI DEPAN TAMPILAN UTAMA -->
-  <footer id="app-footer" class="fixed bottom-0 left-0 right-0 w-full bg-black/95 backdrop-blur-md border-t border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.85)] text-slate-200 z-50 select-none overflow-hidden" style="position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 2cm !important; min-height: 2cm !important; max-height: 2cm !important; z-index: 50 !important; background-color: #000000 !important;">
+  <!-- FOOTER STATIS (MENEMPEL DI BAWAH SEPERTI HEADER) TINGGI 2 CM DENGAN BACKGROUND HITAM - SELALU DI DEPAN TAMPILAN UTAMA SAAT SCROLL -->
+  <footer id="app-footer" class="fixed bottom-0 left-0 right-0 w-full bg-black border-t border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.95)] text-slate-200 z-[100] select-none overflow-hidden" style="position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 2cm !important; min-height: 2cm !important; max-height: 2cm !important; z-index: 100 !important; background-color: #000000 !important; background: #000000 !important; opacity: 1 !important;">
     <div class="h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center items-center text-center gap-1">
       <!-- Baris 1: Kutipan Nilai Luhur Budaya Humanis Tzu Chi -->
       <p class="text-xs sm:text-sm font-medium text-slate-200 italic truncate max-w-3xl leading-snug">
@@ -15146,7 +15146,7 @@
   </div>
 
   <!-- FLOATING SCROLL NAVIGATION (KE ATAS / KE TABEL / KE BAWAH) -->
-  <div id="floating-scroll-nav" class="fixed right-4 sm:right-6 bottom-[2.3cm] z-[55] flex flex-col gap-2">
+  <div id="floating-scroll-nav" class="fixed right-4 sm:right-6 bottom-[2.3cm] z-[105] flex flex-col gap-2" style="z-index: 105 !important;">
     <button type="button" onclick="gulirKeAtas()" class="px-3.5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-title font-bold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-1.5 transition cursor-pointer">
       <i class="fa-solid fa-arrow-up"></i> <span>Ke Atas</span>
     </button>
@@ -15166,6 +15166,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261107_footer_front_z50_v86"></script>
+  <script src="app.js?v=20261107_footer_front_z100_v87"></script>
 </body>
 </html>
