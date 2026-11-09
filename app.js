@@ -7057,6 +7057,87 @@ function pasangSlotDriveKeWord(habitKey) {
 }
 window.pasangSlotDriveKeWord = pasangSlotDriveKeWord;
 
+// Ekspor Seluruh Koleksi Drive 7 Kebiasaan ke Berkas Cadangan (.JSON) untuk Dipindahkan ke Komputer Lain
+function eksporDataDriveKeFile() {
+  playSound('click');
+  const drive = muatDrive7Kebiasaan();
+  const keys = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k));
+  if (keys.length === 0) {
+    showToast('Drive masih kosong. Kumpulkan minimal 1 gambar sebelum mengekspor!', 'warning');
+    return;
+  }
+
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const nis = profile ? (profile.nis || profile.id || 'siswa') : 'siswa';
+  const nama = profile ? profile.nama.replace(/\s+/g, '_') : 'karya';
+  const kelas = profile ? profile.kelas : '4A';
+
+  const exportObj = {
+    app: 'EduCodeAI',
+    version: '2.0',
+    type: 'drive_7kebiasaan_backup',
+    student: profile || { nis, nama, kelas },
+    driveData: drive,
+    exportDate: new Date().toISOString()
+  };
+
+  const jsonStr = JSON.stringify(exportObj, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Drive_7Kebiasaan_${kelas}_${nama}_${nis}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+
+  showToast(`Berkas Drive (${keys.length} gambar) berhasil diekspor! Pindahkan file ini ke komputer lain via Flashdisk / WA / Drive 💾`, 'success');
+}
+window.eksporDataDriveKeFile = eksporDataDriveKeFile;
+
+// Impor Berkas Cadangan (.JSON) dari Komputer Lain ke Drive Komputer Ini
+function imporDataDriveDariFile() {
+  playSound('click');
+  let input = document.getElementById('input-impor-drive-file');
+  if (!input) {
+    input = document.createElement('input');
+    input.type = 'file';
+    input.id = 'input-impor-drive-file';
+    input.accept = '.json,application/json';
+    input.style.display = 'none';
+    input.onchange = function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          const importedDrive = parsed.driveData || (parsed.bangun_pagi ? parsed : null);
+          if (!importedDrive || typeof importedDrive !== 'object') {
+            alert('Format berkas tidak valid atau bukan berkas cadangan Drive 7 Kebiasaan!');
+            return;
+          }
+          const current = muatDrive7Kebiasaan();
+          const merged = { ...current, ...importedDrive };
+          simpanDrive7Kebiasaan(merged);
+          renderDrive7KebiasaanGrid();
+          playSound('fanfare');
+          const count = Object.keys(importedDrive).length;
+          showToast(`Berhasil memulihkan ${count} gambar ke Drive komputer ini! 🎉`, 'success');
+        } catch (err) {
+          alert('Gagal membaca berkas cadangan: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+    document.body.appendChild(input);
+  }
+  input.value = '';
+  input.click();
+}
+window.imporDataDriveDariFile = imporDataDriveDariFile;
+
 function kirimSemuaDriveKePosterWord() {
   playSound('fanfare');
   const drive = muatDrive7Kebiasaan();
