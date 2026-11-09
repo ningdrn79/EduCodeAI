@@ -19311,6 +19311,98 @@ const SEED_STUDENTS = [
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
+    id: 'STD-5A-5000',
+    nis: '5000',
+    nama: 'Pelajar Uji Coba 5A',
+    kelas: '5A',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 Januari 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 50,
+    statusKkm: 'Tuntas',
+    catatanGuru: 'Akun Uji Coba Kelas 5 SD • Portofolio Digital & AI'
+  },
+  {
+    id: 'STD-5A-3102',
+    nis: '3102',
+    nama: 'AURELIA CLAUDIA',
+    kelas: '5A',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Februari 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5B-3103',
+    nis: '3103',
+    nama: 'BRANDON WIJAYA',
+    kelas: '5B',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 Maret 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5C-3104',
+    nis: '3104',
+    nama: 'CLARISSA ANGELINE',
+    kelas: '5C',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 April 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
     id: 'STD-5D-3101',
     nis: '3101',
     nama: 'BRYAN ALVINO',
@@ -19319,6 +19411,29 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '14 Agustus 2016',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 0,
+    statusKkm: 'Remedial',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5E-3105',
+    nis: '3105',
+    nama: 'DARREN CHANDRA',
+    kelas: '5E',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Mei 2016',
     kuisSem1: 0,
     kuisSem2: 0,
     posterWord: 0,
@@ -19731,6 +19846,19 @@ function getStudentDatabase() {
       parsed = JSON.parse(JSON.stringify(SEED_STUDENTS));
       localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(parsed));
       changed = true;
+    } else if (Array.isArray(SEED_STUDENTS)) {
+      // Pastikan seluruh siswa resmi bawaan dari SEED_STUDENTS (termasuk Kelas 5 dan 6) selalu tersedia jika belum ada di database
+      const existingNisSet = new Set(parsed.map(s => String(s.nis || '').trim()));
+      SEED_STUDENTS.forEach(seedS => {
+        const seedNis = String(seedS.nis || '').trim();
+        if (seedNis && !existingNisSet.has(seedNis)) {
+          if (!deletedIds || (!deletedIds.includes(seedS.id) && !deletedIds.includes(`NIS-${seedS.kelas}-${seedS.nis}`))) {
+            parsed.push(JSON.parse(JSON.stringify(seedS)));
+            existingNisSet.add(seedNis);
+            changed = true;
+          }
+        }
+      });
     }
 
     parsed.forEach(s => {
@@ -25218,15 +25346,11 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const primaryTab = (c.tabName || kelasKey).trim();
   let fetchedStudents = [];
 
-  // Daftar variasi nama tab ringkas & cepat (Mendukung Tab Master "DATA SISWA LMS" untuk Semua Rombel)
+  // Daftar variasi nama tab ringkas & cepat (Maksimal 3 kandidat terpenting, timeout kilat 1200ms)
   const candidateTabs = [
     primaryTab,
     'DATA SISWA LMS',
-    'DATA SISWA',
-    'DATA_SISWA',
-    kelasKey,
-    `Kelas ${kelasKey}`,
-    '' // fallback lembar pertama
+    kelasKey
   ];
   if (c.tabName && !candidateTabs.includes(c.tabName)) {
     candidateTabs.unshift(c.tabName);
@@ -25235,10 +25359,10 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const uniqueTabs = [...new Set(candidateTabs.map(t => (t || '').trim()))];
   let resolvedTab = primaryTab;
 
-  // Coba query variasi nama tab dengan timeout cepat (2500ms)
+  // Coba query variasi nama tab dengan timeout kilat (1200ms)
   for (const tName of uniqueTabs) {
     try {
-      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 2500);
+      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 1200);
       const parsed = parseGoogleSheetTable(parsedData, kelasKey);
       if (parsed && parsed.length > 0) {
         fetchedStudents = parsed;
@@ -25247,6 +25371,28 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
           c.tabName = tName;
           cfg[kelasKey].tabName = tName;
           saveClassSheetsConfig(cfg);
+        }
+
+        // Optimasi Cerdas Terpusat: Jika sheet ini adalah tab master "DATA SISWA LMS",
+        // simpan juga data siswa kelas lainnya sekaligus agar rombel lain instan 0 detik!
+        if (tName === 'DATA SISWA LMS' || tName === 'DATA SISWA') {
+          try {
+            const allParsed = parseGoogleSheetTable(parsedData, 'semua');
+            if (allParsed && allParsed.length > 0) {
+              const curDb = getStudentDatabase();
+              const mapCur = new Map();
+              curDb.forEach(s => { if (s.nis) mapCur.set(String(s.nis).trim().toLowerCase(), s); });
+              let addedAny = false;
+              allParsed.forEach(s => {
+                const k = String(s.nis || '').trim().toLowerCase();
+                if (!mapCur.has(k)) {
+                  curDb.push(s);
+                  addedAny = true;
+                }
+              });
+              if (addedAny) saveStudentDatabase(curDb);
+            }
+          } catch (eAll) {}
         }
         break;
       }
@@ -25320,8 +25466,27 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
 }
 window.sinkronkanDataSiswaPerKelas = sinkronkanDataSiswaPerKelas;
 
-// 2. Sinkronkan Rombel per Tingkat (Contoh: Tingkat 4 -> 4A-4E, Tingkat 5 -> 5D, Tingkat 6 -> 6A-6E)
+// 2. Sinkronkan Rombel per Tingkat (Contoh: Tingkat 4 -> 4A-4E, Tingkat 5 -> 5A-5E, Tingkat 6 -> 6A-6E)
 async function sinkronkanRombelTingkat(tingkat, silent = false) {
+  // Optimasi Kilat: Coba sinkronisasi master terpusat terlebih dahulu (Hanya 1 request JSONP kilat untuk semua rombel!)
+  try {
+    const masterRes = await sinkronkanMasterDataSiswaLMS(true);
+    if (masterRes && masterRes.length > 0) {
+      const dbNow = getStudentDatabase();
+      const countTingkat = dbNow.filter(s => String(s.kelas || '').startsWith(tingkat)).length;
+      if (countTingkat > 0) {
+        renderTabsKelasSheet();
+        renderRingkasanKoneksiKelas();
+        if (typeof renderDasborGuru === 'function') renderDasborGuru();
+        if (!silent) {
+          playSound('success');
+          showToast(`⚡ Cepat & Instan! ${countTingkat} siswa Tingkat ${tingkat} tersinkronisasi dari Master Sheet! 🎉`, 'success');
+        }
+        return countTingkat;
+      }
+    }
+  } catch (eM) {}
+
   const rombels = (tingkat === '4') ? ['4A', '4B', '4C', '4D', '4E'] : (tingkat === '5') ? ['5A', '5B', '5C', '5D', '5E'] : ['6A', '6B', '6C', '6D', '6E'];
   let total = 0;
   for (const r of rombels) {
@@ -25341,6 +25506,7 @@ async function sinkronkanRombelTingkat(tingkat, silent = false) {
       showToast(`Pastikan link Google Sheets untuk Kelas ${tingkat} sudah diatur.`, 'warning');
     }
   }
+  return total;
 }
 window.sinkronkanRombelTingkat = sinkronkanRombelTingkat;
 
@@ -25470,6 +25636,30 @@ async function cekNisGoogleSheet(nisVal) {
     return testSiswa6;
   }
 
+  if (targetVal === '5000') {
+    const testSiswa5 = {
+      id: 'STD-5A-5000',
+      nis: '5000',
+      nama: 'Pelajar Uji Coba 5A',
+      kelas: '5A',
+      absen: '01',
+      statusKkm: 'Tuntas',
+      poinBintang: 50,
+      catatanGuru: 'Akun Uji Coba Kelas 5 SD • Portofolio Digital & AI'
+    };
+    try {
+      let db = getStudentDatabase();
+      const existIdx = db.findIndex(s => String(s.nis || '').trim() === '5000');
+      if (existIdx >= 0) {
+        db[existIdx] = { ...db[existIdx], ...testSiswa5 };
+      } else {
+        db.push(testSiswa5);
+      }
+      saveStudentDatabase(db);
+    } catch (eDb) {}
+    return testSiswa5;
+  }
+
   if (targetVal === '3000') {
     const testSiswa = {
       id: 'STD-4A-3000',
@@ -25554,7 +25744,11 @@ async function cekNisGoogleSheet(nisVal) {
       : (targetVal.startsWith('43') || targetVal.startsWith('33')) ? '4C'
       : (targetVal.startsWith('44') || targetVal.startsWith('34')) ? '4D'
       : (targetVal.startsWith('45') || targetVal.startsWith('35')) ? '4E'
-      : (targetVal.startsWith('54') || targetVal.startsWith('51') || targetVal.startsWith('52')) ? '5D'
+      : (targetVal.startsWith('51') || targetVal === '5000') ? '5A'
+      : targetVal.startsWith('52') ? '5B'
+      : targetVal.startsWith('53') ? '5C'
+      : (targetVal.startsWith('54') || targetVal === '3101') ? '5D'
+      : targetVal.startsWith('55') ? '5E'
       : targetVal.startsWith('61') ? '6A'
       : targetVal.startsWith('62') ? '6B'
       : targetVal.startsWith('63') ? '6C'
@@ -26116,6 +26310,23 @@ window.masukCepatKelas6 = function() {
   setHeaderNavMode('kelas6');
   switchTab('petualangan6');
   showToast('Berhasil masuk sebagai Pelajar Uji Coba 6A (Fase C • Computational Thinking)! 🚀💡', 'success');
+};
+
+window.masukCepatKelas5 = function() {
+  const testSiswa5 = {
+    id: 'STD-5A-5000',
+    nis: '5000',
+    nama: 'Pelajar Uji Coba 5A',
+    kelas: '5A',
+    absen: '01'
+  };
+  saveActiveStudentSession(testSiswa5, 'petualangan5');
+  state.userPoints = 50;
+  tutupModalProfilSiswa();
+  muatProfilSiswa();
+  setHeaderNavMode('kelas5');
+  switchTab('petualangan5');
+  showToast('Berhasil masuk sebagai Pelajar Uji Coba 5A (Fase C • Portofolio Digital)! 🚀🎨', 'success');
 };
 window.setPraktikSubtab = typeof setPraktikSubtab === 'function' ? setPraktikSubtab : function(){};
 window.bukaModulDetail = typeof bukaModulDetail === 'function' ? bukaModulDetail : function(){};
