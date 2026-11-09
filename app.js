@@ -19219,98 +19219,6 @@ const SEED_STUDENTS = [
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
-    id: 'STD-4C-3202',
-    nis: '3202',
-    nama: 'ABINAYA DHITAJAYANTI',
-    kelas: '4C',
-    absen: '01',
-    jenisKelamin: 'P',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '15 Maret 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-4B-3205',
-    nis: '3205',
-    nama: 'ALBERTO KURNIAWAN',
-    kelas: '4B',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '12 Mei 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-4D-3206',
-    nis: '3206',
-    nama: 'ALVIN WIJAYA',
-    kelas: '4D',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '08 Juni 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-4E-3207',
-    nis: '3207',
-    nama: 'AMANDA CHARLOTTE',
-    kelas: '4E',
-    absen: '01',
-    jenisKelamin: 'P',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '20 Juli 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
     id: 'STD-5A-5000',
     nis: '5000',
     nama: 'Pelajar Uji Coba 5A',
@@ -19332,236 +19240,6 @@ const SEED_STUDENTS = [
     poinBintang: 50,
     statusKkm: 'Tuntas',
     catatanGuru: 'Akun Uji Coba Kelas 5 SD • Portofolio Digital & AI'
-  },
-  {
-    id: 'STD-5A-3102',
-    nis: '3102',
-    nama: 'AURELIA CLAUDIA',
-    kelas: '5A',
-    absen: '02',
-    jenisKelamin: 'P',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '12 Februari 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-5B-3103',
-    nis: '3103',
-    nama: 'BRANDON WIJAYA',
-    kelas: '5B',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '05 Maret 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-5C-3104',
-    nis: '3104',
-    nama: 'CLARISSA ANGELINE',
-    kelas: '5C',
-    absen: '01',
-    jenisKelamin: 'P',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '20 April 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-5D-3101',
-    nis: '3101',
-    nama: 'BRYAN ALVINO',
-    kelas: '5D',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '14 Agustus 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-5E-3105',
-    nis: '3105',
-    nama: 'DARREN CHANDRA',
-    kelas: '5E',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '29 Mei 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-6A-3001',
-    nis: '3001',
-    nama: 'CALVIN HARTONO',
-    kelas: '6A',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '09 September 2015',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-6B-3002',
-    nis: '3002',
-    nama: 'DARRYL CHANDRA',
-    kelas: '6B',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '11 Oktober 2015',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-6C-3003',
-    nis: '3003',
-    nama: 'EUGENE TAN',
-    kelas: '6C',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '25 November 2015',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-6D-3004',
-    nis: '3004',
-    nama: 'FELIX SURYA',
-    kelas: '6D',
-    absen: '01',
-    jenisKelamin: 'L',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '18 Desember 2015',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
-  },
-  {
-    id: 'STD-6E-3005',
-    nis: '3005',
-    nama: 'GRACE ANGELINE',
-    kelas: '6E',
-    absen: '01',
-    jenisKelamin: 'P',
-    tempatLahir: 'JAKARTA',
-    tanggalLahir: '03 Januari 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   }
 ];
 
@@ -19573,13 +19251,29 @@ const DAFTAR_NAMA_SISWA_CONTOH = [
   'patrick jonathan', 'queen olivia', 'rafael santoso', 'stella angeline', 'ahmad fauzan',
   'clarissa valerie', 'darren salim', 'gabriel christian', 'helena susanto', 'jonathan liu',
   'keisha natalie', 'leonhart surya', 'megan florencia', 'nathaniel hartono', 'patricia tan',
-  'reinhard wijaya', 'sharon valerie'
+  'reinhard wijaya', 'sharon valerie',
+  // Data dummy fiktif rombel uji coba yang dibersihkan permanen:
+  'bryan alvino', 'aurelia claudia', 'brandon wijaya', 'clarissa angeline', 'darren chandra',
+  'calvin hartono', 'darryl chandra', 'eugene tan', 'felix surya', 'grace angeline',
+  'alberto kurniawan', 'abinaya dhitajayanti', 'alvin wijaya', 'amanda charlotte'
 ];
 
 // Helper: Memeriksa apakah data siswa adalah data dummy/contoh fiktif
 function isSiswaContohDummy(s) {
   if (!s || !s.nama) return true;
-  if (String(s.nis || '').trim() === '3000' || s.id === 'STD-4A-3000') return false;
+  const nisStr = String(s.nis || '').trim();
+  // Akun uji coba resmi yang dilindungi sistem
+  if (nisStr === '3000' || s.id === 'STD-4A-3000') return false;
+  if (nisStr === '5000' || s.id === 'STD-5A-5000') return false;
+  if (nisStr === '6000' || s.id === 'STD-6A-6000') return false;
+
+  const n = s.nama.trim().toLowerCase();
+  if (DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
+  if (DAFTAR_NAMA_SISWA_CONTOH.some(d => n.includes(d))) return true;
+  if (n.startsWith('siswa ') && (n.includes('(') || n.includes('4') || n.includes('5') || n.includes('6'))) return true;
+  if (s.id && typeof s.id === 'string' && (s.id.includes('STD-5D-3101') || s.id.includes('STD-5A-3102') || s.id.includes('STD-5B-3103') || s.id.includes('STD-5C-3104') || s.id.includes('STD-5E-3105') || s.id.includes('STD-6A-3001') || s.id.includes('STD-6B-3002') || s.id.includes('STD-6C-3003') || s.id.includes('STD-6D-3004') || s.id.includes('STD-6E-3005'))) return true;
+  return false;
+}
   const n = s.nama.trim().toLowerCase();
   if (DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
   if (DAFTAR_NAMA_SISWA_CONTOH.some(d => n.includes(d))) return true;
@@ -19783,7 +19477,8 @@ function getStudentDatabase() {
     const preValidDummyLen = parsed.length;
     parsed = parsed.filter(s => {
       if (!s || !s.nama) return false;
-      if (String(s.nis || '').trim() === '3000' || s.id === 'STD-4A-3000') return true;
+      const nisStr = String(s.nis || '').trim();
+      if (nisStr === '3000' || s.id === 'STD-4A-3000' || nisStr === '5000' || s.id === 'STD-5A-5000' || nisStr === '6000' || s.id === 'STD-6A-6000') return true;
       if (s.nama.startsWith('Siswa ') && s.nama.includes('(')) return false;
       return true;
     });
@@ -25346,10 +25041,13 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const primaryTab = (c.tabName || kelasKey).trim();
   let fetchedStudents = [];
 
-  // Daftar variasi nama tab ringkas & cepat (Maksimal 3 kandidat terpenting, timeout kilat 1200ms)
+  // Daftar variasi nama tab ringkas & cepat (prioritas cerdas per rombel & master tab)
   const candidateTabs = [
     primaryTab,
     'DATA SISWA LMS',
+    `Kelas ${kelasKey}`,
+    `KELAS ${kelasKey}`,
+    `DATA SISWA ${kelasKey}`,
     kelasKey
   ];
   if (c.tabName && !candidateTabs.includes(c.tabName)) {
@@ -25747,7 +25445,7 @@ async function cekNisGoogleSheet(nisVal) {
       : (targetVal.startsWith('51') || targetVal === '5000') ? '5A'
       : targetVal.startsWith('52') ? '5B'
       : targetVal.startsWith('53') ? '5C'
-      : (targetVal.startsWith('54') || targetVal === '3101') ? '5D'
+      : targetVal.startsWith('54') ? '5D'
       : targetVal.startsWith('55') ? '5E'
       : targetVal.startsWith('61') ? '6A'
       : targetVal.startsWith('62') ? '6B'
