@@ -6764,6 +6764,11 @@ function renderDrive7KebiasaanGrid() {
   if (!grid) return;
 
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  // Pasang listener realtime Firebase secara otomatis untuk akun siswa ini
+  if (profile && (profile.nis || profile.id) && typeof pasangRealtimeSyncDrive === 'function') {
+    pasangRealtimeSyncDrive(profile.nis || profile.id);
+  }
+
   const drive = muatDrive7Kebiasaan();
   const filledCount = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
   const totalCount = DRIVE_7KEBIASAAN_CONFIG.length;
@@ -25900,6 +25905,13 @@ if (document.readyState === 'loading') {
 }
 
 window.addEventListener('load', function() {
+  // Inisialisasi otomatis Firebase Realtime Cloud Sync
+  try {
+    if (typeof initFirebaseClient === 'function') {
+      initFirebaseClient();
+    }
+  } catch (eFbInit) {}
+
   try {
     if (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) {
       state.isGuruLoggedIn = true;
@@ -25918,6 +25930,16 @@ window.addEventListener('load', function() {
     } else {
       const student = getActiveStudentProfile();
       if (student) {
+        // Pasang listener realtime live sync untuk siswa aktif ini
+        try {
+          if (typeof pasangRealtimeSyncDrive === 'function') {
+            pasangRealtimeSyncDrive(student.nis || student.id);
+          }
+          if (typeof sinkronkanKaryaSiswaDariCloud === 'function') {
+            sinkronkanKaryaSiswaDariCloud(student);
+          }
+        } catch (eSyncEarly) {}
+
         const isKelas5 = String(student.kelas || '').includes('5');
         if (isKelas5) {
           setHeaderNavMode('kelas5');
@@ -26259,9 +26281,9 @@ function initFirebaseClient(customConfig = null) {
       firebaseStorageInstance = firebase.storage();
     }
 
-    // Hanya aktifkan isFirebaseConnected jika cloud sudah diuji dan disetujui
-    const isApproved = localStorage.getItem('educode_firebase_enabled_v1') === 'true';
-    isFirebaseConnected = isApproved;
+    // Otomatis aktifkan isFirebaseConnected jika SDK dan config valid (kecuali jika user memilih mode offline lokal)
+    const isExplicitlyDisabled = localStorage.getItem('educode_firebase_enabled_v1') === 'false';
+    isFirebaseConnected = !isExplicitlyDisabled;
     perbaruiStatusFirebaseUI(config);
     return true;
   } catch (err) {
@@ -26636,8 +26658,11 @@ async function unggahPosterKeCloud(posterItem) {
 }
 window.unggahPosterKeCloud = unggahPosterKeCloud;
 
-// 2. Unggah Drive 7 Kebiasaan Siswa ke Firestore
+// 2. Unggah Drive 7 Kebiasaan Siswa ke Firestore (Realtime Sync)
 async function unggahDriveKeCloud(data) {
+  if (!firebaseFirestoreInstance) {
+    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+  }
   if (!isFirebaseConnected || !firebaseFirestoreInstance) return;
 
   try {
@@ -26649,12 +26674,11 @@ async function unggahDriveKeCloud(data) {
       studentName: activeStudent ? activeStudent.nama : 'Umum',
       studentClass: activeStudent ? activeStudent.kelas : 'Kelas 4',
       driveData: JSON.stringify(data),
-      updatedAt: (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue)
-        ? firebase.firestore.FieldValue.serverTimestamp()
-        : Date.now()
+      points: (typeof state !== 'undefined' && state.userPoints) ? state.userPoints : 0,
+      updatedAt: Date.now()
     };
 
-    await firebaseFirestoreInstance.collection('student_drives').doc(studentNis).set(payload, { merge: true });
+    await firebaseFirestoreInstance.collection('student_drives').doc(String(studentNis)).set(payload, { merge: true });
     
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     localStorage.setItem(FIREBASE_LAST_SYNC_KEY, nowStr);
@@ -26664,6 +26688,69 @@ async function unggahDriveKeCloud(data) {
   }
 }
 window.unggahDriveKeCloud = unggahDriveKeCloud;
+
+// 2B. Listener Sinkronisasi Realtime Firestore Antar-Komputer (Multi-Device Live Sync)
+let _driveRealtimeUnsubscribe = null;
+let _currentSubscribedNis = null;
+
+function pasangRealtimeSyncDrive(studentNis) {
+  if (!studentNis) return;
+  if (!firebaseFirestoreInstance) {
+    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+  }
+  if (!isFirebaseConnected || !firebaseFirestoreInstance) return;
+
+  const targetId = String(studentNis);
+  if (_driveRealtimeUnsubscribe && _currentSubscribedNis === targetId) {
+    return; // Sudah tersambung ke listener realtime
+  }
+  if (_driveRealtimeUnsubscribe) {
+    try { _driveRealtimeUnsubscribe(); } catch (e) {}
+    _driveRealtimeUnsubscribe = null;
+  }
+
+  _currentSubscribedNis = targetId;
+  try {
+    _driveRealtimeUnsubscribe = firebaseFirestoreInstance.collection('student_drives').doc(targetId)
+      .onSnapshot((doc) => {
+        if (!doc.exists) return;
+        const cloudData = doc.data();
+        if (!cloudData || !cloudData.driveData) return;
+        try {
+          const parsed = JSON.parse(cloudData.driveData);
+          if (parsed && typeof parsed === 'object') {
+            const driveKey = getDriveStorageKey();
+            const localRaw = localStorage.getItem(driveKey);
+            const localParsed = localRaw ? JSON.parse(localRaw) : {};
+
+            // Penggabungan Cerdas (Auto-Merge): gabungkan data cloud dengan data lokal
+            const merged = { ...localParsed, ...parsed };
+            const isDiff = JSON.stringify(merged) !== localRaw;
+            if (isDiff) {
+              localStorage.setItem(driveKey, JSON.stringify(merged));
+              if (cloudData.points !== undefined && typeof state !== 'undefined' && state.userPoints < cloudData.points) {
+                state.userPoints = cloudData.points;
+                try {
+                  const ptsEl = document.getElementById('user-points');
+                  if (ptsEl) ptsEl.innerText = state.userPoints;
+                } catch (ePts) {}
+              }
+              const grid = document.getElementById('drive-7kebiasaan-grid');
+              if (grid && state.currentTab === 'praktik') {
+                renderDrive7KebiasaanGrid();
+                showToast('⚡ Sinkronisasi realtime: Gambar terbaru dari komputer lain berhasil dimuat!', 'success');
+              }
+            }
+          }
+        } catch (eParse) {}
+      }, (err) => {
+        console.warn('Realtime listener error:', err);
+      });
+  } catch (err) {
+    console.warn('Gagal pasang realtime listener:', err);
+  }
+}
+window.pasangRealtimeSyncDrive = pasangRealtimeSyncDrive;
 
 // 3. Sinkronkan Karya Siswa dari Cloud saat Siswa Login (Word Poster & Drive 7 Kebiasaan)
 async function sinkronkanKaryaSiswaDariCloud(profile) {
