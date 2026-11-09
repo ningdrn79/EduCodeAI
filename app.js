@@ -1893,6 +1893,11 @@ function switchTab(tabId) {
 
   // Inisialisasi canvas atau galeri jika membuka tab praktik
   if (tabId === 'praktik') {
+    try {
+      if (typeof renderDrive7KebiasaanGrid === 'function') {
+        setTimeout(renderDrive7KebiasaanGrid, 50);
+      }
+    } catch (ePrk) {}
     if (state.p1Mode === 'gambar') {
       setTimeout(initPaintApp, 100);
     } else {
@@ -6763,65 +6768,84 @@ function renderDrive7KebiasaanGrid() {
   const grid = document.getElementById('drive-7kebiasaan-grid');
   if (!grid) return;
 
-  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-  // Pasang listener realtime Firebase secara otomatis untuk akun siswa ini
-  if (profile && (profile.nis || profile.id) && typeof pasangRealtimeSyncDrive === 'function') {
-    pasangRealtimeSyncDrive(profile.nis || profile.id);
+  let profile = null;
+  try {
+    profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    // Pasang listener realtime Firebase secara otomatis untuk akun siswa ini
+    if (profile && (profile.nis || profile.id) && typeof pasangRealtimeSyncDrive === 'function') {
+      pasangRealtimeSyncDrive(profile.nis || profile.id);
+    }
+  } catch (eSync) {
+    console.warn('Realtime listener skip:', eSync);
   }
 
-  const drive = muatDrive7Kebiasaan();
-  const filledCount = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
-  const totalCount = DRIVE_7KEBIASAAN_CONFIG.length;
+  let drive = {};
+  try {
+    drive = muatDrive7Kebiasaan() || {};
+  } catch (eDrive) {
+    drive = {};
+  }
+
+  const totalCount = (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined' && Array.isArray(DRIVE_7KEBIASAAN_CONFIG)) ? DRIVE_7KEBIASAAN_CONFIG.length : 7;
+  const filledCount = Object.keys(drive).filter(k => (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined') && DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
   const percent = Math.round((filledCount / totalCount) * 100);
 
   // Update Header Bar Status dengan Nama Siswa Aktif
-  const titleEl = document.getElementById('drive-progress-title');
-  const barEl = document.getElementById('drive-progress-bar');
-  const kkmBadge = document.getElementById('drive-koleksi-kkm-badge');
-  const nilaiBadge = document.getElementById('drive-nilai-angka-badge');
-  const hintEl = document.getElementById('drive-progress-hint');
-  const quickLabel = document.getElementById('drive-quick-status-label');
-  const penamaanBadge = document.getElementById('drive-penamaan-badge');
+  try {
+    const titleEl = document.getElementById('drive-progress-title');
+    const barEl = document.getElementById('drive-progress-bar');
+    const kkmBadge = document.getElementById('drive-koleksi-kkm-badge');
+    const nilaiBadge = document.getElementById('drive-nilai-angka-badge');
+    const hintEl = document.getElementById('drive-progress-hint');
+    const quickLabel = document.getElementById('drive-quick-status-label');
+    const penamaanBadge = document.getElementById('drive-penamaan-badge');
 
-  const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) — ` : '';
-  if (titleEl) titleEl.innerHTML = `${studentPrefix}Progres Koleksi: ${filledCount} dari ${totalCount} Gambar Terkumpul`;
-  if (barEl) barEl.style.width = `${percent}%`;
-  if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${percent}`;
+    const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) — ` : '';
+    if (titleEl) titleEl.innerHTML = `${studentPrefix}Progres Koleksi: ${filledCount} dari ${totalCount} Gambar Terkumpul`;
+    if (barEl) barEl.style.width = `${percent}%`;
+    if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${percent}`;
 
-  // Hitung jumlah penamaan file baku
-  const validNamesCount = Object.keys(drive).filter(k => {
-    const it = drive[k];
-    return it && it.fileName && periksaFormatNamaFile(it.fileName).valid;
-  }).length;
+    // Hitung jumlah penamaan file baku
+    let validNamesCount = 0;
+    try {
+      validNamesCount = Object.keys(drive).filter(k => {
+        const it = drive[k];
+        return it && it.fileName && (typeof periksaFormatNamaFile === 'function') && periksaFormatNamaFile(it.fileName).valid;
+      }).length;
+    } catch (eVal) { validNamesCount = 0; }
 
-  if (penamaanBadge) {
-    if (validNamesCount >= totalCount) {
-      penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs flex items-center gap-1';
-      penamaanBadge.innerHTML = `<i class="fa-solid fa-star text-amber-500"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b> (+${validNamesCount * 20} Poin)`;
-    } else {
-      penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 shadow-xs flex items-center gap-1';
-      penamaanBadge.innerHTML = `<i class="fa-solid fa-pen-ruler text-blue-600"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b>`;
+    if (penamaanBadge) {
+      if (validNamesCount >= totalCount) {
+        penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs flex items-center gap-1';
+        penamaanBadge.innerHTML = `<i class="fa-solid fa-star text-amber-500"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b> (+${validNamesCount * 20} Poin)`;
+      } else {
+        penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 shadow-xs flex items-center gap-1';
+        penamaanBadge.innerHTML = `<i class="fa-solid fa-pen-ruler text-blue-600"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b>`;
+      }
     }
+
+    if (kkmBadge) {
+      if (filledCount >= totalCount) {
+        kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs';
+        kkmBadge.innerHTML = '🎉 TUNTAS: Nilai 100 (Sangat Baik)';
+        if (hintEl) hintEl.innerHTML = '✨ <b>Hebat sekali!</b> Semua 7 kebiasaan sudah terkumpul lengkap! Nilai TP 2.1 terpenuhi 100.';
+        if (quickLabel) quickLabel.innerHTML = '🎉 <b>Drive Lengkap 7/7!</b> Nilai TP 2.1: 100 (Tuntas)';
+      } else {
+        kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
+        kkmBadge.innerText = `Belum Lengkap (${filledCount}/${totalCount})`;
+        if (hintEl) hintEl.innerText = `Kumpulkan sisa ${totalCount - filledCount} gambar lagi untuk mendapatkan Nilai 100 (Tuntas) pada TP 2.1!`;
+        if (quickLabel) quickLabel.innerText = `📁 Kumpulkan ${totalCount - filledCount} gambar lagi untuk nilai 100!`;
+      }
+    }
+  } catch (eHead) {
+    console.warn('Gagal render status header:', eHead);
   }
 
-  if (kkmBadge) {
-    if (filledCount >= totalCount) {
-      kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs';
-      kkmBadge.innerHTML = '🎉 TUNTAS: Nilai 100 (Sangat Baik)';
-      if (hintEl) hintEl.innerHTML = '✨ <b>Hebat sekali!</b> Semua 7 kebiasaan sudah terkumpul lengkap! Nilai TP 2.1 terpenuhi 100.';
-      if (quickLabel) quickLabel.innerHTML = '🎉 <b>Drive Lengkap 7/7!</b> Nilai TP 2.1: 100 (Tuntas)';
-    } else {
-      kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
-      kkmBadge.innerText = `Belum Lengkap (${filledCount}/${totalCount})`;
-      if (hintEl) hintEl.innerText = `Kumpulkan sisa ${totalCount - filledCount} gambar lagi untuk mendapatkan Nilai 100 (Tuntas) pada TP 2.1!`;
-      if (quickLabel) quickLabel.innerText = `📁 Kumpulkan ${totalCount - filledCount} gambar lagi untuk nilai 100!`;
-    }
-  }
-
-  // Render 7 Cards
-  grid.innerHTML = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
-    const item = drive[cfg.key];
-    const isFilled = !!(item && item.imageSrc);
+  // Render 7 Cards Secara Aman & Terisolasi
+  try {
+    grid.innerHTML = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
+      const item = drive[cfg.key];
+      const isFilled = !!(item && item.imageSrc);
 
     if (isFilled) {
       const fileName = item.fileName || buatSaranNamaFileBaku(cfg.cleanTitle);
@@ -6940,6 +6964,9 @@ function renderDrive7KebiasaanGrid() {
       `;
     }
   }).join('');
+  } catch (eCards) {
+    console.error('Gagal render grid kartu Drive:', eCards);
+  }
 }
 window.renderDrive7KebiasaanGrid = renderDrive7KebiasaanGrid;
 
@@ -26259,12 +26286,17 @@ function initFirebaseClient(customConfig = null) {
       if (saved) {
         config = parseFirebaseConfig(saved);
       }
-    }
-
-    if (!config || !config.apiKey || !config.projectId) {
-      isFirebaseConnected = false;
-      perbaruiStatusFirebaseUI();
-      return false;
+      if (!config || !config.apiKey || !config.projectId) {
+        config = {
+          apiKey: "AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y",
+          authDomain: "sd-tzuchi-kelas4.firebaseapp.com",
+          projectId: "sd-tzuchi-kelas4",
+          storageBucket: "sd-tzuchi-kelas4.firebasestorage.app",
+          messagingSenderId: "1083820511307",
+          appId: "1:1083820511307:web:4bd4f5933d6c061f1b7dce",
+          measurementId: "G-KWEHGW5C0X"
+        };
+      }
     }
 
     // Inisialisasi Firebase App
