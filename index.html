@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261109_clean_dummy_v117">
+  <link rel="stylesheet" href="styles.css?v=20261109_sync_fix_v119">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -16318,7 +16318,7 @@
                   Link URL atau ID Google Spreadsheet (<span id="form-target-class-label" class="text-indigo-600 font-bold">Kelas 4A</span>):
                 </label>
                 <div class="flex flex-wrap gap-2">
-                  <input type="text" id="guru-sheet-url-id-kelas" placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs0X.../edit atau ID Spreadsheet" class="flex-1 min-w-[240px] px-3 py-2 rounded-xl text-xs border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-800 shadow-2xs">
+                  <input type="text" id="guru-sheet-url-id-kelas" value="https://docs.google.com/spreadsheets/d/16fKDdyZpLqTznn6crU1yZ0c5_srXd2XiLvfRtGSztEs/edit?usp=sharing" placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs0X.../edit atau ID Spreadsheet" class="flex-1 min-w-[240px] px-3 py-2 rounded-xl text-xs border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-800 shadow-2xs">
                   <button onclick="simpanPengaturanSheetKelasAktif()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
                     <i class="fa-solid fa-floppy-disk"></i> Simpan Kelas Ini
                   </button>
@@ -16337,8 +16337,8 @@
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">Status Sinkronisasi Kelas Ini:</label>
-                  <div id="guru-sheet-sync-status-kelas" class="px-3 py-2 rounded-xl text-xs bg-slate-100 text-slate-700 font-semibold border border-slate-200 truncate flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-amber-400"></span> Belum Dihubungkan
+                  <div id="guru-sheet-sync-status-kelas" class="px-3 py-2 rounded-xl text-xs bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 truncate flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Terhubung: Master Spreadsheet (Tab: 4A)
                   </div>
                 </div>
               </div>
@@ -19428,7 +19428,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261109_clean_dummy_v117"></script>
+  <script src="app.js?v=20261109_sync_fix_v119"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

@@ -19271,14 +19271,7 @@ function isSiswaContohDummy(s) {
   if (DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
   if (DAFTAR_NAMA_SISWA_CONTOH.some(d => n.includes(d))) return true;
   if (n.startsWith('siswa ') && (n.includes('(') || n.includes('4') || n.includes('5') || n.includes('6'))) return true;
-  if (s.id && typeof s.id === 'string' && (s.id.includes('STD-5D-3101') || s.id.includes('STD-5A-3102') || s.id.includes('STD-5B-3103') || s.id.includes('STD-5C-3104') || s.id.includes('STD-5E-3105') || s.id.includes('STD-6A-3001') || s.id.includes('STD-6B-3002') || s.id.includes('STD-6C-3003') || s.id.includes('STD-6D-3004') || s.id.includes('STD-6E-3005'))) return true;
-  return false;
-}
-  const n = s.nama.trim().toLowerCase();
-  if (DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
-  if (DAFTAR_NAMA_SISWA_CONTOH.some(d => n.includes(d))) return true;
-  if (n.startsWith('siswa ') && (n.includes('(') || n.includes('4') || n.includes('5') || n.includes('6'))) return true;
-  if (s.id && typeof s.id === 'string' && (s.id === 'STD-4A-01' || s.id === 'STD-4B-02' || s.id === 'STD-4C-09') && DAFTAR_NAMA_SISWA_CONTOH.includes(n)) return true;
+  if (s.id && typeof s.id === 'string' && (s.id.includes('STD-5D-3101') || s.id.includes('STD-5A-3102') || s.id.includes('STD-5B-3103') || s.id.includes('STD-5C-3104') || s.id.includes('STD-5E-3105') || s.id.includes('STD-6A-3001') || s.id.includes('STD-6B-3002') || s.id.includes('STD-6C-3003') || s.id.includes('STD-6D-3004') || s.id.includes('STD-6E-3005') || s.id === 'STD-4A-01' || s.id === 'STD-4B-02' || s.id === 'STD-4C-09')) return true;
   return false;
 }
 window.isSiswaContohDummy = isSiswaContohDummy;
@@ -24486,9 +24479,22 @@ function extractGoogleSpreadsheetId(input) {
 
 function getClassSheetsConfig() {
   try {
-    const raw = localStorage.getItem(CLASS_SHEETS_KEY);
+    let raw = localStorage.getItem(CLASS_SHEETS_KEY);
+    if (!raw) {
+      try { raw = sessionStorage.getItem(CLASS_SHEETS_KEY); } catch (e) {}
+    }
     const cfg = raw ? JSON.parse(raw) : {};
-    const masterUrl = (localStorage.getItem(SPREADSHEET_ID_KEY) || DEFAULT_MASTER_SPREADSHEET_URL || '').trim();
+    let masterUrl = '';
+    try {
+      masterUrl = (localStorage.getItem(SPREADSHEET_ID_KEY) || sessionStorage.getItem(SPREADSHEET_ID_KEY) || '').trim();
+      if (!masterUrl) {
+        const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + SPREADSHEET_ID_KEY + '=([^;]+)'));
+        if (m && m[1]) masterUrl = decodeURIComponent(m[1]).trim();
+      }
+      if (!masterUrl) masterUrl = DEFAULT_MASTER_SPREADSHEET_URL;
+    } catch (e) {
+      masterUrl = DEFAULT_MASTER_SPREADSHEET_URL;
+    }
     const merged = {};
 
     Object.keys(DEFAULT_CLASS_SHEETS_CONFIG).forEach(k => {
@@ -24509,8 +24515,11 @@ function saveClassSheetsConfig(cfg) {
   try {
     localStorage.setItem(CLASS_SHEETS_KEY, JSON.stringify(cfg));
   } catch (e) {
-    console.error('Error menyimpan konfigurasi sheet kelas:', e);
+    console.error('Error menyimpan konfigurasi sheet kelas ke localStorage:', e);
   }
+  try {
+    sessionStorage.setItem(CLASS_SHEETS_KEY, JSON.stringify(cfg));
+  } catch (e) {}
 }
 
 function getActiveSheetClassKey() {
@@ -24563,7 +24572,8 @@ function renderTabsKelasSheet() {
   if (lblActive) lblActive.innerText = `Mengatur: Kelas ${activeKey}`;
   if (lblTargetClass) lblTargetClass.innerText = `Kelas ${activeKey}`;
   if (lblTargetTab) lblTargetTab.innerText = `Kelas ${activeKey}`;
-  if (inputUrl) inputUrl.value = activeConf.sheetUrl || '';
+  const effectiveUrl = activeConf.sheetUrl || (localStorage.getItem(SPREADSHEET_ID_KEY) || sessionStorage.getItem(SPREADSHEET_ID_KEY) || DEFAULT_MASTER_SPREADSHEET_URL || '').trim();
+  if (inputUrl) inputUrl.value = effectiveUrl;
   if (inputTab) inputTab.value = activeConf.tabName || activeKey;
 
   const inputWebhook = document.getElementById('guru-webhook-url');
@@ -24577,7 +24587,7 @@ function renderTabsKelasSheet() {
   if (statusEl) {
     const db = getStudentDatabase();
     const countInDb = db.filter(s => s.kelas === activeKey).length;
-    if (activeConf.sheetUrl) {
+    if (effectiveUrl) {
       statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Terhubung: ${countInDb} Siswa (Tab: ${activeConf.tabName || activeKey})`;
       statusEl.className = 'px-3 py-2 rounded-xl text-xs bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 truncate flex items-center gap-1.5';
     } else {
@@ -24645,6 +24655,12 @@ function simpanPengaturanSheetKelasAktif() {
   // Selalu perbarui master SPREADSHEET_ID_KEY agar kelas lain otomatis mewarisi jika menggunakan 1 berkas yang sama
   if (rawUrl) {
     try { localStorage.setItem(SPREADSHEET_ID_KEY, rawUrl); } catch (e) {}
+    try { sessionStorage.setItem(SPREADSHEET_ID_KEY, rawUrl); } catch (e) {}
+    try {
+      const d = new Date();
+      d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+      document.cookie = `${SPREADSHEET_ID_KEY}=${encodeURIComponent(rawUrl)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+    } catch (e) {}
   }
 
   playSound('success');
@@ -24673,11 +24689,17 @@ function terapkanLinkKeSemuaKelas() {
 
   saveClassSheetsConfig(cfg);
   try { localStorage.setItem(SPREADSHEET_ID_KEY, rawUrl); } catch (e) {}
+  try { sessionStorage.setItem(SPREADSHEET_ID_KEY, rawUrl); } catch (e) {}
+  try {
+    const d = new Date();
+    d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+    document.cookie = `${SPREADSHEET_ID_KEY}=${encodeURIComponent(rawUrl)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+  } catch (e) {}
 
   playSound('success');
   renderTabsKelasSheet();
   renderRingkasanKoneksiKelas();
-  showToast('✅ Link Google Spreadsheet berhasil diterapkan ke seluruh 11 kelas sekaligus! ☁️🎉', 'success');
+  showToast('✅ Link Google Spreadsheet berhasil diterapkan & tersimpan permanen ke seluruh 15 kelas! ☁️🎉', 'success');
 }
 window.terapkanLinkKeSemuaKelas = terapkanLinkKeSemuaKelas;
 
