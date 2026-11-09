@@ -787,8 +787,9 @@ function setHeaderNavMode(mode) {
       } catch(eStd){}
     }
     if (activeStd && (activeStd.nama || activeStd.nis || activeStd.id)) {
+      const isKelas6 = String(activeStd.kelas || '').indexOf('6') !== -1;
       const isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1;
-      mode = isKelas5 ? 'kelas5' : 'sem1';
+      mode = isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1');
     }
   }
 
@@ -797,6 +798,7 @@ function setHeaderNavMode(mode) {
   const navSem1 = document.getElementById('navbar-tampilan-sem1');
   const navGuru = document.getElementById('navbar-tampilan-guru');
   const navKelas5 = document.getElementById('navbar-tampilan-kelas5');
+  const navKelas6 = document.getElementById('navbar-tampilan-kelas6');
   const mNavUtama = document.getElementById('m-navbar-utama');
   const mNavSem1 = document.getElementById('m-navbar-sem1');
   const mNavGuru = document.getElementById('m-navbar-guru');
@@ -804,9 +806,10 @@ function setHeaderNavMode(mode) {
   const btnLoginGuru = document.getElementById('btn-main-login-guru');
 
   if (mode === 'guru') {
-    // Mode Dasbor Guru: Sembunyikan Dock Guru, Sem1, Kelas 5 & bar strip sekunder
+    // Mode Dasbor Guru: Sembunyikan Dock Guru, Sem1, Kelas 5, Kelas 6 & bar strip sekunder
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
     if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
+    if (navKelas6) { navKelas6.classList.add('hidden'); navKelas6.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
@@ -820,12 +823,23 @@ function setHeaderNavMode(mode) {
       btnLoginGuru.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/70 border border-rose-500/60 hover:bg-rose-900/90 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
       btnLoginGuru.title = 'Keluar dari Akun Guru';
     }
+  } else if (mode === 'kelas6') {
+    // Mode Khusus Kelas 6 SD (4 Pilar Computational Thinking)
+    if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
+    if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
+    if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
+    if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
+    if (navKelas6) { navKelas6.classList.remove('hidden'); navKelas6.style.removeProperty('display'); navKelas6.style.setProperty('display', 'flex', 'important'); }
+    if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
+    if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
+    if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
   } else if (mode === 'kelas5') {
     // Mode Khusus Kelas 5 SD (4 Misi: Presentasi, Sertifikat, Poster, Scratch)
     if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
     if (navKelas5) { navKelas5.classList.remove('hidden'); navKelas5.style.removeProperty('display'); navKelas5.style.setProperty('display', 'flex', 'important'); }
+    if (navKelas6) { navKelas6.classList.add('hidden'); navKelas6.style.setProperty('display', 'none', 'important'); }
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
@@ -835,6 +849,7 @@ function setHeaderNavMode(mode) {
     if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); navSem1.style.setProperty('display', 'flex', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
     if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
+    if (navKelas6) { navKelas6.classList.add('hidden'); navKelas6.style.setProperty('display', 'none', 'important'); }
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
@@ -844,6 +859,7 @@ function setHeaderNavMode(mode) {
     if (navSem1) { navSem1.classList.add('hidden'); navSem1.style.setProperty('display', 'none', 'important'); }
     if (navGuru) { navGuru.classList.add('hidden'); navGuru.style.setProperty('display', 'none', 'important'); }
     if (navKelas5) { navKelas5.classList.add('hidden'); navKelas5.style.setProperty('display', 'none', 'important'); }
+    if (navKelas6) { navKelas6.classList.add('hidden'); navKelas6.style.setProperty('display', 'none', 'important'); }
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
@@ -1745,18 +1761,24 @@ function switchTab(tabId) {
 
   // Sinkronkan navbar:
   // 1. Jika membuka Dasbor Guru, tampilkan dock menu guru (Darningsih, S.T., Kelas 4, 5, 6, Keluar)
-  // 2. Jika membuka Portofolio Kelas 5 SD / siswa Kelas 5 aktif, tampilkan dock khusus menu Kelas 5 SD
-  // 3. Jika siswa kelas 4 login, tampilkan dock menu semester 1
-  // 4. Jika di beranda dan belum login, tampilkan navbar utama
+  // 2. Jika membuka Portofolio Kelas 6 SD / siswa Kelas 6 aktif, tampilkan dock khusus menu Kelas 6 SD (Computational Thinking)
+  // 3. Jika membuka Portofolio Kelas 5 SD / siswa Kelas 5 aktif, tampilkan dock khusus menu Kelas 5 SD
+  // 4. Jika siswa kelas 4 login, tampilkan dock menu semester 1
+  // 5. Jika di beranda dan belum login, tampilkan navbar utama
   if (tabId === 'guru' || (state.isGuruLoggedIn && tabId === 'guru')) {
     setHeaderNavMode('guru');
+  } else if (tabId === 'petualangan6') {
+    setHeaderNavMode('kelas6');
   } else if (tabId === 'petualangan5') {
     setHeaderNavMode('kelas5');
   } else {
     const student = getActiveStudentProfile();
     if (student) {
+      const isKelas6 = String(student.kelas || '').includes('6');
       const isKelas5 = String(student.kelas || '').includes('5');
-      if (isKelas5) {
+      if (isKelas6) {
+        setHeaderNavMode('kelas6');
+      } else if (isKelas5) {
         setHeaderNavMode('kelas5');
       } else {
         setHeaderNavMode('sem1');
@@ -1777,8 +1799,8 @@ function switchTab(tabId) {
     }
   }
 
-  // Daftar semua tab (termasuk Tab Petualangan Berpikir Kelas 5 SD)
-  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5'];
+  // Daftar semua tab (termasuk Tab Petualangan Kelas 5 SD & Kelas 6 SD)
+  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5', 'petualangan6'];
   if (!tabs.includes(tabId)) {
     tabId = 'beranda';
   }
@@ -18828,6 +18850,29 @@ state.selectedStudentId = null;
 // ==========================================
 const SEED_STUDENTS = [
   {
+    id: 'STD-6A-6000',
+    nis: '6000',
+    nama: 'Pelajar Uji Coba 6A',
+    kelas: '6A',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 Januari 2015',
+    kuisSem1: 0,
+    kuisSem2: 0,
+    posterWord: 0,
+    nilaiPoster: 0,
+    excelTabel: 0,
+    nilaiExcel: 0,
+    nilaiDrive: 0,
+    koleksiDrive: 0,
+    nilaiScratch: 0,
+    nilaiRoboMind: 0,
+    poinBintang: 50,
+    statusKkm: 'Tuntas',
+    catatanGuru: 'Akun Uji Coba Kelas 6 SD • 4 Pilar Computational Thinking'
+  },
+  {
     id: 'STD-4A-3000',
     nis: '3000',
     nama: 'Siswa Contoh (3000)',
@@ -20822,8 +20867,9 @@ async function loginDenganNis() {
       kelas: student.kelas || '4A',
       absen: student.absen || '01'
     };
+    const isKelas6 = String(profile.kelas || '').includes('6');
     const isKelas5 = String(profile.kelas || '').includes('5');
-    const targetTab = isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
+    const targetTab = isKelas6 ? 'petualangan6' : (isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5' && state.currentTab !== 'petualangan6') ? state.currentTab : 'beranda'));
     saveActiveStudentSession(profile, targetTab);
 
     state.userPoints = student.poinBintang || 0;
@@ -20837,7 +20883,7 @@ async function loginDenganNis() {
 
     // Jalankan pembaruan UI secara aman
     try { muatProfilSiswa(); } catch (eUI) { console.warn('UI update muatProfilSiswa:', eUI); }
-    try { setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1'); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
+    try { setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1')); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
     try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (eUI) {}
     try { switchTab(targetTab); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
 
@@ -20849,9 +20895,10 @@ async function loginDenganNis() {
     if (activeSession && String(activeSession.nis).trim() === String(nisVal).trim()) {
       tutupModalProfilSiswa();
       try {
+        const isK6 = String(activeSession.kelas || '').includes('6');
         const isK5 = String(activeSession.kelas || '').includes('5');
-        const targetTab = isK5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
-        setHeaderNavMode(isK5 ? 'kelas5' : 'sem1');
+        const targetTab = isK6 ? 'petualangan6' : (isK5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5' && state.currentTab !== 'petualangan6') ? state.currentTab : 'beranda'));
+        setHeaderNavMode(isK6 ? 'kelas6' : (isK5 ? 'kelas5' : 'sem1'));
         switchTab(targetTab);
       } catch (e) {}
     } else {
@@ -21066,8 +21113,9 @@ function pilihSiswaDariDropdown(studentId) {
     kelas: student.kelas,
     absen: student.absen
   };
+  const isKelas6 = String(profile.kelas || '').includes('6');
   const isKelas5 = String(profile.kelas || '').includes('5');
-  const targetTab = isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5') ? state.currentTab : 'beranda');
+  const targetTab = isKelas6 ? 'petualangan6' : (isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5' && state.currentTab !== 'petualangan6') ? state.currentTab : 'beranda'));
   saveActiveStudentSession(profile, targetTab);
 
   // Perbarui poin aktif sesuai poin tersimpan siswa
@@ -21078,7 +21126,7 @@ function pilihSiswaDariDropdown(studentId) {
   if (p2) p2.innerText = state.userPoints;
 
   muatProfilSiswa();
-  setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1');
+  setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1'));
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTab);
@@ -21370,8 +21418,9 @@ function muatProfilSiswa() {
     if (heroGuestBtn) heroGuestBtn.classList.add('hidden');
     const cardsSiswa = document.getElementById('beranda-fitur-cards-siswa');
     if (cardsSiswa) cardsSiswa.classList.remove('hidden');
+    const isKelas6 = String(profile.kelas || '').includes('6');
     const isKelas5 = String(profile.kelas || '').includes('5');
-    setHeaderNavMode(isKelas5 ? 'kelas5' : 'sem1');
+    setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1'));
     if (welcomeAvatar) {
       welcomeAvatar.innerText = profile.nama ? profile.nama.charAt(0).toUpperCase() : 'S';
       welcomeAvatar.className = 'w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center font-black text-base shadow-md flex-shrink-0';
@@ -21380,7 +21429,7 @@ function muatProfilSiswa() {
     if (welcomePing) welcomePing.classList.remove('hidden');
     if (welcomeNama) welcomeNama.innerText = profile.nama || 'Siswa';
     if (welcomeKelas) {
-      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas5 ? '5D' : '4A')} • Absen ${profile.absen || '-'}`;
+      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas6 ? '6A' : (isKelas5 ? '5D' : '4A'))} • Absen ${profile.absen || '-'}`;
       welcomeKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
     }
 
@@ -25283,7 +25332,31 @@ async function cekNisGoogleSheet(nisVal) {
   if (!nisVal) return null;
   const targetVal = String(nisVal).trim().toLowerCase();
 
-  // 1. Khusus test student NIS 3000 (Cepat, Tanpa Menunggu Jaringan Google Sheet)
+  // 1. Khusus test student NIS 6000 (Kelas 6 Uji Coba CT) & 3000 (Kelas 4 Uji Coba)
+  if (targetVal === '6000') {
+    const testSiswa6 = {
+      id: 'STD-6A-6000',
+      nis: '6000',
+      nama: 'Pelajar Uji Coba 6A',
+      kelas: '6A',
+      absen: '01',
+      statusKkm: 'Tuntas',
+      poinBintang: 50,
+      catatanGuru: 'Akun Uji Coba Kelas 6 SD • 4 Pilar Computational Thinking'
+    };
+    try {
+      let db = getStudentDatabase();
+      const existIdx = db.findIndex(s => String(s.nis || '').trim() === '6000');
+      if (existIdx >= 0) {
+        db[existIdx] = { ...db[existIdx], ...testSiswa6 };
+      } else {
+        db.push(testSiswa6);
+      }
+      saveStudentDatabase(db);
+    } catch (eDb) {}
+    return testSiswa6;
+  }
+
   if (targetVal === '3000') {
     const testSiswa = {
       id: 'STD-4A-3000',
@@ -25913,6 +25986,24 @@ window.ujiKirimWebhookGuru = typeof ujiKirimWebhookGuru === 'function' ? ujiKiri
 window.bukaKuisAtauSertifikatSiswa = typeof bukaKuisAtauSertifikatSiswa === 'function' ? bukaKuisAtauSertifikatSiswa : function(){};
 window.bukaRoboMindLangsung = typeof bukaRoboMindLangsung === 'function' ? bukaRoboMindLangsung : function(){};
 window.bukaPetualanganZona = typeof bukaPetualanganZona === 'function' ? bukaPetualanganZona : function(z){ if(typeof switchTab==='function')switchTab('petualangan5'); };
+window.bukaPetualangan6Zona = typeof bukaPetualangan6Zona === 'function' ? bukaPetualangan6Zona : function(z){ if(typeof switchTab==='function')switchTab('petualangan6'); };
+
+window.masukCepatKelas6 = function() {
+  const testSiswa6 = {
+    id: 'STD-6A-6000',
+    nis: '6000',
+    nama: 'Pelajar Uji Coba 6A',
+    kelas: '6A',
+    absen: '01'
+  };
+  saveActiveStudentSession(testSiswa6, 'petualangan6');
+  state.userPoints = 50;
+  tutupModalProfilSiswa();
+  muatProfilSiswa();
+  setHeaderNavMode('kelas6');
+  switchTab('petualangan6');
+  showToast('Berhasil masuk sebagai Pelajar Uji Coba 6A (Fase C • Computational Thinking)! 🚀💡', 'success');
+};
 window.setPraktikSubtab = typeof setPraktikSubtab === 'function' ? setPraktikSubtab : function(){};
 window.bukaModulDetail = typeof bukaModulDetail === 'function' ? bukaModulDetail : function(){};
 window.gulirKeTabelProta = typeof gulirKeTabelProta === 'function' ? gulirKeTabelProta : function(){};
@@ -25967,14 +26058,20 @@ window.addEventListener('load', function() {
           }
         } catch (eSyncEarly) {}
 
+        const isKelas6 = String(student.kelas || '').includes('6');
         const isKelas5 = String(student.kelas || '').includes('5');
-        if (isKelas5) {
+        if (isKelas6) {
+          setHeaderNavMode('kelas6');
+          muatProfilSiswa();
+          switchTab('petualangan6');
+        } else if (isKelas5) {
           setHeaderNavMode('kelas5');
           muatProfilSiswa();
           switchTab('petualangan5');
         } else {
           setHeaderNavMode('sem1');
           muatProfilSiswa();
+        }
           let savedTab = 'beranda';
           try { savedTab = localStorage.getItem('educode_student_active_tab_v1') || 'beranda'; } catch (eTab) {}
           if (!savedTab || savedTab === 'guru' || savedTab === 'petualangan5') savedTab = 'beranda';

@@ -167,8 +167,9 @@
             } catch(eStd){}
           }
           if (activeStd && (activeStd.nama || activeStd.nis || activeStd.id)) {
+            var isKelas6 = String(activeStd.kelas || '').indexOf('6') !== -1;
             var isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1;
-            mode = isKelas5 ? 'kelas5' : 'sem1';
+            mode = isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1');
           }
         }
 
@@ -176,6 +177,7 @@
         var s1 = document.getElementById('navbar-tampilan-sem1');
         var g = document.getElementById('navbar-tampilan-guru');
         var k5 = document.getElementById('navbar-tampilan-kelas5');
+        var k6 = document.getElementById('navbar-tampilan-kelas6');
         var mu = document.getElementById('m-navbar-utama');
         var ms1 = document.getElementById('m-navbar-sem1');
         var mg = document.getElementById('m-navbar-guru');
@@ -190,6 +192,7 @@
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
           if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
+          if (k6) { k6.classList.add('hidden'); k6.style.setProperty('display', 'none', 'important'); }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket text-rose-400 pointer-events-none"></i><span class="text-rose-200 font-title font-bold pointer-events-none">Keluar Guru</span>';
@@ -197,22 +200,31 @@
             btnLg.className = 'px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm text-rose-200 bg-rose-950/70 border border-rose-500/60 hover:bg-rose-900/90 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md select-none transition';
             btnLg.title = 'Keluar dari Akun Guru';
           }
+        } else if (mode === 'kelas6') {
+          if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
+          if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
+          if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
+          if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
+          if (k6) { k6.classList.remove('hidden'); k6.style.removeProperty('display'); k6.style.setProperty('display', 'flex', 'important'); }
         } else if (mode === 'kelas5') {
           if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
           if (k5) { k5.classList.remove('hidden'); k5.style.removeProperty('display'); k5.style.setProperty('display', 'flex', 'important'); }
+          if (k6) { k6.classList.add('hidden'); k6.style.setProperty('display', 'none', 'important'); }
         } else if (mode === 'sem1') {
           if (u) { u.classList.add('hidden'); u.style.setProperty('display', 'none', 'important'); }
           if (s1) { s1.classList.remove('hidden'); s1.style.removeProperty('display'); s1.style.setProperty('display', 'flex', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
           if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
+          if (k6) { k6.classList.add('hidden'); k6.style.setProperty('display', 'none', 'important'); }
         } else {
           // Mode Utama (Tamu / Guest)
           if (u) { u.classList.remove('hidden'); u.style.removeProperty('display'); u.style.setProperty('display', 'flex', 'important'); }
           if (s1) { s1.classList.add('hidden'); s1.style.setProperty('display', 'none', 'important'); }
           if (g) { g.classList.add('hidden'); g.style.setProperty('display', 'none', 'important'); }
           if (k5) { k5.classList.add('hidden'); k5.style.setProperty('display', 'none', 'important'); }
+          if (k6) { k6.classList.add('hidden'); k6.style.setProperty('display', 'none', 'important'); }
           var btnLg = document.getElementById('btn-main-login-guru');
           if (btnLg) {
             btnLg.innerHTML = '<i class="fa-solid fa-chalkboard-user text-amber-400 text-sm pointer-events-none"></i><span class="text-amber-200 font-title font-bold pointer-events-none">Login Guru</span>';
@@ -337,6 +349,7 @@
             window.__ACTIVE_STUDENT_RESTORED__ = s;
             window.__ACTIVE_STUDENT_PROFILE__ = s;
 
+            var isKelas6 = String(s.kelas || '').indexOf('6') !== -1;
             var isKelas5 = String(s.kelas || '').indexOf('5') !== -1;
             var isSem2Open = false;
             try { isSem2Open = localStorage.getItem('educode_semester_2_unlocked_v1') === 'true'; } catch(e) {}
@@ -344,13 +357,33 @@
             // Injeksi style seawal mungkin ke <head> agar peramban langsung menampilkan dock siswa dan menyembunyikan menu tamu sejak frame pertama reload F5
             var style = document.createElement('style');
             style.id = 'style-early-student-session';
-            if (isKelas5) {
+            if (isKelas6) {
               style.innerHTML = `
                 #navbar-tampilan-utama { display: none !important; }
                 #navbar-tampilan-sem1 { display: none !important; }
+                #navbar-tampilan-kelas5 { display: none !important; }
+                #navbar-tampilan-kelas6 { display: flex !important; pointer-events: auto !important; }
+                #navbar-tampilan-kelas6 * { pointer-events: auto !important; }
+                #tab-beranda { display: none !important; }
+                #tab-petualangan5 { display: none !important; }
+                #tab-petualangan6 { display: block !important; }
+                #btn-welcome-login { display: none !important; }
+                #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
+                  display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
+                }
+              `;
+            } else if (isKelas5) {
+              style.innerHTML = `
+                #navbar-tampilan-utama { display: none !important; }
+                #navbar-tampilan-sem1 { display: none !important; }
+                #navbar-tampilan-kelas6 { display: none !important; }
                 #navbar-tampilan-kelas5 { display: flex !important; pointer-events: auto !important; }
                 #navbar-tampilan-kelas5 * { pointer-events: auto !important; }
                 #tab-beranda { display: none !important; }
+                #tab-petualangan6 { display: none !important; }
                 #tab-petualangan5 { display: block !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
@@ -366,6 +399,8 @@
                 #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
                 #navbar-tampilan-sem1 * { pointer-events: auto !important; }
                 #navbar-tampilan-kelas5 { display: none !important; }
+                #navbar-tampilan-kelas6 { display: none !important; }
+                #tab-petualangan6 { display: none !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
@@ -1372,6 +1407,60 @@
 
           <!-- Tombol Keluar Siswa Kelas 5 -->
           <button type="button" onclick="konfirmasiKeluarSiswa()" id="nav-p5-keluar" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-300 hover:text-white shrink-0 cursor-pointer" title="Keluar dari Akun Siswa">
+            <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> <span class="hidden sm:inline">Keluar</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- TAMPILAN MENU KHUSUS KELAS 6 SD (COMPUTATIONAL THINKING)   -->
+      <!-- 4 Pilar: 1. Dekomposisi | 2. Pola | 3. Abstraksi | 4. Algoritma -->
+      <!-- ======================================================== -->
+      <div id="navbar-tampilan-kelas6" class="hidden flex items-center justify-end">
+        <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
+          <!-- 1. Tombol Kembali ke Beranda -->
+          <button type="button" onclick="switchTab('beranda')" id="nav-p6-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kembali ke Beranda LMS">
+            <i class="fa-solid fa-arrow-left text-[#38bdf8] icon-3d-glow"></i> <span>Beranda</span>
+          </button>
+
+          <!-- Label Kelas 6 SD -->
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 font-title font-black text-[11px] uppercase border border-emerald-400/40 shrink-0 hidden md:inline-flex items-center gap-1">
+            <i class="fa-solid fa-brain text-yellow-300"></i> Kelas 6 SD • CT
+          </span>
+
+          <!-- Menu 1: Dekomposisi -->
+          <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" id="nav-p6-dekomposisi" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-white shrink-0 cursor-pointer" title="Pilar 1: Dekomposisi (Memecah Masalah)">
+            <i class="fa-solid fa-puzzle-piece text-sky-300 icon-3d-glow"></i> <span>1. Dekomposisi</span>
+          </button>
+
+          <!-- Menu 2: Pengenalan Pola -->
+          <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" id="nav-p6-pola" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Pilar 2: Pengenalan Pola (Menemukan Kesamaan)">
+            <i class="fa-solid fa-shapes text-emerald-300 icon-3d-glow"></i> <span>2. Pola</span>
+          </button>
+
+          <!-- Menu 3: Abstraksi -->
+          <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" id="nav-p6-abstraksi" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Pilar 3: Abstraksi (Memilih Informasi Pokok)">
+            <i class="fa-solid fa-filter text-amber-300 icon-3d-glow"></i> <span>3. Abstraksi</span>
+          </button>
+
+          <!-- Menu 4: Algoritma -->
+          <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" id="nav-p6-algoritma" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Pilar 4: Algoritma (Urutan Langkah Logis)">
+            <i class="fa-solid fa-paper-plane text-orange-300 icon-3d-glow"></i> <span>4. Algoritma</span>
+          </button>
+
+          <!-- Sound Orb -->
+          <button type="button" onclick="toggleAudioNarration()" title="Suara Narator" class="btn-sound-3d shrink-0">
+            <i class="fa-solid fa-volume-high text-xs"></i>
+          </button>
+
+          <!-- Poin Bintang 3D Badge -->
+          <div class="badge-points-3d shrink-0" title="Total Poin Komputasi Kelas 6">
+            <i class="fa-solid fa-star text-yellow-300 text-xs"></i>
+            <span id="user-points-kelas6">4 Pilar</span>
+          </div>
+
+          <!-- Tombol Keluar Siswa Kelas 6 -->
+          <button type="button" onclick="konfirmasiKeluarSiswa()" id="nav-p6-keluar" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-300 hover:text-white shrink-0 cursor-pointer" title="Keluar dari Akun Siswa">
             <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> <span class="hidden sm:inline">Keluar</span>
           </button>
         </nav>
@@ -2879,7 +2968,1120 @@
 
     </section>
 
-    <!-- INLINE SCRIPT INTERAKTIF KHUSUS 4 MENU KELAS 5 SD (PERSISTENSI & HANDLERS) -->
+    <!-- ======================================================== -->
+    <!-- TAB KHUSUS: 4 PILAR COMPUTATIONAL THINKING KELAS 6 SD    -->
+    <!-- Panduan untuk Siswa Kelas 6 SD:                          -->
+    <!-- 1. Dekomposisi (Memecah Masalah)                         -->
+    <!-- 2. Pengenalan Pola (Menemukan Kesamaan)                  -->
+    <!-- 3. Abstraksi (Memilih Informasi)                         -->
+    <!-- 4. Algoritma (Urutan Langkah)                            -->
+    <!-- "Mari Kita Berpikir Seperti Ahli Komputer!"              -->
+    <!-- ======================================================== -->
+    <section id="tab-petualangan6" class="hidden space-y-6 animate-fadeIn select-none">
+      
+      <!-- HERO HEADER KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-emerald-950 border-2 border-emerald-400/40 p-6 sm:p-8 text-white shadow-2xl">
+        <!-- Ornamen Visual Latar Belakang -->
+        <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-4 right-1/4 text-yellow-300 text-2xl pointer-events-none animate-pulse">💡</div>
+        <div class="absolute bottom-6 left-1/4 text-cyan-300 text-xl pointer-events-none animate-bounce">🤖</div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-3 max-w-3xl">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Fase C • Kelas 6 SD
+              </span>
+              <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-microchip"></i> Informatika &amp; Berpikir Komputasional
+              </span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-title font-black tracking-tight text-white leading-tight">
+              4 Pilar Computational Thinking <span class="text-emerald-400 block sm:inline">(Kelas 6 SD)</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+              <span class="text-yellow-300 font-bold">&ldquo;Mari Kita Berpikir Seperti Ahli Komputer!&rdquo;</span> Pelajari 4 senjata rahasia ahli komputer untuk memecahkan masalah sehari-hari secara cerdas, sistematis, dan terstruktur.
+            </p>
+
+            <!-- Status Progres Siswa Kelas 6 -->
+            <div class="pt-2 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-300">
+              <div class="flex items-center gap-2 bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-700">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Akun Aktif: <strong class="text-emerald-300" id="label-siswa-aktif-k6">Pelajar Kelas 6</strong></span>
+              </div>
+              <div class="flex items-center gap-2 bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-700">
+                <i class="fa-solid fa-cloud text-sky-400"></i>
+                <span id="label-cloud-status-k6">Tersinkron Cloud Server</span>
+              </div>
+              <div class="flex items-center gap-2 bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-700">
+                <i class="fa-solid fa-star text-yellow-300"></i>
+                <span id="label-poin-ct-k6">Total Poin: 0 Bintang</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Pintas Sinkronisasi Cloud Antar-PC Kelas 6 -->
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full sm:w-auto shrink-0">
+            <button type="button" onclick="window.sinkronCloudKelas6()" id="btn-sync-cloud-k6" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-rotate text-yellow-300"></i> <span>⚡ Sinkron Cloud Antar-PC</span>
+            </button>
+            <button type="button" onclick="window.resetMisiKelas6()" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 font-title font-bold text-xs border border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-arrows-rotate text-slate-400"></i> <span>Muat Ulang Misi</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KARTU MENU NAVIGASI DOCK PILAR COMPUTATIONAL THINKING KELAS 6 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-slate-800/80">
+          
+          <!-- Kartu Menu 1: Dekomposisi -->
+          <button type="button" onclick="window.bukaPetualangan6Zona('zona-dekomposisi')" id="btn-dock-p6-dekomposisi" class="dock-p6-card p-3.5 sm:p-4 rounded-2xl bg-sky-950/60 border-2 border-sky-400 text-left transition transform hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between cursor-pointer group">
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-300 flex items-center justify-center text-xl font-black group-hover:scale-110 transition">
+                🧩
+              </span>
+              <span id="badge-p6-status-dekomposisi" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">Materi 1</span>
+            </div>
+            <div class="mt-2.5">
+              <div class="text-[11px] font-bold text-sky-400 uppercase tracking-wider">1. DEKOMPOSISI</div>
+              <div class="font-title font-bold text-sm sm:text-base text-white">Memecah Masalah</div>
+              <div class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">Membagi rumit jadi kecil</div>
+            </div>
+          </button>
+
+          <!-- Kartu Menu 2: Pengenalan Pola -->
+          <button type="button" onclick="window.bukaPetualangan6Zona('zona-pola')" id="btn-dock-p6-pola" class="dock-p6-card p-3.5 sm:p-4 rounded-2xl bg-slate-900/60 border border-emerald-500/40 text-left transition transform hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between cursor-pointer group">
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xl font-black group-hover:scale-110 transition">
+                🔍
+              </span>
+              <span id="badge-p6-status-pola" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">Materi 2</span>
+            </div>
+            <div class="mt-2.5">
+              <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">2. PENGENALAN POLA</div>
+              <div class="font-title font-bold text-sm sm:text-base text-white">Menemukan Kesamaan</div>
+              <div class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">Keteraturan &amp; sortir tren</div>
+            </div>
+          </button>
+
+          <!-- Kartu Menu 3: Abstraksi -->
+          <button type="button" onclick="window.bukaPetualangan6Zona('zona-abstraksi')" id="btn-dock-p6-abstraksi" class="dock-p6-card p-3.5 sm:p-4 rounded-2xl bg-slate-900/60 border border-amber-500/40 text-left transition transform hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between cursor-pointer group">
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-xl font-black group-hover:scale-110 transition">
+                🗺️
+              </span>
+              <span id="badge-p6-status-abstraksi" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">Materi 3</span>
+            </div>
+            <div class="mt-2.5">
+              <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">3. ABSTRAKSI</div>
+              <div class="font-title font-bold text-sm sm:text-base text-white">Memilih Informasi</div>
+              <div class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">Fokus pada inti masalah</div>
+            </div>
+          </button>
+
+          <!-- Kartu Menu 4: Algoritma -->
+          <button type="button" onclick="window.bukaPetualangan6Zona('zona-algoritma')" id="btn-dock-p6-algoritma" class="dock-p6-card p-3.5 sm:p-4 rounded-2xl bg-slate-900/60 border border-orange-500/40 text-left transition transform hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between cursor-pointer group">
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-300 flex items-center justify-center text-xl font-black group-hover:scale-110 transition">
+                ✈️
+              </span>
+              <span id="badge-p6-status-algoritma" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">Materi 4</span>
+            </div>
+            <div class="mt-2.5">
+              <div class="text-[11px] font-bold text-orange-400 uppercase tracking-wider">4. ALGORITMA</div>
+              <div class="font-title font-bold text-sm sm:text-base text-white">Urutan Langkah</div>
+              <div class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">Instruksi logis berurutan</div>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 1: DEKOMPOSISI (MEMECAH MASALAH)                    -->
+      <!-- Masalah besar jadi lebih mudah? Pecah saja!              -->
+      <!-- Membagi masalah rumit menjadi bagian lebih kecil & dikelola -->
+      <!-- Contoh: Merencanakan liburan keluarga:                   -->
+      <!-- 1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan -->
+      <!-- ======================================================== -->
+      <div id="p6-zona-dekomposisi" class="p6-zona-content space-y-5">
+        <div class="bg-white rounded-3xl border border-sky-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          
+          <!-- Banner Pilar 1 -->
+          <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">
+                🧩
+              </div>
+              <div>
+                <span class="text-[11px] font-bold text-sky-600 uppercase tracking-wider bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1 • Computational Thinking
+                </span>
+                <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">1. DEKOMPOSISI (MEMECAH)</h3>
+                <p class="text-xs text-slate-500">Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-puzzle-piece text-sky-500"></i> &ldquo;Pecah Saja Masalahnya!&rdquo;
+              </span>
+            </div>
+          </div>
+
+          <!-- Infografis Konsep & Contoh Nyata (Persis Berdasarkan Gambar Panduan) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <!-- Penjelasan Konsep -->
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-sky-50 to-blue-50/50 border border-sky-200 space-y-3">
+              <div class="flex items-center gap-2 text-sky-800 font-title font-bold text-sm sm:text-base">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i> Konsep Utama Dekomposisi:
+              </div>
+              <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                <strong>Masalah besar jadi lebih mudah? Pecah saja!</strong><br>
+                Dekomposisi adalah teknik memecah suatu masalah yang besar atau rumit menjadi bagian-bagian sub-masalah yang lebih kecil, sederhana, dan terpisah agar mudah dipahami serta dikerjakan satu per satu.
+              </p>
+              <div class="p-3 bg-white rounded-2xl border border-sky-100 text-xs text-slate-600 space-y-1">
+                <div class="font-bold text-sky-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-robot text-sky-600"></i> Mengapa Ahli Komputer Memakai Dekomposisi?
+                </div>
+                <p>Komputer tidak bisa langsung menyelesaikan program raksasa sekaligus. Programmer memecah program menjadi fungsi-fungsi kecil!</p>
+              </div>
+            </div>
+
+            <!-- Contoh Nyata Sesuai Gambar -->
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-emerald-800 font-title font-bold text-sm sm:text-base">
+                  <i class="fa-solid fa-plane-departure text-emerald-600"></i> Contoh Nyata di Kehidupan:
+                </div>
+                <span class="text-[11px] font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Liburan Keluarga 🌍
+                </span>
+              </div>
+              <p class="text-xs text-slate-700 font-medium">
+                Contoh: <strong>Merencanakan liburan keluarga</strong>. Masalah ini terlalu besar jika dipikirkan sekaligus. Kita dekomposisi dengan membagi tugas:
+              </p>
+              <div class="space-y-2 text-xs">
+                <div class="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-emerald-100 text-slate-700 shadow-2xs">
+                  <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                  <span><strong>Pesan tiket</strong> (pesawat, kereta, atau bensin mobil)</span>
+                </div>
+                <div class="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-emerald-100 text-slate-700 shadow-2xs">
+                  <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                  <span><strong>Siapkan koper</strong> (baju ganti, obat, charger)</span>
+                </div>
+                <div class="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-emerald-100 text-slate-700 shadow-2xs">
+                  <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                  <span><strong>Pilih tempat yang mau dikunjungi</strong> (pantai, museum, taman)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIMULASI PRAKTIK INTERAKTIF DEKOMPOSISI -->
+          <div class="p-5 rounded-3xl bg-slate-900 text-white border-2 border-sky-400/50 shadow-inner space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2 font-title font-bold text-sm sm:text-base text-yellow-300">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Laboratorium Interaktif: Pemecah Masalah (Problem Decomposer)</span>
+              </div>
+              <span class="text-xs text-slate-300">Pilih skenario lalu pecah masalahnya!</span>
+            </div>
+
+            <!-- Pemilih Skenario Masalah -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <button type="button" onclick="window.pilihSkenarioDekomposisi('liburan')" id="btn-skenario-liburan" class="p-2.5 rounded-xl bg-sky-600 text-white font-title font-bold text-xs border border-sky-400 flex items-center justify-center gap-1.5 cursor-pointer transition">
+                <span>🏖️ 1. Liburan Keluarga</span>
+              </button>
+              <button type="button" onclick="window.pilihSkenarioDekomposisi('pameran')" id="btn-skenario-pameran" class="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-title font-bold text-xs border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition">
+                <span>🎪 2. Festival Budaya Sekolah</span>
+              </button>
+              <button type="button" onclick="window.pilihSkenarioDekomposisi('kamar')" id="btn-skenario-kamar" class="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-title font-bold text-xs border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition">
+                <span>🧹 3. Merapikan Kamar Tidur</span>
+              </button>
+            </div>
+
+            <!-- Tampilan Pohon Dekomposisi Interaktif -->
+            <div id="box-visual-dekomposisi" class="p-4 rounded-2xl bg-slate-950/80 border border-sky-500/30 space-y-3">
+              <div class="text-center pb-2 border-b border-slate-800">
+                <span class="text-[11px] text-sky-400 font-bold uppercase tracking-wider">Masalah Utama yang Rumit:</span>
+                <h4 id="judul-masalah-besar-k6" class="font-title font-black text-lg text-yellow-300">Merencanakan Liburan Keluarga yang Menyenangkan</h4>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1" id="wadah-subtugas-k6">
+                <!-- Otomatis diisi oleh JS -->
+              </div>
+            </div>
+
+            <!-- Lembar Tantangan Siswa Mandiri -->
+            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3 text-xs">
+              <div class="font-title font-bold text-emerald-300 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> <span>Misi Siswa: Dekomposisi Masalahmu Sendiri!</span>
+              </div>
+              <p class="text-slate-300">Tuliskan 1 masalah besar di sekolah atau rumahmu, lalu pecah menjadi 3 sub-tugas kecil yang mudah dikerjakan:</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="space-y-1.5">
+                  <label class="block font-bold text-slate-300">Masalah Besar / Judul Proyek:</label>
+                  <input type="text" id="input-k6-dekomposisi-judul" placeholder="Contoh: Membuat Video Tugas Presentasi Kelompok" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block font-bold text-slate-300">Pecahan 1 (Sub-Tugas Awal):</label>
+                  <input type="text" id="input-k6-dekomposisi-p1" placeholder="Contoh: 1. Menentukan tema & naskah cerita" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block font-bold text-slate-300">Pecahan 2 (Sub-Tugas Inti):</label>
+                  <input type="text" id="input-k6-dekomposisi-p2" placeholder="Contoh: 2. Rekam video & bagi tugas peran" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block font-bold text-slate-300">Pecahan 3 (Sub-Tugas Akhir):</label>
+                  <input type="text" id="input-k6-dekomposisi-p3" placeholder="Contoh: 3. Edit video & unggah ke guru" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol Simpan & Kirim Cloud -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <span class="text-xs text-slate-400" id="status-simpan-dekomposisi">
+                Status: Lengkapi pecahan masalah dan simpan ke Cloud.
+              </span>
+              <button type="button" onclick="window.simpanMisiKomputasiKelas6('dekomposisi')" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan Misi 1 (Dekomposisi) 🚀 (+25 Poin)</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 2: PENGENALAN POLA (MENEMUKAN KESAMAAN)             -->
+      <!-- Melihat persamaan!                                       -->
+      <!-- Menemukan keteraturan atau tren dalam berbagai masalah / data -->
+      <!-- Contoh: Mengelompokkan mainan (Boneka di satu kotak,      -->
+      <!-- mobil-mobilan di kotak lain, blok bangunan di kotak ketiga) -->
+      <!-- ======================================================== -->
+      <div id="p6-zona-pola" class="p6-zona-content hidden space-y-5">
+        <div class="bg-white rounded-3xl border border-emerald-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          
+          <!-- Banner Pilar 2 -->
+          <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">
+                🔍
+              </div>
+              <div>
+                <span class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2 • Computational Thinking
+                </span>
+                <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">2. PENGENALAN POLA (MENEMUKAN KESAMAAN)</h3>
+                <p class="text-xs text-slate-500">Menemukan keteraturan atau tren dalam berbagai masalah atau data.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-shapes text-emerald-500"></i> &ldquo;Melihat Persamaan &amp; Keteraturan!&rdquo;
+              </span>
+            </div>
+          </div>
+
+          <!-- Infografis Konsep & Contoh Nyata Sesuai Gambar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200 space-y-3">
+              <div class="flex items-center gap-2 text-emerald-800 font-title font-bold text-sm sm:text-base">
+                <i class="fa-solid fa-brain text-emerald-600"></i> Konsep Pengenalan Pola (Pattern Recognition):
+              </div>
+              <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                <strong>Melihat persamaan!</strong><br>
+                Saat kita mengamati beberapa masalah atau data, kita mencari kemiripan, kesamaan ciri, atau pola yang berulang. Jika kita mengenali pola dari masalah sebelumnya, kita bisa menggunakan solusi yang sama untuk masalah baru!
+              </p>
+              <div class="p-3 bg-white rounded-2xl border border-emerald-100 text-xs text-slate-600 space-y-1">
+                <div class="font-bold text-emerald-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-microchip text-emerald-600"></i> Penerapan di Komputer &amp; AI:
+                </div>
+                <p>AI pengenal wajah mendeteksi pola mata, hidung, dan senyum. Mesin pencari Google mengenali pola kata kunci yang sering dicari!</p>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-amber-800 font-title font-bold text-sm sm:text-base">
+                  <i class="fa-solid fa-box-open text-amber-600"></i> Contoh Nyata Sesuai Gambar:
+                </div>
+                <span class="text-[11px] font-bold text-amber-700 bg-white px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Mengelompokkan Mainan 🧸
+                </span>
+              </div>
+              <p class="text-xs text-slate-700 font-medium">
+                Contoh: <strong>Mengelompokkan mainan yang berserakan</strong> berdasarkan pola ciri dan fungsinya ke wadah masing-masing:
+              </p>
+              <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                <div class="p-3 rounded-2xl bg-white border border-amber-200 shadow-2xs space-y-1">
+                  <div class="text-2xl">🧸</div>
+                  <b class="text-amber-950 block text-[11px]">Kotak 1</b>
+                  <p class="text-[10px] text-slate-500">Boneka &amp; Hewan Lucu</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-white border border-amber-200 shadow-2xs space-y-1">
+                  <div class="text-2xl">🚗</div>
+                  <b class="text-amber-950 block text-[11px]">Kotak 2</b>
+                  <p class="text-[10px] text-slate-500">Mobil-mobilan &amp; Roda</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-white border border-amber-200 shadow-2xs space-y-1">
+                  <div class="text-2xl">🧱</div>
+                  <b class="text-amber-950 block text-[11px]">Kotak 3</b>
+                  <p class="text-[10px] text-slate-500">Blok Bangunan / Lego</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MINI-GAME INTERAKTIF SORTIR POLA MAINAN -->
+          <div class="p-5 rounded-3xl bg-slate-900 text-white border-2 border-emerald-400/50 shadow-inner space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2 font-title font-bold text-sm sm:text-base text-yellow-300">
+                <i class="fa-solid fa-gamepad"></i> <span>Game Interaktif: Sortir Mainan Sesuai Pola Kotak!</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700">Skor Sortir: <strong class="text-emerald-400" id="game-pola-skor">0</strong>/6</span>
+                <button type="button" onclick="window.resetGameSortirPola()" class="text-xs text-sky-400 hover:underline">Ulangi Game</button>
+              </div>
+            </div>
+
+            <!-- Kartu Item Mainan Aktif yang Harus Disortir -->
+            <div class="p-4 rounded-2xl bg-slate-950/80 border border-emerald-500/30 text-center space-y-2">
+              <span class="text-[11px] text-slate-400 uppercase tracking-wider">Mainan yang Sedang Muncul:</span>
+              <div class="text-4xl animate-bounce" id="item-mainan-icon">🧸</div>
+              <div class="font-title font-black text-base text-white" id="item-mainan-nama">Boneka Beruang Cokelat</div>
+              <p class="text-xs text-slate-400">Klik kotak kategori di bawah yang cocok dengan pola mainan ini:</p>
+            </div>
+
+            <!-- 3 Wadah Kotak Sasaran -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button type="button" onclick="window.tebakKotakPola('boneka')" class="p-4 rounded-2xl bg-pink-950/60 border-2 border-pink-400/60 hover:border-pink-300 hover:bg-pink-900/60 text-center transition cursor-pointer group active:scale-95">
+                <div class="text-3xl mb-1 group-hover:scale-110 transition">🧸</div>
+                <div class="font-title font-bold text-sm text-pink-200">Kotak 1: Boneka</div>
+                <div class="text-[11px] text-slate-300 mt-0.5">Koleksi boneka, kain, dan bantal</div>
+              </button>
+
+              <button type="button" onclick="window.tebakKotakPola('mobil')" class="p-4 rounded-2xl bg-cyan-950/60 border-2 border-cyan-400/60 hover:border-cyan-300 hover:bg-cyan-900/60 text-center transition cursor-pointer group active:scale-95">
+                <div class="text-3xl mb-1 group-hover:scale-110 transition">🚗</div>
+                <div class="font-title font-bold text-sm text-cyan-200">Kotak 2: Mobil-mobilan</div>
+                <div class="text-[11px] text-slate-300 mt-0.5">Kendaraan, roda, helikopter, trek</div>
+              </button>
+
+              <button type="button" onclick="window.tebakKotakPola('blok')" class="p-4 rounded-2xl bg-amber-950/60 border-2 border-amber-400/60 hover:border-amber-300 hover:bg-amber-900/60 text-center transition cursor-pointer group active:scale-95">
+                <div class="text-3xl mb-1 group-hover:scale-110 transition">🧱</div>
+                <div class="font-title font-bold text-sm text-amber-200">Kotak 3: Blok Bangunan</div>
+                <div class="text-[11px] text-slate-300 mt-0.5">Lego susun, balok kayu geometri</div>
+              </button>
+            </div>
+
+            <!-- Input Refleksi Pola Siswa -->
+            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
+              <label class="block font-bold text-emerald-300">
+                <i class="fa-solid fa-pen"></i> Tuliskan 1 Pola / Kebiasaan yang Selalu Berulang di Kelas atau Rumahmu:
+              </label>
+              <input type="text" id="input-k6-pola-refleksi" placeholder="Contoh: Setiap pagi hari, pola rutinitas saya: merapikan tempat tidur, mandi, lalu berdoa sebelum sarapan." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <!-- Tombol Simpan -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <span class="text-xs text-slate-400" id="status-simpan-pola">
+                Status: Selesaikan game sortir pola atau isi refleksi untuk menyimpan.
+              </span>
+              <button type="button" onclick="window.simpanMisiKomputasiKelas6('pola')" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan Misi 2 (Pengenalan Pola) 🚀 (+25 Poin)</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 3: ABSTRAKSI (MEMILIH INFORMASI)                   -->
+      <!-- Fokus pada inti masalah!                                 -->
+      <!-- Memilih informasi penting dan mengabaikan detail yang tidak diperlukan -->
+      <!-- Contoh: Menggunakan peta digital. Kamu hanya perlu melihat jalan -->
+      <!-- dan belokan, bukan semua jenis pohon yang ada.           -->
+      <!-- ======================================================== -->
+      <div id="p6-zona-abstraksi" class="p6-zona-content hidden space-y-5">
+        <div class="bg-white rounded-3xl border border-amber-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          
+          <!-- Banner Pilar 3 -->
+          <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">
+                🗺️
+              </div>
+              <div>
+                <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3 • Computational Thinking
+                </span>
+                <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">3. ABSTRAKSI (MEMILIH INFORMASI)</h3>
+                <p class="text-xs text-slate-500">Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-filter text-amber-500"></i> &ldquo;Fokus Pada Inti Masalah!&rdquo;
+              </span>
+            </div>
+          </div>
+
+          <!-- Infografis Konsep & Contoh Nyata Sesuai Gambar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-amber-50 to-yellow-50/50 border border-amber-200 space-y-3">
+              <div class="flex items-center gap-2 text-amber-800 font-title font-bold text-sm sm:text-base">
+                <i class="fa-solid fa-crosshairs text-amber-600"></i> Konsep Abstraksi (Abstraction):
+              </div>
+              <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                <strong>Fokus pada inti masalah!</strong><br>
+                Abstraksi adalah kemampuan untuk memilah informasi mana yang benar-benar <strong>penting (esensial)</strong> untuk mencapai tujuan, sambil <strong>mengabaikan detail tidak relevan</strong> yang hanya membuat bingung dan memperlambat kinerja.
+              </p>
+              <div class="p-3 bg-white rounded-2xl border border-amber-100 text-xs text-slate-600 space-y-1">
+                <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-microchip text-amber-600"></i> Mengapa Komputer Butuh Abstraksi?
+                </div>
+                <p>Memori komputer akan cepat habis jika menyimpan semua detail kecil. Komputer hanya menyimpan variabel yang diperlukan!</p>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-cyan-50 to-blue-50/50 border border-cyan-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-cyan-800 font-title font-bold text-sm sm:text-base">
+                  <i class="fa-solid fa-map-location-dot text-cyan-600"></i> Contoh Nyata Sesuai Gambar:
+                </div>
+                <span class="text-[11px] font-bold text-cyan-700 bg-white px-2.5 py-0.5 rounded-full border border-cyan-200">
+                  Peta Digital GPS 📱
+                </span>
+              </div>
+              <p class="text-xs text-slate-700 font-medium">
+                Contoh: <strong>Menggunakan peta digital (seperti Google Maps / Waze)</strong> saat menuju ke suatu tempat:
+              </p>
+              <div class="space-y-2 text-xs">
+                <div class="p-2.5 rounded-xl bg-white border border-emerald-200 text-slate-700 space-y-0.5">
+                  <b class="text-emerald-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-check-circle text-emerald-600"></i> INFORMASI PENTING (DISIMPAN):
+                  </b>
+                  <p class="text-slate-600">Nama jalan, belokan kiri/kanan, jarak kilometer, dan titik lokasi tujuan.</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white border border-rose-200 text-slate-700 space-y-0.5">
+                  <b class="text-rose-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-xmark text-rose-500"></i> DETAIL TAK PENTING (DIABAIKAN):
+                  </b>
+                  <p class="text-slate-600">Jenis pohon di trotoar, warna cat rumah orang yang dilewati, bentuk pagar gang.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIMULASI INTERAKTIF SAKLAR FILTER PETA ABSTRAKSI -->
+          <div class="p-5 rounded-3xl bg-slate-900 text-white border-2 border-amber-400/50 shadow-inner space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2 font-title font-bold text-sm sm:text-base text-yellow-300">
+                <i class="fa-solid fa-sliders"></i> <span>Simulator Interaktif: Filter Abstraksi Peta Digital GPS</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="window.toggleModeAbstraksiPeta()" id="btn-toggle-abstraksi" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-title font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md">
+                  <i class="fa-solid fa-filter"></i> <span id="label-mode-abstraksi">Aktifkan Mode Abstraksi (Saring Data)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tampilan Peta Simulasi -->
+            <div id="box-visual-peta" class="p-5 rounded-2xl bg-slate-950/90 border border-amber-500/30 text-center transition space-y-3">
+              <div class="text-xs font-bold text-amber-300 flex items-center justify-center gap-2">
+                <span id="badge-mode-peta" class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Mode: Peta Penuh (Banyak Detail Tak Penting)</span>
+              </div>
+
+              <!-- Peta Grafis SVG / Visual Sederhana -->
+              <div class="relative w-full max-w-xl mx-auto h-48 bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 flex items-center justify-center p-4">
+                <!-- Jalan Utama (Selalu Ada) -->
+                <div class="absolute inset-x-8 top-1/2 -translate-y-1/2 h-8 bg-slate-600 border-y-2 border-dashed border-yellow-300 rounded-md flex items-center justify-between px-4 z-10">
+                  <span class="text-[10px] font-bold text-white bg-blue-600 px-2 py-0.5 rounded-full">🏠 Titik Mulai</span>
+                  <span class="text-[11px] font-mono text-yellow-200 font-bold">Jl. Cinta Kasih Tzu Chi</span>
+                  <span class="text-[10px] font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-full">🎯 Sekolah Tzu Chi</span>
+                </div>
+
+                <!-- Detail Pengganggu (Akan hilang saat mode abstraksi aktif) -->
+                <div id="detail-tak-penting-peta" class="absolute inset-0 flex items-center justify-around pointer-events-none transition-all duration-300">
+                  <span class="text-2xl animate-pulse" title="Pohon Mangga (Detail Tak Perlu)">🌳</span>
+                  <span class="text-2xl animate-bounce" title="Kucing Lewat (Detail Tak Perlu)">🐈</span>
+                  <span class="text-2xl animate-pulse" title="Pohon Kelapa (Detail Tak Perlu)">🌴</span>
+                  <span class="text-2xl" title="Burung Terbang (Detail Tak Perlu)">🕊️</span>
+                  <span class="text-2xl" title="Pagar Cat Hijau (Detail Tak Perlu)">🏡</span>
+                </div>
+
+                <!-- Rute Panduan Navigasi Bersih -->
+                <div id="rute-abstraksi-peta" class="hidden absolute bottom-3 text-xs font-bold text-emerald-400 bg-slate-900/90 px-3 py-1 rounded-full border border-emerald-500 z-20">
+                  ✅ Rute Komputer Bersih: Lurus 500m &gt; Belok Kanan &gt; Tiba di Sekolah (Detail tak perlu disaring!)
+                </div>
+              </div>
+            </div>
+
+            <!-- Tantangan Memilih Informasi Pokok -->
+            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
+              <label class="block font-bold text-amber-300">
+                <i class="fa-solid fa-circle-question"></i> Latihan Abstraksi: Jika kamu membeli tiket bioskop, data apa yang paling PENTING?
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
+                <label class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center gap-2 cursor-pointer hover:border-amber-400">
+                  <input type="radio" name="soal_abstraksi" value="benar" class="text-amber-500">
+                  <span><strong>Judul film, jam tayang, dan nomor kursi</strong> (Penting!)</span>
+                </label>
+                <label class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center gap-2 cursor-pointer hover:border-amber-400">
+                  <input type="radio" name="soal_abstraksi" value="salah" class="text-amber-500">
+                  <span>Warna sepatu kasir bioskop dan jenis merk proyektor (Tidak penting)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tombol Simpan -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <span class="text-xs text-slate-400" id="status-simpan-abstraksi">
+                Status: Uji saklar filter abstraksi dan simpan progres.
+              </span>
+              <button type="button" onclick="window.simpanMisiKomputasiKelas6('abstraksi')" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan Misi 3 (Abstraksi) 🚀 (+25 Poin)</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- MENU 4: ALGORITMA (URUTAN LANGKAH)                      -->
+      <!-- Urutan langkah rahasia!                                  -->
+      <!-- Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas -->
+      <!-- Contoh: Membuat Origami Pesawat:                         -->
+      <!-- 1. Lipat dua kertas -> 2. Lipat sudut atas ke tengah ->  -->
+      <!-- 3. Lipat sayap -> 4. Terbangkan!                         -->
+      <!-- ======================================================== -->
+      <div id="p6-zona-algoritma" class="p6-zona-content hidden space-y-5">
+        <div class="bg-white rounded-3xl border border-orange-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          
+          <!-- Banner Pilar 4 -->
+          <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">
+                ✈️
+              </div>
+              <div>
+                <span class="text-[11px] font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4 • Computational Thinking
+                </span>
+                <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">4. ALGORITMA (URUTAN LANGKAH)</h3>
+                <p class="text-xs text-slate-500">Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 rounded-xl bg-orange-50 text-orange-700 border border-orange-200 text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-list-ol text-orange-500"></i> &ldquo;Urutan Langkah Rahasia!&rdquo;
+              </span>
+            </div>
+          </div>
+
+          <!-- Infografis Konsep & Contoh Nyata Sesuai Gambar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-orange-50 to-amber-50/50 border border-orange-200 space-y-3">
+              <div class="flex items-center gap-2 text-orange-800 font-title font-bold text-sm sm:text-base">
+                <i class="fa-solid fa-code text-orange-600"></i> Konsep Algoritma (Algorithm):
+              </div>
+              <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                <strong>Urutan langkah rahasia!</strong><br>
+                Algoritma adalah susunan urutan instruksi langkah demi langkah yang logis, teratur, dan jelas dari awal hingga akhir. Jika urutannya tertukar atau salah, hasilnya tidak akan tercapai atau komputer akan error!
+              </p>
+              <div class="p-3 bg-white rounded-2xl border border-orange-100 text-xs text-slate-600 space-y-1">
+                <div class="font-bold text-orange-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-robot text-orange-600"></i> Algoritma dalam Coding Komputer:
+                </div>
+                <p>Semua aplikasi, game Scratch, dan robot cerdas berjalan karena ada baris-baris algoritma instruksi yang ditaati robot.</p>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-yellow-50 to-orange-50/50 border border-yellow-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-orange-800 font-title font-bold text-sm sm:text-base">
+                  <i class="fa-solid fa-paper-plane text-orange-600"></i> Contoh Nyata Sesuai Gambar:
+                </div>
+                <span class="text-[11px] font-bold text-orange-700 bg-white px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Origami Pesawat Kertas ✈️
+                </span>
+              </div>
+              <p class="text-xs text-slate-700 font-medium">
+                Contoh: <strong>Membuat Origami Pesawat</strong> membutuhkan urutan algoritma yang tepat agar bisa terbang:
+              </p>
+              <div class="space-y-1.5 text-xs">
+                <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
+                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
+                  <span><strong>Lipat dua kertas</strong> secara simetris</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
+                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+                  <span><strong>Lipat sudut atas ke tengah</strong> membentuk segitiga</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
+                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
+                  <span><strong>Lipat sayap</strong> kiri dan kanan ke bawah</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
+                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">4</span>
+                  <span><strong>Terbangkan!</strong> Pesawat kertas meluncur di udara! ✈️</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GAME PUZZLE URUTAN ALGORITMA ORIGAMI INTERAKTIF -->
+          <div class="p-5 rounded-3xl bg-slate-900 text-white border-2 border-orange-400/50 shadow-inner space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2 font-title font-bold text-sm sm:text-base text-yellow-300">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Game Interaktif: Susun Urutan Algoritma Origami Pesawat!</span>
+              </div>
+              <button type="button" onclick="window.acakUrutanOrigami()" class="text-xs text-sky-400 hover:underline">Acak Kartu Langkah</button>
+            </div>
+
+            <p class="text-xs text-slate-300">Urutkan 4 kartu langkah di bawah dari langkah 1 sampai langkah 4 dengan menekan tombol nomor yang sesuai:</p>
+
+            <!-- 4 Kartu Langkah yang Diurutkan Siswa -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="wadah-kartu-origami">
+              <!-- JS mengisi kartu origami interaktif -->
+            </div>
+
+            <!-- Area Uji Terbang Pesawat -->
+            <div class="relative p-5 rounded-2xl bg-slate-950 border border-orange-500/30 text-center overflow-hidden h-28 flex flex-col items-center justify-center">
+              <div id="animasi-pesawat-kertas" class="text-4xl transition-all duration-1000 transform translate-x-0">
+                ✈️
+              </div>
+              <div class="mt-2 text-xs font-bold text-slate-300" id="status-terbang-pesawat">
+                Susun 4 kartu langkah di atas dengan urutan 1 &gt; 2 &gt; 3 &gt; 4 untuk menerbangkan pesawat!
+              </div>
+            </div>
+
+            <!-- Lembar Tantangan Algoritma Siswa Mandiri -->
+            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
+              <label class="block font-bold text-orange-300">
+                <i class="fa-solid fa-pen-nib"></i> Tuliskan Algoritma (3-4 Langkah) Menyalakan Komputer Sekolah Tzu Chi:
+              </label>
+              <textarea id="input-k6-algoritma-refleksi" rows="2" placeholder="Contoh: 1. Tekan tombol power CPU -> 2. Nyalakan monitor -> 3. Tunggu Windows memuat -> 4. Masuk ke aplikasi EduCodeAI!" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+            </div>
+
+            <!-- Tombol Simpan -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <span class="text-xs text-slate-400" id="status-simpan-algoritma">
+                Status: Susun algoritma dan simpan progres ke Cloud.
+              </span>
+              <button type="button" onclick="window.simpanMisiKomputasiKelas6('algoritma')" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan Misi 4 (Algoritma) 🚀 (+25 Poin)</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- POJOK BUDAYA HUMANIS TZU CHI KELAS 6 SD -->
+      <div class="bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 rounded-3xl p-6 border-2 border-emerald-500/40 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-3xl shrink-0">
+            🪷
+          </div>
+          <div class="space-y-1">
+            <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-leaf"></i> Kata Perenungan Master Cheng Yen • Kelas 6 SD
+            </span>
+            <p class="font-title text-sm sm:text-base text-slate-100 italic leading-snug">
+              &ldquo;Dengan pikiran yang jernih, tenang, dan teratur, setiap masalah rumit dapat diurai menjadi sederhana dan diselesaikan dengan bijaksana.&rdquo;
+            </p>
+          </div>
+        </div>
+
+        <button type="button" onclick="window.klaimLencanaKaryaP6()" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-amber-500/30 transition transform hover:scale-105 active:scale-95 flex items-center gap-2 shrink-0 cursor-pointer">
+          <i class="fa-solid fa-award text-base"></i> <span>Klaim Lencana Ahli Komputer 🏅</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- INLINE SCRIPT INTERAKTIF KHUSUS 4 MENU KELAS 6 SD (PERSISTENSI, SIMULASI & CLOUD) -->
+    <script>
+      (function initKelas6Modules() {
+        var KEY_P6 = 'educode_kelas6_karya_v1';
+
+        // State Penyimpanan Lokal Data Komputasi Kelas 6
+        window._p6Data = {
+          dekomposisi: { judul: '', p1: '', p2: '', p3: '', poin: 0, time: null },
+          pola: { skorSortir: 0, refleksi: '', poin: 0, time: null },
+          abstraksi: { isAbstraksiMode: false, jawabanSoal: '', poin: 0, time: null },
+          algoritma: { urutanSelesai: false, refleksi: '', poin: 0, time: null }
+        };
+
+        // Muat dari localStorage
+        try {
+          var saved = localStorage.getItem(KEY_P6);
+          if (saved) {
+            var parsed = JSON.parse(saved);
+            window._p6Data = Object.assign(window._p6Data, parsed);
+          }
+        } catch(e) {}
+
+        // Skenario Dekomposisi
+        var skenarioDekomposisiData = {
+          liburan: {
+            judul: 'Merencanakan Liburan Keluarga yang Menyenangkan',
+            subs: [
+              { icon: '🎫', nama: '1. Pesan Tiket', desc: 'Pesan tiket pesawat/kereta, hotel, dan budget biaya.' },
+              { icon: '🧳', nama: '2. Siapkan Koper', desc: 'Kemasi pakaian ganti, perlengkapan mandi, dan obat pribadi.' },
+              { icon: '📍', nama: '3. Pilih Tempat Wisata', desc: 'Tentukan tujuan: pantai, museum edukasi, dan kuliner.' }
+            ]
+          },
+          pameran: {
+            judul: 'Membuat Festival Budaya Sekolah Tzu Chi',
+            subs: [
+              { icon: '🎭', nama: '1. Pentas Seni', desc: 'Latihan tarian isyarat tangan dan drama budaya humanis.' },
+              { icon: '🍱', nama: '2. Bazar Makanan Sehat', desc: 'Menyusun menu makanan vegetarian sehat dan higienis.' },
+              { icon: '🎨', nama: '3. Dekorasi & Stand', desc: 'Menghias aula dengan lampion dan poster hasil karya.' }
+            ]
+          },
+          kamar: {
+            judul: 'Merapikan Kamar Tidur Sendiri',
+            subs: [
+              { icon: '🛏️', nama: '1. Tempat Tidur', desc: 'Tarik selimut, tepuk bantal, rapikan seprai dengan rapi.' },
+              { icon: '📚', nama: '2. Meja Belajar', desc: 'Tata buku pelajaran sesuai jadwal dan masukkan alat tulis.' },
+              { icon: '🧹', nama: '3. Lantai Kamar', desc: 'Sapu debu dan masukkan sampah ke tempat sampah daur ulang.' }
+            ]
+          }
+        };
+
+        window.pilihSkenarioDekomposisi = function(key) {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          ['liburan', 'pameran', 'kamar'].forEach(function(k) {
+            var btn = document.getElementById('btn-skenario-' + k);
+            if (btn) {
+              if (k === key) {
+                btn.className = 'p-2.5 rounded-xl bg-sky-600 text-white font-title font-bold text-xs border border-sky-400 flex items-center justify-center gap-1.5 cursor-pointer transition';
+              } else {
+                btn.className = 'p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white font-title font-bold text-xs border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer transition';
+              }
+            }
+          });
+
+          var data = skenarioDekomposisiData[key] || skenarioDekomposisiData.liburan;
+          var elJudul = document.getElementById('judul-masalah-besar-k6');
+          if (elJudul) elJudul.innerText = data.judul;
+
+          var wadah = document.getElementById('wadah-subtugas-k6');
+          if (wadah) {
+            wadah.innerHTML = data.subs.map(function(s) {
+              return `
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-sky-500/30 text-left space-y-1">
+                  <div class="text-2xl">${s.icon}</div>
+                  <div class="font-title font-bold text-xs text-yellow-300">${s.nama}</div>
+                  <div class="text-[11px] text-slate-300 leading-snug">${s.desc}</div>
+                </div>
+              `;
+            }).join('');
+          }
+        };
+
+        // Mini-Game Pola Sortir Mainan
+        var daftarMainanGame = [
+          { icon: '🧸', nama: 'Boneka Beruang Cokelat', kategori: 'boneka' },
+          { icon: '🚗', nama: 'Mobil Balap Merah', kategori: 'mobil' },
+          { icon: '🧱', nama: 'Balok Lego Susun Warna-warni', kategori: 'blok' },
+          { icon: '🐰', nama: 'Boneka Kelinci Lembut', kategori: 'boneka' },
+          { icon: '🚁', nama: 'Helikopter Roda Cilik', kategori: 'mobil' },
+          { icon: '🏰', nama: 'Set Istana Balok Kayu', kategori: 'blok' }
+        ];
+        var gamePolaIndex = 0;
+        var gamePolaSkor = 0;
+
+        window.renderMainanAktif = function() {
+          var item = daftarMainanGame[gamePolaIndex % daftarMainanGame.length];
+          var elIcon = document.getElementById('item-mainan-icon');
+          var elNama = document.getElementById('item-mainan-nama');
+          var elSkor = document.getElementById('game-pola-skor');
+          if (elIcon) elIcon.innerText = item.icon;
+          if (elNama) elNama.innerText = item.nama;
+          if (elSkor) elSkor.innerText = gamePolaSkor;
+        };
+
+        window.tebakKotakPola = function(kategoriPilihan) {
+          var item = daftarMainanGame[gamePolaIndex % daftarMainanGame.length];
+          if (kategoriPilihan === item.kategori) {
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            gamePolaSkor++;
+            if (typeof showToast === 'function') showToast('Hebat! Pola mainan tepat dikelompokkan! 🎉', 'success');
+          } else {
+            try { if (typeof playSound === 'function') playSound('error'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Kurang tepat. Cek kembali jenis dan polanya ya!', 'warning');
+          }
+          gamePolaIndex++;
+          window.renderMainanAktif();
+        };
+
+        window.resetGameSortirPola = function() {
+          gamePolaIndex = 0;
+          gamePolaSkor = 0;
+          window.renderMainanAktif();
+        };
+
+        // Abstraksi Peta Simulator
+        var isAbstraksiAktif = false;
+        window.toggleModeAbstraksiPeta = function() {
+          isAbstraksiAktif = !isAbstraksiAktif;
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          var elDetail = document.getElementById('detail-tak-penting-peta');
+          var elRute = document.getElementById('rute-abstraksi-peta');
+          var elBadge = document.getElementById('badge-mode-peta');
+          var elLabelBtn = document.getElementById('label-mode-abstraksi');
+
+          if (isAbstraksiAktif) {
+            if (elDetail) { elDetail.style.opacity = '0'; elDetail.style.pointerEvents = 'none'; }
+            if (elRute) elRute.classList.remove('hidden');
+            if (elBadge) {
+              elBadge.innerText = 'Mode: Abstraksi Aktif (Hanya Menampilkan Data Pokok)';
+              elBadge.className = 'px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500';
+            }
+            if (elLabelBtn) elLabelBtn.innerText = 'Matikan Abstraksi (Tampilkan Peta Asli)';
+            if (typeof showToast === 'function') showToast('Filter Abstraksi Aktif: Detail tak penting disaring bersih! 🗺️✨', 'success');
+          } else {
+            if (elDetail) { elDetail.style.opacity = '1'; elDetail.style.pointerEvents = 'auto'; }
+            if (elRute) elRute.classList.add('hidden');
+            if (elBadge) {
+              elBadge.innerText = 'Mode: Peta Penuh (Banyak Detail Tak Penting)';
+              elBadge.className = 'px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700';
+            }
+            if (elLabelBtn) elLabelBtn.innerText = 'Aktifkan Mode Abstraksi (Saring Data)';
+          }
+        };
+
+        // Algoritma Origami Pesawat Interaktif
+        var langkahOrigamiList = [
+          { id: 1, step: '1', title: '1. Lipat Dua Kertas', desc: 'Lipat simetris memanjang', icon: '📄' },
+          { id: 2, step: '2', title: '2. Lipat Sudut Atas', desc: 'Lipat dua sudut ke tengah', icon: '📐' },
+          { id: 3, step: '3', title: '3. Lipat Sayap', desc: 'Bentuk dua sayap pesawat', icon: '🛩️' },
+          { id: 4, step: '4', title: '4. Terbangkan!', desc: 'Pegang bagian bawah & luncurkan', icon: '✈️' }
+        ];
+        var susunanSiswaOrigami = [2, 4, 1, 3]; // Posisi acak awal
+
+        window.renderOrigamiPuzzle = function() {
+          var wadah = document.getElementById('wadah-kartu-origami');
+          if (!wadah) return;
+          wadah.innerHTML = susunanSiswaOrigami.map(function(numId, idx) {
+            var item = langkahOrigamiList.find(function(l) { return l.id === numId; });
+            var isBenar = (numId === (idx + 1));
+            return `
+              <div class="p-3.5 rounded-2xl ${isBenar ? 'bg-emerald-950/80 border-2 border-emerald-400' : 'bg-slate-800/90 border border-slate-700'} space-y-2 text-center transition">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-400">Urutan ${idx + 1}</span>
+                  ${isBenar ? '<span class="text-emerald-400 text-xs">✅ Tepat</span>' : '<span class="text-amber-400 text-xs">❓ Belum Tepat</span>'}
+                </div>
+                <div class="text-3xl">${item.icon}</div>
+                <div class="font-title font-bold text-xs text-white">${item.title}</div>
+                <div class="text-[10px] text-slate-400">${item.desc}</div>
+                <div class="pt-1 flex items-center justify-center gap-1">
+                  ${idx > 0 ? `<button type="button" onclick="window.geserOrigami(${idx}, -1)" class="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-xs flex items-center justify-center cursor-pointer">⬅️</button>` : ''}
+                  ${idx < 3 ? `<button type="button" onclick="window.geserOrigami(${idx}, 1)" class="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-xs flex items-center justify-center cursor-pointer">➡️</button>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Cek apakah urutan sudah 1, 2, 3, 4
+          var cekSelesai = susunanSiswaOrigami.every(function(val, index) { return val === (index + 1); });
+          var elPesawat = document.getElementById('animasi-pesawat-kertas');
+          var elStatus = document.getElementById('status-terbang-pesawat');
+          if (cekSelesai) {
+            if (elPesawat) {
+              elPesawat.className = 'text-5xl text-yellow-300 animate-pulse transform translate-x-24 transition-all duration-1000';
+            }
+            if (elStatus) {
+              elStatus.innerHTML = '<span class="text-emerald-400 font-bold">🎉 ALGORITMA BENAR! Pesawat kertas meluncur terbang tinggi! ✈️💨</span>';
+            }
+          } else {
+            if (elPesawat) elPesawat.className = 'text-4xl transition-all duration-1000 transform translate-x-0';
+            if (elStatus) elStatus.innerText = 'Susun 4 kartu langkah di atas dengan urutan 1 > 2 > 3 > 4 untuk menerbangkan pesawat!';
+          }
+        };
+
+        window.geserOrigami = function(idx, direction) {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          var targetIdx = idx + direction;
+          if (targetIdx < 0 || targetIdx >= susunanSiswaOrigami.length) return;
+          var temp = susunanSiswaOrigami[idx];
+          susunanSiswaOrigami[idx] = susunanSiswaOrigami[targetIdx];
+          susunanSiswaOrigami[targetIdx] = temp;
+          window.renderOrigamiPuzzle();
+        };
+
+        window.acakUrutanOrigami = function() {
+          susunanSiswaOrigami = [3, 1, 4, 2];
+          window.renderOrigamiPuzzle();
+        };
+
+        // Navigasi Antar Zona Pilar Kelas 6
+        window.bukaPetualangan6Zona = function(zonaId) {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          var zonas = ['zona-dekomposisi', 'zona-pola', 'zona-abstraksi', 'zona-algoritma'];
+          zonas.forEach(function(z) {
+            var el = document.getElementById('p6-' + z);
+            var nav = document.getElementById('nav-p6-' + z.replace('zona-', ''));
+            var dock = document.getElementById('btn-dock-p6-' + z.replace('zona-', ''));
+
+            if (z === zonaId) {
+              if (el) { el.classList.remove('hidden'); el.style.setProperty('display', 'block', 'important'); }
+              if (nav) { nav.classList.add('active-tab', 'text-white'); nav.classList.remove('text-slate-300'); }
+              if (dock) { dock.classList.add('border-2', 'border-sky-400'); dock.classList.remove('border-emerald-500/40', 'border-amber-500/40', 'border-orange-500/40'); }
+            } else {
+              if (el) { el.classList.add('hidden'); el.style.setProperty('display', 'none', 'important'); }
+              if (nav) { nav.classList.remove('active-tab', 'text-white'); nav.classList.add('text-slate-300'); }
+            }
+          });
+          try { window.scrollTo({ top: 120, behavior: 'smooth' }); } catch(e){}
+        };
+
+        // Simpan Hasil ke LocalStorage & Cloud Firebase
+        window.simpanMisiKomputasiKelas6 = function(pilarKey) {
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          var student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+          var stdName = student ? student.nama : 'Pelajar Kelas 6';
+          var stdNis = student ? student.nis : '6000';
+          var stdKelas = student ? student.kelas : '6A';
+
+          if (pilarKey === 'dekomposisi') {
+            var inJudul = document.getElementById('input-k6-dekomposisi-judul');
+            var inP1 = document.getElementById('input-k6-dekomposisi-p1');
+            var inP2 = document.getElementById('input-k6-dekomposisi-p2');
+            var inP3 = document.getElementById('input-k6-dekomposisi-p3');
+            window._p6Data.dekomposisi = {
+              judul: inJudul ? inJudul.value.trim() : 'Dekomposisi Masalah',
+              p1: inP1 ? inP1.value.trim() : 'Langkah 1',
+              p2: inP2 ? inP2.value.trim() : 'Langkah 2',
+              p3: inP3 ? inP3.value.trim() : 'Langkah 3',
+              poin: 25,
+              time: new Date().toISOString()
+            };
+            var st1 = document.getElementById('status-simpan-dekomposisi');
+            if (st1) st1.innerHTML = '✅ <strong class="text-emerald-400">Tersimpan di Cloud! (+25 Poin)</strong>';
+          } else if (pilarKey === 'pola') {
+            var inRefleksi = document.getElementById('input-k6-pola-refleksi');
+            window._p6Data.pola = {
+              skorSortir: gamePolaSkor,
+              refleksi: inRefleksi ? inRefleksi.value.trim() : 'Refleksi Pola',
+              poin: 25,
+              time: new Date().toISOString()
+            };
+            var st2 = document.getElementById('status-simpan-pola');
+            if (st2) st2.innerHTML = '✅ <strong class="text-emerald-400">Tersimpan di Cloud! (+25 Poin)</strong>';
+          } else if (pilarKey === 'abstraksi') {
+            var checkedSoal = document.querySelector('input[name="soal_abstraksi"]:checked');
+            window._p6Data.abstraksi = {
+              isAbstraksiMode: isAbstraksiAktif,
+              jawabanSoal: checkedSoal ? checkedSoal.value : 'benar',
+              poin: 25,
+              time: new Date().toISOString()
+            };
+            var st3 = document.getElementById('status-simpan-abstraksi');
+            if (st3) st3.innerHTML = '✅ <strong class="text-emerald-400">Tersimpan di Cloud! (+25 Poin)</strong>';
+          } else if (pilarKey === 'algoritma') {
+            var inAlgo = document.getElementById('input-k6-algoritma-refleksi');
+            window._p6Data.algoritma = {
+              urutanSelesai: true,
+              refleksi: inAlgo ? inAlgo.value.trim() : 'Algoritma Komputer',
+              poin: 25,
+              time: new Date().toISOString()
+            };
+            var st4 = document.getElementById('status-simpan-algoritma');
+            if (st4) st4.innerHTML = '✅ <strong class="text-emerald-400">Tersimpan di Cloud! (+25 Poin)</strong>';
+          }
+
+          // Simpan ke local
+          try {
+            localStorage.setItem(KEY_P6, JSON.stringify(window._p6Data));
+          } catch(e){}
+
+          // Tambah Poin Bintang
+          if (typeof tambahPoin === 'function') tambahPoin(25);
+
+          // Simpan ke Cloud Firebase Firestore jika aktif
+          try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+              var db = firebase.firestore();
+              var docId = 'k6_' + stdKelas + '_' + stdNis;
+              db.collection('karya_komputasi_kelas6').doc(docId).set({
+                studentId: student ? student.id : docId,
+                nama: stdName,
+                nis: stdNis,
+                kelas: stdKelas,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                dataCT: window._p6Data
+              }, { merge: true }).then(function() {
+                console.log('Data CT Kelas 6 sukses disinkronkan ke Cloud Firestore!');
+              }).catch(function(errCloud) {
+                console.warn('Sync Cloud CT Kelas 6:', errCloud);
+              });
+            }
+          } catch(eCloud){}
+
+          if (typeof showToast === 'function') {
+            showToast('Misi Pilar ' + pilarKey.toUpperCase() + ' berhasil disimpan & dikirim ke Cloud Server! 🚀 (+25 Poin)', 'success');
+          }
+        };
+
+        // Sinkronisasi Cloud Antar-PC Manual
+        window.sinkronCloudKelas6 = function() {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          var student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+          var stdNis = student ? student.nis : '6000';
+          var stdKelas = student ? student.kelas : '6A';
+
+          if (typeof showToast === 'function') showToast('Menghubungkan ke Cloud Server...', 'info');
+
+          if (typeof firebase !== 'undefined' && firebase.firestore) {
+            var db = firebase.firestore();
+            var docId = 'k6_' + stdKelas + '_' + stdNis;
+            db.collection('karya_komputasi_kelas6').doc(docId).get().then(function(doc) {
+              if (doc.exists && doc.data() && doc.data().dataCT) {
+                window._p6Data = Object.assign(window._p6Data, doc.data().dataCT);
+                localStorage.setItem(KEY_P6, JSON.stringify(window._p6Data));
+                if (typeof showToast === 'function') showToast('⚡ Berhasil tersinkronisasi realtime dari Cloud Server!', 'success');
+              } else {
+                if (typeof showToast === 'function') showToast('Cloud aktif dan siap menerima portofolio barumu!', 'success');
+              }
+            }).catch(function(err) {
+              if (typeof showToast === 'function') showToast('Penyimpanan lokal aman. ' + err.message, 'info');
+            });
+          } else {
+            if (typeof showToast === 'function') showToast('Data lokal tersinkron dengan aman di perangkat ini!', 'success');
+          }
+        };
+
+        // Klaim Lencana Karya Kelas 6
+        window.klaimLencanaKaryaP6 = function() {
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof tambahPoin === 'function') tambahPoin(50);
+          if (typeof showToast === 'function') {
+            showToast('Selamat! Kamu telah meraih Lencana Ahli Computational Thinking Kelas 6! 🏅✨ (+50 Bintang)', 'success');
+          }
+        };
+
+        // Inisialisasi awal UI
+        window.addEventListener('load', function() {
+          try {
+            window.pilihSkenarioDekomposisi('liburan');
+            window.renderMainanAktif();
+            window.renderOrigamiPuzzle();
+          } catch(eInit){}
+        });
+
+      })();
+    </script>
     <script>
       (function initKelas5Modules() {
         var KEY_P5 = 'educode_kelas5_karya_v1';
@@ -15568,6 +16770,18 @@
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <span>Masuk Sekarang 🚀</span>
           </button>
+
+          <!-- Tombol Masuk Cepat Kelas 6 SD (Computational Thinking) -->
+          <div class="pt-2 flex flex-col gap-2 max-w-xs mx-auto">
+            <button type="button" onclick="if(window.masukCepatKelas6){window.masukCepatKelas6();}else{document.getElementById('input-login-nis').value='6000';loginDenganNis();}" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-900 to-emerald-900 hover:from-indigo-800 hover:to-emerald-800 text-emerald-200 border border-emerald-400/50 font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-brain text-yellow-300"></i>
+              <span>🚀 Masuk Cepat Kelas 6 (NIS: 6000)</span>
+            </button>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 px-1">
+              <span>Akun Uji Coba: <b>6000</b> (6A)</span>
+              <span>Siswa 6A: <b>3001</b></span>
+            </div>
+          </div>
 
           <!-- Bantuan Ramah Anak & Info Database Resmi Google Sheet -->
           <div class="pt-3 border-t border-emerald-200/60 space-y-2">
