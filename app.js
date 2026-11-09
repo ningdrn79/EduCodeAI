@@ -26784,6 +26784,85 @@ function pasangRealtimeSyncDrive(studentNis) {
 }
 window.pasangRealtimeSyncDrive = pasangRealtimeSyncDrive;
 
+// 2C. Tombol Paksa Sinkronisasi Drive Cloud Manual & Auto-Merge Cerdas Antar-Komputer
+async function paksaSinkronDriveManual() {
+  playSound('click');
+  showToast('⚡ Menguji koneksi Cloud Firebase & menyinkronkan gambar...', 'info');
+
+  if (!firebaseFirestoreInstance) {
+    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+  }
+
+  if (!firebaseFirestoreInstance) {
+    alert('⚠️ Firebase SDK belum siap. Periksa koneksi internet komputer Anda.');
+    return;
+  }
+
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const studentNis = activeStudent ? (activeStudent.nis || activeStudent.id) : '3000';
+  const targetId = String(studentNis);
+
+  try {
+    // 1. Ambil data lokal saat ini
+    const driveKey = getDriveStorageKey(activeStudent);
+    const localRaw = localStorage.getItem(driveKey);
+    let localData = {};
+    try { localData = localRaw ? JSON.parse(localRaw) : {}; } catch (e) { localData = {}; }
+
+    // 2. Baca data dari cloud Firestore
+    const docRef = firebaseFirestoreInstance.collection('student_drives').doc(targetId);
+    const docSnap = await docRef.get();
+
+    let cloudDrive = {};
+    if (docSnap.exists) {
+      const cData = docSnap.data();
+      if (cData && cData.driveData) {
+        try { cloudDrive = JSON.parse(cData.driveData); } catch (e) {}
+      }
+    }
+
+    // 3. Gabungkan kedua sisi (merge cerdas kedua komputer)
+    const merged = { ...cloudDrive, ...localData };
+
+    // 4. Simpan hasil gabungan kembali ke cloud agar komputer lain bisa menariknya
+    const payload = {
+      studentNis: targetId,
+      studentName: activeStudent ? activeStudent.nama : 'Pelajar Uji Coba',
+      studentClass: activeStudent ? activeStudent.kelas : '4A',
+      driveData: JSON.stringify(merged),
+      points: (typeof state !== 'undefined' && state.userPoints) ? state.userPoints : 0,
+      updatedAt: Date.now()
+    };
+
+    await docRef.set(payload, { merge: true });
+
+    // 5. Simpan ke local storage komputer ini
+    localStorage.setItem(driveKey, JSON.stringify(merged));
+    renderDrive7KebiasaanGrid();
+
+    playSound('fanfare');
+    const totalGambar = Object.keys(merged).filter(k => (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined') && DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
+    alert(`🎉 SINKRONISASI CLOUD BERHASIL!\n\nKoleksi gambar komputer ini dan cloud telah digabungkan secara lengkap (${totalGambar} dari 7 gambar).\n\nSekarang buka komputer kedua dan klik tombol "⚡ Sinkron Cloud", maka semua gambar akan langsung sama persis! ✨`);
+    showToast(`✅ Sinkronisasi Cloud sukses! Total ${totalGambar} gambar aktif.`, 'success');
+  } catch (err) {
+    console.error('Error manual sync:', err);
+    if (err && (err.code === 'permission-denied' || (err.message && err.message.toLowerCase().includes('permission')))) {
+      alert(
+        `⚠️ AKSES FIREBASE CLOUD DITOLAK (Permission Denied)!\n\n` +
+        `Hal ini terjadi karena di Firebase Console aturan "Rules" belum diubah ke "allow read, write: if true;".\n\n` +
+        `Cara Memperbaikinya Sangat Mudah:\n` +
+        `1. Buka tab "Rules" di Firebase Console (di sebelah tab Data).\n` +
+        `2. Ganti kata "if false;" menjadi "if true;".\n` +
+        `3. Klik tombol biru "Publish" di kanan atas.\n\n` +
+        `Setelah itu, klik tombol [⚡ Sinkron Cloud] ini lagi, dan semua gambar akan langsung tersinkron di kedua komputer!`
+      );
+    } else {
+      alert(`⚠️ Kendala Sinkronisasi: ${err.message || 'Gagal tersambung ke Firebase Cloud.'}`);
+    }
+  }
+}
+window.paksaSinkronDriveManual = paksaSinkronDriveManual;
+
 // 3. Sinkronkan Karya Siswa dari Cloud saat Siswa Login (Word Poster & Drive 7 Kebiasaan)
 async function sinkronkanKaryaSiswaDariCloud(profile) {
   if (!isFirebaseConnected || !firebaseFirestoreInstance || !profile) return;
