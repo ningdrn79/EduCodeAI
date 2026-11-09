@@ -265,10 +265,16 @@ function saveActiveStudentSession(profile, targetTab = null) {
   if (!profile) return;
   window.__ACTIVE_STUDENT_PROFILE__ = profile;
   window.__ACTIVE_STUDENT_RESTORED__ = profile;
+
+  // PENTING: Untuk cookie browser, buang gambar base64 besar (driveData) agar tidak melampaui batas 4KB cookie
+  const cookieProfile = { ...profile };
+  delete cookieProfile.driveData;
+  const rawCookie = JSON.stringify(cookieProfile);
   const raw = JSON.stringify(profile);
+
   try { localStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
   try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
-  try { document.cookie = ACTIVE_STUDENT_KEY + '=' + encodeURIComponent(raw) + '; path=/; max-age=31536000'; } catch (e) {}
+  try { document.cookie = ACTIVE_STUDENT_KEY + '=' + encodeURIComponent(rawCookie) + '; path=/; max-age=31536000'; } catch (e) {}
 
   if (targetTab) {
     try { localStorage.setItem(ACTIVE_TAB_KEY, targetTab); } catch (e) {}
@@ -6883,9 +6889,9 @@ function renderDrive7KebiasaanGrid() {
         </div>
       `;
     } else {
-      // Slot Kosong
+      // Slot Kosong dengan Upload File Langsung & Dukungan Drag and Drop
       return `
-        <div class="bg-slate-50/80 rounded-3xl border-2 border-dashed border-slate-300 hover:border-purple-400 transition-all p-4 flex flex-col justify-between space-y-3">
+        <div class="bg-slate-50/80 rounded-3xl border-2 border-dashed border-slate-300 hover:border-blue-400 transition-all p-4 flex flex-col justify-between space-y-3">
           <!-- Header Slot Kosong -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -6897,19 +6903,32 @@ function renderDrive7KebiasaanGrid() {
             </span>
           </div>
 
-          <!-- Placeholder Area -->
-          <div class="w-full aspect-square rounded-2xl bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-3 cursor-pointer group hover:bg-purple-50/50 transition" onclick="bukaModalPilihSumberSlot('${cfg.key}')" title="Klik untuk menambah gambar">
-            <div class="w-12 h-12 rounded-2xl bg-purple-50 group-hover:bg-purple-100 text-purple-600 flex items-center justify-center text-2xl mb-2 transition transform group-hover:scale-110">
-              <i class="fa-solid ${cfg.icon}"></i>
+          <!-- Hidden Direct Input File -->
+          <input type="file" id="input-direct-slot-${cfg.key}" accept="image/*" class="hidden" onchange="handleDirectSlotFileUpload(event, '${cfg.key}')">
+
+          <!-- Placeholder Area: 1-Klik Buka File atau Drag-and-Drop Gambar Langsung -->
+          <div class="w-full aspect-square rounded-2xl bg-white border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 flex flex-col items-center justify-center text-center p-3 cursor-pointer group transition" 
+               onclick="triggerUploadFileSlotDrive('${cfg.key}')" 
+               ondragover="event.preventDefault(); this.classList.add('border-blue-500', 'bg-blue-50');" 
+               ondragleave="this.classList.remove('border-blue-500', 'bg-blue-50');" 
+               ondrop="handleSlotFileDrop(event, '${cfg.key}')" 
+               title="Klik untuk memilih foto dari komputer/HP atau tarik gambar ke sini!">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2 transition transform group-hover:scale-110">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
             </div>
-            <span class="text-xs font-bold text-slate-700 font-title group-hover:text-purple-700 transition">+ Tambah Gambar</span>
-            <p class="text-[10px] text-slate-400 mt-1 max-w-[160px] leading-tight">File Komputer, Paint, Kartun Edukasi, atau Gemini AI</p>
+            <span class="text-xs font-bold text-slate-700 font-title group-hover:text-blue-700 transition">+ Upload Gambar</span>
+            <p class="text-[10px] text-slate-400 mt-1 max-w-[160px] leading-tight">Klik atau Tarik Foto ke sini (.jpg, .png)</p>
           </div>
 
-          <!-- Tombol Aksi Bawah -->
-          <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-plus text-[10px]"></i> Pilih Gambar
-          </button>
+          <!-- Tombol Aksi Bawah: Upload File Utama & Menu Pilihan Lain -->
+          <div class="flex items-center gap-1.5 w-full">
+            <button type="button" onclick="triggerUploadFileSlotDrive('${cfg.key}')" class="flex-1 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Upload langsung file gambar dari Laptop/HP">
+              <i class="fa-solid fa-upload text-[10px]"></i> Upload File
+            </button>
+            <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="py-2 px-2.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1 cursor-pointer shrink-0" title="Pilihan Lain: Vektor HD, AI Studio, Paint, Kartun">
+              <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Lainnya
+            </button>
+          </div>
         </div>
       `;
     }
@@ -7180,19 +7199,8 @@ function aksiPilihSumberSlot(sumberType) {
     setModePraktik1('gambar');
     showToast(`Membuka Aplikasi Paint Terbaru! Silakan gambar untuk "${cfg ? cfg.cleanTitle : 'slot'}", lalu klik tombol "Simpan ke Drive 📁"! 🎨`, 'info');
   } else if (sumberType === 'upload') {
-    // Trigger input file
-    let fileInput = document.getElementById('drive-slot-upload-input');
-    if (!fileInput) {
-      fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.id = 'drive-slot-upload-input';
-      fileInput.accept = 'image/*';
-      fileInput.className = 'hidden';
-      fileInput.onchange = handleDriveSlotUpload;
-      document.body.appendChild(fileInput);
-    }
-    fileInput.setAttribute('data-target-habit', habitKey);
-    fileInput.click();
+    // Pemicu upload file untuk slot yang dipilih
+    triggerUploadFileSlotDrive(habitKey);
   } else if (sumberType === 'vektor_instan') {
     // Pasang vektor bawaan
     const item = KATALOG_KARTUN_7KEBIASAAN.find(k => k.id === cfg.vectorId);
@@ -7207,14 +7215,12 @@ function aksiPilihSumberSlot(sumberType) {
 }
 window.aksiPilihSumberSlot = aksiPilihSumberSlot;
 
-function handleDriveSlotUpload(event) {
-  const file = event.target.files && event.target.files[0];
-  const habitKey = event.target.getAttribute('data-target-habit') || currentSlotHabitKey;
+// Helper Utama: Memproses Berkas Gambar (Upload Langsung / Drag-and-Drop) ke Slot Drive
+function prosesFileGambarKeSlot(file, habitKey) {
   if (!file || !habitKey) return;
 
   if (file.type && !file.type.startsWith('image/')) {
-    alert('Harap pilih file berupa gambar (JPG, PNG, WebP, GIF)!');
-    event.target.value = '';
+    alert('Harap pilih file berupa gambar (JPG, PNG, WebP, JPEG)!');
     return;
   }
 
@@ -7231,7 +7237,69 @@ function handleDriveSlotUpload(event) {
       simpanGambarKeSlotDrive(habitKey, optimizedDataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), '📤 File Komputer', chosenName);
     });
   };
+  reader.onerror = function() {
+    showToast('Gagal membaca file gambar. Silakan coba pilih berkas lain.', 'error');
+  };
   reader.readAsDataURL(file);
+}
+window.prosesFileGambarKeSlot = prosesFileGambarKeSlot;
+
+// Pemicu Dialog File Picker Komputer/HP untuk Slot Tertentu
+function triggerUploadFileSlotDrive(habitKey) {
+  if (!habitKey) return;
+  playSound('click');
+  currentSlotHabitKey = habitKey;
+
+  let fileInput = document.getElementById(`input-direct-slot-${habitKey}`);
+  if (!fileInput) {
+    fileInput = document.getElementById('drive-slot-upload-input');
+  }
+  if (!fileInput) {
+    fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = `input-direct-slot-${habitKey}`;
+    fileInput.accept = 'image/*';
+    fileInput.className = 'hidden';
+    fileInput.style.display = 'none';
+    fileInput.onchange = function(e) { handleDirectSlotFileUpload(e, habitKey); };
+    document.body.appendChild(fileInput);
+  }
+  fileInput.value = ''; // Reset nilai agar memilih file yang sama tetap memicu onchange
+  fileInput.setAttribute('data-target-habit', habitKey);
+  fileInput.click();
+}
+window.triggerUploadFileSlotDrive = triggerUploadFileSlotDrive;
+
+// Penangan Input File Langsung dari Slot
+function handleDirectSlotFileUpload(event, habitKey) {
+  const file = event.target.files && event.target.files[0];
+  const targetKey = habitKey || event.target.getAttribute('data-target-habit') || currentSlotHabitKey;
+  if (!file || !targetKey) return;
+  prosesFileGambarKeSlot(file, targetKey);
+  event.target.value = '';
+}
+window.handleDirectSlotFileUpload = handleDirectSlotFileUpload;
+
+// Penangan Drag-and-Drop Gambar Langsung ke Kartu Slot
+function handleSlotFileDrop(event, habitKey) {
+  event.preventDefault();
+  event.stopPropagation();
+  if (event.currentTarget) {
+    event.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
+  }
+  const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+  const targetKey = habitKey || currentSlotHabitKey;
+  if (!file || !targetKey) return;
+  prosesFileGambarKeSlot(file, targetKey);
+}
+window.handleSlotFileDrop = handleSlotFileDrop;
+
+// Fallback untuk Penangan Input Upload Modal
+function handleDriveSlotUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  const habitKey = event.target.getAttribute('data-target-habit') || currentSlotHabitKey;
+  if (!file || !habitKey) return;
+  prosesFileGambarKeSlot(file, habitKey);
   event.target.value = '';
 }
 window.handleDriveSlotUpload = handleDriveSlotUpload;
