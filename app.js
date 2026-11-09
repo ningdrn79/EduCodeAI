@@ -32,21 +32,21 @@ const DEFAULT_MASTER_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1
 const DEFAULT_OFFICIAL_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzfPogN8mA_Ro1pC2RIDVHxgQ2UaYbM103kkP6s8s6T6XHj8GCnPBt56M1BIgHXAIt3/exec';
 
 const DEFAULT_CLASS_SHEETS_CONFIG = {
-  '4A': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4A', count: 0 },
-  '4B': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4B', count: 0 },
-  '4C': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4C', count: 0 },
-  '4D': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4D', count: 0 },
-  '4E': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4E', count: 0 },
-  '5A': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5A', count: 0 },
-  '5B': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5B', count: 0 },
-  '5C': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5C', count: 0 },
-  '5D': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5D', count: 0 },
-  '5E': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5E', count: 0 },
-  '6A': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6A', count: 0 },
-  '6B': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6B', count: 0 },
-  '6C': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6C', count: 0 },
-  '6D': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6D', count: 0 },
-  '6E': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6E', count: 0 }
+  '4A': { label: 'Kelas 4A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4A', tingkat: '4', count: 0 },
+  '4B': { label: 'Kelas 4B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4B', tingkat: '4', count: 0 },
+  '4C': { label: 'Kelas 4C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4C', tingkat: '4', count: 0 },
+  '4D': { label: 'Kelas 4D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4D', tingkat: '4', count: 0 },
+  '4E': { label: 'Kelas 4E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4E', tingkat: '4', count: 0 },
+  '5A': { label: 'Kelas 5A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5A', tingkat: '5', count: 0 },
+  '5B': { label: 'Kelas 5B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5B', tingkat: '5', count: 0 },
+  '5C': { label: 'Kelas 5C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5C', tingkat: '5', count: 0 },
+  '5D': { label: 'Kelas 5D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5D', tingkat: '5', count: 0 },
+  '5E': { label: 'Kelas 5E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5E', tingkat: '5', count: 0 },
+  '6A': { label: 'Kelas 6A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6A', tingkat: '6', count: 0 },
+  '6B': { label: 'Kelas 6B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6B', tingkat: '6', count: 0 },
+  '6C': { label: 'Kelas 6C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6C', tingkat: '6', count: 0 },
+  '6D': { label: 'Kelas 6D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6D', tingkat: '6', count: 0 },
+  '6E': { label: 'Kelas 6E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6E', tingkat: '6', count: 0 }
 };
 
 // Auto-inisialisasi link permanen ke peramban jika belum tersimpan
@@ -18898,27 +18898,7 @@ function mulaiDengarSuaraSiswa(event) {
 
 // Catatan: Konstanta DB_STORAGE_KEY, ACTIVE_STUDENT_KEY, dsb. dideklarasikan di bagian paling atas skrip.
 
-// Master URL Google Spreadsheet Terpusat (Otomatis aktif di seluruh siswa & guru di perangkat mana pun)
-const DEFAULT_MASTER_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/16fKDdyZpLqTznn6crU1yZ0c5_srXd2XiLvfRtGSztEs/edit?usp=sharing';
-
-// Default konfigurasi penyimpanan Google Sheets per kelas
-const DEFAULT_CLASS_SHEETS_CONFIG = {
-  '4A': { label: 'Kelas 4A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4A', tingkat: '4', count: 0 },
-  '4B': { label: 'Kelas 4B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4B', tingkat: '4', count: 0 },
-  '4C': { label: 'Kelas 4C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4C', tingkat: '4', count: 0 },
-  '4D': { label: 'Kelas 4D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4D', tingkat: '4', count: 0 },
-  '4E': { label: 'Kelas 4E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4E', tingkat: '4', count: 0 },
-  '5A': { label: 'Kelas 5A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5A', tingkat: '5', count: 0 },
-  '5B': { label: 'Kelas 5B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5B', tingkat: '5', count: 0 },
-  '5C': { label: 'Kelas 5C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5C', tingkat: '5', count: 0 },
-  '5D': { label: 'Kelas 5D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5D', tingkat: '5', count: 0 },
-  '5E': { label: 'Kelas 5E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5E', tingkat: '5', count: 0 },
-  '6A': { label: 'Kelas 6A', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6A', tingkat: '6', count: 0 },
-  '6B': { label: 'Kelas 6B', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6B', tingkat: '6', count: 0 },
-  '6C': { label: 'Kelas 6C', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6C', tingkat: '6', count: 0 },
-  '6D': { label: 'Kelas 6D', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6D', tingkat: '6', count: 0 },
-  '6E': { label: 'Kelas 6E', sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6E', tingkat: '6', count: 0 }
-};
+// Catatan: DEFAULT_MASTER_SPREADSHEET_URL dan DEFAULT_CLASS_SHEETS_CONFIG telah dideklarasikan di bagian paling atas skrip.
 
 // Inisialisasi State Dasbor Guru
 if (typeof state.isGuruLoggedIn === 'undefined' || !state.isGuruLoggedIn) {
