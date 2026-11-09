@@ -148,6 +148,30 @@
           mode = 'guru';
         }
 
+        // Jika guru tidak aktif, periksa apakah ada sesi siswa aktif agar dock menu pembelajaran selalu tampil
+        if (!isGuru && mode !== 'guru') {
+          var activeStd = null;
+          try {
+            if (window.__ACTIVE_STUDENT_PROFILE__ && (window.__ACTIVE_STUDENT_PROFILE__.nama || window.__ACTIVE_STUDENT_PROFILE__.nis || window.__ACTIVE_STUDENT_PROFILE__.id)) {
+              activeStd = window.__ACTIVE_STUDENT_PROFILE__;
+            } else if (typeof getActiveStudentProfile === 'function') {
+              activeStd = getActiveStudentProfile();
+            }
+          } catch(eAct){}
+          if (!activeStd) {
+            try {
+              var rawStd = localStorage.getItem('educode_active_student_v1');
+              if (rawStd && rawStd !== 'LOGGED_OUT' && rawStd !== 'null' && rawStd.indexOf('{') !== -1) {
+                activeStd = JSON.parse(rawStd);
+              }
+            } catch(eStd){}
+          }
+          if (activeStd && (activeStd.nama || activeStd.nis || activeStd.id)) {
+            var isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1;
+            mode = isKelas5 ? 'kelas5' : 'sem1';
+          }
+        }
+
         var u = document.getElementById('navbar-tampilan-utama');
         var s1 = document.getElementById('navbar-tampilan-sem1');
         var g = document.getElementById('navbar-tampilan-guru');
@@ -16450,6 +16474,6 @@
 
   <canvas id="export-canvas" class="hidden"></canvas>
 
-  <script src="app.js?v=20261109_drive_fix_v103"></script>
+  <script src="app.js?v=20261109_header_nav_fix_v104"></script>
 </body>
 </html>

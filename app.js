@@ -761,6 +761,31 @@ function setHeaderNavMode(mode) {
   if (isGuru && mode !== 'guru') {
     mode = 'guru';
   }
+
+  // Jika guru tidak aktif, periksa apakah ada sesi siswa aktif agar dock menu pembelajaran selalu tampil
+  if (!isGuru && mode !== 'guru') {
+    let activeStd = null;
+    try {
+      if (window.__ACTIVE_STUDENT_PROFILE__ && (window.__ACTIVE_STUDENT_PROFILE__.nama || window.__ACTIVE_STUDENT_PROFILE__.nis || window.__ACTIVE_STUDENT_PROFILE__.id)) {
+        activeStd = window.__ACTIVE_STUDENT_PROFILE__;
+      } else if (typeof getActiveStudentProfile === 'function') {
+        activeStd = getActiveStudentProfile();
+      }
+    } catch(eAct){}
+    if (!activeStd) {
+      try {
+        const rawStd = localStorage.getItem('educode_active_student_v1');
+        if (rawStd && rawStd !== 'LOGGED_OUT' && rawStd !== 'null' && rawStd.indexOf('{') !== -1) {
+          activeStd = JSON.parse(rawStd);
+        }
+      } catch(eStd){}
+    }
+    if (activeStd && (activeStd.nama || activeStd.nis || activeStd.id)) {
+      const isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1;
+      mode = isKelas5 ? 'kelas5' : 'sem1';
+    }
+  }
+
   state.headerNavMode = mode;
   const navUtama = document.getElementById('navbar-tampilan-utama');
   const navSem1 = document.getElementById('navbar-tampilan-sem1');
