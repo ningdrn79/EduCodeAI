@@ -26825,6 +26825,15 @@ async function paksaSinkronDriveManual() {
     const merged = { ...cloudDrive, ...localData };
 
     // 4. Simpan hasil gabungan kembali ke cloud agar komputer lain bisa menariknya
+    // Kompresi ringan gambar jika base64 sangat besar agar tidak melampaui batas 1 MB Firestore
+    for (const k of Object.keys(merged)) {
+      if (merged[k] && merged[k].imageSrc && merged[k].imageSrc.startsWith('data:image/')) {
+        if (typeof kompresGambarUntukCloud === 'function') {
+          merged[k].imageSrc = await kompresGambarUntukCloud(merged[k].imageSrc);
+        }
+      }
+    }
+
     const payload = {
       studentNis: targetId,
       studentName: activeStudent ? activeStudent.nama : 'Pelajar Uji Coba',

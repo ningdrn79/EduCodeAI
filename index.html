@@ -10006,8 +10006,8 @@
               <button type="button" onclick="isiOtomatisVektorEdukasiLengkap()" class="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer" title="Lengkapi semua 7 slot dengan Vektor Edukasi HD resmi">
                 <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i> Lengkapi Cepat (Vektor HD)
               </button>
-              <button type="button" onclick="paksaSinkronDriveManual()" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Sinkronkan gambar ke Cloud agar otomatis sama di Komputer Lain">
-                <i class="fa-solid fa-cloud-arrow-up text-amber-300"></i> ⚡ Sinkron Cloud Antar-PC
+              <button type="button" id="btn-sync-cloud-drive" onclick="paksaSinkronDriveManual()" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Sinkronkan gambar ke Cloud agar otomatis sama di Komputer Lain">
+                <i class="fa-solid fa-cloud-arrow-up text-amber-300"></i> <span id="label-sync-cloud-drive">⚡ Sinkron Cloud Antar-PC</span>
               </button>
               <button type="button" onclick="resetDrive7Kebiasaan()" class="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer" title="Kosongkan semua slot di Drive">
                 <i class="fa-solid fa-rotate-left"></i> Reset Drive
@@ -16490,6 +16490,189 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
-  <script src="app.js?v=20261109_sync_cloud_v111"></script>
+  <script src="app.js?v=20261109_sync_cloud_v112"></script>
+
+  <script id="engine-cloud-sync-inline">
+  // ========================================================
+  // INLINE CORE: SINKRONISASI DRIVE CLOUD REALTIME & MERGE CERDAS
+  // Menjamin tombol [⚡ Sinkron Cloud Antar-PC] 100% selalu bereaksi seketika
+  // tanpa terhalang cache browser atau keterlambatan pemuatan script eksternal
+  // ========================================================
+  const OFFICIAL_TZUCHI_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y",
+    authDomain: "sd-tzuchi-kelas4.firebaseapp.com",
+    projectId: "sd-tzuchi-kelas4",
+    storageBucket: "sd-tzuchi-kelas4.firebasestorage.app",
+    messagingSenderId: "1083820511307",
+    appId: "1:1083820511307:web:4bd4f5933d6c061f1b7dce",
+    measurementId: "G-KWEHGW5C0X"
+  };
+
+  function getInlineFirestore() {
+    try {
+      if (typeof firebase === 'undefined') return null;
+      if (!firebase.apps || firebase.apps.length === 0) {
+        firebase.initializeApp(OFFICIAL_TZUCHI_FIREBASE_CONFIG);
+      }
+      return firebase.firestore();
+    } catch (e) {
+      console.warn('Gagal inisialisasi Firestore:', e);
+      return null;
+    }
+  }
+
+  // Kompresi helper sederhana untuk memastikan gambar tidak melebihi batas 1 MB Firestore
+  async function kompresGambarUntukCloud(dataUrl, maxSide = 480, quality = 0.65) {
+    if (!dataUrl || typeof dataUrl !== 'string' || dataUrl.length < 80000) return dataUrl;
+    if (dataUrl.startsWith('data:image/svg+xml')) return dataUrl;
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > h) {
+          if (w > maxSide) { h = Math.round((h * maxSide) / w); w = maxSide; }
+        } else {
+          if (h > maxSide) { w = Math.round((w * maxSide) / h); h = maxSide; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, w);
+        canvas.height = Math.max(1, h);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        try {
+          const comp = canvas.toDataURL('image/jpeg', quality);
+          resolve(comp.length < dataUrl.length ? comp : dataUrl);
+        } catch (e) {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
+  window.paksaSinkronDriveManual = async function() {
+    const btn = document.getElementById('btn-sync-cloud-drive');
+    const label = document.getElementById('label-sync-cloud-drive');
+    const oriLabel = label ? label.innerHTML : '⚡ Sinkron Cloud Antar-PC';
+
+    if (label) label.innerHTML = '⏳ Menghubungkan Cloud...';
+    if (btn) btn.disabled = true;
+
+    try {
+      // 1. Ambil DB Firestore
+      const db = getInlineFirestore();
+      if (!db) {
+        alert('⚠️ Firebase SDK belum termuat atau koneksi internet terputus.\n\nTips Instan: Gunakan tombol [📤 Ekspor File] dan [📥 Buka File] untuk menyamakan gambar secara langsung tanpa internet!');
+        if (label) label.innerHTML = oriLabel;
+        if (btn) btn.disabled = false;
+        return;
+      }
+
+      // 2. Identifikasi Siswa Aktif (Default: Pelajar Uji Coba NIS 3000)
+      let activeStudent = null;
+      try {
+        if (typeof getActiveStudentProfile === 'function') activeStudent = getActiveStudentProfile();
+        if (!activeStudent) {
+          const sess = localStorage.getItem('educode_active_student_v1');
+          if (sess) activeStudent = JSON.parse(sess);
+        }
+      } catch (e) {}
+
+      const studentNis = activeStudent ? (activeStudent.nis || activeStudent.id || '3000') : '3000';
+      const targetId = String(studentNis);
+      const studentNama = activeStudent ? (activeStudent.nama || 'Pelajar Uji Coba') : 'Pelajar Uji Coba';
+      const studentKelas = activeStudent ? (activeStudent.kelas || '4A') : '4A';
+
+      // 3. Ambil data lokal dari semua kemungkinan kunci storage browser
+      let localDrive = {};
+      const possibleKeys = [
+        'educode_drive_7kebiasaan_' + targetId,
+        'educode_drive_7kebiasaan_3000',
+        'educode_drive_7kebiasaan_tamu_umum',
+        'educode_drive_7kebiasaan_Pelajar Uji Coba'
+      ];
+      for (let k of possibleKeys) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const p = JSON.parse(raw);
+            if (p && typeof p === 'object') {
+              localDrive = { ...localDrive, ...p };
+            }
+          }
+        } catch (e) {}
+      }
+
+      // 4. Unduh data dari Cloud Firestore
+      if (label) label.innerHTML = '⏳ Mengambil data Cloud...';
+      const docRef = db.collection('student_drives').doc(targetId);
+      const docSnap = await docRef.get();
+
+      let cloudDrive = {};
+      if (docSnap.exists) {
+        const cData = docSnap.data();
+        if (cData && cData.driveData) {
+          try { cloudDrive = JSON.parse(cData.driveData); } catch (e) {}
+        }
+      }
+
+      // 5. Gabungkan kedua sisi (Auto-Merge Cerdas Antar-Komputer)
+      const merged = { ...cloudDrive, ...localDrive };
+
+      // 6. Kompresi gambar besar agar muat aman di limit 1 MB Firestore
+      if (label) label.innerHTML = '⏳ Mengoptimasi & Mengunggah...';
+      for (const k of Object.keys(merged)) {
+        if (merged[k] && merged[k].imageSrc && merged[k].imageSrc.startsWith('data:image/')) {
+          merged[k].imageSrc = await kompresGambarUntukCloud(merged[k].imageSrc);
+        }
+      }
+
+      // 7. Simpan hasil gabungan kembali ke Cloud Firestore
+      const payload = {
+        studentNis: targetId,
+        studentName: studentNama,
+        studentClass: studentKelas,
+        driveData: JSON.stringify(merged),
+        totalGambar: Object.keys(merged).length,
+        updatedAt: Date.now()
+      };
+
+      await docRef.set(payload, { merge: true });
+
+      // 8. Simpan kembali ke penyimpanan lokal komputer ini
+      for (let k of possibleKeys) {
+        try { localStorage.setItem(k, JSON.stringify(merged)); } catch (e) {}
+      }
+      if (activeStudent) {
+        activeStudent.driveData = merged;
+        try { localStorage.setItem('educode_active_student_v1', JSON.stringify(activeStudent)); } catch (e) {}
+      }
+
+      // 9. Refresh tampilan grid kartu Drive
+      if (typeof renderDrive7KebiasaanGrid === 'function') {
+        renderDrive7KebiasaanGrid();
+      }
+
+      const totalActive = Object.keys(merged).length;
+      alert(`🎉 SINKRONISASI CLOUD BERHASIL!\n\n` +
+            `• ID Siswa: ${studentNama} (${targetId})\n` +
+            `• Total Gambar Tersinkron: ${totalActive} dari 7 Gambar\n` +
+            `• Status: Berhasil tersimpan di Google Cloud Firestore!\n\n` +
+            `Sekarang buka Komputer Kedua dan klik tombol [⚡ Sinkron Cloud Antar-PC], maka seluruh gambarnya akan langsung sama persis! ✨`);
+
+    } catch (err) {
+      console.error('Error sinkron manual:', err);
+      if (err && (err.code === 'permission-denied' || (err.message && err.message.toLowerCase().includes('permission')))) {
+        alert('⚠️ Izin Cloud Ditolak (Permission Denied):\nAturan Firestore di Firebase Console belum diatur ke: allow read, write: if true;');
+      } else {
+        alert('⚠️ Hasil Sinkronisasi:\n' + (err.message || 'Gagal tersambung. Periksa koneksi internet atau gunakan tombol [📤 Ekspor File].'));
+      }
+    } finally {
+      if (label) label.innerHTML = oriLabel;
+      if (btn) btn.disabled = false;
+    }
+  };
+  </script>
 </body>
 </html>
