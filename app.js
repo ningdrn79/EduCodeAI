@@ -6426,46 +6426,48 @@ function kompresiGambarDataUrl(dataUrl, maxDimension = 600, quality = 0.8, callb
 window.kompresiGambarDataUrl = kompresiGambarDataUrl;
 
 function muatDrive7Kebiasaan(studentProfile) {
-  if (studentProfile) {
-    // 1. Cek langsung properti driveData di profil siswa
-    if (studentProfile.driveData && typeof studentProfile.driveData === 'object' && Object.keys(studentProfile.driveData).length > 0) {
-      return studentProfile.driveData;
-    }
+  const activeStudent = studentProfile || ((typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null);
+  const key = getDriveStorageKey(activeStudent);
+  let driveObj = {};
 
-    // 2. Coba beberapa variasi kunci penyimpanan siswa (NIS, ID, Nama) di localStorage
+  // 1. Baca dari penyimpanan utama localStorage[key]
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        driveObj = { ...parsed };
+      }
+    }
+  } catch (e) {}
+
+  // 2. Gabungkan jika ada data di variasi kunci lama atau properti driveData di profil siswa
+  if (activeStudent) {
     const possibleKeys = [
-      studentProfile.nis ? `educode_drive_7kebiasaan_${studentProfile.nis}` : null,
-      studentProfile.id ? `educode_drive_7kebiasaan_${studentProfile.id}` : null,
-      studentProfile.nama ? `educode_drive_7kebiasaan_${studentProfile.nama}` : null
+      activeStudent.nis ? `educode_drive_7kebiasaan_${activeStudent.nis}` : null,
+      activeStudent.id ? `educode_drive_7kebiasaan_${activeStudent.id}` : null,
+      activeStudent.nama ? `educode_drive_7kebiasaan_${activeStudent.nama}` : null
     ].filter(Boolean);
 
     for (let k of possibleKeys) {
-      let r = localStorage.getItem(k);
-      if (r) {
-        try {
+      if (k === key) continue;
+      try {
+        let r = localStorage.getItem(k);
+        if (r) {
           const parsed = JSON.parse(r);
-          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-            return parsed;
+          if (parsed && typeof parsed === 'object') {
+            driveObj = { ...parsed, ...driveObj };
           }
-        } catch (e) {}
-      }
+        }
+      } catch (e) {}
+    }
+
+    if (activeStudent.driveData && typeof activeStudent.driveData === 'object') {
+      driveObj = { ...activeStudent.driveData, ...driveObj };
     }
   }
 
-  // 3. Jika dipanggil tanpa parameter (misal siswa aktif saat belajar)
-  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-  if (activeStudent && activeStudent.driveData && typeof activeStudent.driveData === 'object' && Object.keys(activeStudent.driveData).length > 0) {
-    return activeStudent.driveData;
-  }
-
-  const key = getDriveStorageKey(studentProfile || activeStudent);
-  let raw = localStorage.getItem(key);
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw) || {};
-  } catch (e) {
-    return {};
-  }
+  return driveObj;
 }
 window.muatDrive7Kebiasaan = muatDrive7Kebiasaan;
 
