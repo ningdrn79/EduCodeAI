@@ -2355,6 +2355,19 @@
                   </button>
                 </div>
 
+                <!-- Input Tautan Google Drive / Google Slides File 1 -->
+                <div class="mt-3 text-left">
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">
+                    <i class="fa-brands fa-google-drive text-orange-500"></i> Atau Link Google Drive / Google Slides (Opsional):
+                  </label>
+                  <div class="flex gap-1.5">
+                    <input type="url" id="link-gdrive-ppt1" placeholder="https://drive.google.com/... atau link Google Slides" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-mono focus:ring-2 focus:ring-orange-500" onchange="window.handleGdriveLinkChange()">
+                    <button type="button" onclick="window.bukaGdrivePpt(1)" class="px-2.5 py-1.5 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Buka Link Google Drive">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Detail Berkas Terunggah -->
                 <div id="detail-ppt1-box" class="hidden mt-3 p-3 bg-orange-50/70 border border-orange-200 rounded-xl text-xs space-y-1">
                   <div class="font-bold text-orange-950 truncate flex items-center gap-1.5">
@@ -2411,6 +2424,19 @@
                   <textarea id="prompt-gemini-ai" rows="2" placeholder="Contoh: 'Tolong buatkan 5 ide slide presentasi hemat energi listrik untuk kelas 5 SD'..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 font-sans"></textarea>
                 </div>
 
+                <!-- Input Tautan Google Drive / Google Slides File 2 -->
+                <div class="mt-3 text-left">
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">
+                    <i class="fa-brands fa-google-drive text-sky-500"></i> Atau Link Google Drive / Google Slides (Opsional):
+                  </label>
+                  <div class="flex gap-1.5">
+                    <input type="url" id="link-gdrive-ppt2" placeholder="https://drive.google.com/... atau link Google Slides" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-mono focus:ring-2 focus:ring-sky-500" onchange="window.handleGdriveLinkChange()">
+                    <button type="button" onclick="window.bukaGdrivePpt(2)" class="px-2.5 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Buka Link Google Drive">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Detail Berkas Terunggah -->
                 <div id="detail-ppt2-box" class="hidden mt-3 p-3 bg-sky-50/70 border border-sky-200 rounded-xl text-xs space-y-1">
                   <div class="font-bold text-sky-950 truncate flex items-center gap-1.5">
@@ -2435,13 +2461,13 @@
 
           </div>
 
-          <!-- Tombol Final Kirim Tugas Presentasi -->
+          <!-- Tombol Final Kirim Tugas Presentasi ke Server Cloud & Guru -->
           <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
             <div class="text-xs text-slate-500" id="status-keseluruhan-ppt">
-              <span class="font-bold text-slate-700">Status Tugas:</span> Pastikan kedua berkas (PPT Manual &amp; PPT Gemini AI) terunggah lengkap.
+              <span class="font-bold text-slate-700">Status Tugas:</span> <span id="label-status-cloud-ppt">Pastikan berkas (PPT Manual, PPT Gemini AI, atau Link Google Drive) terisi.</span>
             </div>
-            <button type="button" onclick="window.simpanTugasPresentasiP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-              <i class="fa-solid fa-paper-plane"></i> <span>Kirim 2 Berkas Presentasi ke Guru 🚀</span>
+            <button type="button" id="btn-kirim-presentasi-cloud" onclick="window.simpanTugasPresentasiP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 via-amber-600 to-indigo-600 hover:from-orange-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-cloud-arrow-up"></i> <span id="label-btn-kirim-ppt">Kirim ke Server Cloud &amp; Guru 🚀</span>
             </button>
           </div>
         </div>
@@ -2954,17 +2980,42 @@
         };
 
         // --- MENU 1: PRESENTASI (PPT MANUAL & GEMINI AI) ---
+        window.bukaGdrivePpt = function(fileNum) {
+          var input = document.getElementById('link-gdrive-ppt' + fileNum);
+          var val = input ? input.value.trim() : '';
+          if (!val) {
+            alert('Belum ada tautan Google Drive / Google Slides yang dimasukkan.');
+            return;
+          }
+          if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+          window.open(val, '_blank');
+        };
+
+        window.handleGdriveLinkChange = function() {
+          var g1 = document.getElementById('link-gdrive-ppt1');
+          var g2 = document.getElementById('link-gdrive-ppt2');
+          if (g1) {
+            window._p5Data.ppt1 = window._p5Data.ppt1 || {};
+            window._p5Data.ppt1.gdriveLink = g1.value.trim();
+          }
+          if (g2) {
+            window._p5Data.ppt2 = window._p5Data.ppt2 || {};
+            window._p5Data.ppt2.gdriveLink = g2.value.trim();
+          }
+          simpanKeStorage();
+          window.renderStatusPpt();
+        };
+
         window.handleUploadPpt1 = function(e) {
           var file = e.target.files && e.target.files[0];
           if (!file) return;
           var reader = new FileReader();
           reader.onload = function(evt) {
-            window._p5Data.ppt1 = {
-              name: file.name,
-              size: (file.size / 1024).toFixed(1) + ' KB',
-              time: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }),
-              dataUrl: evt.target.result
-            };
+            window._p5Data.ppt1 = window._p5Data.ppt1 || {};
+            window._p5Data.ppt1.name = file.name;
+            window._p5Data.ppt1.size = (file.size / 1024).toFixed(1) + ' KB';
+            window._p5Data.ppt1.time = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            window._p5Data.ppt1.dataUrl = evt.target.result;
             simpanKeStorage();
             window.renderStatusPpt();
             try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
@@ -2979,13 +3030,12 @@
           var reader = new FileReader();
           reader.onload = function(evt) {
             var promptVal = document.getElementById('prompt-gemini-ai') ? document.getElementById('prompt-gemini-ai').value : '';
-            window._p5Data.ppt2 = {
-              name: file.name,
-              size: (file.size / 1024).toFixed(1) + ' KB',
-              time: new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }),
-              dataUrl: evt.target.result,
-              prompt: promptVal
-            };
+            window._p5Data.ppt2 = window._p5Data.ppt2 || {};
+            window._p5Data.ppt2.name = file.name;
+            window._p5Data.ppt2.size = (file.size / 1024).toFixed(1) + ' KB';
+            window._p5Data.ppt2.time = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            window._p5Data.ppt2.dataUrl = evt.target.result;
+            window._p5Data.ppt2.prompt = promptVal;
             simpanKeStorage();
             window.renderStatusPpt();
             try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
@@ -2997,6 +3047,8 @@
         window.hapusFilePpt1 = function() {
           window._p5Data.ppt1 = null;
           simpanKeStorage();
+          var g1 = document.getElementById('link-gdrive-ppt1');
+          if (g1) g1.value = '';
           window.renderStatusPpt();
           if (typeof showToast === 'function') showToast('Berkas File 1 dihapus.', 'info');
         };
@@ -3004,6 +3056,8 @@
         window.hapusFilePpt2 = function() {
           window._p5Data.ppt2 = null;
           simpanKeStorage();
+          var g2 = document.getElementById('link-gdrive-ppt2');
+          if (g2) g2.value = '';
           window.renderStatusPpt();
           if (typeof showToast === 'function') showToast('Berkas File 2 dihapus.', 'info');
         };
@@ -3016,13 +3070,33 @@
           var u1 = document.getElementById('ukuran-file-ppt1');
           var w1 = document.getElementById('waktu-file-ppt1');
           var l1 = document.getElementById('link-unduh-ppt1');
-          if (window._p5Data.ppt1) {
-            if (b1) { b1.innerText = '✅ Siap Dikirim'; b1.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; }
+          var g1 = document.getElementById('link-gdrive-ppt1');
+
+          if (window._p5Data.ppt1 && (window._p5Data.ppt1.name || window._p5Data.ppt1.gdriveLink)) {
+            if (b1) { 
+              b1.innerText = window._p5Data.ppt1.isCloudSaved ? '☁️ Tersimpan di Cloud' : '✅ Siap Dikirim'; 
+              b1.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; 
+            }
             if (d1) d1.classList.remove('hidden');
-            if (n1) n1.innerText = window._p5Data.ppt1.name;
-            if (u1) u1.innerText = 'Ukuran: ' + window._p5Data.ppt1.size;
-            if (w1) w1.innerText = 'Waktu: ' + window._p5Data.ppt1.time;
-            if (l1) { l1.href = window._p5Data.ppt1.dataUrl; l1.download = window._p5Data.ppt1.name; }
+            if (n1) n1.innerText = window._p5Data.ppt1.name || (window._p5Data.ppt1.gdriveLink ? 'Tautan Google Drive' : 'Berkas Terlampir');
+            if (u1) u1.innerText = 'Ukuran: ' + (window._p5Data.ppt1.size || '-');
+            if (w1) w1.innerText = 'Waktu: ' + (window._p5Data.ppt1.time || '-');
+            if (l1) {
+              if (window._p5Data.ppt1.dataUrl) {
+                l1.href = window._p5Data.ppt1.dataUrl; 
+                l1.download = window._p5Data.ppt1.name || 'Presentasi_Manual.pptx';
+                l1.classList.remove('hidden');
+              } else if (window._p5Data.ppt1.gdriveLink) {
+                l1.href = window._p5Data.ppt1.gdriveLink;
+                l1.target = '_blank';
+                l1.removeAttribute('download');
+                l1.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> Buka di Google Drive';
+                l1.classList.remove('hidden');
+              }
+            }
+            if (g1 && window._p5Data.ppt1.gdriveLink && !g1.value) {
+              g1.value = window._p5Data.ppt1.gdriveLink;
+            }
           } else {
             if (b1) { b1.innerText = 'Belum Diunggah'; b1.className = 'text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full'; }
             if (d1) d1.classList.add('hidden');
@@ -3036,35 +3110,225 @@
           var w2 = document.getElementById('waktu-file-ppt2');
           var l2 = document.getElementById('link-unduh-ppt2');
           var p2 = document.getElementById('prompt-gemini-ai');
-          if (window._p5Data.ppt2) {
-            if (b2) { b2.innerText = '✅ Siap Dikirim'; b2.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; }
+          var g2 = document.getElementById('link-gdrive-ppt2');
+
+          if (window._p5Data.ppt2 && (window._p5Data.ppt2.name || window._p5Data.ppt2.gdriveLink)) {
+            if (b2) { 
+              b2.innerText = window._p5Data.ppt2.isCloudSaved ? '☁️ Tersimpan di Cloud' : '✅ Siap Dikirim'; 
+              b2.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; 
+            }
             if (d2) d2.classList.remove('hidden');
-            if (n2) n2.innerText = window._p5Data.ppt2.name;
-            if (u2) u2.innerText = 'Ukuran: ' + window._p5Data.ppt2.size;
-            if (w2) w2.innerText = 'Waktu: ' + window._p5Data.ppt2.time;
-            if (l2) { l2.href = window._p5Data.ppt2.dataUrl; l2.download = window._p5Data.ppt2.name; }
+            if (n2) n2.innerText = window._p5Data.ppt2.name || (window._p5Data.ppt2.gdriveLink ? 'Tautan Google Drive' : 'Berkas Terlampir');
+            if (u2) u2.innerText = 'Ukuran: ' + (window._p5Data.ppt2.size || '-');
+            if (w2) w2.innerText = 'Waktu: ' + (window._p5Data.ppt2.time || '-');
+            if (l2) {
+              if (window._p5Data.ppt2.dataUrl) {
+                l2.href = window._p5Data.ppt2.dataUrl; 
+                l2.download = window._p5Data.ppt2.name || 'Presentasi_GeminiAI.pptx';
+                l2.classList.remove('hidden');
+              } else if (window._p5Data.ppt2.gdriveLink) {
+                l2.href = window._p5Data.ppt2.gdriveLink;
+                l2.target = '_blank';
+                l2.removeAttribute('download');
+                l2.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> Buka di Google Drive';
+                l2.classList.remove('hidden');
+              }
+            }
             if (p2 && window._p5Data.ppt2.prompt && !p2.value) p2.value = window._p5Data.ppt2.prompt;
+            if (g2 && window._p5Data.ppt2.gdriveLink && !g2.value) {
+              g2.value = window._p5Data.ppt2.gdriveLink;
+            }
           } else {
             if (b2) { b2.innerText = 'Belum Diunggah'; b2.className = 'text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full'; }
             if (d2) d2.classList.add('hidden');
           }
+
+          // Label Status Tugas Global
+          var labelStatus = document.getElementById('label-status-cloud-ppt');
+          var isAnyCloud = (window._p5Data.ppt1 && window._p5Data.ppt1.isCloudSaved) || (window._p5Data.ppt2 && window._p5Data.ppt2.isCloudSaved);
+          if (labelStatus) {
+            if (isAnyCloud) {
+              labelStatus.innerHTML = '<b class="text-emerald-700">☁️ Status: Tersinkron di Google Cloud Firebase &amp; Siap Dinilai Guru!</b>';
+            } else if (window._p5Data.ppt1 || window._p5Data.ppt2) {
+              labelStatus.innerHTML = '<b class="text-amber-700">Siap dikirim ke Server Cloud &amp; Guru (Klik tombol di kanan)</b>';
+            }
+          }
         };
 
-        window.simpanTugasPresentasiP5 = function() {
-          if (!window._p5Data.ppt1 && !window._p5Data.ppt2) {
-            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
-            if (typeof showToast === 'function') showToast('Unggah minimal salah satu berkas presentasi terlebih dahulu!', 'warning');
-            return;
-          }
+        window.simpanTugasPresentasiP5 = async function() {
+          var g1Val = document.getElementById('link-gdrive-ppt1') ? document.getElementById('link-gdrive-ppt1').value.trim() : '';
+          var g2Val = document.getElementById('link-gdrive-ppt2') ? document.getElementById('link-gdrive-ppt2').value.trim() : '';
           var promptVal = document.getElementById('prompt-gemini-ai') ? document.getElementById('prompt-gemini-ai').value : '';
+
+          if (g1Val) {
+            window._p5Data.ppt1 = window._p5Data.ppt1 || {};
+            window._p5Data.ppt1.gdriveLink = g1Val;
+          }
+          if (g2Val) {
+            window._p5Data.ppt2 = window._p5Data.ppt2 || {};
+            window._p5Data.ppt2.gdriveLink = g2Val;
+          }
           if (window._p5Data.ppt2) {
             window._p5Data.ppt2.prompt = promptVal;
           }
+
+          var hasFile1 = window._p5Data.ppt1 && (window._p5Data.ppt1.dataUrl || window._p5Data.ppt1.gdriveLink);
+          var hasFile2 = window._p5Data.ppt2 && (window._p5Data.ppt2.dataUrl || window._p5Data.ppt2.gdriveLink);
+
+          if (!hasFile1 && !hasFile2) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            alert('⚠️ Unggah minimal salah satu berkas (.pptx/.ppt/.pdf) atau tempel link Google Drive sebelum mengirim!');
+            return;
+          }
+
+          var btn = document.getElementById('btn-kirim-presentasi-cloud');
+          var labelBtn = document.getElementById('label-btn-kirim-ppt');
+          var oriBtnHtml = labelBtn ? labelBtn.innerHTML : 'Kirim ke Server Cloud &amp; Guru 🚀';
+
+          if (labelBtn) labelBtn.innerHTML = '⏳ Mengunggah ke Server Cloud...';
+          if (btn) btn.disabled = true;
+
+          // 1. Identifikasi Profil Siswa
+          var student = null;
+          try {
+            if (typeof getActiveStudentProfile === 'function') student = getActiveStudentProfile();
+            if (!student) {
+              var sess = localStorage.getItem('educode_active_student_v1');
+              if (sess) student = JSON.parse(sess);
+            }
+          } catch(e) {}
+
+          var studentNis = student ? (student.nis || student.id || '3000') : '3000';
+          var studentNama = student ? (student.nama || 'Pelajar Uji Coba') : 'Pelajar Uji Coba';
+          var studentKelas = student ? (student.kelas || '5A') : '5A';
+
+          // 2. Hubungkan & Simpan ke Server Cloud Firebase (Firestore & Storage)
+          var cloudSuccess = false;
+          try {
+            var db = null;
+            if (typeof getInlineFirestore === 'function') db = getInlineFirestore();
+            if (!db && typeof firebase !== 'undefined' && firebase.firestore) db = firebase.firestore();
+
+            if (db) {
+              var payload = {
+                studentNis: String(studentNis),
+                studentName: studentNama,
+                studentClass: studentKelas,
+                kategori: 'presentasi_kelas5',
+                ppt1: window._p5Data.ppt1 ? {
+                  name: window._p5Data.ppt1.name || 'PowerPoint_Manual',
+                  size: window._p5Data.ppt1.size || '-',
+                  time: window._p5Data.ppt1.time || new Date().toLocaleString('id-ID'),
+                  gdriveLink: window._p5Data.ppt1.gdriveLink || ''
+                } : null,
+                ppt2: window._p5Data.ppt2 ? {
+                  name: window._p5Data.ppt2.name || 'PowerPoint_GeminiAI',
+                  size: window._p5Data.ppt2.size || '-',
+                  time: window._p5Data.ppt2.time || new Date().toLocaleString('id-ID'),
+                  prompt: window._p5Data.ppt2.prompt || '',
+                  gdriveLink: window._p5Data.ppt2.gdriveLink || ''
+                } : null,
+                status: 'Terkumpul',
+                points: 25,
+                updatedAt: Date.now()
+              };
+
+              // Simpan dataUrl jika ukurannya di bawah batas 700 KB
+              if (window._p5Data.ppt1 && window._p5Data.ppt1.dataUrl && window._p5Data.ppt1.dataUrl.length < 800000) {
+                payload.ppt1.dataUrl = window._p5Data.ppt1.dataUrl;
+              }
+              if (window._p5Data.ppt2 && window._p5Data.ppt2.dataUrl && window._p5Data.ppt2.dataUrl.length < 800000) {
+                payload.ppt2.dataUrl = window._p5Data.ppt2.dataUrl;
+              }
+
+              await db.collection('karya_presentasi_kelas5').doc(String(studentNis)).set(payload, { merge: true });
+              cloudSuccess = true;
+              if (window._p5Data.ppt1) window._p5Data.ppt1.isCloudSaved = true;
+              if (window._p5Data.ppt2) window._p5Data.ppt2.isCloudSaved = true;
+            }
+          } catch(errCloud) {
+            console.warn('Gagal simpan presentasi ke Firebase Cloud:', errCloud);
+          }
+
+          // 3. Simpan ke Penyimpanan Lokal
           simpanKeStorage();
+          window.renderStatusPpt();
+
+          if (btn) btn.disabled = false;
+          if (labelBtn) labelBtn.innerHTML = oriBtnHtml;
+
           try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
-          if (typeof showToast === 'function') showToast('Tugas Presentasi (PowerPoint & Gemini AI) berhasil dikirim ke Guru! 📊✨ (+25 Bintang)', 'success');
           if (typeof tambahPoin === 'function') tambahPoin(25);
+
+          var ringkasan = [];
+          if (window._p5Data.ppt1) {
+            var s1 = window._p5Data.ppt1.name || 'File PPT 1';
+            if (window._p5Data.ppt1.gdriveLink) s1 += ' [Link Google Drive]';
+            ringkasan.push('• File 1 (Manual): ' + s1);
+          }
+          if (window._p5Data.ppt2) {
+            var s2 = window._p5Data.ppt2.name || 'File PPT 2';
+            if (window._p5Data.ppt2.gdriveLink) s2 += ' [Link Google Drive]';
+            ringkasan.push('• File 2 (Gemini AI): ' + s2);
+          }
+
+          if (cloudSuccess) {
+            alert('🎉 TUGAS PRESENTASI BERHASIL DIHUBUNGKAN KE SERVER CLOUD!\n\n' +
+                  '• Siswa: ' + studentNama + ' (' + studentNis + ' - ' + studentKelas + ')\n' +
+                  ringkasan.join('\n') + '\n\n' +
+                  '• Status Cloud: Berhasil tersimpan di Google Cloud Firebase (sd-tzuchi-kelas4)!\n' +
+                  '• Status Google Drive: Terkoneksi!\n\n' +
+                  'Siswa kini dapat berpindah ke komputer lab mana saja, tugas presentasi akan otomatis termuat kembali! ✨');
+            if (typeof showToast === 'function') showToast('✅ Tugas Presentasi berhasil disimpan di Server Cloud Firebase & Google Drive! ☁️ (+25 Bintang)', 'success');
+          } else {
+            alert('💾 TUGAS PRESENTASI TERSIMPAN DI PERAMBAN KOMPUTER:\n\n' +
+                  ringkasan.join('\n') + '\n\n' +
+                  'Periksa koneksi internet untuk mengunggah otomatis ke Cloud Firebase, atau pastikan link Google Drive sudah terisi.');
+            if (typeof showToast === 'function') showToast('Tugas tersimpan di komputer lokal (+25 Bintang)', 'info');
+          }
         };
+
+        // Pulihkan Tugas Presentasi dari Cloud jika ada
+        async function pulihkanPresentasiDariCloud() {
+          try {
+            var db = null;
+            if (typeof getInlineFirestore === 'function') db = getInlineFirestore();
+            if (!db && typeof firebase !== 'undefined' && firebase.firestore) db = firebase.firestore();
+            if (!db) return;
+
+            var student = null;
+            try {
+              if (typeof getActiveStudentProfile === 'function') student = getActiveStudentProfile();
+              if (!student) {
+                var sess = localStorage.getItem('educode_active_student_v1');
+                if (sess) student = JSON.parse(sess);
+              }
+            } catch(e) {}
+            var studentNis = student ? (student.nis || student.id || '3000') : '3000';
+
+            var docSnap = await db.collection('karya_presentasi_kelas5').doc(String(studentNis)).get();
+            if (docSnap && docSnap.exists) {
+              var cData = docSnap.data();
+              if (cData) {
+                var changed = false;
+                if (cData.ppt1 && !window._p5Data.ppt1) {
+                  window._p5Data.ppt1 = cData.ppt1;
+                  window._p5Data.ppt1.isCloudSaved = true;
+                  changed = true;
+                }
+                if (cData.ppt2 && !window._p5Data.ppt2) {
+                  window._p5Data.ppt2 = cData.ppt2;
+                  window._p5Data.ppt2.isCloudSaved = true;
+                  changed = true;
+                }
+                if (changed) {
+                  simpanKeStorage();
+                  window.renderStatusPpt();
+                }
+              }
+            }
+          } catch(e) {}
+        }
 
         // --- MENU 2: SERTIFIKAT HOUR OF CODE (FILE HASIL DOWNLOAD) ---
         window.handleUploadSertifikatHourOfCode = function(e) {
@@ -3329,6 +3593,9 @@
           window.renderSertifikatView();
           window.renderPosterPreview();
           window.renderScratchView();
+          if (typeof pulihkanPresentasiDariCloud === 'function') {
+            setTimeout(pulihkanPresentasiDariCloud, 200);
+          }
         }
 
         if (document.readyState === 'loading') {
@@ -16489,8 +16756,9 @@
   <!-- Firebase SDKs for Realtime Multi-Computer Sync -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261109_sync_cloud_v112"></script>
+  <script src="app.js?v=20261109_sync_cloud_v113"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

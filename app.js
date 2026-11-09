@@ -26936,6 +26936,11 @@ async function sinkronkanKaryaSiswaDariCloud(profile) {
       }
     }
 
+    // 3C. Tarik tugas Presentasi Kelas 5 dari Cloud
+    if (studentNis && typeof pulihkanPresentasiDariCloud === 'function') {
+      pulihkanPresentasiDariCloud();
+    }
+
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     localStorage.setItem(FIREBASE_LAST_SYNC_KEY, nowStr);
     perbaruiStatusFirebaseUI();
