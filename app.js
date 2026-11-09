@@ -7090,14 +7090,20 @@ function bukaModalPilihSumberSlot(habitKey) {
   if (titleEl && cfg) {
     titleEl.innerText = `Pilih Gambar: [${cfg.title}]`;
   }
-  const modal = document.getElementById('modal-pilih-sumber-drive');
-  if (modal) modal.classList.remove('hidden');
+  const modal = document.getElementById('modal-pilih-sumber-drive') || document.getElementById('modal-pilih-sumber-drive-alt');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  }
 }
 window.bukaModalPilihSumberSlot = bukaModalPilihSumberSlot;
 
 function tutupModalPilihSumberSlot() {
-  const modal = document.getElementById('modal-pilih-sumber-drive');
-  if (modal) modal.classList.add('hidden');
+  const modal = document.getElementById('modal-pilih-sumber-drive') || document.getElementById('modal-pilih-sumber-drive-alt');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
 }
 window.tutupModalPilihSumberSlot = tutupModalPilihSumberSlot;
 
@@ -7150,17 +7156,27 @@ function aksiPilihSumberSlot(sumberType) {
     showToast(`Membuka Aplikasi Paint Terbaru! Silakan gambar untuk "${cfg ? cfg.cleanTitle : 'slot'}", lalu klik tombol "Simpan ke Drive 📁"! 🎨`, 'info');
   } else if (sumberType === 'upload') {
     // Trigger input file
-    const fileInput = document.getElementById('drive-slot-upload-input');
-    if (fileInput) {
-      fileInput.setAttribute('data-target-habit', habitKey);
-      fileInput.click();
+    let fileInput = document.getElementById('drive-slot-upload-input');
+    if (!fileInput) {
+      fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.id = 'drive-slot-upload-input';
+      fileInput.accept = 'image/*';
+      fileInput.className = 'hidden';
+      fileInput.onchange = handleDriveSlotUpload;
+      document.body.appendChild(fileInput);
     }
+    fileInput.setAttribute('data-target-habit', habitKey);
+    fileInput.click();
   } else if (sumberType === 'vektor_instan') {
     // Pasang vektor bawaan
     const item = KATALOG_KARTUN_7KEBIASAAN.find(k => k.id === cfg.vectorId);
     const dataUrl = item ? (item.dataUrl || dapatkanDataUrlKartun(item)) : null;
     if (dataUrl) {
-      simpanGambarKeSlotDrive(habitKey, dataUrl, item.title, '🌟 Vektor HD');
+      const fileName = buatSaranNamaFileBaku(cfg.cleanTitle);
+      simpanGambarKeSlotDrive(habitKey, dataUrl, item.title, '🌟 Vektor HD', fileName);
+    } else {
+      showToast(`Vektor untuk ${cfg ? cfg.cleanTitle : 'slot'} berhasil diproses.`, 'info');
     }
   }
 }
