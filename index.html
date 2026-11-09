@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261107_smooth_zero_delay_v102">
+  <link rel="stylesheet" href="styles.css?v=20261109_kelas_terpisah_v115">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -1540,12 +1540,23 @@
           }
           return;
         }
-        var s = window.__ACTIVE_STUDENT_RESTORED__;
+        var s = window.__ACTIVE_STUDENT_RESTORED__ || window.__ACTIVE_STUDENT_PROFILE__;
         if (s) {
-          var u = document.getElementById('navbar-tampilan-utama');
-          var s1 = document.getElementById('navbar-tampilan-sem1');
-          if (u) u.classList.add('hidden');
-          if (s1) s1.classList.remove('hidden');
+          var isKelas6 = String(s.kelas || '').indexOf('6') !== -1;
+          var isKelas5 = String(s.kelas || '').indexOf('5') !== -1;
+          var mode = isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1');
+          if (typeof window.setHeaderNavMode === 'function') {
+            window.setHeaderNavMode(mode);
+          } else {
+            var u = document.getElementById('navbar-tampilan-utama');
+            var s1 = document.getElementById('navbar-tampilan-sem1');
+            var k5 = document.getElementById('navbar-tampilan-kelas5');
+            var k6 = document.getElementById('navbar-tampilan-kelas6');
+            if (u) u.classList.add('hidden');
+            if (s1) { if (mode === 'sem1') s1.classList.remove('hidden'); else s1.classList.add('hidden'); }
+            if (k5) { if (mode === 'kelas5') k5.classList.remove('hidden'); else k5.classList.add('hidden'); }
+            if (k6) { if (mode === 'kelas6') k6.classList.remove('hidden'); else k6.classList.add('hidden'); }
+          }
         }
       })();
     </script>
@@ -1662,10 +1673,21 @@
               btnGanti.style.removeProperty('display');
               btnGanti.style.setProperty('display', 'inline-flex', 'important'); 
             }
-            var navSem1 = document.getElementById('navbar-tampilan-sem1');
-            if (navSem1) { navSem1.classList.remove('hidden'); navSem1.style.removeProperty('display'); }
-            var navUtama = document.getElementById('navbar-tampilan-utama');
-            if (navUtama) { navUtama.classList.add('hidden'); }
+            var isKelas6 = String(s.kelas || '').indexOf('6') !== -1;
+            var isKelas5 = String(s.kelas || '').indexOf('5') !== -1;
+            var modeNav = isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1');
+            if (typeof window.setHeaderNavMode === 'function') {
+              window.setHeaderNavMode(modeNav);
+            } else {
+              var navUtama = document.getElementById('navbar-tampilan-utama');
+              var navSem1 = document.getElementById('navbar-tampilan-sem1');
+              var navK5 = document.getElementById('navbar-tampilan-kelas5');
+              var navK6 = document.getElementById('navbar-tampilan-kelas6');
+              if (navUtama) navUtama.classList.add('hidden');
+              if (navSem1) { if (modeNav === 'sem1') navSem1.classList.remove('hidden'); else navSem1.classList.add('hidden'); }
+              if (navK5) { if (modeNav === 'kelas5') navK5.classList.remove('hidden'); else navK5.classList.add('hidden'); }
+              if (navK6) { if (modeNav === 'kelas6') navK6.classList.remove('hidden'); else navK6.classList.add('hidden'); }
+            }
             var isSem2Open = false;
             try { isSem2Open = localStorage.getItem('educode_semester_2_unlocked_v1') === 'true'; } catch(e) {}
             if (btnToggleSem) {
@@ -2155,6 +2177,245 @@
 
       </div>
 
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum Informatika • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+          <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+          <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+          <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
+              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Scratch &gt;
+            </button>
+          </div>
+        </div>
+      </div>
+
     </section>
 
     <!-- ======================================================== -->
@@ -2266,6 +2527,245 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum Informatika • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+          <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+          <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+          <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
+              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Scratch &gt;
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -10249,6 +10749,245 @@
 
       </div>
 
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum Informatika • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+          <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+          <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+          <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
+              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Scratch &gt;
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- MODAL PANDUAN CARA BERMAIN TYPING HERO -->
       <div id="modal-panduan-typing" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
@@ -17532,6 +18271,245 @@
 
       </div>
 
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum Informatika • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+          <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+          <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+          <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
+              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Scratch &gt;
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal Footer -->
       <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
         <span class="text-[11px] text-slate-500">
@@ -17650,6 +18628,245 @@
           </p>
         </div>
 
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum Informatika • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+          <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+          <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+          <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
+              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Scratch &gt;
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Modal Footer -->
@@ -17929,6 +19146,245 @@
 
       </div>
 
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum Informatika • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+            <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+              </h3>
+            </div>
+          </div>
+          <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+          <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+          <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+          <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
+              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+            </div>
+            <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Scratch &gt;
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal Footer -->
       <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-2">
         <span class="text-[11px] text-slate-500">
@@ -17972,7 +19428,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261109_sync_cloud_v113"></script>
+  <script src="app.js?v=20261109_kelas_terpisah_v115"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
