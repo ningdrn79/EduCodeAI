@@ -24,6 +24,44 @@ const BANK_SOAL_SEM1_KEY = 'educode_bank_soal_sem1_v1';
 const BANK_SOAL_SEM2_KEY = 'educode_bank_soal_sem2_v1';
 const GURU_OFFICIAL_EMAIL = 'ningdrn79@gmail.com';
 
+// ==========================================
+// KONFIGURASI PERMANEN RESMI GOOGLE SPREADSHEET & WEBHOOK APPS SCRIPT
+// Guru Pengampu: Ibu Darningsih, S.T. - SDS Cinta Kasih Tzu Chi
+// ==========================================
+const DEFAULT_MASTER_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/16fKDdyZpLqTznn6crU1yZ0c5_srXd2XiLvfRtGSztEs/edit?usp=sharing';
+const DEFAULT_OFFICIAL_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzfPogN8mA_Ro1pC2RIDVHxgQ2UaYbM103kkP6s8s6T6XHj8GCnPBt56M1BIgHXAIt3/exec';
+
+const DEFAULT_CLASS_SHEETS_CONFIG = {
+  '4A': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4A', count: 0 },
+  '4B': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4B', count: 0 },
+  '4C': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4C', count: 0 },
+  '4D': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4D', count: 0 },
+  '4E': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '4E', count: 0 },
+  '5A': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5A', count: 0 },
+  '5B': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5B', count: 0 },
+  '5C': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5C', count: 0 },
+  '5D': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5D', count: 0 },
+  '5E': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '5E', count: 0 },
+  '6A': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6A', count: 0 },
+  '6B': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6B', count: 0 },
+  '6C': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6C', count: 0 },
+  '6D': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6D', count: 0 },
+  '6E': { sheetUrl: DEFAULT_MASTER_SPREADSHEET_URL, tabName: '6E', count: 0 }
+};
+
+// Auto-inisialisasi link permanen ke peramban jika belum tersimpan
+try {
+  if (!localStorage.getItem(SPREADSHEET_ID_KEY)) {
+    localStorage.setItem(SPREADSHEET_ID_KEY, DEFAULT_MASTER_SPREADSHEET_URL);
+  }
+  if (!localStorage.getItem(WEBHOOK_KEY)) {
+    localStorage.setItem(WEBHOOK_KEY, DEFAULT_OFFICIAL_WEBHOOK_URL);
+  }
+  if (!localStorage.getItem(CLASS_SHEETS_KEY)) {
+    localStorage.setItem(CLASS_SHEETS_KEY, JSON.stringify(DEFAULT_CLASS_SHEETS_CONFIG));
+  }
+} catch (eInitPerm) {}
+
 // Helper: Ambil PIN Guru Resmi (Multi-Lapisan: localStorage, Cookie, sessionStorage)
 function getTeacherPin() {
   try {
@@ -97,7 +135,7 @@ function getPersistentWebhookUrl() {
     const ss = sessionStorage.getItem(WEBHOOK_KEY);
     if (ss && ss.trim()) return ss.trim();
   } catch (e) {}
-  return '';
+  return DEFAULT_OFFICIAL_WEBHOOK_URL;
 }
 window.getPersistentWebhookUrl = getPersistentWebhookUrl;
 
@@ -24499,9 +24537,12 @@ function getClassSheetsConfig() {
 
     Object.keys(DEFAULT_CLASS_SHEETS_CONFIG).forEach(k => {
       merged[k] = { ...DEFAULT_CLASS_SHEETS_CONFIG[k], ...(cfg[k] || {}) };
-      // Fallback Cerdas: Jika kelas ini belum disetel link khusus, gunakan link master
+      // Fallback Cerdas: Jika kelas ini belum disetel link khusus, gunakan link master resmi
       if (!merged[k].sheetUrl && masterUrl) {
         merged[k].sheetUrl = masterUrl;
+      }
+      if (!merged[k].sheetUrl) {
+        merged[k].sheetUrl = DEFAULT_MASTER_SPREADSHEET_URL;
       }
     });
 
@@ -24648,7 +24689,7 @@ function simpanPengaturanSheetKelasAktif() {
 
   const cfg = getClassSheetsConfig();
   if (!cfg[activeKey]) cfg[activeKey] = { ...DEFAULT_CLASS_SHEETS_CONFIG[activeKey] };
-  cfg[activeKey].sheetUrl = rawUrl;
+  cfg[activeKey].sheetUrl = rawUrl || DEFAULT_MASTER_SPREADSHEET_URL;
   cfg[activeKey].tabName = tabName || activeKey;
   saveClassSheetsConfig(cfg);
 
@@ -24672,11 +24713,14 @@ window.simpanPengaturanSheetKelasAktif = simpanPengaturanSheetKelasAktif;
 
 function terapkanLinkKeSemuaKelas() {
   const inputUrl = document.getElementById('guru-sheet-url-id-kelas');
-  const rawUrl = inputUrl ? inputUrl.value.trim() : '';
+  const rawUrl = (inputUrl ? inputUrl.value.trim() : '') || DEFAULT_MASTER_SPREADSHEET_URL;
   if (!rawUrl) {
     showToast('Ketik atau tempel link / ID Google Spreadsheet terlebih dahulu!', 'warning');
     if (inputUrl) inputUrl.focus();
     return;
+  }
+  if (inputUrl && !inputUrl.value.trim()) {
+    inputUrl.value = rawUrl;
   }
 
   const cfg = getClassSheetsConfig();
@@ -25044,6 +25088,10 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
     if (anyClass) {
       rawSheet = (cfg[anyClass].sheetUrl || '').trim();
     }
+  }
+  // 4. Fallback Permanen: Gunakan Link Master Resmi Guru Tzu Chi
+  if (!rawSheet) {
+    rawSheet = DEFAULT_MASTER_SPREADSHEET_URL;
   }
 
   if (!rawSheet) {
