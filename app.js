@@ -27813,8 +27813,16 @@ function beriBintangKaryaGuru(title) {
 // --------------------------------------------------------------------------
 // MONITORING DRIVE 7 KEBIASAAN OLEH GURU (MISI TP 2.1)
 // --------------------------------------------------------------------------
+function setFilterKelasDrive7K(kelas) {
+  try { playSound('click'); } catch (e) {}
+  state.filterKelasDrive7K = kelas;
+  state.filterKelasGuru = kelas;
+  renderMonitoringDrive7KGuru();
+}
+window.setFilterKelasDrive7K = setFilterKelasDrive7K;
+
 function setFilterDrive7KStatus(status) {
-  playSound('click');
+  try { playSound('click'); } catch (e) {}
   state.filterDrive7KStatus = status;
   const statuses = ['semua', 'lengkap', 'proses', 'kosong'];
   statuses.forEach(st => {
@@ -27832,178 +27840,228 @@ function setFilterDrive7KStatus(status) {
 window.setFilterDrive7KStatus = setFilterDrive7KStatus;
 
 function renderMonitoringDrive7KGuru(isFromRealtime = false) {
-  if (!isFromRealtime && typeof mulaiRealtimeMonitoringDriveGuru === 'function') {
-    mulaiRealtimeMonitoringDriveGuru();
-  }
-  const grid = document.getElementById('guru-drive7k-grid');
-  const emptyBox = document.getElementById('guru-drive7k-empty');
-  if (!grid) return;
-
-  grid.innerHTML = '';
-  if (emptyBox) emptyBox.classList.add('hidden');
-
-  let allStudents = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
-  if (state.filterKelasGuru && state.filterKelasGuru !== 'semua' && !state.filterKelasGuru.startsWith('tingkat_')) {
-    allStudents = allStudents.filter(s => s.kelas === state.filterKelasGuru);
-  }
-
-  // Bersihkan dari author siswa fiktif dummy
-  allStudents = allStudents.filter(s => {
-    const sName = (s.nama || '').toLowerCase();
-    return !DAFTAR_NAMA_SISWA_CONTOH.some(d => sName.includes(d));
-  });
-
-  // Hitung KPI
-  let countLengkap = 0;
-  let countProses = 0;
-  let countKosong = 0;
-
-  const evaluatedStudents = allStudents.map(s => {
-    const driveData = dapatkanDriveSiswa(s);
-    const evalData = hitungNilaiDrive7Kebiasaan(driveData);
-    if (evalData.filledCount === 7) {
-      countLengkap++;
-    } else if (evalData.filledCount > 0) {
-      countProses++;
-    } else {
-      countKosong++;
+  try {
+    if (!isFromRealtime && typeof mulaiRealtimeMonitoringDriveGuru === 'function') {
+      mulaiRealtimeMonitoringDriveGuru();
     }
-    return {
-      student: s,
-      driveData: driveData,
-      evalData: evalData
-    };
-  });
+    const grid = document.getElementById('guru-drive7k-grid');
+    const emptyBox = document.getElementById('guru-drive7k-empty');
+    if (!grid) return;
 
-  const statTotal = document.getElementById('guru-drive7k-stat-total');
-  const statLengkap = document.getElementById('guru-drive7k-stat-lengkap');
-  const statProses = document.getElementById('guru-drive7k-stat-proses');
-  const statKosong = document.getElementById('guru-drive7k-stat-kosong');
+    grid.innerHTML = '';
+    if (emptyBox) emptyBox.classList.add('hidden');
 
-  if (statTotal) statTotal.innerText = allStudents.length;
-  if (statLengkap) statLengkap.innerText = `${countLengkap} Siswa`;
-  if (statProses) statProses.innerText = `${countProses} Siswa`;
-  if (statKosong) statKosong.innerText = `${countKosong} Siswa`;
+    // 1. Tentukan Kelas yang Aktif (Default: Kelas 4C atau kelas terpilih)
+    let activeClass = state.filterKelasDrive7K || state.filterKelasGuru || '4C';
+    if (!state.filterKelasDrive7K) state.filterKelasDrive7K = activeClass;
 
-  // Filter berdasarkan status
-  const currentStatus = state.filterDrive7KStatus || 'semua';
-  let filtered = evaluatedStudents;
-  if (currentStatus === 'lengkap') {
-    filtered = filtered.filter(item => item.evalData.filledCount === 7);
-  } else if (currentStatus === 'proses') {
-    filtered = filtered.filter(item => item.evalData.filledCount >= 1 && item.evalData.filledCount < 7);
-  } else if (currentStatus === 'kosong') {
-    filtered = filtered.filter(item => item.evalData.filledCount === 0);
-  }
+    // Perbarui style tombol pemilih kelas di UI Drive 7K
+    const classContainer = document.getElementById('drive7k-class-filter-container');
+    if (classContainer) {
+      const btns = classContainer.querySelectorAll('button[id^="btn-f-drive-"]');
+      btns.forEach(b => {
+        const idTarget = `btn-f-drive-${activeClass}`;
+        if (b.id === idTarget) {
+          b.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-purple-600 text-white shadow-xs';
+        } else {
+          b.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200';
+        }
+      });
+    }
 
-  // Filter pencarian
-  const searchInput = document.getElementById('guru-cari-drive7k');
-  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-  if (query) {
-    filtered = filtered.filter(item => {
-      const s = item.student;
-      return (s.nama && s.nama.toLowerCase().includes(query)) ||
-             (s.nis && s.nis.toLowerCase().includes(query)) ||
-             (s.absen && s.absen.toString().includes(query));
+    // 2. Ambil dan Filter Database Siswa
+    let allStudents = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
+
+    // Bersihkan dari author siswa fiktif dummy
+    allStudents = allStudents.filter(s => {
+      if (!s || !s.nama) return false;
+      const sName = (s.nama || '').toLowerCase();
+      return !DAFTAR_NAMA_SISWA_CONTOH.some(d => sName.includes(d));
     });
-  }
 
-  if (filtered.length === 0) {
-    if (emptyBox) emptyBox.classList.remove('hidden');
-    return;
-  }
-
-  filtered.forEach(item => {
-    const s = item.student;
-    const ev = item.evalData;
-    const drive = item.driveData;
-    const percent = Math.round((ev.filledCount / 7) * 100);
-
-    let statusBadge = '';
-    let borderStatusCls = 'border-slate-200';
-    if (ev.filledCount === 7) {
-      statusBadge = '<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-check text-emerald-600"></i> Lengkap 7/7 (Tuntas 100)</span>';
-      borderStatusCls = 'border-emerald-300 shadow-emerald-500/5';
-    } else if (ev.filledCount > 0) {
-      statusBadge = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-hourglass-half text-amber-600"></i> ${ev.filledCount}/7 Terkumpul (Nilai: ${ev.totalSkor})</span>`;
-      borderStatusCls = 'border-amber-300 shadow-amber-500/5';
-    } else {
-      statusBadge = '<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-xmark text-rose-600"></i> Belum Mengumpulkan (0/7)</span>';
-      borderStatusCls = 'border-rose-200/80';
+    if (activeClass === 'tingkat_4') {
+      allStudents = allStudents.filter(s => s.kelas && s.kelas.startsWith('4'));
+    } else if (activeClass !== 'semua') {
+      allStudents = allStudents.filter(s => s.kelas === activeClass);
     }
 
-    // Mini preview 7 icons
-    const habitIconsHtml = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
-      const hasSlot = drive[cfg.key] && (drive[cfg.key].imageSrc || drive[cfg.key].gambar);
-      if (hasSlot) {
-        return `<span class="w-6 h-6 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] flex items-center justify-center font-bold" title="${cfg.cleanTitle}: Terkumpul">${cfg.emoji}</span>`;
-      } else {
-        return `<span class="w-6 h-6 rounded-lg bg-slate-100 border border-dashed border-slate-300 text-slate-400 text-[11px] flex items-center justify-center opacity-60" title="${cfg.cleanTitle}: Kosong">${cfg.emoji}</span>`;
-      }
-    }).join('');
+    // Jika filter kelas menghasilkan 0 siswa, fallback ke seluruh Kelas 4
+    if (allStudents.length === 0) {
+      const fallbackDb = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
+      allStudents = fallbackDb.filter(s => s.kelas === '4C' || (s.kelas && s.kelas.startsWith('4')));
+    }
 
-    const card = document.createElement('div');
-    card.className = `bg-white rounded-3xl border-2 ${borderStatusCls} p-4 sm:p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3.5`;
-    card.innerHTML = `
-      <div>
-        <div class="flex items-start justify-between gap-2 mb-2">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-title font-black text-sm flex items-center justify-center shadow-xs shrink-0">
-              ${(s.nama || 'S').charAt(0).toUpperCase()}
-            </div>
-            <div class="min-w-0">
-              <h4 class="font-title font-bold text-slate-900 text-sm leading-snug truncate" title="${escapeXml(s.nama)}">
-                ${escapeXml(s.nama)}
-              </h4>
-              <div class="text-[11px] text-slate-500 flex items-center gap-1.5 flex-wrap">
-                <span class="font-bold text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200">Kelas ${escapeXml(s.kelas)}</span>
-                <span>â€¢</span>
-                <span>NIS: ${escapeXml(s.nis || '-')}</span>
-                <span>â€¢</span>
-                <span>Absen: ${escapeXml(s.absen || '-')}</span>
+    // 3. Evaluasi Tiap Siswa
+    let countLengkap = 0;
+    let countProses = 0;
+    let countKosong = 0;
+
+    const evaluatedStudents = allStudents.map(s => {
+      let driveData = {};
+      try {
+        driveData = dapatkanDriveSiswa(s) || {};
+      } catch (eD) {
+        driveData = {};
+      }
+      let evalData = { totalSkor: 0, filledCount: 0, validNameCount: 0, paintCount: 0, aiCount: 0 };
+      try {
+        evalData = hitungNilaiDrive7Kebiasaan(driveData);
+      } catch (eE) {}
+
+      if (evalData.filledCount === 7) {
+        countLengkap++;
+      } else if (evalData.filledCount > 0) {
+        countProses++;
+      } else {
+        countKosong++;
+      }
+      return {
+        student: s,
+        driveData: driveData,
+        evalData: evalData
+      };
+    });
+
+    // 4. Perbarui Kartu Ringkasan Statistik
+    const statTotal = document.getElementById('guru-drive7k-stat-total');
+    const statLengkap = document.getElementById('guru-drive7k-stat-lengkap');
+    const statProses = document.getElementById('guru-drive7k-stat-proses');
+    const statKosong = document.getElementById('guru-drive7k-stat-kosong');
+
+    if (statTotal) statTotal.innerText = allStudents.length;
+    if (statLengkap) statLengkap.innerText = `${countLengkap} Siswa`;
+    if (statProses) statProses.innerText = `${countProses} Siswa`;
+    if (statKosong) statKosong.innerText = `${countKosong} Siswa`;
+
+    // 5. Filter berdasarkan Status Pengumpulan
+    const currentStatus = state.filterDrive7KStatus || 'semua';
+    let filtered = evaluatedStudents;
+    if (currentStatus === 'lengkap') {
+      filtered = filtered.filter(item => item.evalData.filledCount === 7);
+    } else if (currentStatus === 'proses') {
+      filtered = filtered.filter(item => item.evalData.filledCount >= 1 && item.evalData.filledCount < 7);
+    } else if (currentStatus === 'kosong') {
+      filtered = filtered.filter(item => item.evalData.filledCount === 0);
+    }
+
+    // 6. Filter Pencarian Nama / NIS
+    const searchInput = document.getElementById('guru-cari-drive7k');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    if (query) {
+      filtered = filtered.filter(item => {
+        const s = item.student;
+        return (s.nama && s.nama.toLowerCase().includes(query)) ||
+               (s.nis && s.nis.toLowerCase().includes(query)) ||
+               (s.absen && s.absen.toString().includes(query));
+      });
+    }
+
+    if (filtered.length === 0) {
+      if (emptyBox) emptyBox.classList.remove('hidden');
+      return;
+    }
+
+    // 7. Render Kartu Tiap Siswa
+    filtered.forEach(item => {
+      const s = item.student;
+      const ev = item.evalData;
+      const drive = item.driveData;
+      const percent = Math.round((ev.filledCount / 7) * 100);
+
+      let statusBadge = '';
+      let borderStatusCls = 'border-slate-200';
+      if (ev.filledCount === 7) {
+        statusBadge = '<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-check text-emerald-600"></i> Lengkap 7/7 (Tuntas 100)</span>';
+        borderStatusCls = 'border-emerald-300 shadow-emerald-500/5';
+      } else if (ev.filledCount > 0) {
+        statusBadge = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-hourglass-half text-amber-600"></i> ${ev.filledCount}/7 Terkumpul (Nilai: ${ev.totalSkor})</span>`;
+        borderStatusCls = 'border-amber-300 shadow-amber-500/5';
+      } else {
+        statusBadge = '<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1 shrink-0"><i class="fa-solid fa-circle-xmark text-rose-600"></i> Belum Mengumpulkan (0/7)</span>';
+        borderStatusCls = 'border-rose-200/80';
+      }
+
+      // Mini preview 7 icons
+      const habitIconsHtml = (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined' ? DRIVE_7KEBIASAAN_CONFIG : []).map(cfg => {
+        const hasSlot = drive[cfg.key] && (drive[cfg.key].imageSrc || drive[cfg.key].gambar);
+        if (hasSlot) {
+          return `<span class="w-6 h-6 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] flex items-center justify-center font-bold" title="${cfg.cleanTitle}: Terkumpul">${cfg.emoji}</span>`;
+        } else {
+          return `<span class="w-6 h-6 rounded-lg bg-slate-100 border border-dashed border-slate-300 text-slate-400 text-[11px] flex items-center justify-center opacity-60" title="${cfg.cleanTitle}: Kosong">${cfg.emoji}</span>`;
+        }
+      }).join('');
+
+      const safeName = (typeof escapeXml === 'function') ? escapeXml(s.nama) : (s.nama || '');
+      const safeKelas = (typeof escapeXml === 'function') ? escapeXml(s.kelas) : (s.kelas || '');
+      const safeNis = (typeof escapeXml === 'function') ? escapeXml(s.nis || '-') : (s.nis || '-');
+      const safeAbsen = (typeof escapeXml === 'function') ? escapeXml(s.absen || '-') : (s.absen || '-');
+      const initialLetter = (s.nama || 'S').charAt(0).toUpperCase();
+
+      const card = document.createElement('div');
+      card.className = `bg-white rounded-3xl border-2 ${borderStatusCls} p-4 sm:p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3.5`;
+      card.innerHTML = `
+        <div>
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-title font-black text-sm flex items-center justify-center shadow-xs shrink-0">
+                ${initialLetter}
+              </div>
+              <div class="min-w-0">
+                <h4 class="font-title font-bold text-slate-900 text-sm leading-snug truncate" title="${safeName}">
+                  ${safeName}
+                </h4>
+                <div class="text-[11px] text-slate-500 flex items-center gap-1.5 flex-wrap">
+                  <span class="font-bold text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200">Kelas ${safeKelas}</span>
+                  <span>•</span>
+                  <span>NIS: ${safeNis}</span>
+                  <span>•</span>
+                  <span>Absen: ${safeAbsen}</span>
+                </div>
               </div>
             </div>
+            <div>${statusBadge}</div>
           </div>
-          <div>${statusBadge}</div>
+
+          <!-- Progress Bar -->
+          <div class="space-y-1.5 mt-3">
+            <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+              <span>Koleksi 7 Kebiasaan:</span>
+              <span class="font-bold text-slate-800">${ev.filledCount} dari 7 Gambar (${percent}%)</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500 rounded-full transition-all duration-300" style="width: ${percent}%;"></div>
+            </div>
+          </div>
+
+          <!-- 7 Habit Slots Mini Indicators & Composition -->
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
+            <div class="flex items-center gap-1">
+              ${habitIconsHtml}
+            </div>
+            <div class="flex items-center gap-1 text-[10px] font-bold flex-wrap">
+              <span class="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200" title="Kesesuaian 3 Gambar Paint Mandiri">🎨 ${ev.paintCount || 0}/3 Paint</span>
+              <span class="text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200" title="Kesesuaian 4 Gambar Studio AI">🤖 ${ev.aiCount || 0}/4 AI</span>
+              <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" title="Format Baku: Kelas_Nama_File">${ev.validNameCount || 0}/7 Baku</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="space-y-1.5 mt-3">
-          <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
-            <span>Koleksi 7 Kebiasaan:</span>
-            <span class="font-bold text-slate-800">${ev.filledCount} dari 7 Gambar (${percent}%)</span>
-          </div>
-          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500 rounded-full transition-all duration-300" style="width: ${percent}%;"></div>
-          </div>
+        <!-- Action Button -->
+        <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+          <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id}')" class="flex-1 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-title font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-folder-open text-xs"></i>
+            <span>Periksa 7 Gambar Siswa</span>
+          </button>
+          <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition flex items-center justify-center cursor-pointer" title="Beri Nilai / Catatan Guru">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
         </div>
-
-        <!-- 7 Habit Slots Mini Indicators & Composition -->
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
-          <div class="flex items-center gap-1">
-            ${habitIconsHtml}
-          </div>
-          <div class="flex items-center gap-1 text-[10px] font-bold flex-wrap">
-            <span class="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200" title="Kesesuaian 3 Gambar Paint Mandiri">ðŸŽ¨ ${ev.paintCount || 0}/3 Paint</span>
-            <span class="text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200" title="Kesesuaian 4 Gambar Studio AI">ðŸ¤– ${ev.aiCount || 0}/4 AI</span>
-            <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" title="Format Baku: Kelas_Nama_File">${ev.validNameCount}/7 Baku</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Button -->
-      <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
-        <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id}')" class="flex-1 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-title font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-folder-open text-xs"></i>
-          <span>Periksa 7 Gambar Siswa</span>
-        </button>
-        <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition flex items-center justify-center cursor-pointer" title="Beri Nilai / Catatan Guru">
-          <i class="fa-solid fa-pen-to-square"></i>
-        </button>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
+      `;
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Error saat renderMonitoringDrive7KGuru:', err);
+  }
 }
 window.renderMonitoringDrive7KGuru = renderMonitoringDrive7KGuru;
 
@@ -30945,58 +31003,92 @@ window.mulaiRealtimeMonitoringDriveGuru = mulaiRealtimeMonitoringDriveGuru;
 // 2A. Tarik Seluruh Hasil Drive 7 Kebiasaan Siswa dari Cloud Server (Untuk Akun Guru)
 async function tarikSemuaHasilDriveSiswaDariCloud(silent = false) {
   const btn = document.getElementById('btn-sync-cloud-drive-guru');
-  const oriHtml = btn ? btn.innerHTML : '<i class="fa-solid fa-cloud-arrow-down text-amber-300"></i> <span>Tarik dari Cloud</span>';
+  const oriHtml = btn ? '<i class="fa-solid fa-cloud-arrow-down text-amber-300"></i> <span>Tarik dari Cloud</span>' : '';
 
-  if (btn && btn.disabled) return 0;
   if (btn) {
     btn.disabled = true;
     btn.classList.add('opacity-75', 'cursor-not-allowed');
     btn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-amber-300"></i> <span>Menghubungkan Cloud...</span>';
   }
 
-  let db = firebaseFirestoreInstance;
-  if (!db && typeof getInlineFirestore === 'function') {
-    db = getInlineFirestore();
-  }
-  if (!db) {
-    if (typeof initFirebaseClient === 'function') initFirebaseClient();
-    db = firebaseFirestoreInstance;
-  }
-
-  if (!db) {
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove('opacity-75', 'cursor-not-allowed');
-      btn.innerHTML = oriHtml;
-    }
-    if (!silent) {
-      try { playSound('error'); } catch (e) {}
-      showToast('âš ï¸ Koneksi Firebase Cloud belum tersambung atau internet lab terputus.', 'warning');
-    }
-    return 0;
-  }
+  let docsList = [];
 
   try {
     if (!silent) {
-      showToast('âš¡ Sedang memeriksa data siswa di Cloud Server...', 'info');
+      showToast('☁️ Sedang memeriksa data siswa di Cloud Server...', 'info');
     }
 
-    const snapshot = await db.collection('student_drives').get();
-    if (snapshot.empty) {
-      if (!silent) {
-        try { playSound('notification'); } catch (e) {}
-        showToast('Belum ada data karya siswa yang tersimpan di Cloud Server.', 'info');
+    // 1. Coba ambil via SDK Firestore jika terhubung dengan batas timeout 3.5 detik
+    let sdkSuccess = false;
+    let db = firebaseFirestoreInstance || (typeof getInlineFirestore === 'function' ? getInlineFirestore() : null);
+
+    if (db && typeof db.collection === 'function') {
+      try {
+        const fetchPromise = db.collection('student_drives').get();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 3500));
+        const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
+        if (snapshot && !snapshot.empty) {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data) {
+              docsList.push({
+                nis: String(data.studentNis || doc.id).trim(),
+                data: data
+              });
+            }
+          });
+          sdkSuccess = true;
+        }
+      } catch (eSdk) {
+        console.warn('SDK fetch timeout/error, mencoba REST API fallback:', eSdk);
       }
-      return 0;
     }
 
+    // 2. Jika SDK belum siap atau timeout, gunakan direct REST API Google Firestore (100% cepat & bebas blokir)
+    if (!sdkSuccess) {
+      try {
+        const restUrl = 'https://firestore.googleapis.com/v1/projects/sd-tzuchi-kelas4/databases/(default)/documents/student_drives?key=AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(restUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && Array.isArray(json.documents)) {
+            json.documents.forEach(docItem => {
+              const nameParts = (docItem.name || '').split('/');
+              const docId = nameParts[nameParts.length - 1];
+              const f = docItem.fields || {};
+              const driveDataStr = f.driveData && f.driveData.stringValue;
+              const nisStr = (f.studentNis && f.studentNis.stringValue) || docId;
+              if (driveDataStr) {
+                docsList.push({
+                  nis: String(nisStr).trim(),
+                  data: {
+                    studentNis: nisStr,
+                    studentName: f.studentName && f.studentName.stringValue,
+                    studentClass: f.studentClass && f.studentClass.stringValue,
+                    driveData: driveDataStr,
+                    totalGambar: f.totalGambar ? Number(f.totalGambar.integerValue || 0) : 0
+                  }
+                });
+              }
+            });
+            sdkSuccess = true;
+          }
+        }
+      } catch (eRest) {
+        console.warn('REST API Firestore fallback error:', eRest);
+      }
+    }
+
+    // 3. Proses seluruh dokumen yang didapat
     let updatedCount = 0;
     const currentDb = getStudentDatabase();
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (!data) return;
-      const targetNis = String(data.studentNis || doc.id).trim();
+    docsList.forEach(item => {
+      const targetNis = item.nis;
+      const data = item.data;
       let driveObj = null;
 
       if (data.driveData) {
@@ -31006,42 +31098,42 @@ async function tarikSemuaHasilDriveSiswaDariCloud(silent = false) {
       }
 
       if (driveObj && typeof driveObj === 'object') {
-        // Simpan ke storage lokal komputer guru agar persisten
         const localKey = 'educode_drive_7kebiasaan_' + targetNis;
-        try {
-          localStorage.setItem(localKey, JSON.stringify(driveObj));
-        } catch (eL) {}
-
-        // Bersihkan cache performa untuk siswa ini
+        try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch (eL) {}
         _driveDataCache.delete(targetNis);
 
-        // Sinkronkan ke database guru
         const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
         if (sIdx >= 0) {
           const evalData = hitungNilaiDrive7Kebiasaan(driveObj);
           currentDb[sIdx].driveData = driveObj;
           currentDb[sIdx].koleksiDrive = evalData.filledCount;
           currentDb[sIdx].nilaiDrive = evalData.totalSkor;
+          currentDb[sIdx].terakhirAktif = 'Tersinkron Cloud';
         }
         updatedCount++;
       }
     });
 
-    saveStudentDatabase(currentDb);
-    _driveDataCache.clear();
-    renderMonitoringDrive7KGuru();
-    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
-
-    if (!silent) {
-      try { playSound('success'); } catch (e) {}
-      showToast(`ðŸŽ‰ Sukses! Berhasil menyinkronkan data karya dari ${updatedCount} siswa dari Cloud!`, 'success');
+    if (updatedCount > 0) {
+      saveStudentDatabase(currentDb);
+      _driveDataCache.clear();
+      renderMonitoringDrive7KGuru(true);
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      if (!silent) {
+        try { playSound('success'); } catch (e) {}
+        showToast(`🎉 Sukses! Berhasil menyinkronkan karya ${updatedCount} siswa dari Cloud!`, 'success');
+      }
+    } else {
+      renderMonitoringDrive7KGuru(true);
+      if (!silent) {
+        showToast('Koleksi lokal sudah yang paling mutakhir.', 'info');
+      }
     }
     return updatedCount;
   } catch (err) {
-    console.error('Error saat menarik data dari Cloud:', err);
+    console.error('Error tarik Cloud:', err);
     if (!silent) {
-      try { playSound('error'); } catch (e) {}
-      showToast('Gagal menarik data dari Cloud: ' + (err.message || 'Periksa koneksi internet'), 'error');
+      showToast('Kendala saat menarik data dari Cloud: ' + (err.message || 'Periksa koneksi'), 'warning');
     }
     return 0;
   } finally {

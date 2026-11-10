@@ -16336,8 +16336,27 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 2: MONITORING DRIVE 7 KEBIASAAN SISWA (TP 2.1) -->
+            <!-- SUB-TAB 2: MONITORING DRIVE 7 KEBIASAAN SISWA (TP 2.1) -->
       <div id="guru-view-drive7k" class="hidden space-y-4">
+        <!-- Selector Kelas Drive 7 Kebiasaan -->
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-1.5 flex-wrap" id="drive7k-class-filter-container">
+            <span class="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5 mr-1.5">
+              <i class="fa-solid fa-graduation-cap text-purple-600"></i> Pilih Kelas:
+            </span>
+            <button type="button" onclick="setFilterKelasDrive7K('tingkat_4')" id="btn-f-drive-tingkat_4" class="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Semua Kelas 4</button>
+            <button type="button" onclick="setFilterKelasDrive7K('4A')" id="btn-f-drive-4A" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Kelas 4A</button>
+            <button type="button" onclick="setFilterKelasDrive7K('4B')" id="btn-f-drive-4B" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Kelas 4B</button>
+            <button type="button" onclick="setFilterKelasDrive7K('4C')" id="btn-f-drive-4C" class="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-purple-600 text-white shadow-xs">Kelas 4C</button>
+            <button type="button" onclick="setFilterKelasDrive7K('4D')" id="btn-f-drive-4D" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Kelas 4D</button>
+            <button type="button" onclick="setFilterKelasDrive7K('4E')" id="btn-f-drive-4E" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Kelas 4E</button>
+            <button type="button" onclick="setFilterKelasDrive7K('semua')" id="btn-f-drive-semua" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200">Semua Siswa</button>
+          </div>
+          <div class="text-xs text-purple-800 font-bold bg-purple-50 px-3 py-1.5 rounded-xl border border-purple-200 flex items-center gap-1.5 shadow-2xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Cloud: sd-tzuchi-kelas4</span>
+          </div>
+        </div>
         <!-- Top Stats Summary -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3">
@@ -19985,7 +20004,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261110_realtime_cloud_sync_v129"></script>
+  <script src="app.js?v=20261110_realtime_cloud_sync_v130"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
