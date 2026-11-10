@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Kreator Cilik - Aplikasi Pembelajaran Konten Digital & Berpikir Komputasional
  * Kelas 4 SD Semester 1 (TP 2.1 - TP 2.4)
  */
@@ -29120,45 +29120,112 @@ async function sinkronkanRombelTingkat(tingkat, silent = false) {
 }
 window.sinkronkanRombelTingkat = sinkronkanRombelTingkat;
 
-// 3. Sinkronkan Semua Kelas Sekaligus dari Google Sheets Masing-Masing
+// 3. Sinkronkan Semua Kelas Sekaligus dari Google Sheets (Cepat, Efisien, & Responsif)
 async function sinkronkanSemuaKelasGoogleSheet(silent = false) {
-  const cfg = getClassSheetsConfig();
-  const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
+  try { playSound('click'); } catch (e) {}
+
+  const btn = document.getElementById('btn-sync-semua-kelas-header') || document.querySelector('button[onclick*="sinkronkanSemuaKelasGoogleSheet"]');
+  const oriHtml = btn ? btn.innerHTML : '<i class="fa-solid fa-arrows-rotate"></i> <span>Sinkronkan Semua Kelas Sekaligus</span>';
+
+  // Cegah klik berulang saat proses sinkronisasi sedang berlangsung
+  if (btn && btn.disabled) return [];
+
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+    btn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> <span>Menyinkronkan...</span>';
+  }
+
+  if (!silent) {
+    showToast('Memulai sinkronisasi data seluruh kelas dari Google Sheets...', 'info');
+  }
+
   let totalSynced = 0;
   let syncedClasses = [];
 
-  if (!silent) {
-    showToast('Memulai sinkronisasi data seluruh kelas dari Google Sheets... â³', 'info');
-  }
+  try {
+    // Jalur Prioritas 1: Sinkronisasi Master Terpusat (Hanya 1 Query Cepat dalam ~1 Detik)
+    let masterRes = null;
+    try {
+      masterRes = await sinkronkanMasterDataSiswaLMS(true);
+    } catch (eM) {}
 
-  for (const cls of classes) {
-    const hasUrl = Boolean(cfg[cls] && cfg[cls].sheetUrl) || Boolean(localStorage.getItem(SPREADSHEET_ID_KEY));
-    if (hasUrl) {
-      try {
-        const res = await sinkronkanDataSiswaPerKelas(cls, true);
-        if (res && res.length > 0) {
-          totalSynced += res.length;
-          syncedClasses.push(`${cls} (${res.length})`);
-        }
-      } catch (e) {
-        console.warn(`Sinkronisasi ${cls} gagal:`, e);
+    if (masterRes && Array.isArray(masterRes) && masterRes.length > 0) {
+      renderTabsKelasSheet();
+      renderRingkasanKoneksiKelas();
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      if (typeof renderDasborGuru === 'function') renderDasborGuru();
+
+      if (!silent) {
+        try { playSound('success'); } catch (e) {}
+        showToast(`Sukses Kilat! ${masterRes.length} data siswa dari semua rombel berhasil disinkronkan!`, 'success');
+      }
+      return masterRes;
+    }
+
+    // Jalur Prioritas 2: Sinkronisasi Multi-Rombel Sekaligus (Batch Paralel / Sekaligus)
+    let batchRes = null;
+    try {
+      batchRes = await sinkronkanSemuaKelasSekaligus(true);
+    } catch (eB) {}
+
+    if (batchRes && Array.isArray(batchRes) && batchRes.length > 0) {
+      renderTabsKelasSheet();
+      renderRingkasanKoneksiKelas();
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      if (typeof renderDasborGuru === 'function') renderDasborGuru();
+
+      if (!silent) {
+        try { playSound('success'); } catch (e) {}
+        showToast(`Selesai! Berhasil menyinkronkan ${batchRes.length} siswa seluruh rombel kelas!`, 'success');
+      }
+      return batchRes;
+    }
+
+    // Jalur Prioritas 3 (Fallback): Rombel per Rombel Terkonfigurasi
+    const cfg = getClassSheetsConfig();
+    const classes = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
+    for (const cls of classes) {
+      const hasUrl = Boolean(cfg[cls] && cfg[cls].sheetUrl) || Boolean(localStorage.getItem(SPREADSHEET_ID_KEY));
+      if (hasUrl) {
+        try {
+          const res = await sinkronkanDataSiswaPerKelas(cls, true);
+          if (res && res.length > 0) {
+            totalSynced += res.length;
+            syncedClasses.push(`${cls} (${res.length})`);
+          }
+        } catch (eCls) {}
       }
     }
-  }
 
-  renderTabsKelasSheet();
-  renderRingkasanKoneksiKelas();
-  if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    renderTabsKelasSheet();
+    renderRingkasanKoneksiKelas();
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderDasborGuru === 'function') renderDasborGuru();
 
-  if (syncedClasses.length > 0) {
-    if (!silent) {
-      playSound('success');
-      showToast(`Selesai! Berhasil sinkronisasi ${totalSynced} siswa dari kelas: ${syncedClasses.join(', ')} ðŸŽ‰`, 'success');
+    if (syncedClasses.length > 0) {
+      if (!silent) {
+        try { playSound('success'); } catch (e) {}
+        showToast(`Selesai! Berhasil sinkronisasi ${totalSynced} siswa dari kelas: ${syncedClasses.join(', ')}`, 'success');
+      }
+    } else {
+      if (!silent) {
+        try { playSound('error'); } catch (e) {}
+        showToast('Tidak dapat menyinkronkan data. Pastikan koneksi internet aktif dan link spreadsheet telah diatur publik!', 'warning');
+      }
     }
-  } else {
+  } catch (errGlobal) {
+    console.error('Error saat sinkronisasi semua kelas:', errGlobal);
     if (!silent) {
-      playSound('error');
-      showToast('Belum ada Link Google Sheets yang terhubung untuk kelas manapun!', 'warning');
+      try { playSound('error'); } catch (e) {}
+      showToast('Gagal terhubung ke Google Sheets. Periksa koneksi internet atau izin share spreadsheet.', 'error');
+    }
+  } finally {
+    // Selalu pulihkan tombol ke kondisi semula
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-75', 'cursor-not-allowed');
+      btn.innerHTML = oriHtml;
     }
   }
 }
