@@ -2665,6 +2665,7 @@ function gameOverAntariksa() {
 function bukaModulDetail(tpKey) {
   playSound('click');
   window.speechSynthesis && window.speechSynthesis.cancel();
+  if (typeof tutupModalGambarMateri === 'function') tutupModalGambarMateri();
 
   // Beralih ke tab modul jika belum di tab modul
   if (state.currentTab !== 'modul') {
@@ -2940,6 +2941,16 @@ function bukaModalGambarMateri(src, judul = 'Pratinjau Infografis Materi') {
       btnUnduh.download = src.split('/').pop();
     }
     modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('z-index');
+    modal.style.removeProperty('visibility');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('opacity');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
   }
 }
 
@@ -2952,7 +2963,9 @@ function tutupModalGambarMateri() {
     modal.style.setProperty('pointer-events', 'none', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
     modal.style.setProperty('z-index', '-9999', 'important');
+    modal.style.setProperty('opacity', '0', 'important');
   }
+}
 }
 
 // Buka Tab Kuis & Ambil Sertifikat Resmi Siswa
@@ -6315,15 +6328,31 @@ function bukaModalMesinPencariKartun() {
   const modal = document.getElementById('modal-mesin-pencari-kartun');
   if (modal) {
     modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('z-index');
+    modal.style.removeProperty('visibility');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('opacity');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
     renderPencariKartunPills('modal-search-filter-pills', CARTOON_SEARCH_STATE.activeCategory, true);
     cariKoleksiKartunModal(CARTOON_SEARCH_STATE.currentQuery);
   }
 }
-window.bukaModalMesinPencariKartun = bukaModalMesinPencariKartun;
 
 function tutupModalMesinPencariKartun() {
   const modal = document.getElementById('modal-mesin-pencari-kartun');
-  if (modal) modal.classList.add('hidden');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+    modal.style.setProperty('opacity', '0', 'important');
+  }
 }
 window.tutupModalMesinPencariKartun = tutupModalMesinPencariKartun;
 

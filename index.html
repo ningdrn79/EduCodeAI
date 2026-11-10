@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261109_sync_fix_v119">
+  <link rel="stylesheet" href="styles.css?v=20261110_modal_zindex_fix_v120">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -75,7 +75,12 @@
     #modal-panduan-firebase.hidden,
     #modal-status-koneksi-firebase.hidden,
     #modal-upload-soal.hidden,
-    #modal-konfirmasi-hapus-semua-poster.hidden {
+    #modal-upload-dokumen-soal.hidden,
+    #modal-konfirmasi-hapus-poster.hidden,
+    #modal-konfirmasi-hapus-semua-poster.hidden,
+    #modal-panduan-typing.hidden,
+    #modal-robo-victory.hidden,
+    #modal-semester-2.hidden {
       display: none !important;
       visibility: hidden !important;
       pointer-events: none !important;
@@ -92,10 +97,30 @@
     #modal-konfirmasi-logout-siswa:not(.hidden),
     #modal-panduan-sheets:not(.hidden),
     #modal-panduan-firebase:not(.hidden),
+    #modal-status-koneksi-firebase:not(.hidden),
     #modal-ubah-pin-guru:not(.hidden),
-    #modal-bicara-robo:not(.hidden) {
+    #modal-lupa-pin-email-guru:not(.hidden),
+    #modal-bicara-robo:not(.hidden),
+    #modal-detail-siswa:not(.hidden),
+    #modal-tambah-siswa:not(.hidden),
+    #modal-rubrik-penilaian:not(.hidden),
+    #modal-monitoring-drive-guru:not(.hidden),
+    #modal-gambar-materi:not(.hidden),
+    #modal-mesin-pencari-kartun:not(.hidden),
+    #modal-bank-soal-guru:not(.hidden),
+    #modal-upload-soal:not(.hidden),
+    #modal-upload-dokumen-soal:not(.hidden),
+    #modal-konfirmasi-hapus-poster:not(.hidden),
+    #modal-konfirmasi-hapus-semua-poster:not(.hidden),
+    #modal-pilih-sumber-drive:not(.hidden),
+    #modal-semester-2:not(.hidden),
+    #modal-panduan-typing:not(.hidden),
+    #modal-robo-victory:not(.hidden) {
       display: flex !important;
       z-index: 999999 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
   </style>
 
@@ -680,7 +705,76 @@
         if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
       };
 
-      window.bukaModalLoginGuru = function() {
+      window.bukaModalGambarMateri = function(src, judul) {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      var modal = document.getElementById('modal-gambar-materi');
+      var img = document.getElementById('modal-gambar-materi-img');
+      var txtJudul = document.getElementById('modal-gambar-materi-judul');
+      var btnUnduh = document.getElementById('modal-gambar-materi-unduh');
+      if (modal && img) {
+        img.src = src;
+        if (txtJudul) txtJudul.innerText = judul || 'Pratinjau Infografis Materi';
+        if (btnUnduh) {
+          btnUnduh.href = src;
+          btnUnduh.download = src.split('/').pop();
+        }
+        modal.classList.remove('hidden');
+        modal.style.removeProperty('display');
+        modal.style.removeProperty('z-index');
+        modal.style.removeProperty('visibility');
+        modal.style.removeProperty('pointer-events');
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.style.setProperty('z-index', '999999', 'important');
+        modal.style.setProperty('visibility', 'visible', 'important');
+        modal.style.setProperty('pointer-events', 'auto', 'important');
+        modal.style.setProperty('opacity', '1', 'important');
+      }
+    };
+
+    window.tutupModalGambarMateri = function() {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      var modal = document.getElementById('modal-gambar-materi');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.setProperty('display', 'none', 'important');
+        modal.style.setProperty('pointer-events', 'none', 'important');
+        modal.style.setProperty('visibility', 'hidden', 'important');
+        modal.style.setProperty('z-index', '-9999', 'important');
+        modal.style.setProperty('opacity', '0', 'important');
+      }
+    };
+
+    window.bukaModalMesinPencariKartun = window.bukaModalMesinPencariKartun || function() {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      var modal = document.getElementById('modal-mesin-pencari-kartun');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.removeProperty('display');
+        modal.style.removeProperty('z-index');
+        modal.style.removeProperty('visibility');
+        modal.style.removeProperty('pointer-events');
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.style.setProperty('z-index', '999999', 'important');
+        modal.style.setProperty('visibility', 'visible', 'important');
+        modal.style.setProperty('pointer-events', 'auto', 'important');
+        modal.style.setProperty('opacity', '1', 'important');
+      }
+    };
+
+    window.tutupModalMesinPencariKartun = window.tutupModalMesinPencariKartun || function() {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      var modal = document.getElementById('modal-mesin-pencari-kartun');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.setProperty('display', 'none', 'important');
+        modal.style.setProperty('pointer-events', 'none', 'important');
+        modal.style.setProperty('visibility', 'hidden', 'important');
+        modal.style.setProperty('z-index', '-9999', 'important');
+        modal.style.setProperty('opacity', '0', 'important');
+      }
+    };
+
+    window.bukaModalLoginGuru = function() {
         try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
         var modal = document.getElementById('modal-login-guru');
         if (modal) {
@@ -11491,7 +11585,7 @@
       </div>
 
       <!-- MODAL PANDUAN CARA BERMAIN TYPING HERO -->
-      <div id="modal-panduan-typing" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+      <div id="modal-panduan-typing" class="fixed inset-0 z-[999999] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2.5">
@@ -14148,7 +14242,7 @@
       </div> <!-- Penutup Grid Kolom Kiri & Kolom Kanan -->
 
       <!-- Victory / Menang Modal -->
-      <div id="modal-robo-victory" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+      <div id="modal-robo-victory" class="hidden fixed inset-0 z-[999999] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 border-4 border-yellow-400 shadow-2xl relative overflow-hidden">
           <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-yellow-400 to-amber-500 flex items-center justify-center text-4xl shadow-lg shadow-yellow-500/50 animate-bounce">
             🏆
@@ -17202,7 +17296,7 @@
   </footer>
 
   <!-- MODAL INTERAKTIF: PREVIEW SEMESTER 2 -->
-  <div id="modal-semester-2" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+  <div id="modal-semester-2" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999999] hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-purple-200 space-y-5 animate-fadeIn">
       
       <div class="flex items-center justify-between border-b pb-4">
@@ -17416,7 +17510,7 @@
 
 
   <!-- Modal Konfirmasi Hapus Satu Poster Word -->
-  <div id="modal-konfirmasi-hapus-poster" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs items-center justify-center p-4 hidden animate-fadeIn">
+  <div id="modal-konfirmasi-hapus-poster" style="display: none;" class="fixed inset-0 z-[999999] bg-black/70 backdrop-blur-xs items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4 transform transition-all scale-100">
       <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-sm">
         <i class="fa-solid fa-trash-can"></i>
@@ -17445,7 +17539,7 @@
 
 
   <!-- Modal Konfirmasi Hapus Semua Poster Word -->
-  <div id="modal-konfirmasi-hapus-semua-poster" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs items-center justify-center p-4 hidden animate-fadeIn">
+  <div id="modal-konfirmasi-hapus-semua-poster" style="display: none;" class="fixed inset-0 z-[999999] bg-black/70 backdrop-blur-xs items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4 transform transition-all scale-100">
       <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-sm">
         <i class="fa-solid fa-dumpster-fire"></i>
@@ -17473,7 +17567,7 @@
 
 
   <!-- Modal Pratinjau Gambar Infografis / Poster Pembelajaran TP 1.1 -->
-  <div id="modal-gambar-materi" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalGambarMateri()">
+  <div id="modal-gambar-materi" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalGambarMateri()">
     <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-700/20">
       <div class="p-4 sm:p-5 bg-slate-900 text-white flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -17505,7 +17599,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: MESIN PENCARI GAMBAR KARTUN 7 KEBIASAAN (POPUP CEPAT UNTUK LAB WORD) -->
   <!-- ======================================================== -->
-  <div id="modal-mesin-pencari-kartun" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalMesinPencariKartun()">
+  <div id="modal-mesin-pencari-kartun" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalMesinPencariKartun()">
     <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
       
       <!-- Header Modal -->
@@ -17574,7 +17668,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: PILIH SUMBER GAMBAR UNTUK SLOT DRIVE 7 KEBIASAAN -->
   <!-- ======================================================== -->
-  <div id="modal-pilih-sumber-drive" style="display: none;" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs items-center justify-center p-3 sm:p-4">
+  <div id="modal-pilih-sumber-drive" style="display: none;" class="hidden fixed inset-0 z-[999999] bg-slate-900/70 backdrop-blur-xs items-center justify-center p-3 sm:p-4">
     <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200 animate-fadeIn flex flex-col max-h-[90vh]">
       <div class="p-4 sm:p-5 bg-gradient-to-r from-purple-700 via-indigo-700 to-sky-700 text-white flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
@@ -17786,7 +17880,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: UBAH PIN AKSES DASBOR GURU -->
   <!-- ======================================================== -->
-  <div id="modal-ubah-pin-guru" style="display: none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalUbahPinGuru()">
+  <div id="modal-ubah-pin-guru" style="display: none;" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalUbahPinGuru()">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -18147,7 +18241,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: EDIT DATA SISWA, NILAI, & CATATAN GURU -->
   <!-- ======================================================== -->
-  <div id="modal-detail-siswa" style="display: none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalDetailSiswa()">
+  <div id="modal-detail-siswa" style="display: none;" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalDetailSiswa()">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto">
       
       <!-- Header Modal Edit -->
@@ -18452,7 +18546,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: TAMBAH SISWA MANUAL -->
   <!-- ======================================================== -->
-  <div id="modal-tambah-siswa" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalTambahSiswa()">
+  <div id="modal-tambah-siswa" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalTambahSiswa()">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -18534,7 +18628,7 @@
   <!-- ======================================================== -->
   <!-- MODAL: PANDUAN ASPEK RUBRIK PENILAIAN OTOMATIS SISTEM -->
   <!-- ======================================================== -->
-  <div id="modal-rubrik-penilaian" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalRubrikPenilaian()">
+  <div id="modal-rubrik-penilaian" class="fixed inset-0 z-[999999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalRubrikPenilaian()">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -19106,7 +19200,7 @@
       </div>
     </div>
   </div>
-  <div id="modal-panduan-firebase" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+  <div id="modal-panduan-firebase" class="fixed inset-0 z-[999999] bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-amber-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
       <!-- Modal Header -->
       <div class="p-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-between">
@@ -19472,7 +19566,7 @@
   <!-- ======================================================== -->
   <!-- MODAL STATUS KONEKSI & DIAGNOSTIK FIREBASE               -->
   <!-- ======================================================== -->
-  <div id="modal-status-koneksi-firebase" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+  <div id="modal-status-koneksi-firebase" class="fixed inset-0 z-[999999] bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-amber-200 overflow-hidden my-8 max-h-[92vh] flex flex-col animate-fadeIn">
       <!-- Modal Header -->
       <div class="p-5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white flex items-center justify-between">
@@ -19510,7 +19604,7 @@
   <!-- ======================================================== -->
   <!-- MODAL TAMBAH / EDIT SOAL KUIS GURU                      -->
   <!-- ======================================================== -->
-  <div id="modal-bank-soal-guru" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+  <div id="modal-bank-soal-guru" class="fixed inset-0 z-[999999] bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-amber-200 overflow-hidden my-8 max-h-[92vh] flex flex-col">
       <!-- Modal Header -->
       <div class="p-5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-between">
@@ -19607,7 +19701,7 @@
   <!-- ======================================================== -->
   <!-- MODAL IMPORT SOAL OTOMATIS (WORD, PDF, & TEKS)          -->
   <!-- ======================================================== -->
-  <div id="modal-upload-dokumen-soal" class="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+  <div id="modal-upload-dokumen-soal" class="fixed inset-0 z-[999999] bg-slate-900/75 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl border-2 border-indigo-200 overflow-hidden my-6 max-h-[94vh] flex flex-col animate-fadeIn">
       <!-- Modal Header -->
       <div class="p-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white flex items-center justify-between">

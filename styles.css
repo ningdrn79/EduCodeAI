@@ -2566,6 +2566,37 @@ div[id^="m-navbar-"],
   opacity: 1 !important;
 }
 
+#modal-login-guru:not(.hidden),
+#modal-profil-siswa:not(.hidden),
+#modal-konfirmasi-logout-siswa:not(.hidden),
+#modal-panduan-sheets:not(.hidden),
+#modal-panduan-firebase:not(.hidden),
+#modal-status-koneksi-firebase:not(.hidden),
+#modal-ubah-pin-guru:not(.hidden),
+#modal-lupa-pin-email-guru:not(.hidden),
+#modal-bicara-robo:not(.hidden),
+#modal-detail-siswa:not(.hidden),
+#modal-tambah-siswa:not(.hidden),
+#modal-rubrik-penilaian:not(.hidden),
+#modal-monitoring-drive-guru:not(.hidden),
+#modal-gambar-materi:not(.hidden),
+#modal-mesin-pencari-kartun:not(.hidden),
+#modal-bank-soal-guru:not(.hidden),
+#modal-upload-soal:not(.hidden),
+#modal-upload-dokumen-soal:not(.hidden),
+#modal-konfirmasi-hapus-poster:not(.hidden),
+#modal-konfirmasi-hapus-semua-poster:not(.hidden),
+#modal-pilih-sumber-drive:not(.hidden),
+#modal-semester-2:not(.hidden),
+#modal-panduan-typing:not(.hidden),
+#modal-robo-victory:not(.hidden) {
+  display: flex !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* Jaminan Teks Form Konfigurasi Firebase Selalu Terbaca Jelas & Hitam Pekat */
 #firebase-config-input {
   color: #0f172a !important;
