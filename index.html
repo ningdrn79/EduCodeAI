@@ -916,21 +916,57 @@
               earlyStyle.id = 'style-early-student-session';
               document.head.appendChild(earlyStyle);
             }
-            earlyStyle.innerHTML = `
-              #navbar-tampilan-utama { display: none !important; }
-              #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
-              #navbar-tampilan-sem1 * { pointer-events: auto !important; }
-              #btn-welcome-login { display: none !important; }
-              #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-              #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-              #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-              #hero-guest-btn { display: none !important; }
-              #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
-              #welcome-siswa-bintang-wrap { display: flex !important; }
-            `;
+            var isK6 = student.kelas && String(student.kelas).indexOf('6') !== -1;
+            var isK5 = student.kelas && String(student.kelas).indexOf('5') !== -1;
+            if (isK6) {
+              earlyStyle.innerHTML = `
+                #navbar-tampilan-utama { display: none !important; }
+                #navbar-tampilan-sem1 { display: none !important; }
+                #navbar-tampilan-kelas5 { display: none !important; }
+                #navbar-tampilan-kelas6 { display: flex !important; pointer-events: auto !important; }
+                #navbar-tampilan-kelas6 * { pointer-events: auto !important; }
+                #btn-welcome-login { display: none !important; }
+                #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #hero-guest-btn { display: none !important; }
+                #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
+                #welcome-siswa-bintang-wrap { display: flex !important; }
+              `;
+            } else if (isK5) {
+              earlyStyle.innerHTML = `
+                #navbar-tampilan-utama { display: none !important; }
+                #navbar-tampilan-sem1 { display: none !important; }
+                #navbar-tampilan-kelas6 { display: none !important; }
+                #navbar-tampilan-kelas5 { display: flex !important; pointer-events: auto !important; }
+                #navbar-tampilan-kelas5 * { pointer-events: auto !important; }
+                #btn-welcome-login { display: none !important; }
+                #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #hero-guest-btn { display: none !important; }
+                #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
+                #welcome-siswa-bintang-wrap { display: flex !important; }
+              `;
+            } else {
+              earlyStyle.innerHTML = `
+                #navbar-tampilan-utama { display: none !important; }
+                #navbar-tampilan-kelas5 { display: none !important; }
+                #navbar-tampilan-kelas6 { display: none !important; }
+                #navbar-tampilan-sem1 { display: flex !important; pointer-events: auto !important; }
+                #navbar-tampilan-sem1 * { pointer-events: auto !important; }
+                #btn-welcome-login { display: none !important; }
+                #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #hero-guest-btn { display: none !important; }
+                #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
+                #welcome-siswa-bintang-wrap { display: flex !important; }
+              `;
+            }
           } catch(e) {}
           window.tutupModalProfilSiswa();
-          window.setHeaderNavMode('sem1');
+          window.setHeaderNavMode(isK6 ? 'kelas6' : (isK5 ? 'kelas5' : 'sem1'));
           window.switchTab('beranda');
           if (typeof muatProfilSiswa === 'function') muatProfilSiswa();
         } else {
@@ -1427,6 +1463,11 @@
           <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 font-title font-black text-[11px] uppercase border border-emerald-400/40 shrink-0 hidden md:inline-flex items-center gap-1">
             <i class="fa-solid fa-brain text-yellow-300"></i> Kelas 6 SD • CT
           </span>
+
+          <!-- Tombol Modul Belajar (4 Pilar CT) -->
+          <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" id="nav-p6-modul" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Modul Belajar: 4 Pilar Computational Thinking">
+            <i class="fa-solid fa-book-open text-emerald-300 icon-3d-glow"></i> <span>Modul Belajar</span>
+          </button>
 
           <!-- Menu 1: Dekomposisi -->
           <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" id="nav-p6-dekomposisi" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-white shrink-0 cursor-pointer" title="Pilar 1: Dekomposisi (Memecah Masalah)">
@@ -2198,9 +2239,17 @@
               </h3>
             </div>
           </div>
-          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
@@ -2550,9 +2599,17 @@
               </h3>
             </div>
           </div>
-          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
@@ -3530,6 +3587,44 @@
             <button type="button" onclick="window.resetMisiKelas6()" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 font-title font-bold text-xs border border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer">
               <i class="fa-solid fa-arrows-rotate text-slate-400"></i> <span>Muat Ulang Misi</span>
             </button>
+          </div>
+        </div>
+
+        <!-- INFOGRAFIS RESMI: 4 PILAR COMPUTATIONAL THINKING KELAS 6 (KARYA GURU) -->
+        <div class="mt-6 bg-slate-900/90 rounded-3xl border-2 border-emerald-400/50 p-4 sm:p-6 shadow-2xl space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-xl font-bold shadow-xs">
+                <i class="fa-solid fa-image"></i>
+              </span>
+              <div>
+                <h3 class="font-title font-bold text-white text-base sm:text-lg leading-tight">
+                  Infografis: 4 Pilar Computational Thinking (Panduan Siswa Kelas 6 SD)
+                </h3>
+                <span class="text-xs text-emerald-300 font-semibold">Kurikulum Merdeka • Fase C • SDS Cinta Kasih Tzu Chi</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" onclick="suarakanTeksRobo('Mari kita berpikir seperti ahli komputer! Ada empat pilar berpikir komputasional untuk siswa kelas 6 SD: Pertama, Dekomposisi. Kedua, Pengenalan Pola. Ketiga, Abstraksi. Dan keempat, Algoritma!');" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" title="Dengarkan Suara Penjelasan Maskot Robo">
+                <i class="fa-solid fa-volume-high text-yellow-400"></i> Suara Robo 🎧
+              </button>
+              <a href="materi_ct_kelas6.jpg" download="4_Pilar_Computational_Thinking_Kelas6.jpg" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" title="Unduh Poster Infografis">
+                <i class="fa-solid fa-download"></i> Unduh Poster JPG
+              </a>
+              <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-xl text-xs font-title font-black transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Perbesar Ukuran Penuh">
+                <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Perbesar Gambar (Zoom) 🔍
+              </button>
+            </div>
+          </div>
+
+          <!-- Gambar Infografis Interaktif -->
+          <div class="relative group rounded-2xl overflow-hidden border-2 border-emerald-400/30 bg-black/50 flex justify-center cursor-zoom-in shadow-inner" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" title="Klik untuk memperbesar gambar ukuran penuh">
+            <img src="materi_ct_kelas6.jpg" alt="4 Pilar Computational Thinking - Panduan untuk Siswa Kelas 6 SD" class="max-h-[620px] w-auto max-w-full object-contain rounded-xl transition-transform duration-300 group-hover:scale-[1.01]" loading="eager">
+            <div class="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="bg-black/80 text-white text-xs font-bold px-4 py-2 rounded-full backdrop-blur-xs flex items-center gap-2 shadow-2xl border border-emerald-400/50">
+                <i class="fa-solid fa-magnifying-glass-plus text-emerald-400"></i> Klik untuk Melihat Ukuran Penuh (Zoom) 🔍
+              </span>
+            </div>
           </div>
         </div>
 
@@ -5313,10 +5408,23 @@
     <!-- TAB 2: MODUL PEMBELAJARAN LENGKAP (TP 2.1 - 2.4) -->
     <!-- ======================================================== -->
     <section id="tab-modul" class="hidden space-y-6 animate-fadeIn">
-      <div class="flex items-center justify-between">
-        <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 bg-white hover:bg-blue-50 px-4 py-2 rounded-full border border-slate-200 shadow-xs transition">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 bg-white hover:bg-blue-50 px-4 py-2 rounded-full border border-slate-200 shadow-xs transition cursor-pointer">
           <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda LMS
         </button>
+
+        <!-- Pemilih Tingkat Modul Belajar (Kelas 4, 5, 6 SD) -->
+        <div class="flex items-center gap-1.5 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-700/80 shadow-lg backdrop-blur-md overflow-x-auto">
+          <button type="button" id="btn-pilih-modul-k4" onclick="pilihTingkatModul('kelas4')" class="px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-xs cursor-pointer shrink-0">
+            <i class="fa-solid fa-book-open"></i> <span>Kelas 4 (Fase B)</span>
+          </button>
+          <button type="button" id="btn-pilih-modul-k5" onclick="pilihTingkatModul('kelas5')" class="px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0">
+            <i class="fa-solid fa-rocket"></i> <span>Kelas 5 (Fase C)</span>
+          </button>
+          <button type="button" id="btn-pilih-modul-k6" onclick="pilihTingkatModul('kelas6')" class="px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0">
+            <i class="fa-solid fa-brain text-yellow-300"></i> <span>Kelas 6 SD (4 Pilar CT)</span>
+          </button>
+        </div>
       </div>
 
       <!-- KONTEN MODUL SEMESTER 1 (PROTA LENGKAP 38 JP & 8 TP) -->
@@ -7835,10 +7943,392 @@
           </div>
 
           <div class="pt-4 border-t flex flex-wrap gap-3 justify-end">
-            <button onclick="switchTab('kuis')" class="bg-amber-500 hover:bg-amber-600 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+            <button onclick="switchTab('kuis')" class="bg-amber-500 hover:bg-amber-600 text-white font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
               <i class="fa-solid fa-trophy"></i> Uji Pemahaman di Kuis Semester 2
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KONTEN MODUL KELAS 5 SD: PORTOFOLIO DIGITAL TZU CHI       -->
+      <!-- ======================================================== -->
+      <div id="modul-kelas5-container" class="hidden space-y-8 animate-fadeIn">
+        <div class="bg-white rounded-3xl p-5 sm:p-7 border-2 border-indigo-300 shadow-xl space-y-6">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-indigo-800 bg-indigo-100/90 px-3 py-1 rounded-full border border-indigo-300">
+              <i class="fa-solid fa-graduation-cap text-indigo-600"></i> Kurikulum Merdeka • Fase C (Kelas 5 SD)
+            </span>
+            <button onclick="window.print()" class="text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl border border-slate-300 flex items-center gap-1.5 transition cursor-pointer">
+              <i class="fa-solid fa-print text-slate-500"></i> <span class="hidden sm:inline">Cetak Modul</span>
+            </button>
+          </div>
+
+          <div class="text-center space-y-1.5 py-1">
+            <h2 class="font-title font-black text-xl sm:text-2xl text-slate-900 tracking-wide uppercase">
+              MODUL PORTOFOLIO DIGITAL SISWA
+            </h2>
+            <h3 class="font-title font-extrabold text-base sm:text-lg text-indigo-700 tracking-wider">
+              4 Misi Karya: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 font-medium">
+              Fase C • Kelas 5 SD • SDS Cinta Kasih Tzu Chi • Guru Pengampu: Ibu Darningsih, S.T.
+            </p>
+          </div>
+
+          <!-- 4 Kartu Ringkasan Misi Kelas 5 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+              <span class="text-2xl">📊</span>
+              <h4 class="font-title font-bold text-sm text-amber-900">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-600">Komparasi slide presentasi PowerPoint mandiri vs bantuan Gemini AI.</p>
+              <button type="button" onclick="switchTab('petualangan5'); bukaPetualanganZona('zona-presentasi');" class="text-xs font-bold text-amber-700 hover:underline cursor-pointer">Buka Misi 1 &rarr;</button>
+            </div>
+            <div class="p-4 rounded-2xl bg-yellow-50 border border-yellow-200 space-y-2">
+              <span class="text-2xl">🏆</span>
+              <h4 class="font-title font-bold text-sm text-yellow-900">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-600">Unggah bukti kelulusan 1 jam belajar coding dari code.org.</p>
+              <button type="button" onclick="switchTab('petualangan5'); bukaPetualanganZona('zona-sertifikat');" class="text-xs font-bold text-yellow-700 hover:underline cursor-pointer">Buka Misi 2 &rarr;</button>
+            </div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+              <span class="text-2xl">🎨</span>
+              <h4 class="font-title font-bold text-sm text-emerald-900">3. Poster Canva Lingkungan</h4>
+              <p class="text-xs text-slate-600">Desain poster pelestarian lingkungan hidup Tzu Chi format .PNG.</p>
+              <button type="button" onclick="switchTab('petualangan5'); bukaPetualanganZona('zona-poster');" class="text-xs font-bold text-emerald-700 hover:underline cursor-pointer">Buka Misi 3 &rarr;</button>
+            </div>
+            <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
+              <span class="text-2xl">🎮</span>
+              <h4 class="font-title font-bold text-sm text-purple-900">4. Proyek Scratch</h4>
+              <p class="text-xs text-slate-600">Unggah file (.sb3) atau tautan game / cerita animasi Scratch.</p>
+              <button type="button" onclick="switchTab('petualangan5'); bukaPetualanganZona('zona-scratch');" class="text-xs font-bold text-purple-700 hover:underline cursor-pointer">Buka Misi 4 &rarr;</button>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-center">
+            <button type="button" onclick="switchTab('petualangan5')" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer">
+              <span>Buka Ruang Portofolio Kelas 5 Lengkap</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- KONTEN MODUL KHUSUS KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil saat memilih tab Kelas 6 atau saat siswa Kelas 6 aktif  -->
+      <!-- ======================================================== -->
+      <div id="modul-kelas6-container" class="hidden space-y-8 animate-fadeIn">
+        
+        <!-- DOKUMEN MODUL RESMI KELAS 6 SD -->
+        <div class="bg-white rounded-3xl p-5 sm:p-7 border-2 border-emerald-300 shadow-xl space-y-6">
+          
+          <!-- Tombol Aksi Cepat Dokumen (Cetak & Info) -->
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-3 py-1 rounded-full border border-emerald-300">
+              <i class="fa-solid fa-graduation-cap text-emerald-600"></i> Kurikulum Merdeka • Fase C (Kelas 6 SD)
+            </span>
+            <div class="flex items-center gap-2">
+              <button onclick="window.print()" class="text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl border border-slate-300 flex items-center gap-1.5 transition cursor-pointer">
+                <i class="fa-solid fa-print text-slate-500"></i> <span class="hidden sm:inline">Cetak Modul</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Header Judul Modul Kelas 6 -->
+          <div class="text-center space-y-1.5 py-1">
+            <h2 class="font-title font-black text-xl sm:text-2xl text-slate-900 tracking-wide uppercase">
+              MODUL PEMBELAJARAN INFORMATIKA
+            </h2>
+            <h3 class="font-title font-extrabold text-base sm:text-lg text-emerald-700 tracking-wider">
+              4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 font-medium">
+              &ldquo;Mari Kita Berpikir Seperti Ahli Komputer!&rdquo; • SDS Cinta Kasih Tzu Chi
+            </p>
+          </div>
+
+          <!-- Meta Informasi Modul Kelas 6 (2 Kolom Kiri - Kanan) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-xs sm:text-sm font-semibold text-slate-800 px-3 py-2.5 bg-emerald-50/70 rounded-2xl border border-emerald-200">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 min-w-[70px]">Satuan</span>
+                <span>: SDS Cinta Kasih Tzu Chi</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 min-w-[70px]">Kelas /</span>
+                <span>: 6 (Enam) / Fase C</span>
+              </div>
+            </div>
+            <div class="space-y-1 sm:text-left">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 min-w-[110px]">Mata Pelajaran</span>
+                <span>: Informatika &amp; Berpikir Komputasional</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 min-w-[110px]">Guru Pengampu</span>
+                <span>: Ibu Darningsih, S.T.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- INFOGRAFIS UTAMA: 4 PILAR COMPUTATIONAL THINKING KELAS 6 -->
+          <!-- File Asli Unggahan Guru: Disediakan Zoom Penuh & Download  -->
+          <!-- ======================================================== -->
+          <div class="bg-gradient-to-br from-emerald-50 via-teal-50/40 to-slate-50 rounded-3xl border-2 border-emerald-400 p-4 sm:p-6 shadow-md space-y-4">
+            
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-200/80 pb-3">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                  <i class="fa-solid fa-image"></i>
+                </span>
+                <div>
+                  <h4 class="font-title font-bold text-slate-900 text-sm sm:text-base leading-tight">
+                    Infografis: 4 Pilar Computational Thinking (Panduan Siswa Kelas 6 SD)
+                  </h4>
+                  <span class="text-xs text-emerald-800 font-semibold">
+                    Karya / Panduan Resmi: Ibu Darningsih, S.T. • Kurikulum Informatika Fase C
+                  </span>
+                </div>
+              </div>
+
+              <!-- Tombol Aksi: Download, Zoom & Audio Robo -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="suarakanTeksRobo('Mari kita berpikir seperti ahli komputer! Ada empat pilar berpikir komputasional untuk siswa kelas 6 SD: Pertama, Dekomposisi yaitu memecah masalah besar menjadi bagian kecil. Kedua, Pengenalan Pola yaitu menemukan kesamaan atau tren data. Ketiga, Abstraksi yaitu memilih informasi penting dan membuang yang tak perlu. Dan keempat, Algoritma yaitu menyusun urutan langkah-langkah logis untuk menyelesaikan tugas!');" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer" title="Dengarkan Suara Penjelasan Maskot Robo">
+                  <i class="fa-solid fa-volume-high text-emerald-700"></i> Suara Robo 🎧
+                </button>
+                <a href="materi_ct_kelas6.jpg" download="4_Pilar_Computational_Thinking_Kelas6.jpg" class="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer" title="Unduh File Infografis ke Komputer">
+                  <i class="fa-solid fa-download"></i> Unduh File Infografis
+                </a>
+                <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer" title="Perbesar Gambar Ukuran Penuh">
+                  <i class="fa-solid fa-up-right-and-down-left-from-center"></i> Perbesar Gambar (Zoom) 🔍
+                </button>
+              </div>
+            </div>
+
+            <!-- Wadah Tampilan Gambar Infografis Interaktif -->
+            <div class="relative group rounded-2xl overflow-hidden border-2 border-emerald-200 bg-slate-950 flex justify-center cursor-zoom-in shadow-inner" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" title="Klik untuk memperbesar infografis ukuran penuh">
+              <img 
+                src="materi_ct_kelas6.jpg" 
+                alt="4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)" 
+                class="max-h-[640px] w-auto max-w-full object-contain rounded-xl transition-transform duration-300 group-hover:scale-[1.01]" 
+                loading="eager"
+              />
+              <div class="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                <span class="bg-black/80 text-white text-xs font-bold px-4 py-2 rounded-full backdrop-blur-xs flex items-center gap-2 shadow-2xl border border-emerald-400/50">
+                  <i class="fa-solid fa-magnifying-glass-plus text-emerald-400"></i> Klik untuk Melihat Ukuran Penuh (Zoom In) 🔍
+                </span>
+              </div>
+            </div>
+
+            <div class="text-center text-[11px] text-slate-500 pt-1">
+              <i class="fa-solid fa-circle-info text-emerald-600 mr-1"></i> Klik gambar di atas kapan saja untuk memperbesar tampilan dan membaca teks infografis secara jernih.
+            </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PENJELASAN MENDALAM 4 PILAR SESUAI INFOGRAFIS            -->
+          <!-- 1. Dekomposisi | 2. Pengenalan Pola | 3. Abstraksi | 4. Algoritma -->
+          <!-- ======================================================== -->
+          <div class="space-y-4 pt-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-6 rounded-full bg-emerald-600"></span>
+              <h3 class="font-title font-black text-lg text-slate-900">
+                Uraian Materi 4 Pilar Berpikir Komputasional
+              </h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+              
+              <!-- Pilar 1: Dekomposisi -->
+              <div class="p-5 rounded-3xl bg-sky-50/70 border-2 border-sky-200 shadow-2xs flex flex-col justify-between hover:border-sky-400 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-2xl font-black shadow-xs">
+                      🧩
+                    </span>
+                    <span class="text-xs font-mono font-bold bg-sky-100 text-sky-800 px-3 py-1 rounded-full border border-sky-200">
+                      Pilar 1 • Computational Thinking
+                    </span>
+                  </div>
+                  <h4 class="font-title font-bold text-lg text-slate-900">
+                    1. DEKOMPOSISI <span class="text-sky-600">(MEMECAH)</span>
+                  </h4>
+                  <p class="text-xs font-bold text-sky-800 italic mt-1 mb-2">
+                    &ldquo;Masalah besar jadi lebih mudah? Pecah saja!&rdquo;
+                  </p>
+                  <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                    Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola satu per satu.
+                  </p>
+
+                  <div class="mt-4 p-3.5 bg-white rounded-2xl border border-sky-200 space-y-1.5 text-xs text-slate-800">
+                    <div class="font-title font-bold text-sky-950 flex items-center gap-1.5">
+                      <span>🌍</span> Contoh Nyata Infografis: Merencanakan Liburan Keluarga
+                    </div>
+                    <p class="text-slate-600 text-[11px]">Bagi tugas besar menjadi 3 bagian kecil:</p>
+                    <ol class="list-decimal list-inside space-y-0.5 text-slate-700 font-medium text-[11px]">
+                      <li><b>Pesan tiket</b> transportasi &amp; penginapan</li>
+                      <li><b>Siapkan koper</b> dan perlengkapan pribadi</li>
+                      <li><b>Pilih tempat</b> yang mau dikunjungi</li>
+                    </ol>
+                  </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-sky-100">
+                  <button type="button" onclick="switchTab('petualangan6'); bukaPetualangan6Zona('zona-dekomposisi');" class="w-full py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Praktik Dekomposisi</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pilar 2: Pengenalan Pola -->
+              <div class="p-5 rounded-3xl bg-emerald-50/70 border-2 border-emerald-200 shadow-2xs flex flex-col justify-between hover:border-emerald-400 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-black shadow-xs">
+                      🧸
+                    </span>
+                    <span class="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
+                      Pilar 2 • Computational Thinking
+                    </span>
+                  </div>
+                  <h4 class="font-title font-bold text-lg text-slate-900">
+                    2. PENGENALAN POLA <span class="text-emerald-600">(MENEMUKAN KESAMAAN)</span>
+                  </h4>
+                  <p class="text-xs font-bold text-emerald-800 italic mt-1 mb-2">
+                    &ldquo;Melihat persamaan!&rdquo;
+                  </p>
+                  <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                    Menemukan keteraturan, kesamaan, atau tren dalam berbagai masalah atau data sehingga dapat diselesaikan dengan cara serupa.
+                  </p>
+
+                  <div class="mt-4 p-3.5 bg-white rounded-2xl border border-emerald-200 space-y-1.5 text-xs text-slate-800">
+                    <div class="font-title font-bold text-emerald-950 flex items-center gap-1.5">
+                      <span>📦</span> Contoh Nyata Infografis: Mengelompokkan Mainan
+                    </div>
+                    <p class="text-slate-600 text-[11px]">Sortir berdasarkan kategori pola:</p>
+                    <ul class="list-disc list-inside space-y-0.5 text-slate-700 font-medium text-[11px]">
+                      <li><b>Boneka</b> di satu kotak lembut</li>
+                      <li><b>Mobil-mobilan</b> di kotak kedua</li>
+                      <li><b>Blok bangunan</b> di kotak ketiga</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-emerald-100">
+                  <button type="button" onclick="switchTab('petualangan6'); bukaPetualangan6Zona('zona-pola');" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-shapes"></i> <span>Mulai Game Sortir Pola</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pilar 3: Abstraksi -->
+              <div class="p-5 rounded-3xl bg-amber-50/70 border-2 border-amber-200 shadow-2xs flex flex-col justify-between hover:border-amber-400 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-black shadow-xs">
+                      🗺️
+                    </span>
+                    <span class="text-xs font-mono font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-full border border-amber-200">
+                      Pilar 3 • Computational Thinking
+                    </span>
+                  </div>
+                  <h4 class="font-title font-bold text-lg text-slate-900">
+                    3. ABSTRAKSI <span class="text-amber-600">(MEMILIH INFORMASI)</span>
+                  </h4>
+                  <p class="text-xs font-bold text-amber-800 italic mt-1 mb-2">
+                    &ldquo;Fokus pada inti masalah!&rdquo;
+                  </p>
+                  <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                    Memilih informasi yang penting dan relevan, serta mengabaikan detail-detail yang tidak diperlukan agar tidak membingungkan.
+                  </p>
+
+                  <div class="mt-4 p-3.5 bg-white rounded-2xl border border-amber-200 space-y-1.5 text-xs text-slate-800">
+                    <div class="font-title font-bold text-amber-950 flex items-center gap-1.5">
+                      <span>📱</span> Contoh Nyata Infografis: Menggunakan Peta Digital GPS
+                    </div>
+                    <p class="text-slate-600 text-[11px]">Saring informasi fokus inti:</p>
+                    <p class="text-slate-700 font-medium text-[11px]">
+                      Kamu hanya perlu melihat <b>jalan, jarak, dan belokan rute</b>, bukan semua jenis pohon atau tiang listrik yang ada di pinggir jalan!
+                    </p>
+                  </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-amber-100">
+                  <button type="button" onclick="switchTab('petualangan6'); bukaPetualangan6Zona('zona-abstraksi');" class="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-filter"></i> <span>Uji Simulator Filter Peta</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pilar 4: Algoritma -->
+              <div class="p-5 rounded-3xl bg-orange-50/70 border-2 border-orange-200 shadow-2xs flex flex-col justify-between hover:border-orange-400 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="w-11 h-11 rounded-2xl bg-orange-100 text-orange-700 flex items-center justify-center text-2xl font-black shadow-xs">
+                      ✈️
+                    </span>
+                    <span class="text-xs font-mono font-bold bg-orange-100 text-orange-800 px-3 py-1 rounded-full border border-orange-200">
+                      Pilar 4 • Computational Thinking
+                    </span>
+                  </div>
+                  <h4 class="font-title font-bold text-lg text-slate-900">
+                    4. ALGORITMA <span class="text-orange-600">(URUTAN LANGKAH)</span>
+                  </h4>
+                  <p class="text-xs font-bold text-orange-800 italic mt-1 mb-2">
+                    &ldquo;Urutan langkah rahasia!&rdquo;
+                  </p>
+                  <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
+                    Membuat serangkaian langkah logis yang tersusun rapi dari awal hingga akhir untuk menyelesaikan suatu tugas.
+                  </p>
+
+                  <div class="mt-4 p-3.5 bg-white rounded-2xl border border-orange-200 space-y-1.5 text-xs text-slate-800">
+                    <div class="font-title font-bold text-orange-950 flex items-center gap-1.5">
+                      <span>📄</span> Contoh Nyata Infografis: Membuat Origami Pesawat
+                    </div>
+                    <p class="text-slate-600 text-[11px]">4 langkah runtut algoritma:</p>
+                    <div class="flex items-center gap-1 text-[11px] font-bold text-orange-950 flex-wrap">
+                      <span class="px-2 py-0.5 bg-orange-100 rounded">1. Lipat dua kertas</span>
+                      <span>&rarr;</span>
+                      <span class="px-2 py-0.5 bg-orange-100 rounded">2. Lipat sudut atas</span>
+                      <span>&rarr;</span>
+                      <span class="px-2 py-0.5 bg-orange-100 rounded">3. Lipat sayap</span>
+                      <span>&rarr;</span>
+                      <span class="px-2 py-0.5 bg-orange-200 rounded text-orange-900">4. Terbangkan! ✈️</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-orange-100">
+                  <button type="button" onclick="switchTab('petualangan6'); bukaPetualangan6Zona('zona-algoritma');" class="w-full py-2.5 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-paper-plane"></i> <span>Susun Algoritma Origami</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Pojok Budi Pekerti Tzu Chi Kelas 6 SD -->
+          <div class="p-5 rounded-3xl bg-gradient-to-r from-emerald-900 to-teal-950 text-white border-2 border-emerald-400/40 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <span class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center justify-center text-2xl shrink-0">
+                🪷
+              </span>
+              <div>
+                <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">
+                  Budi Pekerti &amp; Kata Perenungan Master Cheng Yen • Kelas 6
+                </span>
+                <p class="font-title text-xs sm:text-sm text-slate-100 italic mt-0.5">
+                  &ldquo;Dengan pikiran yang jernih, tenang, dan teratur, setiap masalah rumit dapat diurai menjadi sederhana dan diselesaikan dengan bijaksana.&rdquo;
+                </p>
+              </div>
+            </div>
+
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+              <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
         </div>
       </div>
     </section>
@@ -10770,9 +11260,17 @@
               </h3>
             </div>
           </div>
-          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
@@ -16345,10 +16843,13 @@
 
               <div class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/70">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <button onclick="sinkronkanMasterDataSiswaLMS()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-md cursor-pointer" title="Tarik seluruh data siswa 11 kelas sekaligus dari sheet 'DATA SISWA LMS'">
-                    <i class="fa-solid fa-cloud-arrow-down"></i> Sinkron Master "DATA SISWA LMS"
+                  <button type="button" onclick="sinkronkanSemuaKelasSekaligus()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-md cursor-pointer" title="Tarik seluruh data siswa kelas 4, 5, dan 6 dari Google Sheets sekaligus!">
+                    <i class="fa-solid fa-bolt text-amber-300"></i> Sinkronkan SEMUA Kelas (4, 5, 6)
                   </button>
-                  <button onclick="sinkronkanDataSiswaKelasAktifForm()" id="btn-sync-single-class" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
+                  <button type="button" onclick="sinkronkanMasterDataSiswaLMS()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer" title="Tarik data master">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Sinkron Master
+                  </button>
+                  <button type="button" onclick="sinkronkanDataSiswaKelasAktifForm()" id="btn-sync-single-class" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title text-xs font-bold transition flex items-center gap-2 shadow-sm cursor-pointer">
                     <i class="fa-solid fa-arrows-rotate"></i> Sinkron Kelas Ini Saja
                   </button>
                 </div>
@@ -18292,9 +18793,17 @@
               </h3>
             </div>
           </div>
-          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
@@ -18651,9 +19160,17 @@
               </h3>
             </div>
           </div>
-          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
@@ -19167,9 +19684,17 @@
               </h3>
             </div>
           </div>
-          <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Komputasi Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
@@ -19428,7 +19953,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261110_fix_sync5d_v122"></script>
+  <script src="app.js?v=20261110_modul6_infografis_v124"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

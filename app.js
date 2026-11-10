@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kreator Cilik - Aplikasi Pembelajaran Konten Digital & Berpikir Komputasional
  * Kelas 4 SD Semester 1 (TP 2.1 - TP 2.4)
  */
@@ -433,9 +433,9 @@ let state = {
   p2SelectedItem: null,
   p2Items: {
     'p2-item-1': { type: 'teks', label: '"HEMAT ENERGI LISTRIK"' },
-    'p2-item-2': { type: 'gambar', label: '💡 [Ikon Lampu Bohlam Hemat]' },
+    'p2-item-2': { type: 'gambar', label: 'ðŸ’¡ [Ikon Lampu Bohlam Hemat]' },
     'p2-item-3': { type: 'teks', label: '"Matikan saklar saat tidak dipakai untuk cegah boros listrik."' },
-    'p2-item-4': { type: 'gambar', label: '🔌 [Ikon Cabut Colokan Kabel]' }
+    'p2-item-4': { type: 'gambar', label: 'ðŸ”Œ [Ikon Cabut Colokan Kabel]' }
   },
   p2PlacedCount: 0,
   // Praktik 3 State (Poster)
@@ -630,7 +630,7 @@ function toggleAudioNarration() {
     if (iconSem1) iconSem1.className = 'fa-solid fa-volume-high text-xs';
     if (iconMobile) iconMobile.className = 'fa-solid fa-volume-high text-lg text-amber-400';
     if (soundLabel) soundLabel.innerText = (state.currentLang === 'en') ? 'Sound: ON' : 'Suara: ON';
-    showToast(state.currentLang === 'en' ? 'Sound is now ON 🔊' : 'Suara narator diaktifkan 🔊');
+    showToast(state.currentLang === 'en' ? 'Sound is now ON ðŸ”Š' : 'Suara narator diaktifkan ðŸ”Š');
   } else {
     try {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -639,7 +639,7 @@ function toggleAudioNarration() {
     if (iconSem1) iconSem1.className = 'fa-solid fa-volume-xmark text-xs';
     if (iconMobile) iconMobile.className = 'fa-solid fa-volume-xmark text-lg text-slate-500';
     if (soundLabel) soundLabel.innerText = (state.currentLang === 'en') ? 'Sound: OFF' : 'Suara: OFF';
-    showToast(state.currentLang === 'en' ? 'Sound is now OFF 🔇' : 'Suara narator dimatikan 🔇');
+    showToast(state.currentLang === 'en' ? 'Sound is now OFF ðŸ”‡' : 'Suara narator dimatikan ðŸ”‡');
   }
 }
 window.toggleAudioNarration = toggleAudioNarration;
@@ -676,7 +676,7 @@ function speakContent(elementOrText, forceLang = null) {
 
   if (!textToRead || !textToRead.trim()) return;
 
-  showToast(targetLang === 'en-US' ? 'Reading material in English... 🎧' : 'Sedang membacakan materi Bahasa Indonesia... 🎧');
+  showToast(targetLang === 'en-US' ? 'Reading material in English... ðŸŽ§' : 'Sedang membacakan materi Bahasa Indonesia... ðŸŽ§');
   suarakanTeksRobo(textToRead, targetLang);
 }
 window.speakContent = speakContent;
@@ -705,21 +705,21 @@ const i18nDict = {
     skor: 'Skor',
     pelindung: 'Perisai',
     rekor: 'Rekor',
-    heroBadge: 'EduCode AI • Semester 1',
-    heroBadgeSem2: 'EduCode AI • Semester 2',
+    heroBadge: 'EduCode AI â€¢ Semester 1',
+    heroBadgeSem2: 'EduCode AI â€¢ Semester 2',
     heroTitleSem1: 'Belajar Coding & AI<br>Bersama, Untuk Masa Depan',
     heroDescSem1: 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan budi pekerti bersama SDS Cinta Kasih Tzu Chi.',
     heroTitleSem2: 'Petualangan Coding & AI Cilik<br>Animasi, Game & Robot Pintar',
     heroDescSem2: 'Mempelajari pemrograman visual (Scratch/Blockly), logika percabangan robot cerdas, dan pengenalan sensor kamera AI bersama SDS Cinta Kasih Tzu Chi.',
     roboBadge: 'Jawaban Robo',
     btnReplayVoice: 'Ulangi Suara',
-    youAsked: '👦 Kamu Bertanya: ',
-    roboSpeaking: 'Robo berbicara... 🔊',
+    youAsked: 'ðŸ‘¦ Kamu Bertanya: ',
+    roboSpeaking: 'Robo berbicara... ðŸ”Š',
     mascotBadge: 'Maskot EduCode',
-    moodBadge: '⭐ Ceria',
-    btnGreet: '👋 Sapa',
-    btnTalkToRobo: 'Bicara ke Robo 🎙️',
-    initialSpeechRobo: 'Halo teman pintar! Aku Robo. Klik tombol <strong>"Bicara ke Robo 🎙️"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! ✨'
+    moodBadge: 'â­ Ceria',
+    btnGreet: 'ðŸ‘‹ Sapa',
+    btnTalkToRobo: 'Bicara ke Robo ðŸŽ™ï¸',
+    initialSpeechRobo: 'Halo teman pintar! Aku Robo. Klik tombol <strong>"Bicara ke Robo ðŸŽ™ï¸"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! âœ¨'
   },
   en: {
     beranda: 'Home',
@@ -739,21 +739,21 @@ const i18nDict = {
     skor: 'Score',
     pelindung: 'Shield',
     rekor: 'Best Score',
-    heroBadge: 'EduCode AI • Semester 1',
-    heroBadgeSem2: 'EduCode AI • Semester 2',
+    heroBadge: 'EduCode AI â€¢ Semester 1',
+    heroBadgeSem2: 'EduCode AI â€¢ Semester 2',
     heroTitleSem1: 'Learn Coding & AI<br>Together, For the Future',
     heroDescSem1: 'Building digital skills, word processing (MS Word), creativity, and good character in the tech era with SDS Cinta Kasih Tzu Chi.',
     heroTitleSem2: 'Junior Coding & AI Adventure<br>Animation, Games & Smart Robots',
     heroDescSem2: 'Learning visual block coding (Scratch/Blockly), smart robot branching logic, and AI vision sensors with SDS Cinta Kasih Tzu Chi.',
     roboBadge: 'Robo Answer',
     btnReplayVoice: 'Replay Voice',
-    youAsked: '👦 You Asked: ',
-    roboSpeaking: 'Robo is speaking... 🔊',
+    youAsked: 'ðŸ‘¦ You Asked: ',
+    roboSpeaking: 'Robo is speaking... ðŸ”Š',
     mascotBadge: 'EduCode Mascot',
-    moodBadge: '⭐ Cheerful',
-    btnGreet: '👋 Greet',
-    btnTalkToRobo: 'Talk to Robo 🎙️',
-    initialSpeechRobo: 'Hello smart friend! I am Robo. Click the <strong>"Talk to Robo 🎙️"</strong> button on the right to ask me anything, and I will answer you right away with my voice! ✨'
+    moodBadge: 'â­ Cheerful',
+    btnGreet: 'ðŸ‘‹ Greet',
+    btnTalkToRobo: 'Talk to Robo ðŸŽ™ï¸',
+    initialSpeechRobo: 'Hello smart friend! I am Robo. Click the <strong>"Talk to Robo ðŸŽ™ï¸"</strong> button on the right to ask me anything, and I will answer you right away with my voice! âœ¨'
   }
 };
 
@@ -762,9 +762,9 @@ function toggleBahasaAplikasi() {
   state.currentLang = (state.currentLang === 'id') ? 'en' : 'id';
   terapkanBahasa();
   if (state.currentLang === 'en') {
-    showToast('Language changed to English 🇬🇧', 'info');
+    showToast('Language changed to English ðŸ‡¬ðŸ‡§', 'info');
   } else {
-    showToast('Bahasa dialihkan ke Bahasa Indonesia 🇮🇩', 'info');
+    showToast('Bahasa dialihkan ke Bahasa Indonesia ðŸ‡®ðŸ‡©', 'info');
   }
 }
 
@@ -977,7 +977,7 @@ function bukaTampilanUtama() {
   if (spaceGame && spaceGame.isRunning) {
     spaceGame.isRunning = false;
   }
-  showToast(state.currentLang === 'en' ? 'Home View Active 🏠' : 'Tampilan Utama Beranda Aktif 🏠', 'info');
+  showToast(state.currentLang === 'en' ? 'Home View Active ðŸ ' : 'Tampilan Utama Beranda Aktif ðŸ ', 'info');
 }
 
 // ==========================================
@@ -1006,13 +1006,13 @@ function toggleAksesSemester2OlehGuru() {
   setSemester2Unlocked(next);
   playSound(next ? 'fanfare' : 'click');
   if (next) {
-    showToast('Akses Semester 2 berhasil DIBUKA untuk Siswa! 🚀 Siswa kini dapat mempelajari materi Coding & AI.', 'success');
+    showToast('Akses Semester 2 berhasil DIBUKA untuk Siswa! ðŸš€ Siswa kini dapat mempelajari materi Coding & AI.', 'success');
   } else {
     // Jika dikunci kembali dan saat ini sedang berada di semester 2, alihkan ke semester 1
     if (state.currentSemester === 2) {
       pilihSemester(1);
     }
-    showToast('Akses Semester 2 berhasil DISEMBUNYIKAN dari Siswa! 🔒 Siswa fokus pada Semester 1 hingga Januari 2027.', 'info');
+    showToast('Akses Semester 2 berhasil DISEMBUNYIKAN dari Siswa! ðŸ”’ Siswa fokus pada Semester 1 hingga Januari 2027.', 'info');
   }
   renderPanelPengaturanSemesterGuru();
   if (typeof renderGaleriGuru === 'function') {
@@ -1129,14 +1129,14 @@ function bukaSemesterDariUtama(semNumber) {
   if (!profile) {
     playSound('warning');
     showToast(state.currentLang === 'en' 
-      ? 'Please log in as a Student with your NIS first to access class materials! 🎓' 
-      : 'Silakan Login Siswa dengan NIS terlebih dahulu untuk mengakses materi kelas! 🎓', 'warning');
+      ? 'Please log in as a Student with your NIS first to access class materials! ðŸŽ“' 
+      : 'Silakan Login Siswa dengan NIS terlebih dahulu untuk mengakses materi kelas! ðŸŽ“', 'warning');
     bukaPilihSiswaCepat();
     return;
   }
   if (semNumber === 2 && !isSemester2Unlocked()) {
     playSound('warning');
-    showToast('Materi Semester 2 (Coding & AI) dijadwalkan mulai bulan Januari 2027! Saat ini mari fokus menuntaskan materi Semester 1 📘✨', 'warning');
+    showToast('Materi Semester 2 (Coding & AI) dijadwalkan mulai bulan Januari 2027! Saat ini mari fokus menuntaskan materi Semester 1 ðŸ“˜âœ¨', 'warning');
     return;
   }
   playSound('fanfare');
@@ -1145,10 +1145,10 @@ function bukaSemesterDariUtama(semNumber) {
   switchTab('modul');
   if (semNumber === 1) {
     if (typeof bukaModulDetail === 'function') bukaModulDetail('tp1');
-    showToast(state.currentLang === 'en' ? 'Welcome to Semester 1! Modules active 📘' : 'Masuk ke Semester 1! Modul Belajar siap dipelajari 📘', 'success');
+    showToast(state.currentLang === 'en' ? 'Welcome to Semester 1! Modules active ðŸ“˜' : 'Masuk ke Semester 1! Modul Belajar siap dipelajari ðŸ“˜', 'success');
   } else {
     if (typeof bukaModulDetailSem2 === 'function') bukaModulDetailSem2('tp5');
-    showToast(state.currentLang === 'en' ? 'Welcome to Semester 2! Coding & AI active 🚀' : 'Masuk ke Semester 2! Lab Coding & AI siap dipelajari 🚀', 'success');
+    showToast(state.currentLang === 'en' ? 'Welcome to Semester 2! Coding & AI active ðŸš€' : 'Masuk ke Semester 2! Lab Coding & AI siap dipelajari ðŸš€', 'success');
   }
 }
 
@@ -1156,12 +1156,12 @@ function bukaSemesterDariUtama(semNumber) {
 // INTERAKSI ROBOT MASKOT LUCU & AI SUARA EDUKASI (ROBO-TZU CHI)
 // ==========================================
 const sapaanRobotList = [
-  '🤖 "Halo teman pintar! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!" ✨',
-  '🎉 "Yey! Semangat belajar hari ini! Buka Modul Belajar atau Lab Word untuk mulai berkarya!" 📘',
-  '💡 "Tahukah kamu? Komputer bekerja dengan instruksi logika yang runtut dan rapi!" 🧠',
-  '🌟 "Kamu anak yang hebat, kreatif, berbudi pekerti luhur, dan berhati penuh cinta kasih!" 💚',
-  '🚀 "Ayo kumpulkan banyak bintang poin dan selesaikan seluruh misi belajarmu hari ini!" ⭐',
-  '🌸 "Gan En! Selalu bersyukur atas setiap kesempatan belajar dan berbuat baik kepada sesama!" 🪷'
+  'ðŸ¤– "Halo teman pintar! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!" âœ¨',
+  'ðŸŽ‰ "Yey! Semangat belajar hari ini! Buka Modul Belajar atau Lab Word untuk mulai berkarya!" ðŸ“˜',
+  'ðŸ’¡ "Tahukah kamu? Komputer bekerja dengan instruksi logika yang runtut dan rapi!" ðŸ§ ',
+  'ðŸŒŸ "Kamu anak yang hebat, kreatif, berbudi pekerti luhur, dan berhati penuh cinta kasih!" ðŸ’š',
+  'ðŸš€ "Ayo kumpulkan banyak bintang poin dan selesaikan seluruh misi belajarmu hari ini!" â­',
+  'ðŸŒ¸ "Gan En! Selalu bersyukur atas setiap kesempatan belajar dan berbuat baik kepada sesama!" ðŸª·'
 ];
 let sapaanRobotIndex = 0;
 let _isRoboListening = false;
@@ -1319,7 +1319,7 @@ function suarakanTeksRobo(teks, lang = null) {
 }
 window.suarakanTeksRobo = suarakanTeksRobo;
 
-// Fungsi Sapaan Utama Robot (Tombol "👋 Sapa")
+// Fungsi Sapaan Utama Robot (Tombol "ðŸ‘‹ Sapa")
 function sapaRobotHalo(teksOrEvent) {
   if (typeof unlockGlobalAudio === 'function') {
     unlockGlobalAudio();
@@ -1369,7 +1369,7 @@ function sapaRobotHalo(teksOrEvent) {
   }
 
   tambahPoin(5);
-  showToast(state.currentLang === 'en' ? 'Robo greets you! (+5 Stars ⭐)' : 'Robo menyapa dengan ramah! (+5 Bintang ⭐)', 'success');
+  showToast(state.currentLang === 'en' ? 'Robo greets you! (+5 Stars â­)' : 'Robo menyapa dengan ramah! (+5 Bintang â­)', 'success');
 
   // Suarakan sapaan Robo
   suarakanTeksRobo(pesan);
@@ -1402,7 +1402,7 @@ function ulangiSuaraJawabanTerakhir() {
     setTimeout(() => mascotImg.classList.remove('animate-bounce'), 1200);
   }
 
-  showToast('Memutar ulang suara Robo... 🔊', 'info');
+  showToast('Memutar ulang suara Robo... ðŸ”Š', 'info');
   suarakanTeksRobo(teks);
 }
 window.ulangiSuaraJawabanTerakhir = ulangiSuaraJawabanTerakhir;
@@ -1435,10 +1435,10 @@ function bukaModalBicaraRobo(event) {
 
   const statusText = document.getElementById('voice-status-text');
   if (statusText) {
-    statusText.innerText = '🎙️ Siap mendengarkan! Klik mikrofon atau pilih topik di bawah untuk bertanya!';
+    statusText.innerText = 'ðŸŽ™ï¸ Siap mendengarkan! Klik mikrofon atau pilih topik di bawah untuk bertanya!';
   }
 
-  showToast('Bicara dengan Robo Aktif 🎙️✨', 'info');
+  showToast('Bicara dengan Robo Aktif ðŸŽ™ï¸âœ¨', 'info');
 }
 window.bukaModalBicaraRobo = bukaModalBicaraRobo;
 
@@ -1473,94 +1473,94 @@ function cariJawabanPintarRobo(pertanyaan) {
   if (mathKali) {
     const a = parseInt(mathKali[1], 10);
     const b = parseInt(mathKali[2], 10);
-    return `Hasil dari ${a} dikali ${b} adalah ${a * b}! Hebat sekali kamu suka berhitung matematika! 💡✨`;
+    return `Hasil dari ${a} dikali ${b} adalah ${a * b}! Hebat sekali kamu suka berhitung matematika! ðŸ’¡âœ¨`;
   }
   const mathBagi = p.match(/(\d+)\s*(?:dibagi|bagi|\/)\s*(\d+)/i);
   if (mathBagi) {
     const a = parseInt(mathBagi[1], 10);
     const b = parseInt(mathBagi[2], 10);
-    if (b === 0) return "Dalam matematika, suatu angka tidak bisa dibagi dengan nol ya teman pintar! 🧠";
-    return `Hasil dari ${a} dibagi ${b} adalah ${(a / b) % 1 === 0 ? (a / b) : (a / b).toFixed(2)}! Pintar sekali kamu! 💡`;
+    if (b === 0) return "Dalam matematika, suatu angka tidak bisa dibagi dengan nol ya teman pintar! ðŸ§ ";
+    return `Hasil dari ${a} dibagi ${b} adalah ${(a / b) % 1 === 0 ? (a / b) : (a / b).toFixed(2)}! Pintar sekali kamu! ðŸ’¡`;
   }
   const mathTambah = p.match(/(\d+)\s*(?:ditambah|tambah|\+)\s*(\d+)/i);
   if (mathTambah) {
     const a = parseInt(mathTambah[1], 10);
     const b = parseInt(mathTambah[2], 10);
-    return `Hasil dari ${a} ditambah ${b} adalah ${a + b}! Teruslah bersemangat belajar! 🌟`;
+    return `Hasil dari ${a} ditambah ${b} adalah ${a + b}! Teruslah bersemangat belajar! ðŸŒŸ`;
   }
   const mathKurang = p.match(/(\d+)\s*(?:dikurang|kurang|-)\s*(\d+)/i);
   if (mathKurang) {
     const a = parseInt(mathKurang[1], 10);
     const b = parseInt(mathKurang[2], 10);
-    return `Hasil dari ${a} dikurang ${b} adalah ${a - b}! Luar biasa ketelitianmu! 🚀`;
+    return `Hasil dari ${a} dikurang ${b} adalah ${a - b}! Luar biasa ketelitianmu! ðŸš€`;
   }
 
   // 2. Pertanyaan Topik Pembelajaran & Humanis Tzu Chi
   if (p.includes('fotosintesis')) {
-    return "Fotosintesis adalah proses ajaib tumbuhan hijau membuat makanannya sendiri dengan bantuan cahaya matahari, air, dan karbon dioksida. Dari proses ini, tumbuhan menghasilkan oksigen segar yang kita hirup setiap saat! 🌿☀️";
+    return "Fotosintesis adalah proses ajaib tumbuhan hijau membuat makanannya sendiri dengan bantuan cahaya matahari, air, dan karbon dioksida. Dari proses ini, tumbuhan menghasilkan oksigen segar yang kita hirup setiap saat! ðŸŒ¿â˜€ï¸";
   }
   if (p.includes('sepak bola') || p.includes('bulu tangkis') || p.includes('olahraga')) {
-    return "Sepak bola dimainkan 11 orang per tim yang bekerja sama menendang bola ke gawang lawan. Sedangkan bulu tangkis menggunakan raket dan kok, melatih kelincahan dan konsentrasi! Olahraga rutin membuat tubuh kita sehat dan bugar! ⚽🏸";
+    return "Sepak bola dimainkan 11 orang per tim yang bekerja sama menendang bola ke gawang lawan. Sedangkan bulu tangkis menggunakan raket dan kok, melatih kelincahan dan konsentrasi! Olahraga rutin membuat tubuh kita sehat dan bugar! âš½ðŸ¸";
   }
   if (p.includes('cpu') || p.includes('komputer') || p.includes('hardware') || p.includes('perangkat')) {
-    return "CPU atau Central Processing Unit adalah otak utama komputer yang memproses semua instruksi. Komputer juga memiliki monitor sebagai layar tampilan, keyboard untuk mengetik, dan mouse untuk menggerakkan kursor! 💻🧠";
+    return "CPU atau Central Processing Unit adalah otak utama komputer yang memproses semua instruksi. Komputer juga memiliki monitor sebagai layar tampilan, keyboard untuk mengetik, dan mouse untuk menggerakkan kursor! ðŸ’»ðŸ§ ";
   }
   if (p.includes('bahasa inggris') || p.includes('selamat pagi') || p.includes('terima kasih') || p.includes('english')) {
-    return "Selamat pagi dalam bahasa Inggris adalah Good Morning! Terima kasih adalah Thank You! Dan sama-sama adalah You are welcome! Senang sekali berlatih bahasa Inggris bersamamu! 🇬🇧✨";
+    return "Selamat pagi dalam bahasa Inggris adalah Good Morning! Terima kasih adalah Thank You! Dan sama-sama adalah You are welcome! Senang sekali berlatih bahasa Inggris bersamamu! ðŸ‡¬ðŸ‡§âœ¨";
   }
   if (p.includes('islam') || p.includes('idul fitri') || p.includes('ramadan')) {
-    return "Agama Islam mengajarkan perdamaian, kasih sayang, dan beribadah kepada Allah SWT. Hari raya Idul Fitri dirayakan setelah berpuasa sebulan penuh di bulan Ramadan, momen indah untuk saling memaafkan dengan hati bersih! 🕌✨";
+    return "Agama Islam mengajarkan perdamaian, kasih sayang, dan beribadah kepada Allah SWT. Hari raya Idul Fitri dirayakan setelah berpuasa sebulan penuh di bulan Ramadan, momen indah untuk saling memaafkan dengan hati bersih! ðŸ•Œâœ¨";
   }
   if (p.includes('buddha') || p.includes('waisak') || p.includes('teratai')) {
-    return "Agama Buddha mengajarkan welas asih tanpa batas, kebijaksanaan, dan jalan kebaikan. Hari raya Waisak memperingati tiga peristiwa suci Sang Buddha: kelahiran, mencapai penerangan sempurna, dan parinibbana. Bunga teratai melambangkan kesucian batin! 🪷🌸";
+    return "Agama Buddha mengajarkan welas asih tanpa batas, kebijaksanaan, dan jalan kebaikan. Hari raya Waisak memperingati tiga peristiwa suci Sang Buddha: kelahiran, mencapai penerangan sempurna, dan parinibbana. Bunga teratai melambangkan kesucian batin! ðŸª·ðŸŒ¸";
   }
   if (p.includes('kristen') || p.includes('katolik') || p.includes('natal') || p.includes('paskah')) {
-    return "Agama Kristen dan Katolik berlandaskan cinta kasih kepada Tuhan dan mengasihi sesama manusia seperti diri sendiri. Hari raya Natal merayakan kelahiran Yesus Kristus pembawa damai, dan Paskah merayakan kebangkitan-Nya penuh suka cita! ⛪🕊️";
+    return "Agama Kristen dan Katolik berlandaskan cinta kasih kepada Tuhan dan mengasihi sesama manusia seperti diri sendiri. Hari raya Natal merayakan kelahiran Yesus Kristus pembawa damai, dan Paskah merayakan kebangkitan-Nya penuh suka cita! â›ªðŸ•Šï¸";
   }
   if (p.includes('hindu') || p.includes('nyepi') || p.includes('tri hita karana')) {
-    return "Agama Hindu mengajarkan ajaran luhur Tri Hita Karana, yaitu keharmonisan manusia dengan Tuhan, sesama manusia, dan alam lingkungan. Pada hari raya Nyepi, umat Hindu berpuasa dan hening bermeditasi menyucikan batin! 🕉️🌿";
+    return "Agama Hindu mengajarkan ajaran luhur Tri Hita Karana, yaitu keharmonisan manusia dengan Tuhan, sesama manusia, dan alam lingkungan. Pada hari raya Nyepi, umat Hindu berpuasa dan hening bermeditasi menyucikan batin! ðŸ•‰ï¸ðŸŒ¿";
   }
   if (p.includes('samudra') || p.includes('benua') || p.includes('geografi') || p.includes('bumi')) {
-    return "Planet Bumi kita yang indah memiliki 5 samudra luas: Pasifik, Atlantik, Hindia, Arktik, dan Antartika. Serta 7 benua: Asia, Afrika, Amerika Utara, Amerika Selatan, Antartika, Eropa, dan Australia! Mari kita rawat bumi tercinta ini bersama! 🌍🌊";
+    return "Planet Bumi kita yang indah memiliki 5 samudra luas: Pasifik, Atlantik, Hindia, Arktik, dan Antartika. Serta 7 benua: Asia, Afrika, Amerika Utara, Amerika Selatan, Antartika, Eropa, dan Australia! Mari kita rawat bumi tercinta ini bersama! ðŸŒðŸŒŠ";
   }
   if (p.includes('bhinneka') || p.includes('tunggal ika') || p.includes('pancasila')) {
-    return "Bhinneka Tunggal Ika artinya Berbeda-beda tetapi tetap satu jua! Walaupun kita memiliki beragam suku, bahasa, dan agama di Indonesia, kita adalah satu keluarga besar yang saling menghormati dan bersatu rukun! 🇮🇩❤️";
+    return "Bhinneka Tunggal Ika artinya Berbeda-beda tetapi tetap satu jua! Walaupun kita memiliki beragam suku, bahasa, dan agama di Indonesia, kita adalah satu keluarga besar yang saling menghormati dan bersatu rukun! ðŸ‡®ðŸ‡©â¤ï¸";
   }
   if (p.includes('apa itu ai') || p.includes('ai') || p.includes('artificial intelligence') || p.includes('kecerdasan buatan')) {
-    return "AI atau Artificial Intelligence adalah Kecerdasan Buatan! Program komputer pintar yang dirancang mampu mengenali suara, memproses gambar, dan membantu kita belajar dengan seru seperti aku, Robo! 🤖💡";
+    return "AI atau Artificial Intelligence adalah Kecerdasan Buatan! Program komputer pintar yang dirancang mampu mengenali suara, memproses gambar, dan membantu kita belajar dengan seru seperti aku, Robo! ðŸ¤–ðŸ’¡";
   }
   if (p.includes('humanis') || p.includes('tzu chi') || p.includes('gan en') || p.includes('da ai')) {
-    return "Budaya Humanis Tzu Chi mengajarkan Da Ai yaitu Cinta Kasih Universal tanpa membeda-bedakan. Gan En berarti selalu bersyukur dengan rendah hati, saling menghormati, dan gemar menolong yang membutuhkan! 🌸💚";
+    return "Budaya Humanis Tzu Chi mengajarkan Da Ai yaitu Cinta Kasih Universal tanpa membeda-bedakan. Gan En berarti selalu bersyukur dengan rendah hati, saling menghormati, dan gemar menolong yang membutuhkan! ðŸŒ¸ðŸ’š";
   }
   if (p.includes('celengan bambu') || p.includes('celengan')) {
-    return "Celengan Bambu Tzu Chi berawal dari 30 ibu rumah tangga yang menyisihkan 50 sen uang belanja setiap hari untuk menolong sesama. Mengajarkan kita bahwa berbuat kebajikan tidak perlu menunggu kaya, yang penting adalah ketulusan niat setiap hari! 🎋🪙";
+    return "Celengan Bambu Tzu Chi berawal dari 30 ibu rumah tangga yang menyisihkan 50 sen uang belanja setiap hari untuk menolong sesama. Mengajarkan kita bahwa berbuat kebajikan tidak perlu menunggu kaya, yang penting adalah ketulusan niat setiap hari! ðŸŽ‹ðŸª™";
   }
   if (p.includes('tata krama') || p.includes('duduk') || p.includes('berdiri') || p.includes('makan')) {
-    return "Tata krama Tzu Chi sangat anggun: duduk tegak dan tenang laksana genta, berdiri tegap lurus laksana pohon pinus, berjalan tertib laksana angin sejuk, dan makan dengan penuh rasa syukur memegang mangkuk dengan dua tangan! 🧘‍♂️✨";
+    return "Tata krama Tzu Chi sangat anggun: duduk tegak dan tenang laksana genta, berdiri tegap lurus laksana pohon pinus, berjalan tertib laksana angin sejuk, dan makan dengan penuh rasa syukur memegang mangkuk dengan dua tangan! ðŸ§˜â€â™‚ï¸âœ¨";
   }
   if (p.includes('perenungan') || p.includes('kata bijak') || p.includes('master cheng yen')) {
-    return "Kata Perenungan Master Cheng Yen: Melakukan perbuatan baik jangan menunggu waktu luang, lakukanlah saat ada kesempatan. Hati yang bersyukur adalah berkah terbesar dalam hidup! 🌱⭐";
+    return "Kata Perenungan Master Cheng Yen: Melakukan perbuatan baik jangan menunggu waktu luang, lakukanlah saat ada kesempatan. Hati yang bersyukur adalah berkah terbesar dalam hidup! ðŸŒ±â­";
   }
   if (p.includes('siapa kamu') || p.includes('namamu') || p.includes('nama kamu')) {
-    return "Aku Robo! Maskot pintar dan sahabat belajar Coding, AI, MS Word, Excel, dan Budi Pekerti siswa-siswi SDS Cinta Kasih Tzu Chi! Senang sekali bisa berteman denganmu! 🤖✨";
+    return "Aku Robo! Maskot pintar dan sahabat belajar Coding, AI, MS Word, Excel, dan Budi Pekerti siswa-siswi SDS Cinta Kasih Tzu Chi! Senang sekali bisa berteman denganmu! ðŸ¤–âœ¨";
   }
   if (p.includes('apa kabar') || p.includes('gimana kabarmu') || p.includes('sehat')) {
-    return "Kabarku sangat baik, bugar, dan ceria! Energi bateraiku 100 persen penuh dan siap menemanimu belajar hal-hal hebat hari ini! Bagaimana kabarmu hari ini? 🔋😄";
+    return "Kabarku sangat baik, bugar, dan ceria! Energi bateraiku 100 persen penuh dan siap menemanimu belajar hal-hal hebat hari ini! Bagaimana kabarmu hari ini? ðŸ”‹ðŸ˜„";
   }
   if (p.includes('terima kasih') || p.includes('makasih') || p.includes('thank')) {
-    return "Sama-sama teman pintar! Gan En ya! Tetap semangat belajar dan terus tebarkan senyuman manis serta budi pekerti luhur! 💖✨";
+    return "Sama-sama teman pintar! Gan En ya! Tetap semangat belajar dan terus tebarkan senyuman manis serta budi pekerti luhur! ðŸ’–âœ¨";
   }
   if (p.includes('word') || p.includes('ms word') || p.includes('poster')) {
-    return "Di Lab MS Word, kamu bisa membuat poster digital 7 Kebiasaan yang keren, menyusun teks slogan, memasang stiker kartun lucu, dan melatih kreativitas senimu! 📝🎨";
+    return "Di Lab MS Word, kamu bisa membuat poster digital 7 Kebiasaan yang keren, menyusun teks slogan, memasang stiker kartun lucu, dan melatih kreativitas senimu! ðŸ“ðŸŽ¨";
   }
   if (p.includes('excel') || p.includes('tabel') || p.includes('baris') || p.includes('kolom')) {
-    return "Microsoft Excel adalah lembar kerja ajaib berbentuk kotak-kotak sel dari baris dan kolom. Excel mempermudah kita membuat tabel rapi dan menghitung rumus angka secara otomatis! 📊🔢";
+    return "Microsoft Excel adalah lembar kerja ajaib berbentuk kotak-kotak sel dari baris dan kolom. Excel mempermudah kita membuat tabel rapi dan menghitung rumus angka secara otomatis! ðŸ“ŠðŸ”¢";
   }
   if (p.includes('coding') || p.includes('scratch') || p.includes('program')) {
-    return "Coding adalah seni menyusun balok logika instruksi agar komputer dan robot bergerak sesuai keinginan kita! Sangat seru dan melatih otak kita berpikir kreatif dan sistematis! 🚀💻";
+    return "Coding adalah seni menyusun balok logika instruksi agar komputer dan robot bergerak sesuai keinginan kita! Sangat seru dan melatih otak kita berpikir kreatif dan sistematis! ðŸš€ðŸ’»";
   }
 
-  return `Pertanyaan yang sangat bagus, teman pintar! Mengenai "${pertanyaan}", ini sangat menarik untuk dipelajari. Kamu anak yang cerdas dan berjiwa ingin tahu tinggi, terus semangat belajar ya! 🌟🤖`;
+  return `Pertanyaan yang sangat bagus, teman pintar! Mengenai "${pertanyaan}", ini sangat menarik untuk dipelajari. Kamu anak yang cerdas dan berjiwa ingin tahu tinggi, terus semangat belajar ya! ðŸŒŸðŸ¤–`;
 }
 
 // Bertanya Langsung Lewat Topik atau Suara
@@ -1602,7 +1602,7 @@ function tanyaVoiceLangsung(pertanyaan) {
   }
 
   tambahPoin(5);
-  showToast('Robo menjawab pertanyaanmu! 🤖✨', 'success');
+  showToast('Robo menjawab pertanyaanmu! ðŸ¤–âœ¨', 'success');
 
   // Suarakan jawaban Robo
   suarakanTeksRobo(jawaban);
@@ -1616,7 +1616,7 @@ function toggleMicMendengarkan() {
   const micBtn = document.getElementById('modal-mic-toggle-btn');
 
   if (!SpeechRecognition) {
-    showToast('Mikrofon suara otomatis belum didukung di peramban ini. Silakan klik topik pertanyaan ramah anak di bawah ya! 🎙️👇', 'info');
+    showToast('Mikrofon suara otomatis belum didukung di peramban ini. Silakan klik topik pertanyaan ramah anak di bawah ya! ðŸŽ™ï¸ðŸ‘‡', 'info');
     if (statusText) statusText.innerText = 'Pilih salah satu topik pertanyaan di bawah untuk mendengar jawaban Robo:';
     return;
   }
@@ -1644,7 +1644,7 @@ function toggleMicMendengarkan() {
     recognition.onstart = function() {
       _isRoboListening = true;
       if (micBtn) micBtn.classList.add('ring-4', 'ring-rose-400', 'animate-pulse');
-      if (statusText) statusText.innerText = '🎙️ Sedang mendengarkan... Katakan pertanyaanmu sekarang!';
+      if (statusText) statusText.innerText = 'ðŸŽ™ï¸ Sedang mendengarkan... Katakan pertanyaanmu sekarang!';
       playSound('click');
     };
 
@@ -1696,11 +1696,11 @@ function updateNavSemesterVisibility() {
     if (navDemo) navDemo.classList.remove('hidden');
     if (mNavDemo) mNavDemo.classList.remove('hidden');
 
-    // 🎮 GAME ROBO HANYA MUNCUL DI SEMESTER 2
+    // ðŸŽ® GAME ROBO HANYA MUNCUL DI SEMESTER 2
     if (navLabirin) navLabirin.classList.remove('hidden');
     if (mNavLabirin) mNavLabirin.classList.remove('hidden');
 
-    // ⌨️ GAME KETIK CEPAT DISEMBUNYIKAN DI SEMESTER 2
+    // âŒ¨ï¸ GAME KETIK CEPAT DISEMBUNYIKAN DI SEMESTER 2
     if (navKetik) navKetik.classList.add('hidden');
     if (mNavKetik) mNavKetik.classList.add('hidden');
   } else {
@@ -1712,11 +1712,11 @@ function updateNavSemesterVisibility() {
     if (navDemo) navDemo.classList.add('hidden');
     if (mNavDemo) mNavDemo.classList.add('hidden');
 
-    // 🎮 GAME ROBO DISEMBUNYIKAN DI SEMESTER 1
+    // ðŸŽ® GAME ROBO DISEMBUNYIKAN DI SEMESTER 1
     if (navLabirin) navLabirin.classList.add('hidden');
     if (mNavLabirin) mNavLabirin.classList.add('hidden');
 
-    // ⌨️ GAME KETIK CEPAT HANYA MUNCUL DI SEMESTER 1
+    // âŒ¨ï¸ GAME KETIK CEPAT HANYA MUNCUL DI SEMESTER 1
     if (navKetik) navKetik.classList.remove('hidden');
     if (mNavKetik) mNavKetik.classList.remove('hidden');
   }
@@ -1726,7 +1726,7 @@ window.updateNavSemesterVisibility = updateNavSemesterVisibility;
 function pilihSemester(semNumber) {
   if (semNumber === 2 && !isSemester2Unlocked()) {
     playSound('warning');
-    showToast('Semester 2 akan dibuka oleh Guru pada Januari 2027. Saat ini fokus di Semester 1 ya! 📘✨', 'info');
+    showToast('Semester 2 akan dibuka oleh Guru pada Januari 2027. Saat ini fokus di Semester 1 ya! ðŸ“˜âœ¨', 'info');
     return;
   }
   state.currentSemester = semNumber;
@@ -1772,7 +1772,7 @@ window.pilihSemester = pilihSemester;
 function toggleSemesterSiswa() {
   if (!isSemester2Unlocked()) {
     playSound('warning');
-    showToast('Semester 2 akan dibuka oleh Guru pada Januari 2027. Saat ini fokus di Semester 1 ya! 📘✨', 'info');
+    showToast('Semester 2 akan dibuka oleh Guru pada Januari 2027. Saat ini fokus di Semester 1 ya! ðŸ“˜âœ¨', 'info');
     return;
   }
   const targetSem = state.currentSemester === 1 ? 2 : 1;
@@ -1819,6 +1819,52 @@ function updateLabelSemesterSiswa() {
   }
 }
 window.updateLabelSemesterSiswa = updateLabelSemesterSiswa;
+
+function pilihTingkatModul(tingkat) {
+  try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+  const k4 = document.getElementById('modul-sem1-container');
+  const k5 = document.getElementById('modul-kelas5-container');
+  const k6 = document.getElementById('modul-kelas6-container');
+  const b4 = document.getElementById('btn-pilih-modul-k4');
+  const b5 = document.getElementById('btn-pilih-modul-k5');
+  const b6 = document.getElementById('btn-pilih-modul-k6');
+
+  if (tingkat === 'kelas6') {
+    if (k4) k4.classList.add('hidden');
+    if (k5) k5.classList.add('hidden');
+    if (k6) {
+      k6.classList.remove('hidden');
+      k6.style.removeProperty('display');
+      k6.style.setProperty('display', 'block', 'important');
+    }
+    if (b4) b4.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0';
+    if (b5) b5.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0';
+    if (b6) b6.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-xs cursor-pointer shrink-0';
+  } else if (tingkat === 'kelas5') {
+    if (k4) k4.classList.add('hidden');
+    if (k5) {
+      k5.classList.remove('hidden');
+      k5.style.removeProperty('display');
+      k5.style.setProperty('display', 'block', 'important');
+    }
+    if (k6) k6.classList.add('hidden');
+    if (b4) b4.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0';
+    if (b5) b5.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-xs cursor-pointer shrink-0';
+    if (b6) b6.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0';
+  } else {
+    if (k4) {
+      k4.classList.remove('hidden');
+      k4.style.removeProperty('display');
+      k4.style.setProperty('display', 'block', 'important');
+    }
+    if (k5) k5.classList.add('hidden');
+    if (k6) k6.classList.add('hidden');
+    if (b4) b4.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 bg-blue-600 text-white shadow-xs cursor-pointer shrink-0';
+    if (b5) b5.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0';
+    if (b6) b6.className = 'px-3.5 py-1.5 rounded-xl text-xs font-title font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer shrink-0';
+  }
+}
+window.pilihTingkatModul = pilihTingkatModul;
 
 function switchTab(tabId) {
   playSound('click');
@@ -1927,6 +1973,21 @@ function switchTab(tabId) {
 
   if (tabId === 'guru') {
     renderDasborGuru();
+  }
+
+  if (tabId === 'modul') {
+    const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (student) {
+      const isKelas6 = String(student.kelas || '').includes('6');
+      const isKelas5 = String(student.kelas || '').includes('5');
+      if (isKelas6) {
+        if (typeof window.pilihTingkatModul === 'function') window.pilihTingkatModul('kelas6');
+      } else if (isKelas5) {
+        if (typeof window.pilihTingkatModul === 'function') window.pilihTingkatModul('kelas5');
+      } else {
+        if (typeof window.pilihTingkatModul === 'function') window.pilihTingkatModul('kelas4');
+      }
+    }
   }
 
   if (tabId === 'labirin') {
@@ -2188,7 +2249,7 @@ function mulaiGameAntariksa() {
   if (spaceGame.animId) cancelAnimationFrame(spaceGame.animId);
   spaceGame.animId = requestAnimationFrame(spaceGameLoop);
 
-  showToast('Misi Antariksa Dimulai! Kumpulkan bintang & hancurkan meteor 🚀⭐', 'success');
+  showToast('Misi Antariksa Dimulai! Kumpulkan bintang & hancurkan meteor ðŸš€â­', 'success');
 }
 
 function pauseGameAntariksa() {
@@ -2196,7 +2257,7 @@ function pauseGameAntariksa() {
   spaceGame.isPaused = !spaceGame.isPaused;
   const lbl = document.getElementById('label-pause-game');
   if (lbl) lbl.innerText = spaceGame.isPaused ? 'Lanjut' : 'Jeda';
-  showToast(spaceGame.isPaused ? 'Game Dijeda ⏸️' : 'Misi Dilanjutkan! ▶️');
+  showToast(spaceGame.isPaused ? 'Game Dijeda â¸ï¸' : 'Misi Dilanjutkan! â–¶ï¸');
 }
 
 function tembakLaserAntariksa() {
@@ -2288,7 +2349,7 @@ function updateSpaceGame() {
       });
     }
 
-    // Spawn Item (Bintang ⭐ atau Kristal 💎)
+    // Spawn Item (Bintang â­ atau Kristal ðŸ’Ž)
     if (Math.random() < 0.55) {
       const type = Math.random() < 0.7 ? 'star' : 'crystal';
       spaceGame.items.push({
@@ -2432,12 +2493,12 @@ function renderSpaceGame() {
       ctx.font = '24px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('⭐', 0, 0);
+      ctx.fillText('â­', 0, 0);
     } else {
       ctx.font = '24px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('💎', 0, 0);
+      ctx.fillText('ðŸ’Ž', 0, 0);
     }
     ctx.restore();
   });
@@ -2450,7 +2511,7 @@ function renderSpaceGame() {
     ctx.font = `${Math.round(met.size)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('🪨', 0, 0);
+    ctx.fillText('ðŸª¨', 0, 0);
     ctx.restore();
   });
 
@@ -2561,8 +2622,8 @@ function updateSpaceHUD() {
   if (scEl) scEl.innerText = spaceGame.score;
   if (lvEl) {
     let hearts = '';
-    for (let i = 0; i < spaceGame.lives; i++) hearts += '❤️';
-    lvEl.innerText = hearts || '💀 Habis';
+    for (let i = 0; i < spaceGame.lives; i++) hearts += 'â¤ï¸';
+    lvEl.innerText = hearts || 'ðŸ’€ Habis';
   }
 }
 
@@ -2589,13 +2650,13 @@ function gameOverAntariksa() {
   const desc = document.getElementById('space-overlay-desc');
   const btnLabel = document.getElementById('space-btn-start-label');
 
-  if (title) title.innerText = 'Misi Selesai! 🎉';
-  if (desc) desc.innerHTML = `Skor Akhirmu: <b class="text-yellow-300 text-lg">${spaceGame.score}</b><br>Kamu mendapatkan <b>+${bonusBintang} Bintang Akun!</b> ⭐<br>Hebat sekali penjelajahanmu hari ini!`;
+  if (title) title.innerText = 'Misi Selesai! ðŸŽ‰';
+  if (desc) desc.innerHTML = `Skor Akhirmu: <b class="text-yellow-300 text-lg">${spaceGame.score}</b><br>Kamu mendapatkan <b>+${bonusBintang} Bintang Akun!</b> â­<br>Hebat sekali penjelajahanmu hari ini!`;
   if (btnLabel) btnLabel.innerText = 'Main Lagi (Play Again)';
   if (overlay) overlay.classList.remove('hidden');
 
   playSound('fanfare');
-  showToast(`Misi Selesai! Skor: ${spaceGame.score} (+${bonusBintang} Bintang) 🚀🏆`, 'success');
+  showToast(`Misi Selesai! Skor: ${spaceGame.score} (+${bonusBintang} Bintang) ðŸš€ðŸ†`, 'success');
 }
 
 // ==========================================
@@ -2697,7 +2758,7 @@ function bukaAplikasiPaintTerbaru() {
   if (typeof setModePraktik1 === 'function') {
     setModePraktik1('gambar');
   }
-  showToast('Membuka Aplikasi Paint Terbaru untuk membuat gambar terpisah! 🎨✨', 'success');
+  showToast('Membuka Aplikasi Paint Terbaru untuk membuat gambar terpisah! ðŸŽ¨âœ¨', 'success');
 
   // Gulir langsung ke kanvas Paint
   setTimeout(() => {
@@ -2718,9 +2779,9 @@ function bukaPraktikWordTP2_2() {
   const filledCount = Object.keys(drive).filter(k => typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined' && DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
 
   if (filledCount >= 1) {
-    showToast(`Membuka Lab Ms. Word untuk TP 2.2! Kamu punya ${filledCount} gambar di Drive 7 Kebiasaan siap dipasang! 📄✨`, 'success');
+    showToast(`Membuka Lab Ms. Word untuk TP 2.2! Kamu punya ${filledCount} gambar di Drive 7 Kebiasaan siap dipasang! ðŸ“„âœ¨`, 'success');
   } else {
-    showToast('Selamat datang di Lab Ms. Word! Mulai praktik menyusun teks dan gambar postermu (TP 2.2) 📄🎨', 'success');
+    showToast('Selamat datang di Lab Ms. Word! Mulai praktik menyusun teks dan gambar postermu (TP 2.2) ðŸ“„ðŸŽ¨', 'success');
   }
 }
 window.bukaPraktikWordTP2_2 = bukaPraktikWordTP2_2;
@@ -2738,7 +2799,7 @@ function bukaGaleriHasilPosterSiswa() {
   if (typeof renderGaleriPosterWord === 'function') {
     renderGaleriPosterWord();
   }
-  showToast('Membuka Galeri & Portofolio Hasil Poster Siswa! 🖼️✨', 'success');
+  showToast('Membuka Galeri & Portofolio Hasil Poster Siswa! ðŸ–¼ï¸âœ¨', 'success');
 
   // Gulir langsung ke wadah lemari galeri poster karya siswa
   setTimeout(() => {
@@ -2763,13 +2824,13 @@ function gantiBahasaModulTP1_1(lang) {
     if (panelEn) panelEn.classList.remove('hidden');
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-title bg-blue-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.1 beralih ke Bahasa Inggris 🇬🇧', 'info');
+    showToast('Materi TP 1.1 beralih ke Bahasa Inggris ðŸ‡¬ðŸ‡§', 'info');
   } else {
     if (panelEn) panelEn.classList.add('hidden');
     if (panelId) panelId.classList.remove('hidden');
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-title bg-emerald-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.1 beralih ke Bahasa Indonesia 🇮🇩', 'info');
+    showToast('Materi TP 1.1 beralih ke Bahasa Indonesia ðŸ‡®ðŸ‡©', 'info');
   }
 }
 
@@ -2786,13 +2847,13 @@ function gantiBahasaModulTP1_2(lang) {
     if (panelEn) panelEn.classList.remove('hidden');
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-blue-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.2 beralih ke Bahasa Inggris 🇬🇧', 'info');
+    showToast('Materi TP 1.2 beralih ke Bahasa Inggris ðŸ‡¬ðŸ‡§', 'info');
   } else {
     if (panelEn) panelEn.classList.add('hidden');
     if (panelId) panelId.classList.remove('hidden');
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-blue-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.2 beralih ke Bahasa Indonesia 🇮🇩', 'info');
+    showToast('Materi TP 1.2 beralih ke Bahasa Indonesia ðŸ‡®ðŸ‡©', 'info');
   }
 }
 
@@ -2809,13 +2870,13 @@ function gantiBahasaModulTP1_3(lang) {
     if (panelEn) panelEn.classList.remove('hidden');
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-amber-500 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.3 beralih ke Bahasa Inggris 🇬🇧', 'info');
+    showToast('Materi TP 1.3 beralih ke Bahasa Inggris ðŸ‡¬ðŸ‡§', 'info');
   } else {
     if (panelEn) panelEn.classList.add('hidden');
     if (panelId) panelId.classList.remove('hidden');
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-amber-500 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.3 beralih ke Bahasa Indonesia 🇮🇩', 'info');
+    showToast('Materi TP 1.3 beralih ke Bahasa Indonesia ðŸ‡®ðŸ‡©', 'info');
   }
 }
 
@@ -2832,13 +2893,13 @@ function gantiBahasaModulTP1_4(lang) {
     if (panelEn) panelEn.classList.remove('hidden');
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-purple-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.4 beralih ke Bahasa Inggris 🇬🇧', 'info');
+    showToast('Materi TP 1.4 beralih ke Bahasa Inggris ðŸ‡¬ðŸ‡§', 'info');
   } else {
     if (panelEn) panelEn.classList.add('hidden');
     if (panelId) panelId.classList.remove('hidden');
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-purple-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 1.4 beralih ke Bahasa Indonesia 🇮🇩', 'info');
+    showToast('Materi TP 1.4 beralih ke Bahasa Indonesia ðŸ‡®ðŸ‡©', 'info');
   }
 }
 
@@ -2855,13 +2916,13 @@ function gantiBahasaModulTP2_1(lang) {
     if (panelEn) panelEn.classList.remove('hidden');
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-blue-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 2.1 beralih ke Bahasa Inggris 🇬🇧', 'info');
+    showToast('Materi TP 2.1 beralih ke Bahasa Inggris ðŸ‡¬ðŸ‡§', 'info');
   } else {
     if (panelEn) panelEn.classList.add('hidden');
     if (panelId) panelId.classList.remove('hidden');
     if (btnId) btnId.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title bg-blue-600 text-white shadow-xs transition flex items-center gap-1.5';
     if (btnEn) btnEn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold font-title text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
-    showToast('Materi TP 2.1 beralih ke Bahasa Indonesia 🇮🇩', 'info');
+    showToast('Materi TP 2.1 beralih ke Bahasa Indonesia ðŸ‡®ðŸ‡©', 'info');
   }
 }
 
@@ -2899,7 +2960,7 @@ function bukaKuisAtauSertifikatSiswa() {
   try { playSound('click'); } catch (e) {}
   switchTab('kuis');
   if (typeof showToast === 'function') {
-    showToast('Silakan ikuti Kuis untuk mendapatkan Sertifikat Digital Resmi! 🏆', 'info');
+    showToast('Silakan ikuti Kuis untuk mendapatkan Sertifikat Digital Resmi! ðŸ†', 'info');
   }
 }
 window.bukaKuisAtauSertifikatSiswa = bukaKuisAtauSertifikatSiswa;
@@ -2915,7 +2976,7 @@ function bukaRoboMindLangsung() {
     setTimeout(initRoboMindSimulator, 50);
   }
   if (typeof showToast === 'function') {
-    showToast('Simulator RoboMind 7.0 Aktif! 🤖', 'info');
+    showToast('Simulator RoboMind 7.0 Aktif! ðŸ¤–', 'info');
   }
 }
 window.bukaRoboMindLangsung = bukaRoboMindLangsung;
@@ -2972,11 +3033,11 @@ function updateDemo1() {
 
   const previewText = document.getElementById('demo1-preview-text');
   if (textSelect === 'baca') {
-    previewText.innerText = '"Buku Adalah Jendela Dunia. Ayo Membaca!" 📖';
+    previewText.innerText = '"Buku Adalah Jendela Dunia. Ayo Membaca!" ðŸ“–';
   } else if (textSelect === 'sampah') {
-    previewText.innerText = '"Buang Sampah Pada Tempatnya Demi Kelas Bersih!" 🧹';
+    previewText.innerText = '"Buang Sampah Pada Tempatnya Demi Kelas Bersih!" ðŸ§¹';
   } else {
-    previewText.innerText = '"Gunakan Internet dengan Sopan dan Cerdas!" 🌐';
+    previewText.innerText = '"Gunakan Internet dengan Sopan dan Cerdas!" ðŸŒ';
   }
 
   const previewImg = document.getElementById('demo1-preview-img');
@@ -3027,7 +3088,7 @@ function evaluasiDemo3() {
   if (teks === gambar) {
     iconEl.className = 'text-5xl my-4 text-emerald-500 animate-bounce';
     iconEl.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-    titleEl.innerText = 'Sangat Cocok & Logis! 🎉';
+    titleEl.innerText = 'Sangat Cocok & Logis! ðŸŽ‰';
     badgeEl.className = 'mt-4 py-1.5 px-3 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-bold';
     badgeEl.innerText = 'Skor Logika: 100/100 (Harmonis)';
 
@@ -3041,7 +3102,7 @@ function evaluasiDemo3() {
   } else {
     iconEl.className = 'text-5xl my-4 text-amber-500 animate-pulse';
     iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-    titleEl.innerText = 'Kurang Logis / Kurang Nyambung! 🤔';
+    titleEl.innerText = 'Kurang Logis / Kurang Nyambung! ðŸ¤”';
     badgeEl.className = 'mt-4 py-1.5 px-3 rounded-xl bg-amber-100 text-amber-800 text-xs font-bold';
     badgeEl.innerText = 'Skor Logika: 40/100 (Perlu Diperbaiki)';
     descEl.innerText = 'Teks dan gambar memiliki topik yang berbeda. Audiens akan merasa bingung memahami pesan utamanya.';
@@ -3067,7 +3128,7 @@ function bukaPaintDariPraktik1() {
   });
   state.currentPraktik = 'praktik-tp1';
   setModePraktik1('gambar');
-  showToast('Masuk ke dalam Aplikasi Paint Terbaru untuk menggambar digital! 🎨✨', 'success');
+  showToast('Masuk ke dalam Aplikasi Paint Terbaru untuk menggambar digital! ðŸŽ¨âœ¨', 'success');
   setTimeout(() => {
     const paintArea = document.getElementById('p1-area-gambar');
     if (paintArea) {
@@ -3080,7 +3141,7 @@ window.bukaPaintDariPraktik1 = bukaPaintDariPraktik1;
 function bukaLabWordDariPraktik3() {
   playSound('fanfare');
   switchTab('msword');
-  showToast('Masuk ke dalam Lab Ms. Word untuk praktik pembuatan poster! 📄✨', 'success');
+  showToast('Masuk ke dalam Lab Ms. Word untuk praktik pembuatan poster! ðŸ“„âœ¨', 'success');
 }
 window.bukaLabWordDariPraktik3 = bukaLabWordDariPraktik3;
 
@@ -3106,7 +3167,7 @@ function bukaHasilPosterSiswaDariPraktik4() {
   });
   state.currentPraktik = 'praktik-tp4';
   setModePraktik1('word');
-  showToast('Masuk ke dalam Lemari Galeri Hasil Poster Siswa! 🖼️✨', 'success');
+  showToast('Masuk ke dalam Lemari Galeri Hasil Poster Siswa! ðŸ–¼ï¸âœ¨', 'success');
   setTimeout(() => {
     const galleryEl = document.getElementById('p1-word-poster-gallery');
     if (galleryEl) {
@@ -3425,7 +3486,7 @@ function renderActivePaintObject() {
   });
 
   // 4. Balon petunjuk geser (Floating Hint Badge)
-  const badgeText = '✥ Geser Objek (Klik & Drag)';
+  const badgeText = 'âœ¥ Geser Objek (Klik & Drag)';
   ctx.font = 'bold 11px Fredoka, sans-serif';
   const tw = ctx.measureText(badgeText).width;
   const bw = tw + 18;
@@ -3715,7 +3776,7 @@ function endPaintDraw(e) {
       };
       renderActivePaintObject();
       playSound('success');
-      showToast('Area terpilih! Klik & geser objek ini ke posisi yang kamu inginkan ✥', 'success');
+      showToast('Area terpilih! Klik & geser objek ini ke posisi yang kamu inginkan âœ¥', 'success');
     } else {
       paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
     }
@@ -3744,7 +3805,7 @@ function endPaintDraw(e) {
       };
       renderActivePaintObject();
       playSound('success');
-      showToast('Bentuk dibuat! Kamu bisa klik & geser untuk memindahkan posisinya ✥', 'success');
+      showToast('Bentuk dibuat! Kamu bisa klik & geser untuk memindahkan posisinya âœ¥', 'success');
     } else {
       paintApp.ctx.putImageData(paintApp.snapshot, 0, 0);
     }
@@ -3923,7 +3984,7 @@ function drawCustomBrushStroke(fromX, fromY, toX, toY, brushType) {
     ctx.lineTo(toX, toY);
     ctx.stroke();
   }
-  // 2. KUAS KALIGRAFI 1 (Calligraphy Brush) - 45° angled ribbon
+  // 2. KUAS KALIGRAFI 1 (Calligraphy Brush) - 45Â° angled ribbon
   else if (brushType === 'calligraphy1') {
     const steps = Math.max(1, Math.ceil(dist / 2));
     const ribbonHalf = baseSize * 0.9;
@@ -3943,7 +4004,7 @@ function drawCustomBrushStroke(fromX, fromY, toX, toY, brushType) {
       ctx.stroke();
     }
   }
-  // 3. PENA KALIGRAFI 2 (Calligraphy Pen) - -45° blade angle
+  // 3. PENA KALIGRAFI 2 (Calligraphy Pen) - -45Â° blade angle
   else if (brushType === 'calligraphy2') {
     const steps = Math.max(1, Math.ceil(dist / 2));
     const ribbonHalf = baseSize * 0.85;
@@ -4156,7 +4217,7 @@ function selectPaintBrush(brushType) {
     }
   });
 
-  showToast(`Kuas diubah ke: ${meta.label} 🎨`, 'info');
+  showToast(`Kuas diubah ke: ${meta.label} ðŸŽ¨`, 'info');
 }
 window.selectPaintBrush = selectPaintBrush;
 
@@ -4187,7 +4248,7 @@ function setPaintTool(toolName) {
     }
   });
 
-  const toolLabels = { brush: 'Kuas', pencil: 'Pensil', eraser: 'Penghapus', bucket: 'Cat Tumpah', text: 'Teks', select: 'Geser / Seleksi ✥' };
+  const toolLabels = { brush: 'Kuas', pencil: 'Pensil', eraser: 'Penghapus', bucket: 'Cat Tumpah', text: 'Teks', select: 'Geser / Seleksi âœ¥' };
   const labelEl = document.getElementById('paint-status-tool');
   if (labelEl) {
     if (toolName === 'brush') {
@@ -4391,7 +4452,7 @@ function downloadPaintCanvas() {
   link.click();
 
   tambahPoin(30);
-  showToast('Lukisan Paint berhasil disimpan dan diunduh ke komputer! 💾 (+30 Bintang)', 'success');
+  showToast('Lukisan Paint berhasil disimpan dan diunduh ke komputer! ðŸ’¾ (+30 Bintang)', 'success');
 }
 
 // FITUR KIRIM HASIL LUKISAN PAINT LANGSUNG KE LAB MS WORD
@@ -4405,7 +4466,7 @@ function kirimPaintKeWord() {
   const dataUrl = paintApp.canvas.toDataURL('image/png');
   sisipkanGambarLuarKeWord(dataUrl, 'Lukisan dari Paint');
   switchTab('msword');
-  showToast('Lukisan Paint langsung dipasang di lembar kerja Word! 📄', 'success');
+  showToast('Lukisan Paint langsung dipasang di lembar kerja Word! ðŸ“„', 'success');
 }
 
 // FITUR SIMPAN HASIL LUKISAN PAINT KE DRIVE 7 KEBIASAAN
@@ -4417,7 +4478,7 @@ function simpanPaintKeDrivePrompt() {
   playSound('click');
 
   const pilihan = prompt(
-    '📁 SIMPAN LUKISAN KE DRIVE 7 KEBIASAAN:\n\nPilih nomor kebiasaan untuk lukisan ini (1 - 7):\n' +
+    'ðŸ“ SIMPAN LUKISAN KE DRIVE 7 KEBIASAAN:\n\nPilih nomor kebiasaan untuk lukisan ini (1 - 7):\n' +
     '1. Bangun Pagi\n' +
     '2. Beribadah & Berdoa\n' +
     '3. Berolahraga\n' +
@@ -4438,10 +4499,10 @@ function simpanPaintKeDrivePrompt() {
   }
 
   const dataUrl = paintApp.canvas.toDataURL('image/png');
-  simpanGambarKeSlotDrive(cfg.key, dataUrl, `Lukisan Paint: ${cfg.cleanTitle}`, '🖌️ Gambar Sendiri');
+  simpanGambarKeSlotDrive(cfg.key, dataUrl, `Lukisan Paint: ${cfg.cleanTitle}`, 'ðŸ–Œï¸ Gambar Sendiri');
   setPraktikSubtab('praktik-tp2');
   setModeAIStudio('drive');
-  showToast(`Lukisanmu berhasil disimpan ke Slot #${num}: ${cfg.cleanTitle}! 📁✨`, 'success');
+  showToast(`Lukisanmu berhasil disimpan ke Slot #${num}: ${cfg.cleanTitle}! ðŸ“âœ¨`, 'success');
 }
 window.simpanPaintKeDrivePrompt = simpanPaintKeDrivePrompt;
 
@@ -4461,7 +4522,7 @@ const AI_HABITS_DATA = {
   bangun_pagi: {
     id: 1,
     title: 'Bangun Pagi Ceria',
-    emoji: '🌅',
+    emoji: 'ðŸŒ…',
     desc: 'Menyambut pagi dengan penuh semangat, berterima kasih atas hari baru, dan merapikan tempat tidur sendiri.',
     quote: '"Bangun pagi membuat tubuh segar, batin damai, dan siap belajar dengan gembira."',
     promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan ceria, baru bangun tidur merentangkan tangan dengan riang di tempat tidur kayu rapi, memakai piyama tidur sopan tertutup, senyum manis bahagia, ada jam weker di meja samping dan jendela kamar dengan sinar matahari pagi yang cerah, gaya ilustrasi kartun edukasi anak Canva yang bersih dan indah',
@@ -4470,7 +4531,7 @@ const AI_HABITS_DATA = {
   beribadah: {
     id: 2,
     title: 'Beribadah & Bersyukur (Gan En)',
-    emoji: '🙏',
+    emoji: 'ðŸ™',
     desc: 'Menjalankan doa ibadah dengan khusyuk tepat waktu serta senantiasa bersyukur atas cinta kasih orang tua dan guru.',
     quote: '"Bersyukur (Gan En) melahirkan kedamaian hati dan menghargai setiap berkah yang kita miliki."',
     promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan santun, sedang berdoa dan bersyukur dengan kedua tangan terkatup khusyuk, berpakaian seragam sekolah rapi tertutup, senyum damai penuh cinta kasih, suasana hangat bercahaya kebaikan, gaya kartun edukasi anak Canva yang sopan dan mulia',
@@ -4479,7 +4540,7 @@ const AI_HABITS_DATA = {
   olahraga: {
     id: 3,
     title: 'Rajin Berolahraga',
-    emoji: '⚽',
+    emoji: 'âš½',
     desc: 'Senam pagi, berlari ceria, dan aktif bergerak agar badan selalu bugar, lincah, dan memiliki daya tahan kuat.',
     quote: '"Di dalam tubuh yang sehat terdapat jiwa yang kuat dan pikiran yang cemerlang."',
     promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan ceria, memakai pakaian olahraga sekolah lengkap dan santun, sedang senam pagi dan lari riang di lapangan sekolah yang hijau dan bersih, membawa bola, senyum bugar dan gembira, gaya ilustrasi kartun edukasi anak Canva',
@@ -4488,7 +4549,7 @@ const AI_HABITS_DATA = {
   makan_sehat: {
     id: 4,
     title: 'Makan Sehat Bergizi',
-    emoji: '🥗',
+    emoji: 'ðŸ¥—',
     desc: 'Memilih makanan bergizi seimbang, gemar makan sayur-mayur, buah segar, dan cukup minum air putih setiap hari.',
     quote: '"Makanan sehat bergizi adalah bahan bakar terbaik untuk kecerdasan otak dan pertumbuhan anak."',
     promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan beradab, duduk rapi di meja makan dengan sikap santun, menikmati bekal makanan sehat bergizi berupa sayur hijau, buah segar, dan susu, tersenyum ceria, gaya ilustrasi kartun edukasi anak Canva yang higienis dan mendidik',
@@ -4497,7 +4558,7 @@ const AI_HABITS_DATA = {
   belajar_membaca: {
     id: 5,
     title: 'Gemar Belajar & Membaca',
-    emoji: '📚',
+    emoji: 'ðŸ“š',
     desc: 'Meluangkan waktu 15 menit setiap hari membaca buku, mengasah logika koding, dan berani bertanya hal baru.',
     quote: '"Buku adalah jendela dunia. Anak yang gemar membaca akan tumbuh menjadi generasi berwawasan luas."',
     promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan cerdas, duduk membaca buku cerita bergambar dengan penuh minat di perpustakaan sekolah yang rapi, berpakaian seragam merah putih santun, senyum manis penuh rasa ingin tahu, gaya ilustrasi kartun edukasi anak Canva',
@@ -4506,7 +4567,7 @@ const AI_HABITS_DATA = {
   rukun_berbagi: {
     id: 6,
     title: 'Bermasyarakat, Rukun & Berbagi',
-    emoji: '🤝',
+    emoji: 'ðŸ¤',
     desc: 'Saling tolong-menolong sesama teman tanpa membedakan latar belakang, hidup rukun (Hu Ai), dan suka berbagi kebaikan.',
     quote: '"Saling mengasihi dan tolong-menolong menjadikan persahabatan indah dan dunia penuh kehangatan."',
     promptBaseId: 'gambar kartun sekelompok anak SD Indonesia yang rukun dan sopan, saling tersenyum, berbagi kue bekal dan bermain bersama dengan gembira di taman sekolah, berpakaian seragam rapi dan sopan, mencerminkan persahabatan dan cinta kasih yang hangat, gaya kartun edukasi anak Canva',
@@ -4515,7 +4576,7 @@ const AI_HABITS_DATA = {
   tidur_tepat: {
     id: 7,
     title: 'Tidur Tepat Waktu',
-    emoji: '🌙',
+    emoji: 'ðŸŒ™',
     desc: 'Istirahat lebih awal tanpa bermain gawai (HP) larut malam agar sel otak beregenerasi dan bangun dalam kondisi prima.',
     quote: '"Tidur tepat waktu menjaga kecerdasan ingatan dan stamina tubuh agar selalu siap berprestasi."',
     promptBaseId: 'gambar kartun anak SD Indonesia yang sopan dan manis, sudah tidur nyenyak di tempat tidur yang rapi dan nyaman dengan selimut hangat, memakai piyama tidur sopan, ada boneka atau jam weker, suasana malam berbintang yang tenang dan damai, gaya ilustrasi kartun edukasi anak Canva',
@@ -4537,9 +4598,9 @@ const AI_STUDIO_STATE = {
 function gantiMesinAI(engine) {
   AI_STUDIO_STATE.currentEngine = engine;
   if (engine === 'local_cartoon') {
-    showToast('Mode Studio Kartun Edukasi Aktif: Bebas kuota & instan! 🌟', 'success');
+    showToast('Mode Studio Kartun Edukasi Aktif: Bebas kuota & instan! ðŸŒŸ', 'success');
   } else if (engine === 'pollinations') {
-    showToast('Mode AI Online (Pollinations.ai) Aktif 🤖 (Batas 1 gambar per 45 detik)', 'info');
+    showToast('Mode AI Online (Pollinations.ai) Aktif ðŸ¤– (Batas 1 gambar per 45 detik)', 'info');
   }
 }
 window.gantiMesinAI = gantiMesinAI;
@@ -4563,7 +4624,7 @@ function salinPromptAI(lang = 'id') {
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(teksPrompt).then(() => {
-      showToast('Prompt AI berhasil disalin ke Clipboard! 📋 Silakan tempel di Canva / Bing AI.', 'success');
+      showToast('Prompt AI berhasil disalin ke Clipboard! ðŸ“‹ Silakan tempel di Canva / Bing AI.', 'success');
     }).catch(() => {
       prompt('Salin teks prompt AI ini:', teksPrompt);
     });
@@ -4584,7 +4645,7 @@ function aktifkanKartunEdukasiBebasLimit() {
 
   renderFallbackArtwork(habitKey, styleVal);
   selesaikanGenerasiGambarAI(true);
-  showToast('✨ Berhasil beralih ke Ilustrasi Kartun Edukasi Bebas Limit!', 'success');
+  showToast('âœ¨ Berhasil beralih ke Ilustrasi Kartun Edukasi Bebas Limit!', 'success');
 }
 window.aktifkanKartunEdukasiBebasLimit = aktifkanKartunEdukasiBebasLimit;
 
@@ -5029,7 +5090,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <circle cx="70" cy="225" r="14" fill="#ffffff"/>
       <path d="M70 225 L70 215 M70 225 L78 230" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">★ Bangun Pagi Ceria &amp; Merentang Tangan ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">â˜… Bangun Pagi Ceria &amp; Merentang Tangan â˜…</text>
     `;
   } else if (id === 'bp_2') {
     body = `
@@ -5061,7 +5122,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <rect x="30" y="240" width="70" height="100" rx="10" fill="#fbcfe8" filter="url(#sh)"/>
       <circle cx="65" cy="225" r="16" fill="#fb7185"/>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#db2777" text-anchor="middle">★ Siswi Ceria Bangun Tidur di Ranjang Pink ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#db2777" text-anchor="middle">â˜… Siswi Ceria Bangun Tidur di Ranjang Pink â˜…</text>
     `;
   } else if (id === 'bp_3') {
     body = `
@@ -5090,7 +5151,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <rect x="60" y="295" width="160" height="40" rx="12" fill="#ffffff" filter="url(#sh)"/>
       <text x="140" y="322" font-family="Fredoka, sans-serif" font-size="20" font-weight="900" fill="#ef4444" text-anchor="middle">05 : 00 PAGI</text>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">★ Jam Weker 05:00 &amp; Bangun Tepat Waktu ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">â˜… Jam Weker 05:00 &amp; Bangun Tepat Waktu â˜…</text>
     `;
   } else if (id === 'bp_4') {
     body = `
@@ -5121,7 +5182,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M250 195 L200 160" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Kamar Pagi Bersih &amp; Jendela Terbuka ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">â˜… Kamar Pagi Bersih &amp; Jendela Terbuka â˜…</text>
     `;
   } else if (id === 'bp_5') {
     body = `
@@ -5150,7 +5211,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M140 245 Q245 230 350 245 L350 340 Q245 360 140 340 Z" fill="#a855f7"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#7e22ce" text-anchor="middle">★ Siswi Berhijab Bangun Pagi Bersyukur ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#7e22ce" text-anchor="middle">â˜… Siswi Berhijab Bangun Pagi Bersyukur â˜…</text>
     `;
   } else if (id === 'bp_6') {
     body = `
@@ -5181,7 +5242,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M250 170 L195 240" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Anak Merapikan &amp; Melipat Selimut Rapi ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">â˜… Anak Merapikan &amp; Melipat Selimut Rapi â˜…</text>
     `;
   }
   // 2. BERIBADAH & BERSYUKUR
@@ -5211,7 +5272,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M230 250 Q245 275 210 290 Q215 265 230 250 Z" fill="#fb7185"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Anak Berdoa Khusyuk dengan Tangan Berkatup ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">â˜… Anak Berdoa Khusyuk dengan Tangan Berkatup â˜…</text>
     `;
   } else if (id === 'bi_2') {
     body = `
@@ -5233,7 +5294,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M160 200 L150 260 L250 260 L240 200 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Siswi Berhijab Berdoa di Sajadah Suci ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">â˜… Siswi Berhijab Berdoa di Sajadah Suci â˜…</text>
     `;
   } else if (id === 'bi_3') {
     body = `
@@ -5250,7 +5311,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <!-- Hati Kasih Gan En -->
       <path d="M200 90 A18 18 0 0,0 170 115 L200 145 L230 115 A18 18 0 0,0 200 90 Z" fill="#ef4444" filter="url(#sh)"/>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">★ Bunga Teratai Suci &amp; Cahaya Kasih Gan En ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">â˜… Bunga Teratai Suci &amp; Cahaya Kasih Gan En â˜…</text>
     `;
   } else if (id === 'bi_4') {
     body = `
@@ -5274,7 +5335,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M175 170 L185 220 M225 170 L215 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">★ Anak Berbakti Menyajikan Teh kepada Orang Tua ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">â˜… Anak Berbakti Menyajikan Teh kepada Orang Tua â˜…</text>
     `;
   }
   // 3. OLAHRAGA
@@ -5302,7 +5363,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <rect x="220" y="215" width="16" height="50" rx="8" fill="#1e293b" transform="rotate(30 220 215)"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">★ Lari Pagi Ceria di Lapangan Hijau ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">â˜… Lari Pagi Ceria di Lapangan Hijau â˜…</text>
     `;
   } else if (id === 'or_2') {
     body = `
@@ -5328,7 +5389,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M155 210 L150 270" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#c2410c" text-anchor="middle">★ Bermain Sepak Bola di Bawah Mentari ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#c2410c" text-anchor="middle">â˜… Bermain Sepak Bola di Bawah Mentari â˜…</text>
     `;
   } else if (id === 'or_3') {
     body = `
@@ -5350,7 +5411,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <rect x="205" y="220" width="15" height="60" rx="7" fill="#1e293b"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">★ Senam Pagi Anak Indonesia Bugar ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">â˜… Senam Pagi Anak Indonesia Bugar â˜…</text>
     `;
   } else if (id === 'or_4') {
     body = `
@@ -5374,7 +5435,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M225 180 L245 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Bersepeda Santai di Taman Sekolah ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">â˜… Bersepeda Santai di Taman Sekolah â˜…</text>
     `;
   }
   // 4. MAKAN SEHAT BERGIZI
@@ -5403,7 +5464,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <line x1="245" y1="180" x2="245" y2="200" stroke="#94a3b8" stroke-width="3"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">★ Piring Sayur Brokoli, Wortel &amp; Apel Merah ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b45309" text-anchor="middle">â˜… Piring Sayur Brokoli, Wortel &amp; Apel Merah â˜…</text>
     `;
   } else if (id === 'ms_2') {
     body = `
@@ -5429,7 +5490,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <rect x="195" y="140" width="45" height="60" rx="12" fill="#0284c7"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Gelas Susu Segar &amp; Mangkuk Buah Bersih ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">â˜… Gelas Susu Segar &amp; Mangkuk Buah Bersih â˜…</text>
     `;
   } else if (id === 'ms_3') {
     body = `
@@ -5453,7 +5514,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M225 155 L240 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Anak Duduk Santun Makan dengan Baik ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">â˜… Anak Duduk Santun Makan dengan Baik â˜…</text>
     `;
   } else if (id === 'ms_4') {
     body = `
@@ -5481,7 +5542,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <rect x="246" y="115" width="8" height="18" rx="4" fill="#fed7aa"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">★ Kotak Bekal 4 Sehat 5 Sempurna ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">â˜… Kotak Bekal 4 Sehat 5 Sempurna â˜…</text>
     `;
   }
   // 5. GEMAR BELAJAR & MEMBACA
@@ -5494,7 +5555,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M120 230 Q200 215 280 230 L275 295 Q200 280 125 295 Z" fill="#ffffff" stroke="#8b5cf6" stroke-width="3"/>
         <line x1="200" y1="220" x2="200" y2="290" stroke="#8b5cf6" stroke-width="3"/>
       </g>
-      <text x="150" y="255" font-size="20">⭐</text><text x="235" y="255" font-size="20">✨</text>
+      <text x="150" y="255" font-size="20">â­</text><text x="235" y="255" font-size="20">âœ¨</text>
       <!-- Siswi Membaca Dongeng Khusyuk -->
       <g filter="url(#sh)">
         <path d="M170 85 Q200 50 230 85" fill="#451a03"/>
@@ -5507,7 +5568,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M175 160 L140 230 M225 160 L260 230" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#581c87" text-anchor="middle">★ Membaca Buku Dongeng Cerita Bergambar ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#581c87" text-anchor="middle">â˜… Membaca Buku Dongeng Cerita Bergambar â˜…</text>
     `;
   } else if (id === 'gb_2') {
     body = `
@@ -5532,7 +5593,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M275 175 L210 160" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">★ Rak Buku Perpustakaan Warna-Warni ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">â˜… Rak Buku Perpustakaan Warna-Warni â˜…</text>
     `;
   } else if (id === 'gb_3') {
     body = `
@@ -5561,7 +5622,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M235 170 L195 240" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Meja Belajar Rapi dengan Lampu Belajar ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">â˜… Meja Belajar Rapi dengan Lampu Belajar â˜…</text>
     `;
   } else if (id === 'gb_4') {
     body = `
@@ -5596,7 +5657,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M295 180 L260 220" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0284c7" text-anchor="middle">★ Belajar Koding Komputer Bersama Robot ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0284c7" text-anchor="middle">â˜… Belajar Koding Komputer Bersama Robot â˜…</text>
     `;
   }
   // 6. BERMASYARAKAT & HIDUP RUKUN
@@ -5632,7 +5693,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <circle cx="200" cy="200" r="14" fill="#ef4444" filter="url(#sh)"/>
       <path d="M200 90 A14 14 0 0,0 175 110 L200 135 L225 110 A14 14 0 0,0 200 90 Z" fill="#f43f5e"/>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">★ Dua Sahabat Berbagi Bekal Kue &amp; Buah ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">â˜… Dua Sahabat Berbagi Bekal Kue &amp; Buah â˜…</text>
     `;
   } else if (id === 'rk_2') {
     body = `
@@ -5664,9 +5725,9 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <rect x="210" y="260" width="35" height="25" rx="4" fill="#0284c7"/>
         <line x1="227" y1="260" x2="255" y2="185" stroke="#0284c7" stroke-width="4"/>
       </g>
-      <text x="180" y="240" font-size="20">✨</text><text x="320" y="220" font-size="20">✨</text>
+      <text x="180" y="240" font-size="20">âœ¨</text><text x="320" y="220" font-size="20">âœ¨</text>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">★ Gotong Royong Membersihkan Kelas Bersama ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#047857" text-anchor="middle">â˜… Gotong Royong Membersihkan Kelas Bersama â˜…</text>
     `;
   } else if (id === 'rk_3') {
     body = `
@@ -5694,7 +5755,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <circle cx="200" cy="160" r="18" fill="#fde047" filter="url(#sh)"/>
       <path d="M200 135 L204 144 L214 144 L206 150 L209 160 L200 154 L191 160 L194 150 L186 144 L196 144 Z" fill="#ea580c"/>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">★ Saling Menyapa Santun &amp; Senyum Ramah ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">â˜… Saling Menyapa Santun &amp; Senyum Ramah â˜…</text>
     `;
   } else if (id === 'rk_4') {
     body = `
@@ -5719,7 +5780,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <path d="M120 225 L180 220 M225 220 L280 225" stroke="#fed7aa" stroke-width="10" stroke-linecap="round"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">★ Lingkaran Sahabat Bergandengan Tangan ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#0f766e" text-anchor="middle">â˜… Lingkaran Sahabat Bergandengan Tangan â˜…</text>
     `;
   }
   // 7. TIDUR TEPAT WAKTU
@@ -5730,8 +5791,8 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <rect x="40" y="45" width="110" height="140" rx="14" fill="#020617" stroke="#475569" stroke-width="5"/>
         <circle cx="95" cy="105" r="28" fill="#fde047"/>
         <circle cx="107" cy="98" r="24" fill="#020617"/>
-        <text x="65" y="85" font-size="14" fill="#ffffff">✨</text>
-        <text x="125" y="160" font-size="14" fill="#ffffff">⭐</text>
+        <text x="65" y="85" font-size="14" fill="#ffffff">âœ¨</text>
+        <text x="125" y="160" font-size="14" fill="#ffffff">â­</text>
       </g>
       <g filter="url(#sh)">
         <circle cx="330" cy="95" r="30" fill="#f8fafc" stroke="#1e293b" stroke-width="3"/>
@@ -5750,10 +5811,10 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <!-- Selimut Bintang Malam -->
       <g filter="url(#sh)">
         <path d="M120 200 Q240 185 350 200 L350 340 Q240 360 120 340 Z" fill="#3730a3"/>
-        <text x="160" y="250" font-size="18">⭐</text><text x="230" y="270" font-size="22">🌙</text><text x="300" y="250" font-size="18">⭐</text>
+        <text x="160" y="250" font-size="18">â­</text><text x="230" y="270" font-size="22">ðŸŒ™</text><text x="300" y="250" font-size="18">â­</text>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">★ Tidur Pulas di Bawah Selimut Bintang ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#312e81" text-anchor="middle">â˜… Tidur Pulas di Bawah Selimut Bintang â˜…</text>
     `;
   } else if (id === 'tt_2') {
     body = `
@@ -5767,9 +5828,9 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <circle cx="185" cy="148" r="4" fill="#0f172a"/>
         <path d="M178 160 Q188 170 196 160" stroke="#b91c1c" stroke-width="3" fill="none"/>
       </g>
-      <text x="110" y="100" font-size="20">✨</text><text x="280" y="110" font-size="24">⭐</text><text x="120" y="230" font-size="24">⭐</text><text x="270" y="240" font-size="20">✨</text>
+      <text x="110" y="100" font-size="20">âœ¨</text><text x="280" y="110" font-size="24">â­</text><text x="120" y="230" font-size="24">â­</text><text x="270" y="240" font-size="20">âœ¨</text>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#e0e7ff" text-anchor="middle">★ Jendela Malam Tenang &amp; Bulan Sabit Senyum ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#e0e7ff" text-anchor="middle">â˜… Jendela Malam Tenang &amp; Bulan Sabit Senyum â˜…</text>
     `;
   } else if (id === 'tt_3') {
     body = `
@@ -5791,7 +5852,7 @@ function buatSvgKartunKatalog(id, title, habitKey) {
         <circle cx="200" cy="298" r="8" fill="#b91c1c"/>
       </g>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#818cf8" text-anchor="middle">★ Jam Dinding Pukul 20:30 (Tidak Begadang) ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#818cf8" text-anchor="middle">â˜… Jam Dinding Pukul 20:30 (Tidak Begadang) â˜…</text>
     `;
   } else if (id === 'tt_4') {
     body = `
@@ -5813,16 +5874,16 @@ function buatSvgKartunKatalog(id, title, habitKey) {
       <circle cx="235" cy="170" r="7" fill="#78350f"/><circle cx="255" cy="170" r="7" fill="#78350f"/>
       <circle cx="245" cy="188" r="8" fill="#fed7aa"/>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#fde047" text-anchor="middle">★ Lampu Tidur Temaram Hangat &amp; Damai ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#fde047" text-anchor="middle">â˜… Lampu Tidur Temaram Hangat &amp; Damai â˜…</text>
     `;
   } else {
     // Default Fallback Vektor Bersih
     body = `
       <rect width="400" height="400" rx="24" fill="url(#gSky)"/>
       <circle cx="200" cy="160" r="80" fill="#ffffff" opacity="0.8" filter="url(#sh)"/>
-      <text x="200" y="180" font-size="64" text-anchor="middle">🎨</text>
+      <text x="200" y="180" font-size="64" text-anchor="middle">ðŸŽ¨</text>
       <rect x="20" y="370" width="360" height="24" rx="12" fill="#ffffff" opacity="0.95"/>
-      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">★ Ilustrasi Kartun Edukasi Sopan ★</text>
+      <text x="200" y="386" font-family="Fredoka, sans-serif" font-size="12" font-weight="bold" fill="#1e40af" text-anchor="middle">â˜… Ilustrasi Kartun Edukasi Sopan â˜…</text>
     `;
   }
 
@@ -5972,14 +6033,14 @@ function setSumberKartun(mode, isModal = false) {
 
   if (mode === 'artis') {
     lakukanPencarianWebOnline(isModal);
-    showToast('Mode Ilustrasi Artis Asli Aktif: Menampilkan karya ilustrator manusia profesional! 🎨', 'success');
+    showToast('Mode Ilustrasi Artis Asli Aktif: Menampilkan karya ilustrator manusia profesional! ðŸŽ¨', 'success');
   } else {
     if (isModal) {
       cariKoleksiKartunModal(CARTOON_SEARCH_STATE.currentQuery);
     } else {
       cariKoleksiKartun(CARTOON_SEARCH_STATE.currentQuery);
     }
-    showToast('Mode Vektor Edukasi HD Aktif: Bebas kuota & instan! 🌟', 'info');
+    showToast('Mode Vektor Edukasi HD Aktif: Bebas kuota & instan! ðŸŒŸ', 'info');
   }
 }
 window.setSumberKartun = setSumberKartun;
@@ -6047,13 +6108,13 @@ function renderPencariKartunPills(containerId, activeCat, isModal = false) {
 
   const categories = [
     { key: 'semua', label: 'Semua (30+)', icon: 'fa-layer-group' },
-    { key: 'bangun_pagi', label: '🌅 Bangun Pagi (6)', icon: 'fa-sun' },
-    { key: 'beribadah', label: '🙏 Beribadah (4)', icon: 'fa-hands-praying' },
-    { key: 'olahraga', label: '⚽ Olahraga (4)', icon: 'fa-futbol' },
-    { key: 'makan_sehat', label: '🥗 Makan Sehat (4)', icon: 'fa-apple-whole' },
-    { key: 'belajar_membaca', label: '📖 Gemar Belajar (4)', icon: 'fa-book-open' },
-    { key: 'rukun_berbagi', label: '🤝 Hidup Rukun (4)', icon: 'fa-users' },
-    { key: 'tidur_tepat', label: '🌙 Tidur Cepat (4)', icon: 'fa-moon' }
+    { key: 'bangun_pagi', label: 'ðŸŒ… Bangun Pagi (6)', icon: 'fa-sun' },
+    { key: 'beribadah', label: 'ðŸ™ Beribadah (4)', icon: 'fa-hands-praying' },
+    { key: 'olahraga', label: 'âš½ Olahraga (4)', icon: 'fa-futbol' },
+    { key: 'makan_sehat', label: 'ðŸ¥— Makan Sehat (4)', icon: 'fa-apple-whole' },
+    { key: 'belajar_membaca', label: 'ðŸ“– Gemar Belajar (4)', icon: 'fa-book-open' },
+    { key: 'rukun_berbagi', label: 'ðŸ¤ Hidup Rukun (4)', icon: 'fa-users' },
+    { key: 'tidur_tepat', label: 'ðŸŒ™ Tidur Cepat (4)', icon: 'fa-moon' }
   ];
 
   container.innerHTML = categories.map(cat => {
@@ -6139,7 +6200,7 @@ function renderPencariKartunGrid(containerId, list, isModal = false) {
         <p class="text-xs text-slate-400 max-w-sm mx-auto">Coba cari dengan kata kunci: <i>bangun, selimut, tidur, sholat, lari, sayur, buku, bekal</i>.</p>
         <div class="flex items-center justify-center gap-2 flex-wrap pt-2">
           <button type="button" onclick="bukaGeminiAIPencari()" class="px-4 py-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer">
-            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat di Gemini AI 🤖
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat di Gemini AI ðŸ¤–
           </button>
           <button type="button" onclick="${isModal ? 'cariKoleksiKartunModal(\'\')' : 'cariKoleksiKartun(\'\')'}; pilihKategoriKartun('semua', ${isModal});" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
             Tampilkan Semua Kartun
@@ -6171,7 +6232,7 @@ function renderPencariKartunGrid(containerId, list, isModal = false) {
             <span class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-base shadow-lg animate-bounce">
               <i class="fa-solid fa-file-word"></i>
             </span>
-            <span class="text-[11px] font-title font-black text-center text-white drop-shadow">Pasang ke Word 📄</span>
+            <span class="text-[11px] font-title font-black text-center text-white drop-shadow">Pasang ke Word ðŸ“„</span>
           </div>
         </div>
 
@@ -6219,7 +6280,7 @@ function pasangKartunKeWord(kartunId) {
   switchTab('msword');
   tambahPoin(20);
   playSound('fanfare');
-  showToast(`Gambar kartun "${item.title}" berhasil dipasang ke Lab Word! 🎨 (+20 Bintang)`, 'success');
+  showToast(`Gambar kartun "${item.title}" berhasil dipasang ke Lab Word! ðŸŽ¨ (+20 Bintang)`, 'success');
 }
 window.pasangKartunKeWord = pasangKartunKeWord;
 
@@ -6234,7 +6295,7 @@ function unduhKartunItem(kartunId) {
   link.target = '_blank';
   link.click();
   playSound('success');
-  showToast(`Gambar "${item.title}" berhasil diunduh ke komputermu! 💾`, 'success');
+  showToast(`Gambar "${item.title}" berhasil diunduh ke komputermu! ðŸ’¾`, 'success');
 }
 window.unduhKartunItem = unduhKartunItem;
 
@@ -6324,7 +6385,7 @@ function bukaGeminiAIPencari() {
     }
   }
 
-  showToast(`Membuka Studio Gemini AI untuk membuat gambar kartun! 🤖✨`, 'success');
+  showToast(`Membuka Studio Gemini AI untuk membuat gambar kartun! ðŸ¤–âœ¨`, 'success');
 }
 window.bukaGeminiAIPencari = bukaGeminiAIPencari;
 
@@ -6335,14 +6396,14 @@ function bukaPinterestSafeSearch(query) {
   const url = `https://id.pinterest.com/search/pins/?q=${encodeURIComponent(safeQuery)}`;
   window.open(url, '_blank');
   playSound('click');
-  showToast('Membuka Pinterest dengan kata kunci kartun anak aman & sopan... 📌', 'info');
+  showToast('Membuka Pinterest dengan kata kunci kartun anak aman & sopan... ðŸ“Œ', 'info');
 }
 window.bukaPinterestSafeSearch = bukaPinterestSafeSearch;
 
 function tempelGambarPinterestPrompt() {
   playSound('click');
   const petunjuk = 
-    '📌 CARA MEMASUKKAN GAMBAR DARI PINTEREST:\n\n' +
+    'ðŸ“Œ CARA MEMASUKKAN GAMBAR DARI PINTEREST:\n\n' +
     '1. Cari gambar kartun yang kamu sukai di Pinterest (atau tab Pinterest yang terbuka).\n' +
     '2. KLIK KANAN pada gambar tersebut -> pilih "Salin Alamat Gambar" (Copy Image Address / Copy Image Link).\n' +
     '3. Tempel (Paste / Ctrl+V) link gambar tersebut di kotak bawah ini:\n\n' +
@@ -6365,7 +6426,7 @@ function tempelGambarPinterestPrompt() {
   switchTab('msword');
   tambahPoin(20);
   playSound('fanfare');
-  showToast('Gambar kartun dari Pinterest berhasil dipasang ke poster Word! 📌✨ (+20 Bintang)', 'success');
+  showToast('Gambar kartun dari Pinterest berhasil dipasang ke poster Word! ðŸ“Œâœ¨ (+20 Bintang)', 'success');
 }
 window.tempelGambarPinterestPrompt = tempelGambarPinterestPrompt;
 
@@ -6378,7 +6439,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 1,
     title: '1. Bangun Pagi',
     cleanTitle: 'Bangun Pagi',
-    emoji: '🌅',
+    emoji: 'ðŸŒ…',
     icon: 'fa-sun',
     colorText: 'text-amber-500',
     colorBg: 'bg-amber-50',
@@ -6393,7 +6454,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 2,
     title: '2. Beribadah & Berdoa',
     cleanTitle: 'Beribadah & Berdoa',
-    emoji: '🙏',
+    emoji: 'ðŸ™',
     icon: 'fa-hands-praying',
     colorText: 'text-blue-500',
     colorBg: 'bg-blue-50',
@@ -6408,7 +6469,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 3,
     title: '3. Berolahraga',
     cleanTitle: 'Berolahraga',
-    emoji: '🏃',
+    emoji: 'ðŸƒ',
     icon: 'fa-person-running',
     colorText: 'text-emerald-500',
     colorBg: 'bg-emerald-50',
@@ -6423,7 +6484,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 4,
     title: '4. Makan Sehat & Bergizi',
     cleanTitle: 'Makan Sehat & Bergizi',
-    emoji: '🥗',
+    emoji: 'ðŸ¥—',
     icon: 'fa-apple-whole',
     colorText: 'text-green-600',
     colorBg: 'bg-green-50',
@@ -6438,7 +6499,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 5,
     title: '5. Gemar Belajar & Membaca',
     cleanTitle: 'Gemar Belajar & Membaca',
-    emoji: '📖',
+    emoji: 'ðŸ“–',
     icon: 'fa-book-open',
     colorText: 'text-purple-500',
     colorBg: 'bg-purple-50',
@@ -6453,7 +6514,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 6,
     title: '6. Bermasyarakat & Hidup Rukun',
     cleanTitle: 'Bermasyarakat & Hidup Rukun',
-    emoji: '🤝',
+    emoji: 'ðŸ¤',
     icon: 'fa-users',
     colorText: 'text-teal-600',
     colorBg: 'bg-teal-50',
@@ -6468,7 +6529,7 @@ const DRIVE_7KEBIASAAN_CONFIG = [
     slotNumber: 7,
     title: '7. Tidur Tepat Waktu',
     cleanTitle: 'Tidur Tepat Waktu',
-    emoji: '🌙',
+    emoji: 'ðŸŒ™',
     icon: 'fa-moon',
     colorText: 'text-indigo-600',
     colorBg: 'bg-indigo-50',
@@ -6666,7 +6727,7 @@ function hitungNilaiDrive7Kebiasaan(driveData) {
   if (isAll7) {
     if (isSesuaiKategori) {
       totalSkor = 100;
-      catatanAnalisis = 'Luar Biasa! 7/7 gambar lengkap dan sesuai kategori (3 Paint mandiri + 4 Studio AI). TUNTAS 100! 🌟';
+      catatanAnalisis = 'Luar Biasa! 7/7 gambar lengkap dan sesuai kategori (3 Paint mandiri + 4 Studio AI). TUNTAS 100! ðŸŒŸ';
     } else {
       totalSkor = 90;
       catatanAnalisis = 'Koleksi 7/7 lengkap (Tuntas). Sebagian sumber gambar masih bisa disempurnakan (3 Paint & 4 AI).';
@@ -6733,7 +6794,7 @@ function simpanDrive7Kebiasaan(data) {
   } catch (e) {
     console.warn('Gagal menyimpan Drive 7 Kebiasaan:', e);
     if (e && (e.name === 'QuotaExceededError' || e.code === 22)) {
-      showToast('⚠️ Penyimpanan browser penuh! Gambar otomatis dikompresi agar muat.', 'warning');
+      showToast('âš ï¸ Penyimpanan browser penuh! Gambar otomatis dikompresi agar muat.', 'warning');
     }
   }
 }
@@ -6792,7 +6853,7 @@ function periksaFormatNamaFile(namaFile) {
     kelas: kelas,
     nama: nama,
     judul: judul,
-    pesan: `Format penamaan baku sesuai standar! Kelas: ${kelas}, Siswa: ${nama}, File: ${judul} (+20 Poin ⭐)`
+    pesan: `Format penamaan baku sesuai standar! Kelas: ${kelas}, Siswa: ${nama}, File: ${judul} (+20 Poin â­)`
   };
 }
 window.periksaFormatNamaFile = periksaFormatNamaFile;
@@ -6824,12 +6885,12 @@ function ubahNamaFileSlotDrive(habitKey) {
   const namaLama = item.fileName || defaultSaran;
 
   const promptMsg =
-    `📁 ATUR PENAMAAN FILE SLOT [${cfg ? cfg.cleanTitle : habitKey}]:\n\n` +
+    `ðŸ“ ATUR PENAMAAN FILE SLOT [${cfg ? cfg.cleanTitle : habitKey}]:\n\n` +
     `Format Baku yang dinilai:\n` +
     `Kelas_Nama Siswa_Nama file\n\n` +
     `Contoh:\n` +
     `4A_Darningsih_Bangun Tidur\n\n` +
-    `⭐ Gunakan format baku di atas untuk mendapatkan +20 Poin Bintang!`;
+    `â­ Gunakan format baku di atas untuk mendapatkan +20 Poin Bintang!`;
 
   const inputNama = prompt(promptMsg, namaLama);
   if (inputNama === null) return;
@@ -6848,18 +6909,18 @@ function ubahNamaFileSlotDrive(habitKey) {
     playSound('fanfare');
     tambahPoin(20);
     alert(
-      `🎉 HEBAT! PENAMAAN FILE BAKU TERPENUHI!\n\n` +
+      `ðŸŽ‰ HEBAT! PENAMAAN FILE BAKU TERPENUHI!\n\n` +
       `Nama File: "${namaBaru}"\n` +
-      `• Kelas: ${check.kelas}\n` +
-      `• Nama Siswa: ${check.nama}\n` +
-      `• Nama File: ${check.judul}\n\n` +
-      `⭐ Selamat! Kerapian digitalmu mendapatkan +20 Poin Bintang!`
+      `â€¢ Kelas: ${check.kelas}\n` +
+      `â€¢ Nama Siswa: ${check.nama}\n` +
+      `â€¢ Nama File: ${check.judul}\n\n` +
+      `â­ Selamat! Kerapian digitalmu mendapatkan +20 Poin Bintang!`
     );
-    showToast(`Penamaan file baku berhasil! (+20 Bintang) ⭐`, 'success');
+    showToast(`Penamaan file baku berhasil! (+20 Bintang) â­`, 'success');
   } else {
     playSound('click');
     alert(
-      `⚠️ PERHATIAN FORMAT PENAMAAN FILE:\n\n` +
+      `âš ï¸ PERHATIAN FORMAT PENAMAAN FILE:\n\n` +
       `Nama file tersimpan: "${namaBaru}"\n\n` +
       `Namun belum sesuai format baku:\n` +
       `Kelas_Nama Siswa_Nama file (gunakan pemisah garis bawah _)\n` +
@@ -6907,7 +6968,7 @@ function renderDrive7KebiasaanGrid() {
     const quickLabel = document.getElementById('drive-quick-status-label');
     const penamaanBadge = document.getElementById('drive-penamaan-badge');
 
-    const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) — ` : '';
+    const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) â€” ` : '';
     if (titleEl) titleEl.innerHTML = `${studentPrefix}Progres Koleksi: ${filledCount} dari ${totalCount} Gambar Terkumpul`;
     if (barEl) barEl.style.width = `${percent}%`;
     if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${percent}`;
@@ -6934,14 +6995,14 @@ function renderDrive7KebiasaanGrid() {
     if (kkmBadge) {
       if (filledCount >= totalCount) {
         kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs';
-        kkmBadge.innerHTML = '🎉 TUNTAS: Nilai 100 (Sangat Baik)';
-        if (hintEl) hintEl.innerHTML = '✨ <b>Hebat sekali!</b> Semua 7 kebiasaan sudah terkumpul lengkap! Nilai TP 2.1 terpenuhi 100.';
-        if (quickLabel) quickLabel.innerHTML = '🎉 <b>Drive Lengkap 7/7!</b> Nilai TP 2.1: 100 (Tuntas)';
+        kkmBadge.innerHTML = 'ðŸŽ‰ TUNTAS: Nilai 100 (Sangat Baik)';
+        if (hintEl) hintEl.innerHTML = 'âœ¨ <b>Hebat sekali!</b> Semua 7 kebiasaan sudah terkumpul lengkap! Nilai TP 2.1 terpenuhi 100.';
+        if (quickLabel) quickLabel.innerHTML = 'ðŸŽ‰ <b>Drive Lengkap 7/7!</b> Nilai TP 2.1: 100 (Tuntas)';
       } else {
         kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
         kkmBadge.innerText = `Belum Lengkap (${filledCount}/${totalCount})`;
         if (hintEl) hintEl.innerText = `Kumpulkan sisa ${totalCount - filledCount} gambar lagi untuk mendapatkan Nilai 100 (Tuntas) pada TP 2.1!`;
-        if (quickLabel) quickLabel.innerText = `📁 Kumpulkan ${totalCount - filledCount} gambar lagi untuk nilai 100!`;
+        if (quickLabel) quickLabel.innerText = `ðŸ“ Kumpulkan ${totalCount - filledCount} gambar lagi untuk nilai 100!`;
       }
     }
   } catch (eHead) {
@@ -6987,7 +7048,7 @@ function renderDrive7KebiasaanGrid() {
               <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shadow-md">
                 <i class="fa-solid fa-file-word"></i>
               </span>
-              <span class="text-[11px] font-title font-bold text-center">Pasang ke Word 📄</span>
+              <span class="text-[11px] font-title font-bold text-center">Pasang ke Word ðŸ“„</span>
             </div>
           </div>
 
@@ -7004,7 +7065,7 @@ function renderDrive7KebiasaanGrid() {
             </div>
             <div>
               ${checkName.valid
-                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin ⭐)</span>'
+                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin â­)</span>'
                 : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded cursor-pointer" onclick="ubahNamaFileSlotDrive(\'' + cfg.key + '\')"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Format Belum Baku (Klik Ubah)</span>'}
             </div>
           </div>
@@ -7077,7 +7138,7 @@ function renderDrive7KebiasaanGrid() {
 }
 window.renderDrive7KebiasaanGrid = renderDrive7KebiasaanGrid;
 
-function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun', sourceBadge = '🎨 Kartun', customFileName = null) {
+function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun', sourceBadge = 'ðŸŽ¨ Kartun', customFileName = null) {
   if (!habitKey || !imageSrc) return;
   const drive = muatDrive7Kebiasaan();
   const wasCompleteBefore = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length >= 7;
@@ -7102,7 +7163,7 @@ function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun
   }
 
   const title = cfg ? cfg.cleanTitle : habitKey;
-  showToast(`Slot "${title}" tersimpan dengan nama: ${finalFileName} 📁✨ (+20 Bintang)`, 'success');
+  showToast(`Slot "${title}" tersimpan dengan nama: ${finalFileName} ðŸ“âœ¨ (+20 Bintang)`, 'success');
 
   // Cek apakah baru saja melengkapi 7/7
   const nowCount = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
@@ -7167,7 +7228,7 @@ function isiOtomatisVektorEdukasiLengkap() {
         drive[cfg.key] = {
           imageSrc: dataUrl,
           sourceName: item.title,
-          sourceBadge: '🌟 Vektor HD',
+          sourceBadge: 'ðŸŒŸ Vektor HD',
           fileName: fileName,
           dateAdded: new Date().toLocaleDateString('id-ID')
         };
@@ -7178,7 +7239,7 @@ function isiOtomatisVektorEdukasiLengkap() {
   simpanDrive7Kebiasaan(drive);
   renderDrive7KebiasaanGrid();
   selesaikanMisiTP2_1();
-  showToast('Semua 7 slot dilengkapi dengan Vektor Edukasi HD & nama file baku! Nilai TP 2.1: 100 🎉', 'success');
+  showToast('Semua 7 slot dilengkapi dengan Vektor Edukasi HD & nama file baku! Nilai TP 2.1: 100 ðŸŽ‰', 'success');
 }
 window.isiOtomatisVektorEdukasiLengkap = isiOtomatisVektorEdukasiLengkap;
 
@@ -7192,7 +7253,7 @@ function pasangSlotDriveKeWord(habitKey) {
   switchTab('msword');
   tambahPoin(15);
   playSound('fanfare');
-  showToast(`Gambar "${cfg ? cfg.cleanTitle : habitKey}" berhasil dipasang ke poster Word! 📄 (+15 Bintang)`, 'success');
+  showToast(`Gambar "${cfg ? cfg.cleanTitle : habitKey}" berhasil dipasang ke poster Word! ðŸ“„ (+15 Bintang)`, 'success');
 }
 window.pasangSlotDriveKeWord = pasangSlotDriveKeWord;
 
@@ -7230,7 +7291,7 @@ function eksporDataDriveKeFile() {
   document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
 
-  showToast(`Berkas Drive (${keys.length} gambar) berhasil diekspor! Pindahkan file ini ke komputer lain via Flashdisk / WA / Drive 💾`, 'success');
+  showToast(`Berkas Drive (${keys.length} gambar) berhasil diekspor! Pindahkan file ini ke komputer lain via Flashdisk / WA / Drive ðŸ’¾`, 'success');
 }
 window.eksporDataDriveKeFile = eksporDataDriveKeFile;
 
@@ -7262,7 +7323,7 @@ function imporDataDriveDariFile() {
           renderDrive7KebiasaanGrid();
           playSound('fanfare');
           const count = Object.keys(importedDrive).length;
-          showToast(`Berhasil memulihkan ${count} gambar ke Drive komputer ini! 🎉`, 'success');
+          showToast(`Berhasil memulihkan ${count} gambar ke Drive komputer ini! ðŸŽ‰`, 'success');
         } catch (err) {
           alert('Gagal membaca berkas cadangan: ' + err.message);
         }
@@ -7311,7 +7372,7 @@ function kirimSemuaDriveKePosterWord() {
   renderWordElements();
   switchTab('msword');
   tambahPoin(35);
-  showToast(`${keys.length} gambar dari Drive berhasil dirangkai ke lembar poster Word! 📄✨ (+35 Bintang)`, 'success');
+  showToast(`${keys.length} gambar dari Drive berhasil dirangkai ke lembar poster Word! ðŸ“„âœ¨ (+35 Bintang)`, 'success');
 }
 window.kirimSemuaDriveKePosterWord = kirimSemuaDriveKePosterWord;
 
@@ -7338,10 +7399,10 @@ function selesaikanMisiTP2_1() {
 
   setTimeout(() => {
     alert(
-      '🎉 SELAMAT! MISI CAPAIAN TP 2.1 TUNTAS TERPENUHI! 🎉\n\n' +
+      'ðŸŽ‰ SELAMAT! MISI CAPAIAN TP 2.1 TUNTAS TERPENUHI! ðŸŽ‰\n\n' +
       'Kamu telah berhasil mengumpulkan lengkap 7 Gambar Kebiasaan Anak Indonesia Hebat ke dalam Drive-mu!\n\n' +
-      '⭐ Nilai Capaian TP 2.1: 100 (SANGAT BAIK / TUNTAS)\n' +
-      '⭐ Bonus Poin: +100 Bintang Kreator Cilik!\n\n' +
+      'â­ Nilai Capaian TP 2.1: 100 (SANGAT BAIK / TUNTAS)\n' +
+      'â­ Bonus Poin: +100 Bintang Kreator Cilik!\n\n' +
       'Sekarang kamu bisa klik tombol "Buat Poster di Word" untuk langsung menaruh semua gambar ini ke lembar poster Lab Word!'
     );
   }, 400);
@@ -7384,7 +7445,7 @@ function aksiPilihSumberSlot(sumberType) {
     // Buka mode pencarian kartun dengan filter kategori terkait
     setModeAIStudio('search');
     pilihKategoriKartun(habitKey, false);
-    showToast(`Membuka pencarian kartun untuk tema: ${cfg.cleanTitle} 🎨`, 'info');
+    showToast(`Membuka pencarian kartun untuk tema: ${cfg.cleanTitle} ðŸŽ¨`, 'info');
   } else if (sumberType === 'pinterest') {
     // Pinterest SafeSearch & prompt
     bukaPinterestSafeSearch(cfg.pinterestQuery);
@@ -7399,19 +7460,19 @@ function aksiPilihSumberSlot(sumberType) {
       select.value = habitKey;
       perbaruiPromptOtomatisAI(false);
     }
-    showToast(`Studio AI disiapkan untuk kebiasaan: ${cfg.cleanTitle} 🤖`, 'info');
+    showToast(`Studio AI disiapkan untuk kebiasaan: ${cfg.cleanTitle} ðŸ¤–`, 'info');
   } else if (sumberType === 'paint') {
     // Ambil dari Aplikasi Paint Terbaru
     const hasDrawing = (typeof paintApp !== 'undefined' && paintApp.canvas && paintApp.history && paintApp.history.length > 0);
     if (hasDrawing) {
       const pakai = confirm(
-        `🎨 Ditemukan lukisan di Aplikasi Paint Terbaru!\n\n` +
-        `• Klik [OK] untuk langsung memasang lukisan tersebut ke Slot [${cfg ? cfg.cleanTitle : habitKey}].\n` +
-        `• Klik [BATAL] jika ingin membuka Paint untuk menggambar lukisan baru.`
+        `ðŸŽ¨ Ditemukan lukisan di Aplikasi Paint Terbaru!\n\n` +
+        `â€¢ Klik [OK] untuk langsung memasang lukisan tersebut ke Slot [${cfg ? cfg.cleanTitle : habitKey}].\n` +
+        `â€¢ Klik [BATAL] jika ingin membuka Paint untuk menggambar lukisan baru.`
       );
       if (pakai) {
         const dataUrl = paintApp.canvas.toDataURL('image/png');
-        simpanGambarKeSlotDrive(habitKey, dataUrl, `Lukisan Paint: ${cfg ? cfg.cleanTitle : 'Paint'}`, '🎨 Paint Terbaru');
+        simpanGambarKeSlotDrive(habitKey, dataUrl, `Lukisan Paint: ${cfg ? cfg.cleanTitle : 'Paint'}`, 'ðŸŽ¨ Paint Terbaru');
         return;
       }
     }
@@ -7419,7 +7480,7 @@ function aksiPilihSumberSlot(sumberType) {
     switchTab('praktik');
     setPraktikSubtab('praktik-tp1');
     setModePraktik1('gambar');
-    showToast(`Membuka Aplikasi Paint Terbaru! Silakan gambar untuk "${cfg ? cfg.cleanTitle : 'slot'}", lalu klik tombol "Simpan ke Drive 📁"! 🎨`, 'info');
+    showToast(`Membuka Aplikasi Paint Terbaru! Silakan gambar untuk "${cfg ? cfg.cleanTitle : 'slot'}", lalu klik tombol "Simpan ke Drive ðŸ“"! ðŸŽ¨`, 'info');
   } else if (sumberType === 'upload') {
     // Pemicu upload file untuk slot yang dipilih
     triggerUploadFileSlotDrive(habitKey);
@@ -7429,7 +7490,7 @@ function aksiPilihSumberSlot(sumberType) {
     const dataUrl = item ? (item.dataUrl || dapatkanDataUrlKartun(item)) : null;
     if (dataUrl) {
       const fileName = buatSaranNamaFileBaku(cfg.cleanTitle);
-      simpanGambarKeSlotDrive(habitKey, dataUrl, item.title, '🌟 Vektor HD', fileName);
+      simpanGambarKeSlotDrive(habitKey, dataUrl, item.title, 'ðŸŒŸ Vektor HD', fileName);
     } else {
       showToast(`Vektor untuk ${cfg ? cfg.cleanTitle : 'slot'} berhasil diproses.`, 'info');
     }
@@ -7456,7 +7517,7 @@ function prosesFileGambarKeSlot(file, habitKey) {
       const cleanUploadName = file.name.replace(/\.[^/.]+$/, '');
       const checkUpload = periksaFormatNamaFile(cleanUploadName);
       const chosenName = checkUpload.valid ? cleanUploadName : buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Upload');
-      simpanGambarKeSlotDrive(habitKey, optimizedDataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), '📤 File Komputer', chosenName);
+      simpanGambarKeSlotDrive(habitKey, optimizedDataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), 'ðŸ“¤ File Komputer', chosenName);
     });
   };
   reader.onerror = function() {
@@ -7529,7 +7590,7 @@ window.handleDriveSlotUpload = handleDriveSlotUpload;
 function tempelPinterestKeSlot(habitKey) {
   const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
   const promptText = 
-    `📌 MASUKKAN GAMBAR PINTEREST UNTUK SLOT [${cfg ? cfg.cleanTitle : ''}]:\n\n` +
+    `ðŸ“Œ MASUKKAN GAMBAR PINTEREST UNTUK SLOT [${cfg ? cfg.cleanTitle : ''}]:\n\n` +
     `1. Cari gambar di tab Pinterest yang baru terbuka.\n` +
     `2. Klik kanan gambar -> pilih "Salin Alamat Gambar" (Copy Image Address).\n` +
     `3. Tempel link (Ctrl+V) di bawah ini:`;
@@ -7544,7 +7605,7 @@ function tempelPinterestKeSlot(habitKey) {
   }
 
   const fileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Pinterest');
-  simpanGambarKeSlotDrive(habitKey, urlBersih, `Pinterest: ${cfg ? cfg.cleanTitle : ''}`, '📌 Pinterest', fileName);
+  simpanGambarKeSlotDrive(habitKey, urlBersih, `Pinterest: ${cfg ? cfg.cleanTitle : ''}`, 'ðŸ“Œ Pinterest', fileName);
 }
 window.tempelPinterestKeSlot = tempelPinterestKeSlot;
 
@@ -7569,7 +7630,7 @@ function simpanKartunItemKeDrive(kartunId) {
   const dataUrl = item.dataUrl || dapatkanDataUrlKartun(item);
   const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === targetKey);
   const fileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : item.title);
-  simpanGambarKeSlotDrive(targetKey, dataUrl, item.title, item.source || '🎨 Kartun', fileName);
+  simpanGambarKeSlotDrive(targetKey, dataUrl, item.title, item.source || 'ðŸŽ¨ Kartun', fileName);
   setModeAIStudio('drive');
 }
 window.simpanKartunItemKeDrive = simpanKartunItemKeDrive;
@@ -7590,9 +7651,9 @@ function simpanGambarAIKeDrive() {
   }
 
   const fileName = buatSaranNamaFileBaku(habit.title);
-  simpanGambarKeSlotDrive(habitKey, imageSrc, `Gambar AI: ${habit.title}`, '🤖 AI Generatif', fileName);
+  simpanGambarKeSlotDrive(habitKey, imageSrc, `Gambar AI: ${habit.title}`, 'ðŸ¤– AI Generatif', fileName);
   setModeAIStudio('drive');
-  showToast(`Gambar AI "${habit.title}" berhasil disimpan ke Drive 7 Kebiasaan! 📁✨`, 'success');
+  showToast(`Gambar AI "${habit.title}" berhasil disimpan ke Drive 7 Kebiasaan! ðŸ“âœ¨`, 'success');
 }
 window.simpanGambarAIKeDrive = simpanGambarAIKeDrive;
 
@@ -7705,13 +7766,13 @@ function updateDisplayHabitInfo(habitKey) {
 
   const styleInput = document.querySelector('input[name="ai-style"]:checked');
   const styleNames = {
-    kartun_canva: '🎨 Gaya: Kartun Edukasi Sopan',
-    storybook: '📖 Gaya: Buku Dongeng Anak',
-    pixar3d: '🌟 Gaya: Animasi 3D Ceria',
-    anime_ceria: '✨ Gaya: Kartun Ramah Anak'
+    kartun_canva: 'ðŸŽ¨ Gaya: Kartun Edukasi Sopan',
+    storybook: 'ðŸ“– Gaya: Buku Dongeng Anak',
+    pixar3d: 'ðŸŒŸ Gaya: Animasi 3D Ceria',
+    anime_ceria: 'âœ¨ Gaya: Kartun Ramah Anak'
   };
   if (styleBadge && styleInput) {
-    styleBadge.innerText = styleNames[styleInput.value] || '🎨 Gaya: Kartun Edukasi Sopan';
+    styleBadge.innerText = styleNames[styleInput.value] || 'ðŸŽ¨ Gaya: Kartun Edukasi Sopan';
   }
 }
 
@@ -7733,7 +7794,7 @@ function acakPromptAI7Kebiasaan() {
   if (styleRadio) styleRadio.checked = true;
 
   perbaruiPromptOtomatisAI(true);
-  showToast('🎲 Ide prompt kartun sopan berhasil diacak! Klik "Buat Gambar dengan AI" untuk melihat hasilnya.', 'info');
+  showToast('ðŸŽ² Ide prompt kartun sopan berhasil diacak! Klik "Buat Gambar dengan AI" untuk melihat hasilnya.', 'info');
 }
 
 function pilihKebiasaanGaleri(habitKey) {
@@ -7778,7 +7839,7 @@ function generateGambarAI7Kebiasaan() {
   if (engineVal === 'local_cartoon') {
     if (loadingOverlay) loadingOverlay.classList.remove('hidden');
     if (loadingStep) loadingStep.innerText = `Menyusun kartun edukasi sopan: "${habit.title}"`;
-    if (btnGenText) btnGenText.innerText = 'Menyusun Kartun... 🎨';
+    if (btnGenText) btnGenText.innerText = 'Menyusun Kartun... ðŸŽ¨';
 
     setTimeout(() => {
       renderFallbackArtwork(habitKey, styleVal);
@@ -7788,7 +7849,7 @@ function generateGambarAI7Kebiasaan() {
       }
       if (fallbackBox) fallbackBox.classList.add('hidden');
       selesaikanGenerasiGambarAI(false);
-      showToast('✨ Gambar kartun edukasi sopan berhasil dibuat (Bebas Limit Kuota)!', 'success');
+      showToast('âœ¨ Gambar kartun edukasi sopan berhasil dibuat (Bebas Limit Kuota)!', 'success');
     }, 350);
     return;
   }
@@ -7815,7 +7876,7 @@ function generateGambarAI7Kebiasaan() {
 
   if (loadingOverlay) loadingOverlay.classList.remove('hidden');
   if (loadingStep) loadingStep.innerText = `Menyusun kartun online: "${habit.title}"`;
-  if (btnGenText) btnGenText.innerText = 'AI Sedang Melukis... 🎨';
+  if (btnGenText) btnGenText.innerText = 'AI Sedang Melukis... ðŸŽ¨';
 
   // Render client-side fallback visual kartun edukasi langsung agar dataUrl selalu terisi
   renderFallbackArtwork(habitKey, styleVal);
@@ -7895,7 +7956,7 @@ function selesaikanGenerasiGambarAI(useFallback = false) {
   const btnGenText = document.getElementById('btn-generate-ai-text');
 
   if (loadingOverlay) loadingOverlay.classList.add('hidden');
-  if (btnGenText) btnGenText.innerText = 'Buat Gambar dengan AI 🚀';
+  if (btnGenText) btnGenText.innerText = 'Buat Gambar dengan AI ðŸš€';
 
   if (useFallback) {
     if (resultImg) {
@@ -7908,11 +7969,11 @@ function selesaikanGenerasiGambarAI(useFallback = false) {
         if (fallbackBox) fallbackBox.classList.remove('hidden');
       }
     }
-    showToast('✨ Ilustrasi kartun sopan 7 Kebiasaan Anak Indonesia Hebat berhasil ditampilkan!', 'success');
+    showToast('âœ¨ Ilustrasi kartun sopan 7 Kebiasaan Anak Indonesia Hebat berhasil ditampilkan!', 'success');
   } else {
     if (resultImg) resultImg.classList.remove('hidden');
     if (fallbackBox) fallbackBox.classList.add('hidden');
-    showToast('🎨 Gambar kartun AI yang sopan & baik berhasil digenerate sempurna!', 'success');
+    showToast('ðŸŽ¨ Gambar kartun AI yang sopan & baik berhasil digenerate sempurna!', 'success');
   }
 }
 
@@ -7924,7 +7985,7 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
   const fallbackHabitName = document.getElementById('fallback-habit-name');
   const fallbackHabitQuote = document.getElementById('fallback-habit-quote');
 
-  if (fallbackBadge) fallbackBadge.innerText = `Kartun Edukasi #${habit.id} • Karakter Sopan & Baik`;
+  if (fallbackBadge) fallbackBadge.innerText = `Kartun Edukasi #${habit.id} â€¢ Karakter Sopan & Baik`;
   if (fallbackEmoji) fallbackEmoji.innerText = habit.emoji;
   if (fallbackHabitName) fallbackHabitName.innerText = habit.title;
   if (fallbackHabitQuote) fallbackHabitQuote.innerText = habit.quote;
@@ -8056,9 +8117,9 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
     ctx.fill();
     ctx.fillStyle = '#d97706';
     ctx.font = '22px sans-serif';
-    ctx.fillText('⭐', 220, 370);
-    ctx.fillText('⭐', 290, 390);
-    ctx.fillText('⭐', 370, 370);
+    ctx.fillText('â­', 220, 370);
+    ctx.fillText('â­', 290, 390);
+    ctx.fillText('â­', 370, 370);
 
     // Meja & Jam Weker 05:00
     ctx.fillStyle = '#92400e';
@@ -8379,8 +8440,8 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
     ctx.stroke();
     ctx.fillStyle = '#a855f7';
     ctx.font = '16px sans-serif';
-    ctx.fillText('⭐', 250, 355);
-    ctx.fillText('📖', 340, 355);
+    ctx.fillText('â­', 250, 355);
+    ctx.fillText('ðŸ“–', 340, 355);
 
     // Anak Membaca Buku dengan Senyum Manis
     ctx.fillStyle = '#6d28d9';
@@ -8501,7 +8562,7 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
     ctx.fill();
     ctx.fillStyle = '#ef4444';
     ctx.font = '22px sans-serif';
-    ctx.fillText('🍎', 288, 315);
+    ctx.fillText('ðŸŽ', 288, 315);
 
     // Simbol Hati Cinta Kasih (Hu Ai) Melayang di Atas
     ctx.fillStyle = '#f43f5e';
@@ -8544,9 +8605,9 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
     // Bintang-bintang berkilau
     ctx.fillStyle = '#ffffff';
     ctx.font = '14px sans-serif';
-    ctx.fillText('✨', 75, 105);
-    ctx.fillText('⭐', 140, 190);
-    ctx.fillText('✨', 80, 195);
+    ctx.fillText('âœ¨', 75, 105);
+    ctx.fillText('â­', 140, 190);
+    ctx.fillText('âœ¨', 80, 195);
 
     // Jam Dinding Pukul 20:30
     ctx.fillStyle = '#f8fafc';
@@ -8614,9 +8675,9 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
     ctx.fill();
     ctx.fillStyle = '#fde047';
     ctx.font = '20px sans-serif';
-    ctx.fillText('⭐', 220, 360);
-    ctx.fillText('🌙', 290, 380);
-    ctx.fillText('⭐', 370, 360);
+    ctx.fillText('â­', 220, 360);
+    ctx.fillText('ðŸŒ™', 290, 380);
+    ctx.fillText('â­', 370, 360);
   }
 
   // Bingkai Luar Putih
@@ -8634,7 +8695,7 @@ function renderFallbackArtwork(habitKey, styleKey = 'kartun_canva') {
   ctx.fillStyle = '#7c3aed';
   ctx.font = 'bold 20px Fredoka, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText(`★ KARTUN EDUKASI: ${habit.title.toUpperCase()} ★`, 300, 53);
+  ctx.fillText(`â˜… KARTUN EDUKASI: ${habit.title.toUpperCase()} â˜…`, 300, 53);
   ctx.shadowBlur = 0;
 
   // Footer Pesan Budi Pekerti
@@ -8676,7 +8737,7 @@ function kirimGambarAIKeWord() {
   switchTab('msword');
 
   tambahPoin(30);
-  showToast(`Gambar AI "${habit.title}" berhasil disisipkan ke Lab Ms. Word! 📄 (+30 Bintang)`, 'success');
+  showToast(`Gambar AI "${habit.title}" berhasil disisipkan ke Lab Ms. Word! ðŸ“„ (+30 Bintang)`, 'success');
 }
 
 function unduhGambarAIHasil() {
@@ -8697,18 +8758,18 @@ function unduhGambarAIHasil() {
 
   link.click();
   tambahPoin(10);
-  showToast(`Gambar AI "${habit.title}" berhasil diunduh ke komputer! 💾`, 'success');
+  showToast(`Gambar AI "${habit.title}" berhasil diunduh ke komputer! ðŸ’¾`, 'success');
 }
 
 function klaimBintangGambarAI() {
   if (AI_STUDIO_STATE.claimedPoints) {
-    showToast('Kamu sudah mengambil bintang untuk gambar ini! Coba buat gambar kebiasaan lainnya ya! ⭐', 'info');
+    showToast('Kamu sudah mengambil bintang untuk gambar ini! Coba buat gambar kebiasaan lainnya ya! â­', 'info');
     return;
   }
   playSound('fanfare');
   AI_STUDIO_STATE.claimedPoints = true;
   tambahPoin(30);
-  showToast('Luar biasa! +30 Bintang berhasil didapatkan dari karya gambar AI! ⭐', 'success');
+  showToast('Luar biasa! +30 Bintang berhasil didapatkan dari karya gambar AI! â­', 'success');
 }
 
 function bukaZoomGambarAI() {
@@ -8730,7 +8791,7 @@ function bukaZoomGambarAI() {
 
 // Backward Compatibility Stubs
 function selectP2Item(itemId, itemType) {
-  showToast('Fitur telah ditingkatkan menjadi Studio Gambar AI 7 Kebiasaan Anak Indonesia Hebat! 🎨', 'info');
+  showToast('Fitur telah ditingkatkan menjadi Studio Gambar AI 7 Kebiasaan Anak Indonesia Hebat! ðŸŽ¨', 'info');
 }
 function dropP2ItemTo(targetWadah) {}
 function resetPraktik2() {}
@@ -8863,7 +8924,7 @@ function unduhPosterKarya() {
   eCtx.fillStyle = '#fef08a';
   eCtx.font = 'bold 22px Fredoka, sans-serif';
   eCtx.textAlign = 'center';
-  eCtx.fillText('★ KARYA KONTEN DIGITAL SISWA KELAS 4 SD ★', width / 2, 80);
+  eCtx.fillText('â˜… KARYA KONTEN DIGITAL SISWA KELAS 4 SD â˜…', width / 2, 80);
 
   // Title
   eCtx.fillStyle = '#ffffff';
@@ -8883,11 +8944,11 @@ function unduhPosterKarya() {
   // Emoji / Icon
   eCtx.font = '80px sans-serif';
   eCtx.fillStyle = '#ffffff';
-  let iconEmoji = '📖';
-  if (state.posterIcon === 'fa-seedling') iconEmoji = '🌱';
-  if (state.posterIcon === 'fa-hands-holding-child') iconEmoji = '🤝';
-  if (state.posterIcon === 'fa-apple-whole') iconEmoji = '🍎';
-  if (state.posterIcon === 'fa-rocket') iconEmoji = '🚀';
+  let iconEmoji = 'ðŸ“–';
+  if (state.posterIcon === 'fa-seedling') iconEmoji = 'ðŸŒ±';
+  if (state.posterIcon === 'fa-hands-holding-child') iconEmoji = 'ðŸ¤';
+  if (state.posterIcon === 'fa-apple-whole') iconEmoji = 'ðŸŽ';
+  if (state.posterIcon === 'fa-rocket') iconEmoji = 'ðŸš€';
   eCtx.fillText(iconEmoji, width / 2, height / 2 + 10);
 
   // Description
@@ -8923,7 +8984,7 @@ function unduhPosterKarya() {
   link.href = exportCanvas.toDataURL('image/png');
   link.click();
 
-  showToast('Poster berhasil diunduh ke komputermu! 🎨', 'success');
+  showToast('Poster berhasil diunduh ke komputermu! ðŸŽ¨', 'success');
 }
 
 // ==========================================
@@ -8950,9 +9011,9 @@ function jalankanSimulasiDiseminasi() {
         </div>
         <p class="text-sm font-bold text-emerald-950 font-title">Mading Digital Kelas 4 Menyala!</p>
         <div class="space-y-1.5 text-xs text-slate-700 bg-white p-3 rounded-xl border">
-          <p>❤️ <b>24 Teman Kelas</b> menyukai postermu!</p>
-          <p>💬 "Warnanya pas banget dan kata-katanya mudah diingat." - Siti</p>
-          <p>🌟 "Bagus sekali nak, contoh pemanfaatan internet yang positif." - Wali Kelas</p>
+          <p>â¤ï¸ <b>24 Teman Kelas</b> menyukai postermu!</p>
+          <p>ðŸ’¬ "Warnanya pas banget dan kata-katanya mudah diingat." - Siti</p>
+          <p>ðŸŒŸ "Bagus sekali nak, contoh pemanfaatan internet yang positif." - Wali Kelas</p>
         </div>
       </div>
     `;
@@ -8965,8 +9026,8 @@ function jalankanSimulasiDiseminasi() {
         </div>
         <p class="text-sm font-bold text-blue-950 font-title">Presentasi di Depan Kelas Berhasil!</p>
         <div class="space-y-1.5 text-xs text-slate-700 bg-white p-3 rounded-xl border">
-          <p>👏 Semua teman bertepuk tangan setelah mendengar penjelasanmu.</p>
-          <p>🙋‍♂️ 3 Teman bertanya bagaimana cara membuat perpaduan teksnya.</p>
+          <p>ðŸ‘ Semua teman bertepuk tangan setelah mendengar penjelasanmu.</p>
+          <p>ðŸ™‹â€â™‚ï¸ 3 Teman bertanya bagaimana cara membuat perpaduan teksnya.</p>
         </div>
       </div>
     `;
@@ -8978,8 +9039,8 @@ function jalankanSimulasiDiseminasi() {
         </div>
         <p class="text-sm font-bold text-purple-950 font-title">Orang Tua Ikut Bangga!</p>
         <div class="space-y-1.5 text-xs text-slate-700 bg-white p-3 rounded-xl border">
-          <p>💖 Ayah dan Ibu memuji hasil karya poster digitalmu.</p>
-          <p>📱 Dibagikan ke grup keluarga dengan aman tanpa bocor data pribadi.</p>
+          <p>ðŸ’– Ayah dan Ibu memuji hasil karya poster digitalmu.</p>
+          <p>ðŸ“± Dibagikan ke grup keluarga dengan aman tanpa bocor data pribadi.</p>
         </div>
       </div>
     `;
@@ -9210,11 +9271,11 @@ function setModeAksesKuisGuru(mode) {
   renderKontrolAksesKuisGuru();
   
   if (mode === 'bebas') {
-    showToast(`Mode Kuis Sem ${semNum}: BUKA BEBAS 🟢 Siswa dapat mengerjakan kuis kapan saja.`, 'success');
+    showToast(`Mode Kuis Sem ${semNum}: BUKA BEBAS ðŸŸ¢ Siswa dapat mengerjakan kuis kapan saja.`, 'success');
   } else if (mode === 'prasyarat') {
-    showToast(`Mode Kuis Sem ${semNum}: PRASYARAT TUGAS 🟡 Kuis otomatis terbuka setelah siswa tuntas tugas.`, 'success');
+    showToast(`Mode Kuis Sem ${semNum}: PRASYARAT TUGAS ðŸŸ¡ Kuis otomatis terbuka setelah siswa tuntas tugas.`, 'success');
   } else {
-    showToast(`Mode Kuis Sem ${semNum}: KUNCI TOTAL 🔴 Kuis ditutup sementara untuk semua siswa hingga jam ujian.`, 'warning');
+    showToast(`Mode Kuis Sem ${semNum}: KUNCI TOTAL ðŸ”´ Kuis ditutup sementara untuk semua siswa hingga jam ujian.`, 'warning');
   }
 }
 window.setModeAksesKuisGuru = setModeAksesKuisGuru;
@@ -9250,7 +9311,7 @@ function renderKontrolAksesKuisGuru() {
     if (currentMode === 'bebas') {
       btnBebas.className = 'p-3.5 rounded-2xl border-2 transition-all text-left flex flex-col justify-between cursor-pointer group bg-emerald-950/70 border-emerald-400 ring-2 ring-emerald-400/40 shadow-lg';
       const indicator = btnBebas.querySelector('div:last-child');
-      if (indicator) indicator.innerHTML = '<span class="text-emerald-300 font-black">Aktif Sekarang ✔</span>';
+      if (indicator) indicator.innerHTML = '<span class="text-emerald-300 font-black">Aktif Sekarang âœ”</span>';
     } else {
       btnBebas.className = baseInactiveClass;
       const indicator = btnBebas.querySelector('div:last-child');
@@ -9262,7 +9323,7 @@ function renderKontrolAksesKuisGuru() {
     if (currentMode === 'prasyarat') {
       btnPrasyarat.className = 'p-3.5 rounded-2xl border-2 transition-all text-left flex flex-col justify-between cursor-pointer group bg-indigo-900/80 border-yellow-400 ring-2 ring-yellow-400/40 shadow-lg';
       const indicator = btnPrasyarat.querySelector('div:last-child');
-      if (indicator) indicator.innerHTML = '<span class="text-yellow-300 font-black">Aktif Sekarang ✔</span>';
+      if (indicator) indicator.innerHTML = '<span class="text-yellow-300 font-black">Aktif Sekarang âœ”</span>';
     } else {
       btnPrasyarat.className = baseInactiveClass;
       const indicator = btnPrasyarat.querySelector('div:last-child');
@@ -9274,7 +9335,7 @@ function renderKontrolAksesKuisGuru() {
     if (currentMode === 'kunci') {
       btnKunci.className = 'p-3.5 rounded-2xl border-2 transition-all text-left flex flex-col justify-between cursor-pointer group bg-rose-950/70 border-rose-400 ring-2 ring-rose-400/40 shadow-lg';
       const indicator = btnKunci.querySelector('div:last-child');
-      if (indicator) indicator.innerHTML = '<span class="text-rose-300 font-black">Aktif Sekarang ✔</span>';
+      if (indicator) indicator.innerHTML = '<span class="text-rose-300 font-black">Aktif Sekarang âœ”</span>';
     } else {
       btnKunci.className = baseInactiveClass;
       const indicator = btnKunci.querySelector('div:last-child');
@@ -9338,7 +9399,7 @@ function simulasiTandaiTugasSelesai() {
     pasangContohPosterGaleri();
   }
 
-  showToast('🎉 Tugas praktik berhasil ditandai selesai! Soal kuis kini DIBUKA! 🚀', 'success');
+  showToast('ðŸŽ‰ Tugas praktik berhasil ditandai selesai! Soal kuis kini DIBUKA! ðŸš€', 'success');
   loadQuizQuestion();
 }
 window.simulasiTandaiTugasSelesai = simulasiTandaiTugasSelesai;
@@ -9395,9 +9456,9 @@ function renderLayarKuisTerkunci(access) {
       <div class="bg-gradient-to-br from-rose-50 via-white to-orange-50 p-6 sm:p-8 rounded-3xl border-2 border-rose-200 shadow-xl space-y-5 text-center animate-fadeIn">
         <div class="relative w-20 h-20 mx-auto">
           <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-rose-500 to-amber-500 text-white flex items-center justify-center text-4xl shadow-lg animate-bounce">
-            🔒
+            ðŸ”’
           </div>
-          <span class="absolute -bottom-1 -right-1 text-xl">🕒</span>
+          <span class="absolute -bottom-1 -right-1 text-xl">ðŸ•’</span>
         </div>
 
         <div class="space-y-2 max-w-md mx-auto">
@@ -9415,7 +9476,7 @@ function renderLayarKuisTerkunci(access) {
         <!-- Balon Ucapan Robo -->
         <div class="bg-white/90 backdrop-blur-sm p-4 rounded-2xl border border-rose-200 flex items-center gap-3.5 max-w-md mx-auto text-left shadow-xs">
           <div class="w-11 h-11 rounded-xl bg-indigo-500 text-white flex items-center justify-center text-2xl shrink-0 shadow-xs">
-            🤖
+            ðŸ¤–
           </div>
           <div>
             <div class="font-title font-bold text-xs text-indigo-950">Pesan Robo Tzu Chi</div>
@@ -9447,7 +9508,7 @@ function renderLayarKuisTerkunci(access) {
     container.innerHTML = `
       <div class="bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 sm:p-8 rounded-3xl border-2 border-amber-200 shadow-xl space-y-5 text-center animate-fadeIn">
         <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-indigo-500 text-white flex items-center justify-center text-4xl shadow-lg mx-auto animate-bounce">
-          🎓
+          ðŸŽ“
         </div>
         <div class="space-y-2 max-w-md mx-auto">
           <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
@@ -9483,9 +9544,9 @@ function renderLayarKuisTerkunci(access) {
       <!-- Icon Gembok & Maskot -->
       <div class="relative w-20 h-20 mx-auto">
         <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-400 via-orange-400 to-yellow-400 text-amber-950 flex items-center justify-center text-4xl shadow-lg border-2 border-amber-200 animate-pulse">
-          🔒
+          ðŸ”’
         </div>
-        <span class="absolute -bottom-1 -right-1 text-2xl">✨</span>
+        <span class="absolute -bottom-1 -right-1 text-2xl">âœ¨</span>
       </div>
 
       <div class="space-y-2 max-w-lg mx-auto">
@@ -9493,7 +9554,7 @@ function renderLayarKuisTerkunci(access) {
           Syarat Kuis Belum Lengkap
         </span>
         <h3 class="font-title text-xl sm:text-2xl font-black text-slate-900">
-          Kuis Masih Terkunci, Selesaikan Tugas Dulu Ya! 🎯
+          Kuis Masih Terkunci, Selesaikan Tugas Dulu Ya! ðŸŽ¯
         </h3>
         <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
           Halo <b>${studentName}</b>! Kuis ini menguji karya dan materi yang telah dipelajari. Agar siap meraih nilai 100 dan Piagam Penghargaan, ayo selesaikan tugas di bawah ini:
@@ -9513,12 +9574,12 @@ function renderLayarKuisTerkunci(access) {
                 1. Tugas Poster Digital (Lab MS Word / Paint)
               </div>
               <div class="text-[11px] ${hasPoster ? 'text-emerald-700 font-bold' : 'text-amber-800'}">
-                ${hasPoster ? '✅ Sudah Ada Karya Poster Tersimpan' : '❌ Belum ada poster tersimpan di lemari galeri'}
+                ${hasPoster ? 'âœ… Sudah Ada Karya Poster Tersimpan' : 'âŒ Belum ada poster tersimpan di lemari galeri'}
               </div>
             </div>
           </div>
           <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold ${hasPoster ? 'bg-emerald-200 text-emerald-900' : 'bg-amber-200 text-amber-900'} shrink-0">
-            ${hasPoster ? 'Tuntas ✔' : 'Wajib 📄'}
+            ${hasPoster ? 'Tuntas âœ”' : 'Wajib ðŸ“„'}
           </span>
         </div>
 
@@ -9533,12 +9594,12 @@ function renderLayarKuisTerkunci(access) {
                 2. Pemahaman Modul Belajar Semester ${sem}
               </div>
               <div class="text-[11px] text-indigo-700">
-                Pelajari materi TP 2.1 – TP 2.4 di Modul Belajar
+                Pelajari materi TP 2.1 â€“ TP 2.4 di Modul Belajar
               </div>
             </div>
           </div>
           <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-indigo-200 text-indigo-900 shrink-0">
-            Materi 📘
+            Materi ðŸ“˜
           </span>
         </div>
       </div>
@@ -9546,13 +9607,13 @@ function renderLayarKuisTerkunci(access) {
       <!-- Tombol Aksi Cepat Menuju Tugas -->
       <div class="flex flex-wrap justify-center items-center gap-3 pt-2">
         <button type="button" onclick="switchTab('msword')" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 cursor-pointer transform hover:-translate-y-0.5">
-          <i class="fa-solid fa-paintbrush"></i> Buat Poster di Lab Word Sekarang 🎨
+          <i class="fa-solid fa-paintbrush"></i> Buat Poster di Lab Word Sekarang ðŸŽ¨
         </button>
         <button type="button" onclick="switchTab('modul')" class="px-4 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-title font-bold text-xs border border-slate-300 transition flex items-center gap-1.5 cursor-pointer">
           <i class="fa-solid fa-book-open text-blue-600"></i> Buka Modul
         </button>
         <button type="button" onclick="simulasiTandaiTugasSelesai()" class="px-3.5 py-3 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-title font-bold text-xs border border-amber-300 transition flex items-center gap-1.5 cursor-pointer" title="Simulasi Kilat: Tandai tugas sudah selesai agar kuis langsung terbuka untuk uji coba">
-          <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Buka Kunci Kilat (Simulasi Cepat) ⚡
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Buka Kunci Kilat (Simulasi Cepat) âš¡
         </button>
       </div>
     </div>
@@ -9597,10 +9658,10 @@ function loadQuizQuestion() {
   const roboAvatar = document.getElementById('quiz-robo-avatar');
   if (roboSpeech) {
     const sapaanQuiz = [
-      `"Ayo teman pintar, kita selesaikan soal nomor ${state.currentQuizIndex + 1}! Baca perlahan dan pilih jawaban yang paling tepat ya! 🌟"`,
-      `"Soal nomor ${state.currentQuizIndex + 1} sangat seru! Pikirkan baik-baik sebelum memilih jawaban ya! ✨"`,
-      `"Kamu anak hebat dan teliti! Coba perhatikan pilihan jawaban soal nomor ${state.currentQuizIndex + 1} ini! 🚀"`,
-      `"Wah, semakin dekat dengan Piagam Sertifikat! Semangat menjawab soal nomor ${state.currentQuizIndex + 1}! 🏆"`
+      `"Ayo teman pintar, kita selesaikan soal nomor ${state.currentQuizIndex + 1}! Baca perlahan dan pilih jawaban yang paling tepat ya! ðŸŒŸ"`,
+      `"Soal nomor ${state.currentQuizIndex + 1} sangat seru! Pikirkan baik-baik sebelum memilih jawaban ya! âœ¨"`,
+      `"Kamu anak hebat dan teliti! Coba perhatikan pilihan jawaban soal nomor ${state.currentQuizIndex + 1} ini! ðŸš€"`,
+      `"Wah, semakin dekat dengan Piagam Sertifikat! Semangat menjawab soal nomor ${state.currentQuizIndex + 1}! ðŸ†"`
     ];
     roboSpeech.innerText = sapaanQuiz[state.currentQuizIndex % sapaanQuiz.length];
   }
@@ -9728,13 +9789,13 @@ function selectQuizAnswer(selectedIndex, buttonEl) {
         </span>
       </div>
       <span class="px-3 py-1 rounded-xl bg-emerald-600 text-white font-title font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-xs">
-        <i class="fa-solid fa-circle-check text-sm"></i> <span>Benar! 🌟</span>
+        <i class="fa-solid fa-circle-check text-sm"></i> <span>Benar! ðŸŒŸ</span>
       </span>
     `;
 
     // Respon Maskot Ceria
     if (roboSpeech) {
-      roboSpeech.innerHTML = '🎉 <b>"Horeee! Jawabanmu tepat sekali! Poin bertambah! Kamu hebat sekali!"</b> ⭐';
+      roboSpeech.innerHTML = 'ðŸŽ‰ <b>"Horeee! Jawabanmu tepat sekali! Poin bertambah! Kamu hebat sekali!"</b> â­';
     }
     if (roboAvatar) {
       roboAvatar.classList.add('animate-bounce');
@@ -9745,7 +9806,7 @@ function selectQuizAnswer(selectedIndex, buttonEl) {
       explanationEl.className = 'p-4 sm:p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 shadow-sm space-y-1.5';
       explanationEl.innerHTML = `
         <div class="flex items-center gap-2 text-emerald-800 font-title font-black text-xs sm:text-sm">
-          <span class="text-xl">🎉</span> <span>Jawabanmu Sangat Tepat!</span>
+          <span class="text-xl">ðŸŽ‰</span> <span>Jawabanmu Sangat Tepat!</span>
         </div>
         <p class="text-xs sm:text-sm text-emerald-900 font-semibold leading-relaxed pl-7">
           ${currentQ.explanation || 'Pemahaman konsepmu sudah sangat baik dan benar!'}
@@ -9792,14 +9853,14 @@ function selectQuizAnswer(selectedIndex, buttonEl) {
 
     // Respon Maskot Memberi Semangat
     if (roboSpeech) {
-      roboSpeech.innerHTML = '💪 <b>"Jangan bersedih ya! Dari kesalahan kita belajar. Baca pembahasan di bawah agar semakin paham! 🤖"</b>';
+      roboSpeech.innerHTML = 'ðŸ’ª <b>"Jangan bersedih ya! Dari kesalahan kita belajar. Baca pembahasan di bawah agar semakin paham! ðŸ¤–"</b>';
     }
 
     if (explanationEl) {
       explanationEl.className = 'p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-slate-900 shadow-sm space-y-1.5';
       explanationEl.innerHTML = `
         <div class="flex items-center gap-2 text-amber-900 font-title font-black text-xs sm:text-sm">
-          <span class="text-xl">💡</span> <span>Yuk Pelajari Pembahasan Ini:</span>
+          <span class="text-xl">ðŸ’¡</span> <span>Yuk Pelajari Pembahasan Ini:</span>
         </div>
         <p class="text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed pl-7">
           ${currentQ.explanation || 'Tetap semangat! Kita coba lagi di pertanyaan berikutnya ya.'}
@@ -9811,7 +9872,7 @@ function selectQuizAnswer(selectedIndex, buttonEl) {
   // Teks Tombol Lanjut (Jika soal terakhir -> Lihat Hasil)
   if (nextBtnText) {
     if (state.currentQuizIndex >= activeQuiz.length - 1) {
-      nextBtnText.innerText = 'Lihat Hasil & Piagam Sertifikat 🏆';
+      nextBtnText.innerText = 'Lihat Hasil & Piagam Sertifikat ðŸ†';
     } else {
       nextBtnText.innerText = 'Lanjut Pertanyaan Berikutnya';
     }
@@ -9972,7 +10033,7 @@ function bukaModalTambahSoal() {
   const expInput = document.getElementById('bank-soal-input-penjelasan');
 
   if (titleEl) titleEl.innerText = 'Tambah Soal Kuis Baru';
-  if (subEl) subEl.innerText = `Semester ${sem} • ${sem === 2 ? 'Coding Scratch & RoboMind AI' : 'Konten Digital & Microsoft Word/Excel'}`;
+  if (subEl) subEl.innerText = `Semester ${sem} â€¢ ${sem === 2 ? 'Coding Scratch & RoboMind AI' : 'Konten Digital & Microsoft Word/Excel'}`;
   if (editIdxEl) editIdxEl.value = '-1';
   if (semSelect) semSelect.value = String(sem);
   if (tpInput) tpInput.value = sem === 2 ? 'TP 2.5 (Pemrograman Balok)' : 'TP 2.1 (Konten Tunggal Sederhana)';
@@ -10010,7 +10071,7 @@ function bukaModalEditSoal(index) {
   const expInput = document.getElementById('bank-soal-input-penjelasan');
 
   if (titleEl) titleEl.innerText = `Edit Soal Nomor ${index + 1}`;
-  if (subEl) subEl.innerText = `Semester ${sem} • Edit Butir Soal`;
+  if (subEl) subEl.innerText = `Semester ${sem} â€¢ Edit Butir Soal`;
   if (editIdxEl) editIdxEl.value = String(index);
   if (semSelect) semSelect.value = String(sem);
   if (tpInput) tpInput.value = q.tp || '';
@@ -10079,10 +10140,10 @@ function simpanSoalBankGuru(e) {
 
   if (editIndex >= 0 && editIndex < questions.length) {
     questions[editIndex] = newQuestionObj;
-    showToast(`Soal nomor ${editIndex + 1} berhasil diperbarui di Semester ${sem}! 📝`, 'success');
+    showToast(`Soal nomor ${editIndex + 1} berhasil diperbarui di Semester ${sem}! ðŸ“`, 'success');
   } else {
     questions.push(newQuestionObj);
-    showToast(`Soal baru berhasil ditambahkan ke Bank Soal Semester ${sem}! ✨`, 'success');
+    showToast(`Soal baru berhasil ditambahkan ke Bank Soal Semester ${sem}! âœ¨`, 'success');
   }
 
   saveBankSoal(sem, questions);
@@ -10106,7 +10167,7 @@ function hapusSoalBankGuru(index) {
     questions.splice(index, 1);
     saveBankSoal(sem, questions);
     playSound('success');
-    showToast(`Soal nomor ${index + 1} berhasil dihapus dari Bank Soal Semester ${sem}! 🗑️`, 'info');
+    showToast(`Soal nomor ${index + 1} berhasil dihapus dari Bank Soal Semester ${sem}! ðŸ—‘ï¸`, 'info');
     renderBankSoalGuru();
   }
 }
@@ -10118,7 +10179,7 @@ function resetBankSoalGuruKonfirmasi() {
   if (confirm(`Kembalikan bank soal Semester ${sem} ke standar kurikulum bawaan?\nSemua soal kustom yang Anda tambahkan di semester ini akan direset.`)) {
     resetBankSoalKeDefault(sem);
     playSound('success');
-    showToast(`Bank Soal Semester ${sem} berhasil dikembalikan ke standar kurikulum! 🔄`, 'success');
+    showToast(`Bank Soal Semester ${sem} berhasil dikembalikan ke standar kurikulum! ðŸ”„`, 'success');
     renderBankSoalGuru();
   }
 }
@@ -10215,7 +10276,7 @@ function handleFileSoalDipilih(e) {
   }
 
   playSound('success');
-  showToast(`Berkas "${file.name}" terpilih! Klik tombol "Pindai & Ekstrak Soal Otomatis". 📄`, 'info');
+  showToast(`Berkas "${file.name}" terpilih! Klik tombol "Pindai & Ekstrak Soal Otomatis". ðŸ“„`, 'info');
 }
 window.handleFileSoalDipilih = handleFileSoalDipilih;
 
@@ -10262,7 +10323,7 @@ Kunci: C
 Pembahasan: Algoritma adalah urutan langkah terstruktur untuk mencapai hasil tertentu.`;
 
   textarea.value = sample;
-  showToast('Contoh format soal berhasil dimasukkan! Klik tombol "Pindai & Ekstrak Soal Otomatis". 🪄', 'success');
+  showToast('Contoh format soal berhasil dimasukkan! Klik tombol "Pindai & Ekstrak Soal Otomatis". ðŸª„', 'success');
 }
 window.isiContohFormatSoal = isiContohFormatSoal;
 
@@ -10512,7 +10573,7 @@ async function prosesAnalisisDokumenSoal() {
   if (_currentMetodeUploadSoal === 'file') {
     if (!_selectedFileSoal) {
       playSound('error');
-      showToast('⚠️ Silakan pilih berkas Word (.docx) atau PDF (.pdf) terlebih dahulu!', 'warning');
+      showToast('âš ï¸ Silakan pilih berkas Word (.docx) atau PDF (.pdf) terlebih dahulu!', 'warning');
       return;
     }
 
@@ -10531,7 +10592,7 @@ async function prosesAnalisisDokumenSoal() {
         btnProses.disabled = false;
         btnProses.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Pindai & Ekstrak Soal Otomatis</span>';
       }
-      if (statusEl) statusEl.innerHTML = `<span class="text-rose-600 font-bold">❌ Gagal membaca berkas: ${err.message}</span>`;
+      if (statusEl) statusEl.innerHTML = `<span class="text-rose-600 font-bold">âŒ Gagal membaca berkas: ${err.message}</span>`;
       showToast(`Gagal membaca berkas: ${err.message}`, 'error');
       return;
     }
@@ -10540,7 +10601,7 @@ async function prosesAnalisisDokumenSoal() {
     rawText = textarea ? textarea.value.trim() : '';
     if (!rawText) {
       playSound('error');
-      showToast('⚠️ Tempelkan teks soal pada kotak isian terlebih dahulu!', 'warning');
+      showToast('âš ï¸ Tempelkan teks soal pada kotak isian terlebih dahulu!', 'warning');
       if (textarea) textarea.focus();
       return;
     }
@@ -10558,7 +10619,7 @@ async function prosesAnalisisDokumenSoal() {
 
   if (parsed.length === 0) {
     playSound('error');
-    if (statusEl) statusEl.innerHTML = '<span class="text-rose-600 font-bold">❌ Tidak ada soal yang berhasil dikenali. Pastikan teks memiliki nomor (1., 2.) dan pilihan (A., B., C., D.).</span>';
+    if (statusEl) statusEl.innerHTML = '<span class="text-rose-600 font-bold">âŒ Tidak ada soal yang berhasil dikenali. Pastikan teks memiliki nomor (1., 2.) dan pilihan (A., B., C., D.).</span>';
     showToast('Tidak ada soal yang dikenali. Silakan periksa format dokumen Anda.', 'error');
     return;
   }
@@ -10566,8 +10627,8 @@ async function prosesAnalisisDokumenSoal() {
   _importedParsedQuestions = parsed;
   playSound('fanfare');
   renderPreviewImportSoal(_importedParsedQuestions);
-  if (statusEl) statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✅ Berhasil mengekstrak ${parsed.length} butir soal! Silakan periksa pratinjau di bawah.</span>`;
-  showToast(`Berhasil mengekstrak ${parsed.length} butir soal pilihan ganda! 🎉`, 'success');
+  if (statusEl) statusEl.innerHTML = `<span class="text-emerald-700 font-bold">âœ… Berhasil mengekstrak ${parsed.length} butir soal! Silakan periksa pratinjau di bawah.</span>`;
+  showToast(`Berhasil mengekstrak ${parsed.length} butir soal pilihan ganda! ðŸŽ‰`, 'success');
 }
 window.prosesAnalisisDokumenSoal = prosesAnalisisDokumenSoal;
 
@@ -10631,7 +10692,7 @@ function renderPreviewImportSoal(questions) {
             </select>
           </div>
           <span class="text-[10px] text-slate-400 italic truncate max-w-xs" title="${escapeXml(q.explanation || '')}">
-            ${escapeXml(q.explanation ? `💡 ${q.explanation}` : 'Belum ada pembahasan')}
+            ${escapeXml(q.explanation ? `ðŸ’¡ ${q.explanation}` : 'Belum ada pembahasan')}
           </span>
         </div>
       </div>
@@ -10700,7 +10761,7 @@ function eksekusiSimpanSoalImport() {
   tutupModalUploadDokumenSoal();
   renderBankSoalGuru();
 
-  showToast(`🎉 Berhasil menyimpan ${finalQuestions.length} butir soal di Semester ${sem}! Soal langsung aktif di kuis siswa. ✨`, 'success');
+  showToast(`ðŸŽ‰ Berhasil menyimpan ${finalQuestions.length} butir soal di Semester ${sem}! Soal langsung aktif di kuis siswa. âœ¨`, 'success');
 }
 window.eksekusiSimpanSoalImport = eksekusiSimpanSoalImport;
 
@@ -10747,7 +10808,7 @@ function nextQuestion() {
 
     tambahPoin(state.quizScore);
     playSound('fanfare');
-    showToast(`Kuis Selesai! Kamu mendapat nilai ${state.quizScore}! 🏆`, 'success');
+    showToast(`Kuis Selesai! Kamu mendapat nilai ${state.quizScore}! ðŸ†`, 'success');
 
     // Simpan hasil kuis otomatis ke Database Guru
     if (typeof catatHasilKuisSiswa === 'function') {
@@ -10782,7 +10843,7 @@ window.kembaliKeSoalKuis = kembaliKeSoalKuis;
 function tampilkanSertifikatTersimpanSiswa() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   if (!profile) {
-    showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu agar namamu tercantum di sertifikat!', 'warning');
+    showToast('âš ï¸ Silakan masuk/pilih akun siswa terlebih dahulu agar namamu tercantum di sertifikat!', 'warning');
     if (typeof bukaPilihSiswaCepat === 'function') bukaPilihSiswaCepat();
     return;
   }
@@ -10821,14 +10882,14 @@ function tampilkanSertifikatTersimpanSiswa() {
 
   switchTab('kuis');
   playSound('fanfare');
-  showToast(`🏆 Menampilkan Piagam Sertifikat Resmi atas nama ${profile.nama}!`, 'success');
+  showToast(`ðŸ† Menampilkan Piagam Sertifikat Resmi atas nama ${profile.nama}!`, 'success');
 }
 window.tampilkanSertifikatTersimpanSiswa = tampilkanSertifikatTersimpanSiswa;
 
 function bukaKuisAtauSertifikatSiswa() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   if (!profile) {
-    showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu!', 'warning');
+    showToast('âš ï¸ Silakan masuk/pilih akun siswa terlebih dahulu!', 'warning');
     if (typeof bukaPilihSiswaCepat === 'function') bukaPilihSiswaCepat();
     return;
   }
@@ -10844,7 +10905,7 @@ function bukaKuisAtauSertifikatSiswa() {
   } else {
     switchTab('kuis');
     restartQuiz();
-    showToast(`Halo ${profile.nama}! Selesaikan 5 soal kuis ini untuk mendapatkan Sertifikat Digitalmu 🚀`, 'info');
+    showToast(`Halo ${profile.nama}! Selesaikan 5 soal kuis ini untuk mendapatkan Sertifikat Digitalmu ðŸš€`, 'info');
   }
 }
 window.bukaKuisAtauSertifikatSiswa = bukaKuisAtauSertifikatSiswa;
@@ -10853,22 +10914,22 @@ window.bukaKuisAtauSertifikatSiswa = bukaKuisAtauSertifikatSiswa;
 // 13. SIMULATOR MICROSOFT WORD: POSTER LINGKUNGAN HIDUP
 // ==========================================
 const WORD_IMAGES = {
-  bangun_pagi: { name: '1. Bangun Pagi', icon: 'fa-sun', color: '#eab308', size: 75, emoji: '🌅' },
-  beribadah: { name: '2. Beribadah', icon: 'fa-hands-praying', color: '#0284c7', size: 75, emoji: '🤲' },
-  berolahraga: { name: '3. Berolahraga', icon: 'fa-futbol', color: '#ea580c', size: 75, emoji: '⚽' },
-  makan_sehat: { name: '4. Makan Bergizi', icon: 'fa-apple-whole', color: '#16a34a', size: 75, emoji: '🥗' },
-  gemar_belajar: { name: '5. Gemar Belajar', icon: 'fa-book-open-reader', color: '#7c3aed', size: 75, emoji: '📖' },
-  bermasyarakat: { name: '6. Bermasyarakat', icon: 'fa-people-group', color: '#0d9488', size: 75, emoji: '🤝' },
-  tidur_cepat: { name: '7. Tidur Cepat', icon: 'fa-moon', color: '#4f46e5', size: 75, emoji: '🌙' },
-  indonesia: { name: 'Indonesia Hebat', icon: 'fa-flag', color: '#dc2626', size: 75, emoji: '🇮🇩' },
-  bumi: { name: 'Bumi Hijau', icon: 'fa-earth-americas', color: '#059669', size: 75, emoji: '🌍' },
-  pohon: { name: 'Pohon Rindang', icon: 'fa-tree', color: '#16a34a', size: 85, emoji: '🌳' },
-  sampah: { name: 'Tong Sampah', icon: 'fa-trash-can-arrow-up', color: '#d97706', size: 70, emoji: '🗑️' },
-  air: { name: 'Keran & Air', icon: 'fa-faucet-drip', color: '#0284c7', size: 70, emoji: '💧' },
-  recycle: { name: 'Daur Ulang 3R', icon: 'fa-recycle', color: '#059669', size: 75, emoji: '♻️' },
-  tunas: { name: 'Tunas Tanaman', icon: 'fa-seedling', color: '#65a30d', size: 65, emoji: '🌱' },
-  sepeda: { name: 'Sepeda Bebas Polusi', icon: 'fa-bicycle', color: '#4f46e5', size: 70, emoji: '🚲' },
-  matahari: { name: 'Matahari Ceria', icon: 'fa-sun', color: '#eab308', size: 75, emoji: '☀️' }
+  bangun_pagi: { name: '1. Bangun Pagi', icon: 'fa-sun', color: '#eab308', size: 75, emoji: 'ðŸŒ…' },
+  beribadah: { name: '2. Beribadah', icon: 'fa-hands-praying', color: '#0284c7', size: 75, emoji: 'ðŸ¤²' },
+  berolahraga: { name: '3. Berolahraga', icon: 'fa-futbol', color: '#ea580c', size: 75, emoji: 'âš½' },
+  makan_sehat: { name: '4. Makan Bergizi', icon: 'fa-apple-whole', color: '#16a34a', size: 75, emoji: 'ðŸ¥—' },
+  gemar_belajar: { name: '5. Gemar Belajar', icon: 'fa-book-open-reader', color: '#7c3aed', size: 75, emoji: 'ðŸ“–' },
+  bermasyarakat: { name: '6. Bermasyarakat', icon: 'fa-people-group', color: '#0d9488', size: 75, emoji: 'ðŸ¤' },
+  tidur_cepat: { name: '7. Tidur Cepat', icon: 'fa-moon', color: '#4f46e5', size: 75, emoji: 'ðŸŒ™' },
+  indonesia: { name: 'Indonesia Hebat', icon: 'fa-flag', color: '#dc2626', size: 75, emoji: 'ðŸ‡®ðŸ‡©' },
+  bumi: { name: 'Bumi Hijau', icon: 'fa-earth-americas', color: '#059669', size: 75, emoji: 'ðŸŒ' },
+  pohon: { name: 'Pohon Rindang', icon: 'fa-tree', color: '#16a34a', size: 85, emoji: 'ðŸŒ³' },
+  sampah: { name: 'Tong Sampah', icon: 'fa-trash-can-arrow-up', color: '#d97706', size: 70, emoji: 'ðŸ—‘ï¸' },
+  air: { name: 'Keran & Air', icon: 'fa-faucet-drip', color: '#0284c7', size: 70, emoji: 'ðŸ’§' },
+  recycle: { name: 'Daur Ulang 3R', icon: 'fa-recycle', color: '#059669', size: 75, emoji: 'â™»ï¸' },
+  tunas: { name: 'Tunas Tanaman', icon: 'fa-seedling', color: '#65a30d', size: 65, emoji: 'ðŸŒ±' },
+  sepeda: { name: 'Sepeda Bebas Polusi', icon: 'fa-bicycle', color: '#4f46e5', size: 70, emoji: 'ðŸš²' },
+  matahari: { name: 'Matahari Ceria', icon: 'fa-sun', color: '#eab308', size: 75, emoji: 'â˜€ï¸' }
 };
 
 let wordElements = [];
@@ -10924,11 +10985,11 @@ function periksaNamaDokumenWordLive(val) {
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-circle-check text-emerald-600 text-base shrink-0"></i>
         <div>
-          <p class="font-bold text-emerald-900">Format Penamaan Baku Sempurna! ⭐</p>
-          <p class="text-[11px] text-emerald-700">Kelas: <b>${check.kelas}</b> • Siswa: <b>${check.nama}</b> • Judul: <b>${check.judul}</b></p>
+          <p class="font-bold text-emerald-900">Format Penamaan Baku Sempurna! â­</p>
+          <p class="text-[11px] text-emerald-700">Kelas: <b>${check.kelas}</b> â€¢ Siswa: <b>${check.nama}</b> â€¢ Judul: <b>${check.judul}</b></p>
         </div>
       </div>
-      <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px] shrink-0 shadow-xs">+20 Poin Nilai ⭐</span>
+      <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px] shrink-0 shadow-xs">+20 Poin Nilai â­</span>
     `;
   } else {
     feedbackEl.className = 'mt-2 p-2.5 rounded-xl text-xs bg-amber-50 text-amber-800 border border-amber-300 flex items-center justify-between animate-fadeIn';
@@ -10941,7 +11002,7 @@ function periksaNamaDokumenWordLive(val) {
         </div>
       </div>
       <button type="button" onclick="terapkanSaranNamaDokumenWord()" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[10px] shrink-0 transition cursor-pointer shadow-xs">
-        🪄 Format Baku
+        ðŸª„ Format Baku
       </button>
     `;
   }
@@ -10955,7 +11016,7 @@ function terapkanSaranNamaDokumenWord() {
   const saran = buatSaranNamaFileBaku('Poster 7 Kebiasaan');
   inputEl.value = saran;
   periksaNamaDokumenWordLive(saran);
-  showToast('Format nama dokumen baku berhasil diterapkan! ✨', 'success');
+  showToast('Format nama dokumen baku berhasil diterapkan! âœ¨', 'success');
 }
 window.terapkanSaranNamaDokumenWord = terapkanSaranNamaDokumenWord;
 
@@ -10968,7 +11029,7 @@ function simpanPaintKeDrivePrompt() {
   const dataUrl = paintApp.canvas.toDataURL('image/png');
   const daftarSlot = DRIVE_7KEBIASAAN_CONFIG.map(c => `${c.slotNumber}. ${c.cleanTitle}`).join('\n');
   const inputNomor = prompt(
-    `🎨 SIMPAN GAMBAR PAINT KE DRIVE 7 KEBIASAAN:\n\n` +
+    `ðŸŽ¨ SIMPAN GAMBAR PAINT KE DRIVE 7 KEBIASAAN:\n\n` +
     `Pilih nomor kebiasaan untuk gambar lukisanmu (1-7):\n` +
     `${daftarSlot}\n\n` +
     `Ketik nomor 1 sampai 7:`,
@@ -10983,11 +11044,11 @@ function simpanPaintKeDrivePrompt() {
   }
 
   const fileName = buatSaranNamaFileBaku(cfg.cleanTitle);
-  simpanGambarKeSlotDrive(cfg.key, dataUrl, `Lukisan Paint: ${cfg.cleanTitle}`, '🖌️ Gambar Sendiri', fileName);
+  simpanGambarKeSlotDrive(cfg.key, dataUrl, `Lukisan Paint: ${cfg.cleanTitle}`, 'ðŸ–Œï¸ Gambar Sendiri', fileName);
   switchTab('praktik');
   if (typeof setPraktikSubtab === 'function') setPraktikSubtab('praktik-tp2');
   setModeAIStudio('drive');
-  showToast(`Lukisanmu berhasil disimpan ke slot "${cfg.cleanTitle}" di Drive! 📁🎨`, 'success');
+  showToast(`Lukisanmu berhasil disimpan ke slot "${cfg.cleanTitle}" di Drive! ðŸ“ðŸŽ¨`, 'success');
 }
 window.simpanPaintKeDrivePrompt = simpanPaintKeDrivePrompt;
 
@@ -11033,7 +11094,7 @@ async function simpanDokumenKeBrowser() {
   const checkNaming = periksaFormatNamaFile(title);
   if (checkNaming.valid) {
     tambahPoin(20);
-    showToast(`Bonus +20 Bintang: Format nama file baku "${title}" terpenuhi! ⭐`, 'success');
+    showToast(`Bonus +20 Bintang: Format nama file baku "${title}" terpenuhi! â­`, 'success');
   }
 
   const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
@@ -11103,7 +11164,7 @@ async function simpanDokumenKeBrowser() {
       }
     }, 250);
 
-    showToast(`Dokumen "${title}" berhasil disimpan di browser & otomatis masuk ke Studio Praktik / Galeri! 🎨⭐`, 'success');
+    showToast(`Dokumen "${title}" berhasil disimpan di browser & otomatis masuk ke Studio Praktik / Galeri! ðŸŽ¨â­`, 'success');
   } catch (e) {
     console.error('Error simpanDokumenKeBrowser:', e);
     showToast('Gagal menyimpan dokumen.', 'error');
@@ -11137,7 +11198,7 @@ async function unduhDokumenWorddoc() {
   const checkNaming = periksaFormatNamaFile(title);
   if (checkNaming.valid) {
     tambahPoin(20);
-    showToast(`Bonus +20 Bintang: Format nama file baku "${title}" terpenuhi! ⭐`, 'success');
+    showToast(`Bonus +20 Bintang: Format nama file baku "${title}" terpenuhi! â­`, 'success');
   }
 
   const docData = {
@@ -11275,7 +11336,7 @@ async function unduhDokumenWorddoc() {
           <w:color w:val="64748B"/>
           <w:sz w:val="18"/>
         </w:rPr>
-        <w:t>--- Dibuat dengan Simulator Microsoft Word • Kelas 4 SD Semester 1 ---</w:t>
+        <w:t>--- Dibuat dengan Simulator Microsoft Word â€¢ Kelas 4 SD Semester 1 ---</w:t>
       </w:r>
     </w:p>`;
 
@@ -11309,7 +11370,7 @@ async function unduhDokumenWorddoc() {
       simpanPosterKeGaleriWord(null);
 
       tambahPoin(25);
-      showToast(`File "${title}.docx" berhasil disimpan di komputer & Galeri Praktik 1! 💾`, 'success');
+      showToast(`File "${title}.docx" berhasil disimpan di komputer & Galeri Praktik 1! ðŸ’¾`, 'success');
       tutupWordBackstage();
       return;
     }
@@ -11326,7 +11387,7 @@ async function unduhDokumenWorddoc() {
   link.click();
 
   tambahPoin(25);
-  showToast(`File "${title}.docx" berhasil diunduh ke komputer! 💾`, 'success');
+  showToast(`File "${title}.docx" berhasil diunduh ke komputer! ðŸ’¾`, 'success');
   tutupWordBackstage();
 }
 
@@ -11354,7 +11415,7 @@ async function handleBukaFileWorddoc(event) {
           const doc = JSON.parse(jsonStr);
           if (doc && Array.isArray(doc.elements)) {
             terapkanDokumenWord(doc);
-            showToast(`Dokumen Word "${doc.title || file.name}" (.docx) berhasil dibuka & siap diedit! 📂`, 'success');
+            showToast(`Dokumen Word "${doc.title || file.name}" (.docx) berhasil dibuka & siap diedit! ðŸ“‚`, 'success');
             tutupWordBackstage();
             event.target.value = '';
             return;
@@ -11397,7 +11458,7 @@ async function handleBukaFileWorddoc(event) {
               pageBgColor: '#ffffff',
               pageBorderStyle: 'none'
             });
-            showToast(`Isi dokumen "${file.name}" (.docx) berhasil diimpor ke lembar kerja! 📂`, 'success');
+            showToast(`Isi dokumen "${file.name}" (.docx) berhasil diimpor ke lembar kerja! ðŸ“‚`, 'success');
             tutupWordBackstage();
             event.target.value = '';
             return;
@@ -11415,7 +11476,7 @@ async function handleBukaFileWorddoc(event) {
         const doc = JSON.parse(e.target.result);
         if (doc && Array.isArray(doc.elements)) {
           terapkanDokumenWord(doc);
-          showToast(`Dokumen "${doc.title || file.name}" berhasil dibuka dan siap diedit! 📂`, 'success');
+          showToast(`Dokumen "${doc.title || file.name}" berhasil dibuka dan siap diedit! ðŸ“‚`, 'success');
           tutupWordBackstage();
         } else {
           showToast('Format file dokumen tidak dikenali!', 'error');
@@ -11491,7 +11552,7 @@ function muatRiwayatDokumenWord() {
           <i class="fa-solid fa-file-word text-blue-600 text-lg shrink-0"></i>
           <div class="overflow-hidden">
             <h5 class="font-bold text-slate-800 truncate">${doc.title}.docx</h5>
-            <span class="text-[10px] text-slate-400">${tgl} • ${countElem} elemen</span>
+            <span class="text-[10px] text-slate-400">${tgl} â€¢ ${countElem} elemen</span>
           </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
@@ -11514,7 +11575,7 @@ function bukaDokumenDariRiwayat(docId) {
     const targetDoc = savedDocs.find(d => d.id === docId);
     if (targetDoc) {
       terapkanDokumenWord(targetDoc);
-      showToast(`Dokumen "${targetDoc.title}" dibuka kembali! Siap diedit 📂`, 'success');
+      showToast(`Dokumen "${targetDoc.title}" dibuka kembali! Siap diedit ðŸ“‚`, 'success');
       tutupWordBackstage();
     }
   } catch (e) {
@@ -11549,7 +11610,7 @@ function minimizeWordWindow() {
     setTimeout(() => {
       switchTab('beranda');
       win.classList.remove('scale-95', 'opacity-0');
-      showToast('Jendela Microsoft Word diminimalkan ke Beranda 📄', 'info');
+      showToast('Jendela Microsoft Word diminimalkan ke Beranda ðŸ“„', 'info');
     }, 200);
   } else {
     switchTab('beranda');
@@ -11588,7 +11649,7 @@ function toggleMaximizeWordWindow(forceState = null) {
     }
     if (floatingBtn) floatingBtn.classList.remove('hidden');
 
-    showToast('Mode Layar Penuh Sejati Microsoft Word aktif! 🖥️ Tekan Esc atau klik tombol di kanan bawah untuk keluar.', 'success');
+    showToast('Mode Layar Penuh Sejati Microsoft Word aktif! ðŸ–¥ï¸ Tekan Esc atau klik tombol di kanan bawah untuk keluar.', 'success');
   } else {
     // Mode Jendela Normal / Standar
     win.classList.remove('word-fullscreen-mode');
@@ -11644,7 +11705,7 @@ window.addEventListener('keydown', function(e) {
     const item = wordElements.find(el => el.id === activeWordElementId);
     const itemLabel = item ? (item.type === 'teks' ? `Teks "${item.text ? item.text.substring(0, 15) : ''}..."` : 'Gambar') : 'Elemen';
     hapusElemenWord(activeWordElementId);
-    showToast(`${itemLabel} dihapus dengan tombol ${e.key} pada keyboard 🗑️`, 'info');
+    showToast(`${itemLabel} dihapus dengan tombol ${e.key} pada keyboard ðŸ—‘ï¸`, 'info');
     return;
   }
 
@@ -11722,7 +11783,7 @@ function buatDokumenBaruWord() {
     if (titleDisplay) titleDisplay.innerText = `${currentWordDocTitle}.docx - Microsoft Word`;
     renderWordElements();
     tutupWordBackstage();
-    showToast('Dokumen baru dibuka! 📄');
+    showToast('Dokumen baru dibuka! ðŸ“„');
   }
 }
 
@@ -11759,7 +11820,7 @@ function setWordPageBg(color) {
   wordPageBgColor = color;
   const paper = document.getElementById('word-paper');
   if (paper) paper.style.backgroundColor = color;
-  showToast('Warna kertas Word diubah! 📄');
+  showToast('Warna kertas Word diubah! ðŸ“„');
 }
 
 function setWordPageBorder(style) {
@@ -11810,7 +11871,7 @@ function sisipkanTeksKeWord(text, subtype = 'slogan', color = '#0f172a') {
   wordElements.push(newElem);
   activeWordElementId = newElem.id;
   renderWordElements();
-  showToast(`Teks "${text.substring(0, 18)}..." disisipkan ke Word! 🔤`, 'success');
+  showToast(`Teks "${text.substring(0, 18)}..." disisipkan ke Word! ðŸ”¤`, 'success');
 }
 
 function sisipkanTeksKustom() {
@@ -11853,7 +11914,7 @@ function sisipkanGambarKeWord(key) {
   wordElements.push(newElem);
   activeWordElementId = newElem.id;
   renderWordElements();
-  showToast(`Gambar ${imgData.name} disisipkan ke Word! 🖼️`, 'success');
+  showToast(`Gambar ${imgData.name} disisipkan ke Word! ðŸ–¼ï¸`, 'success');
 }
 
 // ====================================================
@@ -11913,7 +11974,7 @@ function sisipkanGambarLuarKeWord(imageSrc, imageName = 'Gambar Luar') {
   wordElements.push(newElem);
   activeWordElementId = newElem.id;
   renderWordElements();
-  showToast('Gambar luar (hasil download) disisipkan ke Word! 🖼️', 'success');
+  showToast('Gambar luar (hasil download) disisipkan ke Word! ðŸ–¼ï¸', 'success');
 }
 
 function ubahUkuranGambarLuarWord(id, delta) {
@@ -11940,7 +12001,7 @@ function tambahTextBoxPrompt() {
 }
 
 function tambahBentukKotak() {
-  sisipkanTeksKeWord('★ PEDULI LINGKUNGAN SEKOLAH ★', 'banner', '#15803d');
+  sisipkanTeksKeWord('â˜… PEDULI LINGKUNGAN SEKOLAH â˜…', 'banner', '#15803d');
 }
 
 // Render Seluruh Elemen ke Lembar Word
@@ -12114,7 +12175,7 @@ function renderWordElements() {
         e.preventDefault();
         e.stopPropagation();
         hapusElemenWord(item.id);
-        showToast('Objek berhasil dihapus dengan tombol ' + e.key + ' 🗑️', 'info');
+        showToast('Objek berhasil dihapus dengan tombol ' + e.key + ' ðŸ—‘ï¸', 'info');
       }
     });
 
@@ -12401,7 +12462,7 @@ function endRotateWord() {
     document.removeEventListener('mouseup', endRotateWord);
     document.removeEventListener('touchmove', onRotateWordMove);
     document.removeEventListener('touchend', endRotateWord);
-    showToast(`Gambar diputar ke ${wordElements.find(el => el.id === activeWordElementId)?.rotation || 0}° 🔄`);
+    showToast(`Gambar diputar ke ${wordElements.find(el => el.id === activeWordElementId)?.rotation || 0}Â° ðŸ”„`);
   }
 }
 
@@ -12580,7 +12641,7 @@ function clearWordTextFormatting() {
 
   sinkronkanRibbonFontDenganElemen(item);
   renderWordElements();
-  showToast('Semua format font dibersihkan (Clear Formatting)! 🧹', 'success');
+  showToast('Semua format font dibersihkan (Clear Formatting)! ðŸ§¹', 'success');
 }
 
 function toggleWordFormat(type) {
@@ -12605,10 +12666,10 @@ function toggleWordFormat(type) {
     showToast(item.isStrike ? 'Coretan Teks (Strikethrough)' : 'Tanpa Coretan');
   } else if (type === 'sub') {
     item.subSuper = (item.subSuper === 'sub') ? 'normal' : 'sub';
-    showToast(item.subSuper === 'sub' ? 'Format Subscript (x₂)' : 'Normal');
+    showToast(item.subSuper === 'sub' ? 'Format Subscript (xâ‚‚)' : 'Normal');
   } else if (type === 'super') {
     item.subSuper = (item.subSuper === 'super') ? 'normal' : 'super';
-    showToast(item.subSuper === 'super' ? 'Format Superscript (x²)' : 'Normal');
+    showToast(item.subSuper === 'super' ? 'Format Superscript (xÂ²)' : 'Normal');
   }
 
   sinkronkanRibbonFontDenganElemen(item);
@@ -12637,7 +12698,7 @@ function toggleWordTextEffect() {
     shadow: 'Efek Bayangan 3D (Shadow)',
     outline: 'Efek Garis Tepi (Outline WordArt)'
   };
-  showToast(`Efek Teks: ${labels[nextEffect]} ✨`, 'info');
+  showToast(`Efek Teks: ${labels[nextEffect]} âœ¨`, 'info');
 }
 
 function bukaHighlightPicker(e) {
@@ -12664,7 +12725,7 @@ function toggleWordHighlight(color) {
     showToast('Warna sorot dihapus.', 'info');
   } else {
     item.highlightColor = color;
-    showToast('Warna sorot teks (Highlight) diterapkan! 🖍️', 'success');
+    showToast('Warna sorot teks (Highlight) diterapkan! ðŸ–ï¸', 'success');
   }
 
   const hlBar = document.getElementById('word-hl-bar');
@@ -12692,7 +12753,7 @@ function applyWordTextColor(color) {
   if (colorBar) colorBar.style.backgroundColor = color;
 
   renderWordElements();
-  showToast('Warna teks berhasil diubah! 🎨', 'success');
+  showToast('Warna teks berhasil diubah! ðŸŽ¨', 'success');
 }
 
 function tampilkanTipsFontWord() {
@@ -12723,7 +12784,7 @@ function setWordTextAlign(align) {
   item.textAlign = align;
   renderWordElements();
   const alignNames = { left: 'Rata Kiri', center: 'Rata Tengah', right: 'Rata Kanan', justify: 'Rata Kanan-Kiri' };
-  showToast(`Perataan Teks: ${alignNames[align] || align} 📄`);
+  showToast(`Perataan Teks: ${alignNames[align] || align} ðŸ“„`);
 }
 
 // Galeri Quick Styles MS Word (Normal, No Spacing, Heading 1, Heading 2, Title, Subtitle)
@@ -12839,8 +12900,8 @@ function loadPresetPosterLingkungan(preset) {
       { id: 'w2', type: 'gambar', key: 'indonesia', name: 'Indonesia Hebat', icon: 'fa-flag', color: '#dc2626', size: 85, x: 195, y: 120, zIndex: 1 },
       { id: 'w3', type: 'gambar', key: 'bangun_pagi', name: 'Bangun Pagi', icon: 'fa-sun', color: '#eab308', size: 55, x: 45, y: 220, zIndex: 1 },
       { id: 'w4', type: 'gambar', key: 'berolahraga', name: 'Berolahraga', icon: 'fa-futbol', color: '#ea580c', size: 55, x: 350, y: 220, zIndex: 1 },
-      { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Bangun Pagi • 2. Beribadah • 3. Berolahraga • 4. Makan Bergizi', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 20, y: 330, zIndex: 3 },
-      { id: 'w6', type: 'teks', subtype: 'slogan', text: '5. Gemar Belajar • 6. Bermasyarakat • 7. Tidur Cepat', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 60, y: 380, zIndex: 3 },
+      { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Bangun Pagi â€¢ 2. Beribadah â€¢ 3. Berolahraga â€¢ 4. Makan Bergizi', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 20, y: 330, zIndex: 3 },
+      { id: 'w6', type: 'teks', subtype: 'slogan', text: '5. Gemar Belajar â€¢ 6. Bermasyarakat â€¢ 7. Tidur Cepat', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 60, y: 380, zIndex: 3 },
       { id: 'w7', type: 'teks', subtype: 'slogan', text: 'Dari Pembiasaan Menjadi Kebiasaan, Terbentuk Kepribadian & Peradaban!', color: '#b45309', fontSizePx: 12, isItalic: true, x: 15, y: 460, zIndex: 3 },
       { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Pelajar Pancasila - Siswa Kelas 4 SD Hebat', color: '#475569', fontSizePx: 12, x: 100, y: 560, zIndex: 4 }
     ];
@@ -12850,8 +12911,8 @@ function loadPresetPosterLingkungan(preset) {
     wordElements = [
       { id: 'w1', type: 'teks', subtype: 'judul', text: 'MEWUJUDKAN ASTA CITA BANGSA', color: '#1e40af', fontSizePx: 26, isBold: true, x: 45, y: 35, zIndex: 2 },
       { id: 'w2', type: 'gambar', key: 'indonesia', name: 'Indonesia', icon: 'fa-flag', color: '#dc2626', size: 90, x: 190, y: 130, zIndex: 1 },
-      { id: 'w3', type: 'teks', subtype: 'banner', text: '★ GENERASI EMAS INDONESIA BERKARAKTER ★', color: '#ffffff', fontSizePx: 16, isBold: true, x: 40, y: 280, zIndex: 3 },
-      { id: 'w4', type: 'teks', subtype: 'slogan', text: 'Religius • Bermoral • Sehat • Cerdas & Kreatif • Kerja Keras • Disiplin • Mandiri • Bermanfaat', color: '#1e3a8a', fontSizePx: 13, isBold: true, x: 15, y: 410, zIndex: 3 },
+      { id: 'w3', type: 'teks', subtype: 'banner', text: 'â˜… GENERASI EMAS INDONESIA BERKARAKTER â˜…', color: '#ffffff', fontSizePx: 16, isBold: true, x: 40, y: 280, zIndex: 3 },
+      { id: 'w4', type: 'teks', subtype: 'slogan', text: 'Religius â€¢ Bermoral â€¢ Sehat â€¢ Cerdas & Kreatif â€¢ Kerja Keras â€¢ Disiplin â€¢ Mandiri â€¢ Bermanfaat', color: '#1e3a8a', fontSizePx: 13, isBold: true, x: 15, y: 410, zIndex: 3 },
       { id: 'w5', type: 'teks', subtype: 'pembuat', text: 'Pendidikan Karakter Bangsa Kelas 4 SD', color: '#3b82f6', fontSizePx: 12, x: 120, y: 560, zIndex: 4 }
     ];
   } else if (preset === 'sehat_bugar') {
@@ -13015,7 +13076,7 @@ async function generatePosterDataUrl(customDocData = null) {
           eCtx.lineWidth = 1;
           eCtx.strokeRect(rx + 3.5, ry, fW, fH);
         } else {
-          const emojiChar = imgData.emoji || '🌱';
+          const emojiChar = imgData.emoji || 'ðŸŒ±';
           eCtx.font = `${fontSize}px sans-serif`;
           eCtx.textAlign = 'left';
           eCtx.fillText(emojiChar, rx, ry + fontSize);
@@ -13051,7 +13112,7 @@ async function generatePosterDataUrl(customDocData = null) {
     eCtx.fillStyle = 'rgba(0, 0, 0, 0.35)';
     eCtx.font = '13px Nunito, sans-serif';
     eCtx.textAlign = 'center';
-    eCtx.fillText('Dibuat dengan Microsoft Word Simulator • Kelas 4 SD Semester 1', width / 2, height - 12);
+    eCtx.fillText('Dibuat dengan Microsoft Word Simulator â€¢ Kelas 4 SD Semester 1', width / 2, height - 12);
 
     return canvas.toDataURL('image/png');
   } catch (err) {
@@ -13077,7 +13138,7 @@ async function simpanPosterWord() {
   await simpanPosterKeGaleriWord(pngDataUrl);
 
   tambahPoin(25);
-  showToast('Poster Word berhasil disimpan di Galeri Praktik 1 dan diunduh! 🖨️ ⭐', 'success');
+  showToast('Poster Word berhasil disimpan di Galeri Praktik 1 dan diunduh! ðŸ–¨ï¸ â­', 'success');
 }
 
 // Helper Preset Elemen Poster untuk Galeri & Simulator
@@ -13088,10 +13149,10 @@ function getPosterPresetElements(key = 'lingkungan') {
       { id: 'w2', type: 'gambar', key: 'indonesia', name: 'Indonesia Hebat', icon: 'fa-flag', color: '#dc2626', size: 85, x: 195, y: 120, zIndex: 1 },
       { id: 'w3', type: 'gambar', key: 'bangun_pagi', name: 'Bangun Pagi', icon: 'fa-sun', color: '#eab308', size: 55, x: 45, y: 220, zIndex: 1 },
       { id: 'w4', type: 'gambar', key: 'berolahraga', name: 'Berolahraga', icon: 'fa-futbol', color: '#ea580c', size: 55, x: 350, y: 220, zIndex: 1 },
-      { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Bangun Pagi • 2. Beribadah • 3. Berolahraga • 4. Makan Bergizi', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 20, y: 330, zIndex: 3 },
-      { id: 'w6', type: 'teks', subtype: 'slogan', text: '5. Gemar Belajar • 6. Bermasyarakat • 7. Tidur Cepat', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 60, y: 380, zIndex: 3 },
+      { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Bangun Pagi â€¢ 2. Beribadah â€¢ 3. Berolahraga â€¢ 4. Makan Bergizi', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 20, y: 330, zIndex: 3 },
+      { id: 'w6', type: 'teks', subtype: 'slogan', text: '5. Gemar Belajar â€¢ 6. Bermasyarakat â€¢ 7. Tidur Cepat', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 60, y: 380, zIndex: 3 },
       { id: 'w7', type: 'teks', subtype: 'slogan', text: 'Dari Pembiasaan Menjadi Kebiasaan, Terbentuk Kepribadian & Peradaban!', color: '#b45309', fontSizePx: 12, isItalic: true, x: 15, y: 460, zIndex: 3 },
-      { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Siswa Kelas 4 SD • SDS Cinta Kasih Tzu Chi', color: '#475569', fontSizePx: 12, x: 100, y: 560, zIndex: 4 }
+      { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Siswa Kelas 4 SD â€¢ SDS Cinta Kasih Tzu Chi', color: '#475569', fontSizePx: 12, x: 100, y: 560, zIndex: 4 }
     ];
   }
   return [
@@ -13099,10 +13160,10 @@ function getPosterPresetElements(key = 'lingkungan') {
     { id: 'w2', type: 'gambar', key: 'bumi', name: 'Bumi Hijau', icon: 'fa-earth-americas', color: '#059669', size: 85, x: 195, y: 120, zIndex: 1 },
     { id: 'w3', type: 'gambar', key: 'tunas', name: 'Tunas Tanaman', icon: 'fa-seedling', color: '#65a30d', size: 55, x: 50, y: 220, zIndex: 1 },
     { id: 'w4', type: 'gambar', key: 'recycle', name: 'Daur Ulang', icon: 'fa-recycle', color: '#059669', size: 55, x: 340, y: 220, zIndex: 1 },
-    { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Buang Sampah Pada Tempatnya • 2. Tanam Pohon Rindang', color: '#1e3a8a', fontSizePx: 13, isBold: true, x: 20, y: 330, zIndex: 3 },
-    { id: 'w6', type: 'teks', subtype: 'slogan', text: '3. Hemat Air & Listrik • 4. Olah Sampah Daur Ulang Tzu Chi', color: '#1e3a8a', fontSizePx: 13, isBold: true, x: 20, y: 380, zIndex: 3 },
+    { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Buang Sampah Pada Tempatnya â€¢ 2. Tanam Pohon Rindang', color: '#1e3a8a', fontSizePx: 13, isBold: true, x: 20, y: 330, zIndex: 3 },
+    { id: 'w6', type: 'teks', subtype: 'slogan', text: '3. Hemat Air & Listrik â€¢ 4. Olah Sampah Daur Ulang Tzu Chi', color: '#1e3a8a', fontSizePx: 13, isBold: true, x: 20, y: 380, zIndex: 3 },
     { id: 'w7', type: 'teks', subtype: 'slogan', text: 'Bumi adalah Rumah Kita Bersama, Rawatlah dengan Cinta dan Kasih Sayang!', color: '#b45309', fontSizePx: 12, isItalic: true, x: 15, y: 460, zIndex: 3 },
-    { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Siswa Kelas 4 SD • SDS Cinta Kasih Tzu Chi', color: '#475569', fontSizePx: 12, x: 80, y: 560, zIndex: 4 }
+    { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Siswa Kelas 4 SD â€¢ SDS Cinta Kasih Tzu Chi', color: '#475569', fontSizePx: 12, x: 80, y: 560, zIndex: 4 }
   ];
 }
 
@@ -13201,7 +13262,7 @@ function renderGaleriPosterWord() {
   const descEl = document.getElementById('galeri-desc-siswa');
 
   if (profile && profile.nama) {
-    if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-id-badge text-amber-300"></i> Portofolio Digital: <b>${profile.nama}</b> (${profile.kelas} • NIS: ${profile.nis || '-'})`;
+    if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-id-badge text-amber-300"></i> Portofolio Digital: <b>${profile.nama}</b> (${profile.kelas} â€¢ NIS: ${profile.nis || '-'})`;
     if (titleEl) titleEl.innerText = `Lemari Karya Poster: ${profile.nama}`;
     if (descEl) descEl.innerHTML = `Setiap poster yang dibuat dan disimpan oleh <b>${profile.nama}</b> di Lab Ms. Word tersimpan khusus di sini sebagai portofolio karya digital pribadimu!`;
   } else {
@@ -13390,7 +13451,7 @@ function renderGaleriPosterWord() {
             </div>
             <div class="mt-1 flex items-center justify-between">
               ${(typeof periksaFormatNamaFile === 'function' && periksaFormatNamaFile(p.title).valid)
-                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin ⭐)</span>'
+                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin â­)</span>'
                 : '<span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Belum Baku</span>'}
             </div>
             <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
@@ -13450,7 +13511,7 @@ function perbaikiGaleriPosterWord() {
 
   localStorage.setItem(storageKey, JSON.stringify(list));
   renderGaleriPosterWord();
-  showToast('Galeri poster Microsoft Word berhasil disegarkan & diperbarui! 🌟', 'success');
+  showToast('Galeri poster Microsoft Word berhasil disegarkan & diperbarui! ðŸŒŸ', 'success');
 }
 
 // Buka Poster dari Galeri kembali ke Simulator MS Word untuk diedit
@@ -13462,7 +13523,7 @@ function bukaPosterWordDariGaleri(posterId) {
     if (target && target.docData) {
       terapkanDokumenWord(target.docData);
       switchTab('msword');
-      showToast(`Poster "${target.title}" dibuka kembali di Ms. Word! Siap diedit 📝`, 'success');
+      showToast(`Poster "${target.title}" dibuka kembali di Ms. Word! Siap diedit ðŸ“`, 'success');
     }
   } catch (e) {
     showToast('Gagal membuka poster dari galeri.', 'error');
@@ -13493,7 +13554,7 @@ async function unduhPosterWordDariGaleri(posterId) {
       link.href = imgUrl;
       link.click();
       playSound('success');
-      showToast('Poster berhasil diunduh ke komputermu! 🖼️', 'success');
+      showToast('Poster berhasil diunduh ke komputermu! ðŸ–¼ï¸', 'success');
     } else {
       bukaPosterWordDariGaleri(posterId);
       setTimeout(simpanPosterWord, 500);
@@ -13556,7 +13617,7 @@ function salinPosterWordDariGaleri(posterId) {
 
     renderGaleriPosterWord();
     playSound('success');
-    showToast(`Dokumen "${target.title}" berhasil dicopy! 📋 Salinan baru siap diedit.`, 'success');
+    showToast(`Dokumen "${target.title}" berhasil dicopy! ðŸ“‹ Salinan baru siap diedit.`, 'success');
   } catch (e) {
     console.error('salinPosterWordDariGaleri error:', e);
     showToast('Gagal menyalin dokumen.', 'error');
@@ -13616,7 +13677,7 @@ function konfirmasiEksekusiHapusPoster() {
     tutupModalHapusPoster();
     renderGaleriPosterWord();
     playSound('success');
-    showToast(`Dokumen "${targetTitle}" berhasil dihapus dari galeri! 🗑️`, 'info');
+    showToast(`Dokumen "${targetTitle}" berhasil dihapus dari galeri! ðŸ—‘ï¸`, 'info');
   } catch (e) {
     console.error('konfirmasiEksekusiHapusPoster error:', e);
     tutupModalHapusPoster();
@@ -13667,7 +13728,7 @@ function konfirmasiEksekusiHapusSemuaPoster() {
     tutupModalHapusSemuaPoster();
     renderGaleriPosterWord();
     playSound('success');
-    showToast('Semua dokumen poster di galerimu berhasil dihapus bersih! 🗑️', 'info');
+    showToast('Semua dokumen poster di galerimu berhasil dihapus bersih! ðŸ—‘ï¸', 'info');
   } catch (e) {
     console.error('konfirmasiEksekusiHapusSemuaPoster error:', e);
     tutupModalHapusSemuaPoster();
@@ -13699,7 +13760,7 @@ async function pasangContohPosterGaleri() {
   setTimeout(async () => {
     const pngDataUrl = await generatePosterDataUrl();
     await simpanPosterKeGaleriWord(pngDataUrl);
-    showToast('Contoh Poster 7 Kebiasaan Anak Indonesia Hebat berhasil dipajang di galeri! 🌟', 'success');
+    showToast('Contoh Poster 7 Kebiasaan Anak Indonesia Hebat berhasil dipajang di galeri! ðŸŒŸ', 'success');
   }, 150);
 }
 
@@ -13729,7 +13790,7 @@ function pilihSemester(semNumber) {
     targetSem = 1;
     semNumber = 1;
     playSound('warning');
-    showToast('Materi Semester 2 (Coding & AI) dijadwalkan mulai bulan Januari 2027! Saat ini mari fokus menuntaskan materi Semester 1 📘✨', 'warning');
+    showToast('Materi Semester 2 (Coding & AI) dijadwalkan mulai bulan Januari 2027! Saat ini mari fokus menuntaskan materi Semester 1 ðŸ“˜âœ¨', 'warning');
   } else {
     playSound('click');
   }
@@ -13771,10 +13832,10 @@ function pilihSemester(semNumber) {
     if (btnSem2) btnSem2.className = 'bg-white hover:bg-slate-50 text-[#0284C7] px-7 py-3.5 rounded-full font-title font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-lg transition transform hover:-translate-y-0.5 border border-transparent';
     if (pillSem1) pillSem1.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs';
     if (pillSem2) pillSem2.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white';
-    if (heroBadge) heroBadge.innerText = 'EduCode AI • Semester 1';
+    if (heroBadge) heroBadge.innerText = 'EduCode AI â€¢ Semester 1';
     if (heroTitle) heroTitle.innerHTML = 'Belajar Coding & AI<br>Bersama, Untuk Masa Depan';
     if (heroDesc) heroDesc.innerText = 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan karakter baik di era teknologi bersama SDS Cinta Kasih Tzu Chi.';
-    if (robotSpeech) robotSpeech.innerText = '🤖 Halo! Aku Robo-Tzu Chi, ayo belajar Konten Digital & MS Word Semester 1!';
+    if (robotSpeech) robotSpeech.innerText = 'ðŸ¤– Halo! Aku Robo-Tzu Chi, ayo belajar Konten Digital & MS Word Semester 1!';
     if (navLabText) navLabText.innerText = 'Lab MS Word';
     if (navLabIcon) navLabIcon.className = 'fa-solid fa-file-word text-blue-400 icon-3d-glow';
     if (mNavLabText) mNavLabText.innerText = 'Lab Word';
@@ -13796,7 +13857,7 @@ function pilihSemester(semNumber) {
     document.querySelectorAll('.sem1-content').forEach(el => el.classList.remove('hidden'));
     document.querySelectorAll('.sem2-content').forEach(el => el.classList.add('hidden'));
 
-    showToast('Beralih ke Semester 1: Konten Digital, MS Word & MS Excel! 📘📊', 'info');
+    showToast('Beralih ke Semester 1: Konten Digital, MS Word & MS Excel! ðŸ“˜ðŸ“Š', 'info');
   } else {
     // Mode Semester 2 Aktif
     if (topSem1) topSem1.className = 'px-3.5 py-1.5 rounded-full font-title font-bold text-xs sm:text-sm text-slate-300 hover:text-white hover:bg-slate-700/80 flex items-center gap-1.5 transition';
@@ -13805,10 +13866,10 @@ function pilihSemester(semNumber) {
     if (btnSem2) btnSem2.className = 'bg-[#6D28D9] hover:bg-[#5B21B6] text-white px-7 py-3.5 rounded-full font-title font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-lg shadow-purple-950/30 border border-white/30 transition transform hover:-translate-y-0.5';
     if (pillSem1) pillSem1.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white';
     if (pillSem2) pillSem2.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-purple-600 text-white shadow-xs';
-    if (heroBadge) heroBadge.innerText = 'EduCode AI • Semester 2';
+    if (heroBadge) heroBadge.innerText = 'EduCode AI â€¢ Semester 2';
     if (heroTitle) heroTitle.innerHTML = 'Petualangan Coding & AI Cilik<br>Animasi, Game & Robot Pintar';
     if (heroDesc) heroDesc.innerText = 'Mempelajari pemrograman visual (Scratch/Blockly), logika percabangan robot cerdas, dan pengenalan sensor kamera AI bersama SDS Cinta Kasih Tzu Chi.';
-    if (robotSpeech) robotSpeech.innerText = '🚀 Semangat Semester 2! Ayo buat blok kode Scratch & kendalikan sensor AI!';
+    if (robotSpeech) robotSpeech.innerText = 'ðŸš€ Semangat Semester 2! Ayo buat blok kode Scratch & kendalikan sensor AI!';
     if (navLabText) navLabText.innerText = 'Lab Coding & AI';
     if (navLabIcon) navLabIcon.className = 'fa-solid fa-robot text-purple-600';
     if (mNavLabText) mNavLabText.innerText = 'Lab Coding';
@@ -13835,7 +13896,7 @@ function pilihSemester(semNumber) {
     document.querySelectorAll('.sem1-content').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.sem2-content').forEach(el => el.classList.remove('hidden'));
 
-    showToast('Beralih ke Semester 2: Pemrograman Balok, RoboMind & AI Cilik! 🤖✨', 'success');
+    showToast('Beralih ke Semester 2: Pemrograman Balok, RoboMind & AI Cilik! ðŸ¤–âœ¨', 'success');
   }
 
   // Perbarui indikator tombol semester di kartu sambutan siswa
@@ -13897,7 +13958,7 @@ function tambahBalokCoding(type, label, iconClass, colorClass) {
   };
   state.codingBlocks.push(newBlock);
   renderBalokCoding();
-  showToast(`Balok "${label}" ditambahkan ke kode! 🧩`, 'info');
+  showToast(`Balok "${label}" ditambahkan ke kode! ðŸ§©`, 'info');
 }
 
 function hapusBalokCoding(idx) {
@@ -13929,14 +13990,14 @@ function muatContohCoding(template) {
       { id: 'b1', type: 'event', label: 'Saat Bendera Hijau Diklik', icon: 'fa-flag', color: 'bg-amber-500 text-white' },
       { id: 'b2', type: 'gerak', label: 'Maju 20 Langkah', icon: 'fa-arrow-right', color: 'bg-blue-600 text-white' },
       { id: 'b3', type: 'sensor', label: 'Sensor AI: Deteksi Sampah Daur Ulang', icon: 'fa-robot', color: 'bg-emerald-600 text-white' },
-      { id: 'b4', type: 'bicara', label: 'Katakan "Sampah Berhasil Dipilah! ♻️"', icon: 'fa-comment-dots', color: 'bg-purple-600 text-white' },
+      { id: 'b4', type: 'bicara', label: 'Katakan "Sampah Berhasil Dipilah! â™»ï¸"', icon: 'fa-comment-dots', color: 'bg-purple-600 text-white' },
       { id: 'b5', type: 'gerak', label: 'Lompat Gembira', icon: 'fa-angles-up', color: 'bg-blue-600 text-white' }
     ];
   } else if (template === 'patroli') {
     state.codingBlocks = [
       { id: 'b1', type: 'event', label: 'Saat Bendera Hijau Diklik', icon: 'fa-flag', color: 'bg-amber-500 text-white' },
       { id: 'b2', type: 'gerak', label: 'Maju 20 Langkah', icon: 'fa-arrow-right', color: 'bg-blue-600 text-white' },
-      { id: 'b3', type: 'putar', label: 'Putar Balik 180°', icon: 'fa-rotate-right', color: 'bg-indigo-600 text-white' },
+      { id: 'b3', type: 'putar', label: 'Putar Balik 180Â°', icon: 'fa-rotate-right', color: 'bg-indigo-600 text-white' },
       { id: 'b4', type: 'bicara', label: 'Katakan "Taman Sekolah Bersih & Asri!"', icon: 'fa-comment-dots', color: 'bg-purple-600 text-white' },
       { id: 'b5', type: 'suara', label: 'Bunyikan Nada Ceria', icon: 'fa-music', color: 'bg-pink-600 text-white' }
     ];
@@ -14047,7 +14108,7 @@ async function jalankanProgramCoding() {
     } else if (block.type === 'sensor') {
       if (aiRadar && aiStatusText) {
         aiRadar.classList.remove('hidden');
-        aiStatusText.innerText = '🔍 AI Mengidentifikasi Objek: Botol Daur Ulang Ditemukan! (Akurasi: 98%)';
+        aiStatusText.innerText = 'ðŸ” AI Mengidentifikasi Objek: Botol Daur Ulang Ditemukan! (Akurasi: 98%)';
       }
       playSound('fanfare');
     }
@@ -14075,7 +14136,7 @@ async function jalankanProgramCoding() {
   }
 
   tambahPoin(25);
-  showToast('Program Coding & AI berhasil dijalankan! Hebat! 🌟🚀', 'success');
+  showToast('Program Coding & AI berhasil dijalankan! Hebat! ðŸŒŸðŸš€', 'success');
 }
 
 // Uji Sensor AI (Demo Semester 2)
@@ -14090,19 +14151,19 @@ function ujiSensorAI(tipe) {
   if (!previewImg || !resultBox) return;
 
   if (tipe === 'botol') {
-    previewImg.innerHTML = '<span class="text-6xl">🧴</span>';
+    previewImg.innerHTML = '<span class="text-6xl">ðŸ§´</span>';
     titleBox.innerText = 'Botol Plastik Bekas (Anorganik)';
     confBox.innerText = '98.5%';
     recBox.innerText = 'Kategori: DAUR ULANG. Masukkan ke tong sampah kuning Tzu Chi untuk dijadikan bahan bermanfaat.';
     resultBox.className = 'p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 animate-fadeIn';
   } else if (tipe === 'daun') {
-    previewImg.innerHTML = '<span class="text-6xl">🍂</span>';
+    previewImg.innerHTML = '<span class="text-6xl">ðŸ‚</span>';
     titleBox.innerText = 'Daun Kering Gugur (Organik)';
     confBox.innerText = '97.2%';
     recBox.innerText = 'Kategori: KOMPOS. Daun kering dapat diolah menjadi pupuk penyubur tanaman sekolah.';
     resultBox.className = 'p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 animate-fadeIn';
   } else if (tipe === 'kertas') {
-    previewImg.innerHTML = '<span class="text-6xl">📄</span>';
+    previewImg.innerHTML = '<span class="text-6xl">ðŸ“„</span>';
     titleBox.innerText = 'Kertas Lembar Belajar (Daur Ulang)';
     confBox.innerText = '99.1%';
     recBox.innerText = 'Kategori: KERTAS DAUR ULANG. Pilah secara rapi agar bisa diolah menjadi kertas daur ulang baru.';
@@ -14111,13 +14172,13 @@ function ujiSensorAI(tipe) {
 
   playSound('success');
   tambahPoin(10);
-  showToast('Sensor Kamera AI memindai objek dengan sukses! 👁️✨', 'success');
+  showToast('Sensor Kamera AI memindai objek dengan sukses! ðŸ‘ï¸âœ¨', 'success');
 }
 
 function selesaikanMisiCoding(misiNo) {
   playSound('fanfare');
   tambahPoin(30);
-  showToast(`Misi ${misiNo} Selesai! Kamu mendapatkan 30 Bintang! 🏅🎉`, 'success');
+  showToast(`Misi ${misiNo} Selesai! Kamu mendapatkan 30 Bintang! ðŸ…ðŸŽ‰`, 'success');
 }
 
 // Sub-Tab Misi Studio Praktik Semester 2
@@ -14168,7 +14229,7 @@ async function ujiAlgoritmaMisi1() {
   // Step 2: Maju ke cell 2
   if (statusEl) statusEl.innerText = 'Langkah 2: Maju 1 langkah ke depan...';
   if (c1) c1.classList.remove('bg-purple-900/60');
-  if (c2) { c2.classList.add('bg-purple-600', 'text-white'); c2.innerHTML = '🤖'; }
+  if (c2) { c2.classList.add('bg-purple-600', 'text-white'); c2.innerHTML = 'ðŸ¤–'; }
   playSound('step');
   await new Promise(r => setTimeout(r, 700));
 
@@ -14180,7 +14241,7 @@ async function ujiAlgoritmaMisi1() {
   await new Promise(r => setTimeout(r, 700));
 
   // Step 4: Ambil botol
-  if (statusEl) statusEl.innerText = 'Langkah 4: Robot memungut botol sampah plastik! 🧴';
+  if (statusEl) statusEl.innerText = 'Langkah 4: Robot memungut botol sampah plastik! ðŸ§´';
   if (targetItem) targetItem.style.opacity = '0';
   playSound('success');
   await new Promise(r => setTimeout(r, 700));
@@ -14188,18 +14249,18 @@ async function ujiAlgoritmaMisi1() {
   // Step 5: Belok ke cell 5
   if (statusEl) statusEl.innerText = 'Langkah 5: Berbelok menuju tempat daur ulang Tzu Chi...';
   if (c3) c3.classList.remove('bg-purple-600');
-  if (c5) { c5.classList.add('bg-purple-600', 'text-white'); c5.innerHTML = '🤖'; }
+  if (c5) { c5.classList.add('bg-purple-600', 'text-white'); c5.innerHTML = 'ðŸ¤–'; }
   playSound('step');
   await new Promise(r => setTimeout(r, 700));
 
   // Step 6: Tiba di tong Tzu Chi
   if (c5) { c5.classList.remove('bg-purple-600', 'text-white'); c5.innerHTML = '<i class="fa-solid fa-arrow-turn-down rotate-90"></i>'; }
   if (c6) { c6.classList.add('ring-4', 'ring-emerald-400'); }
-  if (statusEl) statusEl.innerHTML = '🎉 <b class="text-emerald-400">BERHASIL!</b> Botol dimasukkan ke Tong Daur Ulang Tzu Chi!';
+  if (statusEl) statusEl.innerHTML = 'ðŸŽ‰ <b class="text-emerald-400">BERHASIL!</b> Botol dimasukkan ke Tong Daur Ulang Tzu Chi!';
   
   playSound('fanfare');
   tambahPoin(30);
-  showToast('Misi 1 Selesai! Algoritma runtutan berhasil sempurna! 🌟 +30 Bintang', 'success');
+  showToast('Misi 1 Selesai! Algoritma runtutan berhasil sempurna! ðŸŒŸ +30 Bintang', 'success');
 
   isRunningMisi1 = false;
   if (btnRun) btnRun.disabled = false;
@@ -14252,24 +14313,24 @@ function ujiLogikaMisi2() {
 
   if (stateMisi2Benda === 'botol') {
     displayBox.className = 'p-8 rounded-3xl bg-amber-50 border-2 border-amber-400 text-center space-y-3 animate-fadeIn';
-    if (icon) icon.innerHTML = '🧴';
-    title.innerText = 'KEPUTUSAN: Wadah Sampah Daur Ulang ♻️';
+    if (icon) icon.innerHTML = 'ðŸ§´';
+    title.innerText = 'KEPUTUSAN: Wadah Sampah Daur Ulang â™»ï¸';
     desc.innerText = 'Logika JIKA (Botol) terpenuhi! Botol plastik dipisahkan agar dapat diolah menjadi selimut atau baju daur ulang Tzu Chi.';
   } else if (stateMisi2Benda === 'kertas') {
     displayBox.className = 'p-8 rounded-3xl bg-blue-50 border-2 border-blue-400 text-center space-y-3 animate-fadeIn';
-    if (icon) icon.innerHTML = '📄';
-    title.innerText = 'KEPUTUSAN: Wadah Kertas Daur Ulang 📦';
+    if (icon) icon.innerHTML = 'ðŸ“„';
+    title.innerText = 'KEPUTUSAN: Wadah Kertas Daur Ulang ðŸ“¦';
     desc.innerText = 'Logika JIKA (Kertas) terpenuhi! Kertas bekas disusun rapi untuk didaur ulang menjadi kertas baru, menghemat penebangan pohon.';
   } else if (stateMisi2Benda === 'daun') {
     displayBox.className = 'p-8 rounded-3xl bg-emerald-50 border-2 border-emerald-400 text-center space-y-3 animate-fadeIn';
-    if (icon) icon.innerHTML = '🍂';
-    title.innerText = 'KEPUTUSAN: Wadah Kompos Alami 🌱';
+    if (icon) icon.innerHTML = 'ðŸ‚';
+    title.innerText = 'KEPUTUSAN: Wadah Kompos Alami ðŸŒ±';
     desc.innerText = 'Logika JIKA LAINNYA (Daun) terpenuhi! Sampah organik daun kering dibawa ke lubang biopori/kompos untuk menyuburkan tanah.';
   }
 
   playSound('fanfare');
   tambahPoin(30);
-  showToast('Misi 2 Selesai! Logika percabangan robot berjalan akurat! 🤖✨ +30 Bintang', 'success');
+  showToast('Misi 2 Selesai! Logika percabangan robot berjalan akurat! ðŸ¤–âœ¨ +30 Bintang', 'success');
 }
 
 // MISI 3: Loop Perulangan (Menanam 4 Pohon)
@@ -14291,17 +14352,17 @@ async function jalankanLoopMisi3() {
 
     if (slot) {
       slot.className = 'h-24 bg-white/90 border-2 border-emerald-500 rounded-2xl flex flex-col items-center justify-center text-emerald-800 text-xs font-bold shadow-md transform scale-105 transition';
-      slot.innerHTML = '<span class="text-3xl animate-bounce">🌳</span><span class="text-[10px] text-emerald-700">Pohon ' + i + ' Subur!</span>';
+      slot.innerHTML = '<span class="text-3xl animate-bounce">ðŸŒ³</span><span class="text-[10px] text-emerald-700">Pohon ' + i + ' Subur!</span>';
     }
     if (counterEl) counterEl.innerText = `${i}/4`;
     playSound('success');
     await new Promise(r => setTimeout(r, 500));
   }
 
-  if (statusEl) statusEl.innerHTML = '🎉 <b class="text-emerald-700">Luar Biasa!</b> Seluruh 4 pohon berhasil ditanam otomatis dengan 1 balok loop!';
+  if (statusEl) statusEl.innerHTML = 'ðŸŽ‰ <b class="text-emerald-700">Luar Biasa!</b> Seluruh 4 pohon berhasil ditanam otomatis dengan 1 balok loop!';
   playSound('fanfare');
   tambahPoin(30);
-  showToast('Misi 3 Selesai! Balok perulangan (Loop) berhasil menanam 4 pohon! 🌳 +30 Bintang', 'success');
+  showToast('Misi 3 Selesai! Balok perulangan (Loop) berhasil menanam 4 pohon! ðŸŒ³ +30 Bintang', 'success');
 
   isRunningMisi3 = false;
   if (btnRun) btnRun.disabled = false;
@@ -14318,7 +14379,7 @@ function resetMisi3() {
     const slot = document.getElementById(`tree-slot-${i}`);
     if (slot) {
       slot.className = 'h-24 bg-white/60 border-2 border-dashed border-emerald-600 rounded-2xl flex flex-col items-center justify-center text-slate-400 text-xs font-bold transition';
-      slot.innerHTML = '<span class="text-2xl opacity-40">🌱</span><span class="text-[10px]">Titik ' + i + '</span>';
+      slot.innerHTML = '<span class="text-2xl opacity-40">ðŸŒ±</span><span class="text-[10px]">Titik ' + i + '</span>';
     }
   }
 }
@@ -14341,7 +14402,7 @@ function suarakanKataBijakMisi4(teks) {
   }, 4000);
 
   tambahPoin(30);
-  showToast('Misi 4: Robot menyebarkan pesan budi pekerti Tzu Chi! 🌸🙏 +30 Bintang', 'success');
+  showToast('Misi 4: Robot menyebarkan pesan budi pekerti Tzu Chi! ðŸŒ¸ðŸ™ +30 Bintang', 'success');
 }
 
 window.addEventListener('click', (e) => {
@@ -14564,11 +14625,11 @@ const TP_EXCEL_DATA = {
     badgeColor: 'bg-emerald-600',
     anatomy: [
       { name: 'Menyeleksi Sel (+)', desc: 'Kotak pertemuan kolom & baris (Cell). Pointer mouse berbentuk plus putih tebal untuk memilih & memblok sel.', action: "pilihSelExcel('B2')" },
-      { name: 'Melebarkan Kolom (↔)', desc: 'Tarik garis batas di kanan header kolom (A, B, C...) untuk melebarkan/menyempitkan kolom!', action: "autoFitColWidth('B')" },
-      { name: 'Meninggikan Baris (↕)', desc: 'Tarik garis batas di bawah nomor baris (1, 2, 3...) untuk meninggikan/memendekkan baris!', action: "sorotBarisExcel(2)" },
+      { name: 'Melebarkan Kolom (â†”)', desc: 'Tarik garis batas di kanan header kolom (A, B, C...) untuk melebarkan/menyempitkan kolom!', action: "autoFitColWidth('B')" },
+      { name: 'Meninggikan Baris (â†•)', desc: 'Tarik garis batas di bawah nomor baris (1, 2, 3...) untuk meninggikan/memendekkan baris!', action: "sorotBarisExcel(2)" },
       { name: 'Autofill Data (+)', desc: 'Tarik kotak hijau kecil di pojok kanan bawah sel untuk mengisi data berurutan secara otomatis!', action: "pilihSelExcel('C1')" }
     ],
-    masalahNyata: '<b>⚠️ Masalah Pencatatan Manual di Kertas:</b> Catatan uang kas kelas atau tabungan di buku tulis mudah robek, basah, tercecer, dan rawan salah saat menghitung manual. Dengan Microsoft Excel, data tersimpan aman dan terstruktur rapi!',
+    masalahNyata: '<b>âš ï¸ Masalah Pencatatan Manual di Kertas:</b> Catatan uang kas kelas atau tabungan di buku tulis mudah robek, basah, tercecer, dan rawan salah saat menghitung manual. Dengan Microsoft Excel, data tersimpan aman dan terstruktur rapi!',
     contohKasus: 'Mencatat jadwal 7 kebiasaan atau buku kas uang saku siswa secara digital.'
   },
   tp1_2: {
@@ -14664,7 +14725,7 @@ function renderTPExcelContent(tpKey) {
       </div>
       <div class="shrink-0 flex items-center gap-1.5">
         <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300">
-          Misi Aktif ✨
+          Misi Aktif âœ¨
         </span>
       </div>
     </div>
@@ -14719,7 +14780,7 @@ function ubahSampelDataGrafik() {
     renderExcelGrid();
     renderExcelMiniChart();
     updateExcelStats();
-    showToast(`Nilai sel C4 diubah menjadi ${curVal}! Perhatikan grafik batang langsung bergerak otomatis! 📊`, 'success');
+    showToast(`Nilai sel C4 diubah menjadi ${curVal}! Perhatikan grafik batang langsung bergerak otomatis! ðŸ“Š`, 'success');
   } else {
     showToast('Silakan pilih salah satu template dan ubah angkanya!');
   }
@@ -14773,7 +14834,7 @@ function muatTemplateExcel(tplKey, notify = true) {
 
   if (notify) {
     playSound('success');
-    showToast(`Template "${tpl.sheetTitle.split('- ')[1]}" berhasil dibuka! 📊`, 'success');
+    showToast(`Template "${tpl.sheetTitle.split('- ')[1]}" berhasil dibuka! ðŸ“Š`, 'success');
   }
 }
 
@@ -15202,7 +15263,7 @@ function renderExcelGrid() {
       data-col="${col}"
       style="width: ${colWidth}px; min-width: ${colWidth}px; max-width: ${colWidth}px;"
       onmousedown="handleColHeaderMouseDown('${col}', event)"
-      title="Kolom ${col} (Klik untuk memblok kolom, seret garis batas kanan untuk melebarkan ↔)">
+      title="Kolom ${col} (Klik untuk memblok kolom, seret garis batas kanan untuk melebarkan â†”)">
       <span class="pointer-events-none">${col}</span>
       <div class="excel-col-resizer"
         onmousedown="startColResize('${col}', event)"
@@ -15223,7 +15284,7 @@ function renderExcelGrid() {
         data-row="${r}"
         style="height: ${rowHeight}px;"
         onmousedown="handleRowHeaderMouseDown(${r}, event)"
-        title="Baris ${r} (Klik untuk memblok baris, seret garis batas bawah untuk meninggikan ↕)">
+        title="Baris ${r} (Klik untuk memblok baris, seret garis batas bawah untuk meninggikan â†•)">
         <span class="pointer-events-none">${r}</span>
         <div class="excel-row-resizer"
           onmousedown="startRowResize(${r}, event)"
@@ -15341,7 +15402,7 @@ function setExcelViewMode(mode) {
     if (btnSplit) {
       btnSplit.className = 'px-2.5 py-1 rounded text-[11px] font-bold transition flex items-center gap-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-300';
     }
-    showToast('Mode Lembar Excel Penuh (Worksheet View) aktif! 📑');
+    showToast('Mode Lembar Excel Penuh (Worksheet View) aktif! ðŸ“‘');
   } else {
     if (gridCol) {
       gridCol.className = 'lg:col-span-8 p-3 sm:p-4 overflow-x-auto border-b lg:border-b-0 lg:border-r border-slate-200';
@@ -15355,7 +15416,7 @@ function setExcelViewMode(mode) {
     if (btnSplit) {
       btnSplit.className = 'px-2.5 py-1 rounded text-[11px] font-bold transition flex items-center gap-1.5 bg-[#107c41] text-white shadow-xs';
     }
-    showToast('Mode Tampilan Bersama Diagram Batang aktif! 📊');
+    showToast('Mode Tampilan Bersama Diagram Batang aktif! ðŸ“Š');
   }
 }
 
@@ -15403,7 +15464,7 @@ function toggleExcelFullscreen(forceState = null) {
       floatingBtn.classList.remove('hidden');
     }
 
-    showToast('Mode Layar Penuh Sejati Excel aktif! 🖥️ Tekan Esc atau klik tombol merah di pojok kanan bawah untuk keluar.', 'success');
+    showToast('Mode Layar Penuh Sejati Excel aktif! ðŸ–¥ï¸ Tekan Esc atau klik tombol merah di pojok kanan bawah untuk keluar.', 'success');
   } else {
     win.classList.remove('excel-fullscreen-mode');
     document.body.classList.remove('excel-fs-active');
@@ -15663,7 +15724,7 @@ function applyExcelAutofill(anchorCoord, currentCoord) {
   if (typeof simpanExcelDraftSiswa === 'function') {
     simpanExcelDraftSiswa();
   }
-  showToast(`Autofill berhasil mengisi ${count} sel secara berurutan! 🌟`, 'success');
+  showToast(`Autofill berhasil mengisi ${count} sel secara berurutan! ðŸŒŸ`, 'success');
 }
 
 // ==========================================
@@ -15678,7 +15739,7 @@ function startColResize(col, event) {
   const curW = excelState.colWidths[col] || (col === 'B' ? 220 : (col === 'A' ? 48 : 88));
   excelState.resizeColStartWidth = curW;
   document.body.style.cursor = 'col-resize';
-  showResizeTooltip(event.clientX, event.clientY, `Lebar Kolom ${col}: ${curW}px ↔`);
+  showResizeTooltip(event.clientX, event.clientY, `Lebar Kolom ${col}: ${curW}px â†”`);
 }
 
 function startRowResize(row, event) {
@@ -15690,7 +15751,7 @@ function startRowResize(row, event) {
   const curH = excelState.rowHeights[row] || 28;
   excelState.resizeRowStartHeight = curH;
   document.body.style.cursor = 'row-resize';
-  showResizeTooltip(event.clientX, event.clientY, `Tinggi Baris ${row}: ${curH}px ↕`);
+  showResizeTooltip(event.clientX, event.clientY, `Tinggi Baris ${row}: ${curH}px â†•`);
 }
 
 function applyLiveColWidth(col, width) {
@@ -15742,14 +15803,14 @@ function autoFitColWidth(col, event) {
   const optimalW = Math.max(50, Math.min(480, maxLen * 8.5 + 32));
   excelState.colWidths[col] = Math.round(optimalW);
   renderExcelGrid();
-  showToast(`Lebar kolom ${col} disesuaikan otomatis (Auto-fit): ${excelState.colWidths[col]}px ↔️`, 'success');
+  showToast(`Lebar kolom ${col} disesuaikan otomatis (Auto-fit): ${excelState.colWidths[col]}px â†”ï¸`, 'success');
 }
 
 function resetRowHeight(row, event) {
   if (event) event.stopPropagation();
   delete excelState.rowHeights[row];
   renderExcelGrid();
-  showToast(`Tinggi baris ${row} dikembalikan ke default (28px) ↕️`);
+  showToast(`Tinggi baris ${row} dikembalikan ke default (28px) â†•ï¸`);
 }
 
 function handleColHeaderMouseDown(col, event) {
@@ -15761,7 +15822,7 @@ function handleColHeaderMouseDown(col, event) {
   pilihSelExcel(`${col}1`);
   highlightNormalRange(`${col}1`, `${col}${excelState.rowCount}`);
   updateRangeStatsBar(`${col}1`, `${col}${excelState.rowCount}`);
-  showToast(`Seluruh Kolom ${col} dipilih (Blok Kolom) ⬇️`);
+  showToast(`Seluruh Kolom ${col} dipilih (Blok Kolom) â¬‡ï¸`);
 }
 
 function handleRowHeaderMouseDown(row, event) {
@@ -15774,7 +15835,7 @@ function handleRowHeaderMouseDown(row, event) {
   pilihSelExcel(`A${row}`);
   highlightNormalRange(`A${row}`, `${lastCol}${row}`);
   updateRangeStatsBar(`A${row}`, `${lastCol}${row}`);
-  showToast(`Seluruh Baris ${row} dipilih (Blok Baris) ➡️`);
+  showToast(`Seluruh Baris ${row} dipilih (Blok Baris) âž¡ï¸`);
 }
 
 function pilihSelExcel(coord) {
@@ -15790,7 +15851,7 @@ function pilihSelExcel(coord) {
   if (formatPainterActive && formatPainterSavedFormat) {
     excelState.formats[coord] = Object.assign({}, formatPainterSavedFormat);
     formatPainterActive = false;
-    showToast(`Format sel disalin ke ${coord}! ✨`, 'success');
+    showToast(`Format sel disalin ke ${coord}! âœ¨`, 'success');
   }
 
   const coordInput = document.getElementById('excel-cell-coord');
@@ -15997,7 +16058,7 @@ function terapkanFormulaExcel(pindahBawah = true) {
 
   if (String(val).startsWith('=')) {
     const hasil = evaluasiRumusExcel(val);
-    showToast(`Rumus ${val} di sel ${coord} = ${hasil} ✨`, 'success');
+    showToast(`Rumus ${val} di sel ${coord} = ${hasil} âœ¨`, 'success');
   }
 
   renderExcelGrid();
@@ -16069,13 +16130,13 @@ function attachExcelKeyboardListener() {
       const newWidth = Math.max(35, Math.min(600, excelState.resizeColStartWidth + deltaX));
       excelState.colWidths[excelState.resizeColLetter] = newWidth;
       applyLiveColWidth(excelState.resizeColLetter, newWidth);
-      showResizeTooltip(event.clientX, event.clientY, `Lebar Kolom ${excelState.resizeColLetter}: ${newWidth}px ↔`);
+      showResizeTooltip(event.clientX, event.clientY, `Lebar Kolom ${excelState.resizeColLetter}: ${newWidth}px â†”`);
     } else if (excelState.isResizingRow) {
       const deltaY = event.clientY - excelState.resizeRowStartY;
       const newHeight = Math.max(22, Math.min(300, excelState.resizeRowStartHeight + deltaY));
       excelState.rowHeights[excelState.resizeRowNumber] = newHeight;
       applyLiveRowHeight(excelState.resizeRowNumber, newHeight);
-      showResizeTooltip(event.clientX, event.clientY, `Tinggi Baris ${excelState.resizeRowNumber}: ${newHeight}px ↕`);
+      showResizeTooltip(event.clientX, event.clientY, `Tinggi Baris ${excelState.resizeRowNumber}: ${newHeight}px â†•`);
     }
   });
 
@@ -16088,7 +16149,7 @@ function attachExcelKeyboardListener() {
       document.body.style.cursor = '';
       hideResizeTooltip();
       renderExcelGrid();
-      showToast(`Lebar kolom ${col} berhasil diubah: ${w} piksel ↔️`);
+      showToast(`Lebar kolom ${col} berhasil diubah: ${w} piksel â†”ï¸`);
     }
     if (excelState.isResizingRow) {
       const r = excelState.resizeRowNumber;
@@ -16097,7 +16158,7 @@ function attachExcelKeyboardListener() {
       document.body.style.cursor = '';
       hideResizeTooltip();
       renderExcelGrid();
-      showToast(`Tinggi baris ${r} berhasil diubah: ${h} piksel ↕️`);
+      showToast(`Tinggi baris ${r} berhasil diubah: ${h} piksel â†•ï¸`);
     }
     if (excelState.isMouseDown || excelState.isAutofilling) {
       handleGridMouseUp(event);
@@ -16250,7 +16311,7 @@ function formatExcelSel(type) {
     'bold': `Format Tebal (Bold) diterapkan (${cells.length} sel)`,
     'italic': `Format Miring (Italic) diterapkan (${cells.length} sel)`,
     'underline': `Format Garis Bawah (Underline) diterapkan (${cells.length} sel)`,
-    'border-all': `Garis tabel (All Borders) berhasil dibuat (${cells.length} sel)! ⊞`,
+    'border-all': `Garis tabel (All Borders) berhasil dibuat (${cells.length} sel)! âŠž`,
     'border-none': `Garis tabel dihapus (${cells.length} sel)`,
     'align-left': `Rata Kiri diterapkan (${cells.length} sel)`,
     'align-center': `Rata Tengah diterapkan (${cells.length} sel)`,
@@ -16263,7 +16324,7 @@ function formatExcelSel(type) {
 function potongSelExcel() {
   salinSelExcel();
   hapusIsiSelExcel(true);
-  showToast(`Teks sel dipotong (Cut) ke Clipboard! ✂`);
+  showToast(`Teks sel dipotong (Cut) ke Clipboard! âœ‚`);
 }
 
 let formatPainterActive = false;
@@ -16273,7 +16334,7 @@ function formatPainterExcel() {
   formatPainterSavedFormat = Object.assign({}, excelState.formats[coord] || {});
   formatPainterActive = true;
   playSound('click');
-  showToast('Format Painter Aktif! 🖌 Klik sel mana pun untuk menyalin format font, warna, dan perataan.', 'info');
+  showToast('Format Painter Aktif! ðŸ–Œ Klik sel mana pun untuk menyalin format font, warna, dan perataan.', 'info');
 }
 
 function tambahFontSizeDelta(delta) {
@@ -16361,7 +16422,7 @@ function beriWarnaLatarSelExcel(color) {
   document.getElementById('excel-fill-picker')?.classList.add('hidden');
   playSound('click');
   renderExcelGrid();
-  showToast(color ? `Warna latar diterapkan (${cells.length} sel)! 🎨` : `Warna latar dihapus (${cells.length} sel)`, 'success');
+  showToast(color ? `Warna latar diterapkan (${cells.length} sel)! ðŸŽ¨` : `Warna latar dihapus (${cells.length} sel)`, 'success');
 }
 
 function beriWarnaHurufExcel(color) {
@@ -16439,7 +16500,7 @@ function masukkanAutoSumExcel(funcName = 'SUM') {
   if (formulaInput) formulaInput.value = formulaStr;
 
   playSound('success');
-  showToast(`Rumus ${formulaStr} berhasil disisipkan! ✨`, 'success');
+  showToast(`Rumus ${formulaStr} berhasil disisipkan! âœ¨`, 'success');
 
   renderExcelGrid();
   renderExcelMiniChart();
@@ -16481,8 +16542,8 @@ function hapusIsiSelExcel(onlyContents = true) {
   }
 
   const msg = onlyContents
-    ? (cells.length === 1 ? `Isi sel ${cells[0]} berhasil dihapus (Delete) 🗑️` : `Isi ${cells.length} sel berhasil dihapus (Delete) 🗑️`)
-    : `Semua isi & format ${cells.length} sel berhasil dibersihkan! 🧹`;
+    ? (cells.length === 1 ? `Isi sel ${cells[0]} berhasil dihapus (Delete) ðŸ—‘ï¸` : `Isi ${cells.length} sel berhasil dihapus (Delete) ðŸ—‘ï¸`)
+    : `Semua isi & format ${cells.length} sel berhasil dibersihkan! ðŸ§¹`;
   showToast(msg);
 }
 
@@ -16702,7 +16763,7 @@ function salinSelExcel() {
   renderExcelGrid();
 
   const label = cells.length === 1 ? `Sel ${cells[0]}` : `${cells.length} sel`;
-  showToast(`Teks ${label} berhasil disalin (Copy) ke Clipboard! 📋`, 'success');
+  showToast(`Teks ${label} berhasil disalin (Copy) ke Clipboard! ðŸ“‹`, 'success');
 }
 
 async function tempelSelExcel() {
@@ -16774,7 +16835,7 @@ async function tempelSelExcel() {
     formulaInput.value = excelState.cells[excelState.activeCell] || '';
   }
 
-  showToast(`Teks berhasil ditempel (Paste) ke ${pastedCount} sel! 📋✨`, 'success');
+  showToast(`Teks berhasil ditempel (Paste) ke ${pastedCount} sel! ðŸ“‹âœ¨`, 'success');
 }
 
 function pilihSemuaSelExcel() {
@@ -16787,7 +16848,7 @@ function pilihSemuaSelExcel() {
   highlightNormalRange('A1', `${lastCol}${lastRow}`);
   updateRangeStatsBar('A1', `${lastCol}${lastRow}`);
   renderExcelGrid();
-  showToast(`Seluruh lembar kerja dipilih (${excelState.cols.length * lastRow} sel) 📑`);
+  showToast(`Seluruh lembar kerja dipilih (${excelState.cols.length * lastRow} sel) ðŸ“‘`);
 }
 
 function handleCellContextMenu(coord, event) {
@@ -16892,8 +16953,8 @@ function bukaRoboMindLangsung() {
   }, 100);
 
   const msg = state.currentLang === 'en' 
-    ? 'Semester 2: RoboMind 7.0 Desktop Simulator Opened! 🤖' 
-    : 'Semester 2: Aplikasi Simulator RoboMind 7.0 Dibuka! 🤖';
+    ? 'Semester 2: RoboMind 7.0 Desktop Simulator Opened! ðŸ¤–' 
+    : 'Semester 2: Aplikasi Simulator RoboMind 7.0 Dibuka! ðŸ¤–';
   showToast(msg, 'success');
 }
 window.bukaRoboMindLangsung = bukaRoboMindLangsung;
@@ -16935,13 +16996,13 @@ right()
 forward(3)
 # 2. Ambil Beacon ke dalam muatan robot!
 pickUp()
-say("Beacon berhasil kuambil! 💠")
+say("Beacon berhasil kuambil! ðŸ’ ")
 # 3. Pindahkan Beacon ke area pasir baru
 left()
 forward(3)
 # 4. Tempatkan Beacon di posisi baru!
 putDown()
-say("Beacon berhasil kutempatkan! 📥")`,
+say("Beacon berhasil kutempatkan! ðŸ“¥")`,
 
   misi_jejak: `# Misi 2: Telusuri Jalur Cat Putih Gurun
 # Robot melintasi pasir gurun mengikuti jejak
@@ -16960,7 +17021,7 @@ forward(8)
 left()
 forward(2)
 pickUp()
-say("Beacon Plateau Kanan Atas berhasil kuambil! 💠")`,
+say("Beacon Plateau Kanan Atas berhasil kuambil! ðŸ’ ")`,
 
   misi_patroli: `# Misi 4: Patroli Persegi (Loop repeat 4)
 # Robot berpatroli mengelilingi kotak
@@ -16975,10 +17036,10 @@ say("Patroli keliling persegi selesai dikerjakan!")`,
 # Perintah yang dapat kamu gunakan:
 # - forward(n)      : Maju n langkah
 # - backward(n)     : Mundur n langkah
-# - left()          : Belok kiri 90°
-# - right()         : Belok kanan 90°
-# - pickUp()        : Ambil Beacon di depan / bawah robot 💠
-# - putDown()       : Tempatkan Beacon yang sedang dibawa 📥
+# - left()          : Belok kiri 90Â°
+# - right()         : Belok kanan 90Â°
+# - pickUp()        : Ambil Beacon di depan / bawah robot ðŸ’ 
+# - putDown()       : Tempatkan Beacon yang sedang dibawa ðŸ“¥
 # - paintWhite()    : Kuas cat putih ON
 # - paintBlack()    : Kuas cat hitam ON
 # - stopPainting()  : Kuas cat OFF
@@ -17177,15 +17238,15 @@ function renderRoboMindGrid() {
         } else if (mapElem.type === 'water') {
           // Kolam Air Biru Jernih
           cell.className += ' bg-[#64748b] border border-[#475569] p-0.5';
-          cell.innerHTML = '<div class="w-full h-full rounded bg-sky-400 border border-sky-200 shadow-inner flex items-center justify-center text-[10px] text-white">💧</div>';
+          cell.innerHTML = '<div class="w-full h-full rounded bg-sky-400 border border-sky-200 shadow-inner flex items-center justify-center text-[10px] text-white">ðŸ’§</div>';
         } else if (mapElem.type === 'tree') {
           // Pohon Hijau di Atas Batu
           cell.className += ' bg-[#64748b] border border-[#475569] flex items-center justify-center';
-          cell.innerHTML = '<span class="text-base sm:text-lg drop-shadow-md select-none transform hover:scale-125 transition">🌳</span>';
+          cell.innerHTML = '<span class="text-base sm:text-lg drop-shadow-md select-none transform hover:scale-125 transition">ðŸŒ³</span>';
         } else if (mapElem.type === 'crate') {
           // Peti Kayu Cokelat
           cell.className += ' bg-[#e69138] border border-amber-800/20 flex items-center justify-center p-0.5';
-          cell.innerHTML = '<div class="w-full h-full rounded bg-[#92400e] border border-[#b45309] shadow flex items-center justify-center text-[10px] text-amber-200 font-bold select-none">📦</div>';
+          cell.innerHTML = '<div class="w-full h-full rounded bg-[#92400e] border border-[#b45309] shadow flex items-center justify-center text-[10px] text-amber-200 font-bold select-none">ðŸ“¦</div>';
         }
       } else {
         // Pasir Oranye Gurun RoboMind
@@ -17217,7 +17278,7 @@ function renderRoboMindGrid() {
           <div class="relative w-5 h-5 flex items-center justify-center">
             <div class="absolute inset-0 rounded-full bg-cyan-400/50 animate-ping"></div>
             <div class="relative w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-600 via-teal-400 to-emerald-300 border-2 border-white shadow-md flex items-center justify-center text-[8px] text-white font-bold">
-              💠
+              ðŸ’ 
             </div>
           </div>
         `;
@@ -17312,7 +17373,7 @@ function updateRoboBeaconUI() {
       : 'font-bold text-white bg-cyan-800 px-1.5 py-0.2 rounded-full text-[9px]';
   }
   if (status) {
-    status.innerText = robomindState.heldBeacons > 0 ? 'Membawa 💠' : 'Tidak Membawa';
+    status.innerText = robomindState.heldBeacons > 0 ? 'Membawa ðŸ’ ' : 'Tidak Membawa';
     status.className = robomindState.heldBeacons > 0 ? 'text-cyan-300 font-bold' : 'text-slate-300';
   }
 }
@@ -17353,7 +17414,7 @@ function updateRoboLineNumbers(activeLineIndex = -1) {
   let html = '';
   for (let i = 1; i <= count; i++) {
     if (i === activeLineIndex + 1) {
-      html += `<div class="bg-amber-400 text-slate-900 font-bold px-1 rounded-sm flex items-center justify-between"><span>▶</span><span>${i}</span></div>`;
+      html += `<div class="bg-amber-400 text-slate-900 font-bold px-1 rounded-sm flex items-center justify-between"><span>â–¶</span><span>${i}</span></div>`;
     } else {
       html += `<div class="px-1">${i}</div>`;
     }
@@ -17385,7 +17446,7 @@ function gantiMisiRoboMind(misiKey) {
     titleEl.innerText = `RoboMind 7.0 - [${fileNames[misiKey] || 'script.irobo'}]`;
   }
 
-  logKonsolRobo(`📂 Memuat misi "${fileNames[misiKey] || misiKey}". Klik [Play / Run] untuk memulai!`, 'info');
+  logKonsolRobo(`ðŸ“‚ Memuat misi "${fileNames[misiKey] || misiKey}". Klik [Play / Run] untuk memulai!`, 'info');
 }
 
 function sisipkanPerintahRobo(cmd) {
@@ -17590,10 +17651,10 @@ function jalankanRoboMind() {
     robomindState.stepIndex = 0;
 
     if (robomindState.instructions.length === 0) {
-      logKonsolRobo('⚠️ Tidak ada instruksi yang valid untuk dijalankan.', 'warn');
+      logKonsolRobo('âš ï¸ Tidak ada instruksi yang valid untuk dijalankan.', 'warn');
       return;
     }
-    logKonsolRobo(`▶ Memulai eksekusi skrip (${robomindState.instructions.length} langkah)...`, 'normal');
+    logKonsolRobo(`â–¶ Memulai eksekusi skrip (${robomindState.instructions.length} langkah)...`, 'normal');
   }
 
   robomindState.isRunning = true;
@@ -17677,7 +17738,7 @@ function eksekusiSatuInstruksiRobo(inst) {
 
     // Cek batas arena (0 s/d 21 horizontal, 0 s/d 13 vertikal)
     if (nx < 0 || nx >= robomindState.gridCols || ny < 0 || ny >= robomindState.gridRows) {
-      logKonsolRobo(`⚠️ Robot menabrak batas arena di (${nx}, ${ny})!`, 'warn');
+      logKonsolRobo(`âš ï¸ Robot menabrak batas arena di (${nx}, ${ny})!`, 'warn');
       playSound('error');
       return;
     }
@@ -17693,7 +17754,7 @@ function eksekusiSatuInstruksiRobo(inst) {
         crate: 'Peti Kayu'
       }[mapObj.type] || 'Rintangan';
 
-      logKonsolRobo(`⚠️ Gerakan terhalang oleh ${namaRintangan} di (${nx}, ${ny})!`, 'warn');
+      logKonsolRobo(`âš ï¸ Gerakan terhalang oleh ${namaRintangan} di (${nx}, ${ny})!`, 'warn');
       playSound('error');
       return;
     }
@@ -17716,13 +17777,13 @@ function eksekusiSatuInstruksiRobo(inst) {
     robomindState.robotDir = (robomindState.robotDir + 3) % 4;
     updateRoboMindRobotSprite();
     playSound('click');
-    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] left() - Robot belok kiri 90°`, 'robot');
+    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] left() - Robot belok kiri 90Â°`, 'robot');
 
   } else if (inst.action === 'right') {
     robomindState.robotDir = (robomindState.robotDir + 1) % 4;
     updateRoboMindRobotSprite();
     playSound('click');
-    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] right() - Robot belok kanan 90°`, 'robot');
+    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] right() - Robot belok kanan 90Â°`, 'robot');
 
   } else if (inst.action === 'pickUp') {
     robotAmbilBeacon(inst.lineIndex);
@@ -17736,7 +17797,7 @@ function eksekusiSatuInstruksiRobo(inst) {
     terapkanCatDiSel(robomindState.robotX, robomindState.robotY, 'white');
     updateRoboMindRobotSprite();
     playSound('click');
-    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] paintWhite() - Kuas cat putih diaktifkan ⬜`, 'robot');
+    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] paintWhite() - Kuas cat putih diaktifkan â¬œ`, 'robot');
 
   } else if (inst.action === 'paintBlack') {
     robomindState.isPainting = true;
@@ -17744,7 +17805,7 @@ function eksekusiSatuInstruksiRobo(inst) {
     terapkanCatDiSel(robomindState.robotX, robomindState.robotY, 'black');
     updateRoboMindRobotSprite();
     playSound('click');
-    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] paintBlack() - Kuas cat hitam diaktifkan ⬛`, 'robot');
+    logKonsolRobo(`> [Baris ${inst.lineIndex + 1}] paintBlack() - Kuas cat hitam diaktifkan â¬›`, 'robot');
 
   } else if (inst.action === 'stopPainting') {
     robomindState.isPainting = false;
@@ -17763,7 +17824,7 @@ function eksekusiSatuInstruksiRobo(inst) {
       }, 2500);
     }
     playSound('success');
-    logKonsolRobo(`💬 Robot berkata: "${inst.text}"`, 'success');
+    logKonsolRobo(`ðŸ’¬ Robot berkata: "${inst.text}"`, 'success');
   }
 }
 
@@ -17772,7 +17833,7 @@ function eksekusiSatuInstruksiRobo(inst) {
 // ==========================================
 function robotAmbilBeacon(lineIndex = 0) {
   if (robomindState.heldBeacons >= 1) {
-    logKonsolRobo(`⚠️ [Baris ${lineIndex + 1}] Robot sudah membawa Beacon! Gunakan putDown() untuk menaruhnya terlebih dahulu.`, 'warn');
+    logKonsolRobo(`âš ï¸ [Baris ${lineIndex + 1}] Robot sudah membawa Beacon! Gunakan putDown() untuk menaruhnya terlebih dahulu.`, 'warn');
     playSound('error');
     return;
   }
@@ -17803,26 +17864,26 @@ function robotAmbilBeacon(lineIndex = 0) {
     renderRoboMindGrid();
     updateRoboMindRobotSprite();
 
-    logKonsolRobo(`> [Baris ${lineIndex + 1}] pickUp() - 💠 Robot berhasil mengambil Beacon dari ${ambilPosisi}nya di (${takenBeacon.x}, ${takenBeacon.y})!`, 'success');
+    logKonsolRobo(`> [Baris ${lineIndex + 1}] pickUp() - ðŸ’  Robot berhasil mengambil Beacon dari ${ambilPosisi}nya di (${takenBeacon.x}, ${takenBeacon.y})!`, 'success');
     playSound('fanfare');
 
     const bubble = document.getElementById('robomind-speech-bubble');
     const speechText = document.getElementById('robomind-speech-text');
     if (bubble && speechText) {
-      speechText.innerText = 'Beacon kuambil! 💠';
+      speechText.innerText = 'Beacon kuambil! ðŸ’ ';
       bubble.classList.remove('hidden');
       setTimeout(() => bubble.classList.add('hidden'), 2000);
     }
     tambahPoin(15);
   } else {
-    logKonsolRobo(`⚠️ [Baris ${lineIndex + 1}] pickUp() - Tidak ada Beacon di depan atau di posisi robot untuk diambil.`, 'warn');
+    logKonsolRobo(`âš ï¸ [Baris ${lineIndex + 1}] pickUp() - Tidak ada Beacon di depan atau di posisi robot untuk diambil.`, 'warn');
     playSound('error');
   }
 }
 
 function robotLetakkanBeacon(lineIndex = 0) {
   if (robomindState.heldBeacons <= 0) {
-    logKonsolRobo(`⚠️ [Baris ${lineIndex + 1}] putDown() - Robot tidak sedang membawa Beacon untuk ditempatkan!`, 'warn');
+    logKonsolRobo(`âš ï¸ [Baris ${lineIndex + 1}] putDown() - Robot tidak sedang membawa Beacon untuk ditempatkan!`, 'warn');
     playSound('error');
     return;
   }
@@ -17860,18 +17921,18 @@ function robotLetakkanBeacon(lineIndex = 0) {
   renderRoboMindGrid();
   updateRoboMindRobotSprite();
 
-  logKonsolRobo(`> [Baris ${lineIndex + 1}] putDown() - 📥 Robot meletakkan Beacon di koordinat (${targetX}, ${targetY})!`, 'success');
+  logKonsolRobo(`> [Baris ${lineIndex + 1}] putDown() - ðŸ“¥ Robot meletakkan Beacon di koordinat (${targetX}, ${targetY})!`, 'success');
   playSound('success');
 
   const bubble = document.getElementById('robomind-speech-bubble');
   const speechText = document.getElementById('robomind-speech-text');
   if (bubble && speechText) {
-    speechText.innerText = 'Beacon diletakkan! 📥';
+    speechText.innerText = 'Beacon diletakkan! ðŸ“¥';
     bubble.classList.remove('hidden');
     setTimeout(() => bubble.classList.add('hidden'), 2000);
   }
   tambahPoin(20);
-  showToast(`Beacon berhasil ditempatkan di (${targetX}, ${targetY})! 💠 (+20 Bintang)`, 'success');
+  showToast(`Beacon berhasil ditempatkan di (${targetX}, ${targetY})! ðŸ’  (+20 Bintang)`, 'success');
 }
 
 function interaksiKlikBeacon(beacon) {
@@ -17881,8 +17942,8 @@ function interaksiKlikBeacon(beacon) {
     // Robot berada tepat di sebelah beacon, ambil langsung!
     robotAmbilBeacon();
   } else {
-    logKonsolRobo(`💠 Beacon terdeteksi di koordinat (${beacon.x}, ${beacon.y}). Jalankan robot mendekat lalu gunakan perintah pickUp()!`, 'info');
-    showToast(`Beacon ada di X:${beacon.x} Y:${beacon.y}. Dekati lalu jalankan pickUp()! 💠`, 'info');
+    logKonsolRobo(`ðŸ’  Beacon terdeteksi di koordinat (${beacon.x}, ${beacon.y}). Jalankan robot mendekat lalu gunakan perintah pickUp()!`, 'info');
+    showToast(`Beacon ada di X:${beacon.x} Y:${beacon.y}. Dekati lalu jalankan pickUp()! ðŸ’ `, 'info');
   }
 }
 
@@ -17906,12 +17967,12 @@ function selesaikanEksekusiRoboMind(autoToast = true) {
   }
 
   updateRoboLineNumbers(-1);
-  logKonsolRobo('🎉 Seluruh instruksi RoboMind selesai dieksekusi dengan sukses!', 'success');
+  logKonsolRobo('ðŸŽ‰ Seluruh instruksi RoboMind selesai dieksekusi dengan sukses!', 'success');
   playSound('fanfare');
   tambahPoin(20);
 
   if (autoToast) {
-    showToast('Hebat! Skrip RoboMind berhasil dijalankan! 🤖🏆 (+20 Bintang)', 'success');
+    showToast('Hebat! Skrip RoboMind berhasil dijalankan! ðŸ¤–ðŸ† (+20 Bintang)', 'success');
   }
 }
 
@@ -17962,7 +18023,7 @@ function resetRoboMind() {
     statusTag.innerText = 'Siap Dijalankan';
   }
 
-  logKonsolRobo('⏹ Posisi robot dan arena gurun RoboMind telah di-reset ke kondisi awal.', 'normal');
+  logKonsolRobo('â¹ Posisi robot dan arena gurun RoboMind telah di-reset ke kondisi awal.', 'normal');
 }
 
 function resetRoboMindScript() {
@@ -17972,7 +18033,7 @@ function resetRoboMindScript() {
 
 function ubahKecepatanRoboMind(speedMs) {
   robomindState.speedMs = parseInt(speedMs, 10) || 450;
-  logKonsolRobo(`⏱ Kecepatan eksekusi diatur ke ${robomindState.speedMs} ms per langkah`, 'normal');
+  logKonsolRobo(`â± Kecepatan eksekusi diatur ke ${robomindState.speedMs} ms per langkah`, 'normal');
 }
 
 function zoomRoboArena(mode) {
@@ -18018,11 +18079,11 @@ function toggleRoboFullscreen(forceState = null) {
     if (iconFs) iconFs.className = 'fa-solid fa-compress text-xs text-amber-300';
     if (textFs) textFs.innerText = 'Keluar Layar Penuh';
     if (btnWinMax) {
-      btnWinMax.innerText = '🗗';
+      btnWinMax.innerText = 'ðŸ——';
       btnWinMax.title = 'Pulihkan Ukuran Jendela';
     }
 
-    showToast('Mode Layar Penuh Aktif! Anak dapat melihat satu layar penuh ⛶ (Tekan ESC untuk kembali)', 'info');
+    showToast('Mode Layar Penuh Aktif! Anak dapat melihat satu layar penuh â›¶ (Tekan ESC untuk kembali)', 'info');
   } else {
     frame.classList.remove('robomind-fullscreen-mode');
     document.body.style.overflow = '';
@@ -18035,7 +18096,7 @@ function toggleRoboFullscreen(forceState = null) {
     if (iconFs) iconFs.className = 'fa-solid fa-expand text-xs';
     if (textFs) textFs.innerText = 'Layar Penuh';
     if (btnWinMax) {
-      btnWinMax.innerText = '□';
+      btnWinMax.innerText = 'â–¡';
       btnWinMax.title = 'Layar Penuh (Full Screen)';
     }
 
@@ -18102,7 +18163,7 @@ function simpanScriptRoboMind() {
   link.click();
 
   tambahPoin(15);
-  showToast('File skrip RoboMind (.irobo) berhasil disimpan ke komputer! 💾 (+15 Bintang)', 'success');
+  showToast('File skrip RoboMind (.irobo) berhasil disimpan ke komputer! ðŸ’¾ (+15 Bintang)', 'success');
 }
 
 function bukaModalMisiRobo() {
@@ -18117,11 +18178,11 @@ function bukaModalMisiRobo() {
 function bukaRoboMenu(menu) {
   playSound('click');
   const menuInfo = {
-    file: '📁 Menu File: Buat Skrip Baru, Buka Misi, atau Simpan Skrip .irobo ke komputermu!',
-    edit: '✏️ Menu Edit: Gunakan Undo, Redo, atau sisipkan perintah cepat RoboMind.',
-    view: '🔍 Menu View: Perbesar (Zoom In), Perkecil (Zoom Out), atau Reset pandangan arena.',
-    run: '▶️ Menu Run: Klik Play (F5) untuk jalankan penuh, atau Step untuk selangkah demi selangkah.',
-    help: '❓ Menu Help: RoboMind mendukung perintah forward(n), backward(n), left(), right(), paintWhite(), paintBlack(), stopPainting(), say("..."), dan repeat(n) { ... }'
+    file: 'ðŸ“ Menu File: Buat Skrip Baru, Buka Misi, atau Simpan Skrip .irobo ke komputermu!',
+    edit: 'âœï¸ Menu Edit: Gunakan Undo, Redo, atau sisipkan perintah cepat RoboMind.',
+    view: 'ðŸ” Menu View: Perbesar (Zoom In), Perkecil (Zoom Out), atau Reset pandangan arena.',
+    run: 'â–¶ï¸ Menu Run: Klik Play (F5) untuk jalankan penuh, atau Step untuk selangkah demi selangkah.',
+    help: 'â“ Menu Help: RoboMind mendukung perintah forward(n), backward(n), left(), right(), paintWhite(), paintBlack(), stopPainting(), say("..."), dan repeat(n) { ... }'
   };
   showToast(menuInfo[menu] || 'Menu RoboMind 7.0 Aktif');
 }
@@ -18249,9 +18310,9 @@ function sapaRobotHalo(customGreetingOrEvent) {
   // Tambahkan poin bintang siswa
   tambahPoin(5);
   if (typeof customGreetingOrEvent === 'string' && customGreetingOrEvent.trim().length > 0) {
-    showToast('Robo menjawab pertanyaanmu! 🤖✨ (+5 Bintang)', 'success');
+    showToast('Robo menjawab pertanyaanmu! ðŸ¤–âœ¨ (+5 Bintang)', 'success');
   } else {
-    showToast('Robo: "Halo sobat cilik!" 🤖✨ (+5 Bintang)', 'success');
+    showToast('Robo: "Halo sobat cilik!" ðŸ¤–âœ¨ (+5 Bintang)', 'success');
   }
 
   const isEnglish = (state && state.currentLang === 'en');
@@ -18373,7 +18434,7 @@ function kirimPertanyaanKeRobo(event) {
   if (!inputEl) return;
   const teksTanya = inputEl.value.trim();
   if (!teksTanya) {
-    showToast('Tulis pertanyaanmu dulu di kolom tanya ya! 💬', 'info');
+    showToast('Tulis pertanyaanmu dulu di kolom tanya ya! ðŸ’¬', 'info');
     inputEl.focus();
     return;
   }
@@ -18413,7 +18474,7 @@ function prosesPertanyaanKeRobo(rawQuestion) {
       namaOp = 'dibagi';
     }
 
-    jawaban = `Hasil dari ${num1} ${namaOp} ${num2} adalah ${hasil}! Hebat sekali, kamu anak pintar yang suka berhitung! ✨`;
+    jawaban = `Hasil dari ${num1} ${namaOp} ${num2} adalah ${hasil}! Hebat sekali, kamu anak pintar yang suka berhitung! âœ¨`;
   }
   // 2. Kecerdasan Buatan (AI) & Coding
   else if (q.includes('apa itu ai') || q.includes('arti ai') || q.includes('artificial intelligence') || q.includes('kecerdasan buatan')) {
@@ -18720,7 +18781,7 @@ function prosesPertanyaanKeRobo(rawQuestion) {
   const bubbleBadge = document.getElementById('speech-bubble-badge');
   if (bubbleBadge) {
     const isEn = (state && state.currentLang === 'en');
-    bubbleBadge.innerText = isEn ? 'Robo Answered 🔊' : 'Robo Menjawab 🔊';
+    bubbleBadge.innerText = isEn ? 'Robo Answered ðŸ”Š' : 'Robo Menjawab ðŸ”Š';
     bubbleBadge.className = 'text-[11px] font-title font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200';
   }
 
@@ -18731,9 +18792,9 @@ function prosesPertanyaanKeRobo(rawQuestion) {
 // Global Recognition Instance untuk kontrol buka/tutup
 let roboActiveRecognition = null;
 let isRoboListening = false;
-window._jawabanTerakhirRobo = "Halo sobat cilik! Aku Robo! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara 🎙️ jika mau bertanya padaku!";
+window._jawabanTerakhirRobo = "Halo sobat cilik! Aku Robo! Senang sekali bisa mengobrol denganmu! Klik tombol Bicara ðŸŽ™ï¸ jika mau bertanya padaku!";
 
-// Fungsi Utama: Siswa Menekan Tombol "Bicara 🎙️" untuk Bertanya ke Robo
+// Fungsi Utama: Siswa Menekan Tombol "Bicara ðŸŽ™ï¸" untuk Bertanya ke Robo
 function bukaModalBicaraRobo(event) {
   mulaiBicaraKeRobo(event);
 }
@@ -18758,7 +18819,7 @@ function mulaiBicaraKeRobo(event) {
   if (!SpeechRecognition) {
     showToast('Browser belum mendukung mikrofon langsung. Silakan ketik atau klik topik pertanyaan!', 'info');
     if (speechBubbleText) {
-      speechBubbleText.innerText = 'Browser belum mendukung mikrofon langsung. Silakan ketik pertanyaanmu di kolom bawah ya! 😊';
+      speechBubbleText.innerText = 'Browser belum mendukung mikrofon langsung. Silakan ketik pertanyaanmu di kolom bawah ya! ðŸ˜Š';
     }
     return;
   }
@@ -18769,7 +18830,7 @@ function mulaiBicaraKeRobo(event) {
       roboActiveRecognition.stop();
     } catch(e) {}
     isRoboListening = false;
-    if (micText) micText.innerText = 'Bicara 🎙️';
+    if (micText) micText.innerText = 'Bicara ðŸŽ™ï¸';
     if (micBtn) micBtn.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse', 'bg-rose-500', 'text-white');
     return;
   }
@@ -18783,18 +18844,18 @@ function mulaiBicaraKeRobo(event) {
 
     recognition.onstart = () => {
       isRoboListening = true;
-      if (micText) micText.innerText = 'Mendengar... 🔴';
+      if (micText) micText.innerText = 'Mendengar... ðŸ”´';
       if (micBtn) {
         micBtn.classList.add('ring-4', 'ring-rose-500', 'animate-pulse', 'bg-rose-500', 'text-white');
       }
       if (bubbleBadge) {
-        bubbleBadge.innerText = '🎙️ Robo Mendengarkan...';
+        bubbleBadge.innerText = 'ðŸŽ™ï¸ Robo Mendengarkan...';
         bubbleBadge.className = 'text-[11px] font-title font-black text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 animate-pulse';
       }
       if (speechBubbleText) {
-        speechBubbleText.innerHTML = '<span class="text-rose-600 font-bold">Aku sedang mendengarkan suaramu...</span> Katakan pertanyaanmu sekarang! 🎙️';
+        speechBubbleText.innerHTML = '<span class="text-rose-600 font-bold">Aku sedang mendengarkan suaramu...</span> Katakan pertanyaanmu sekarang! ðŸŽ™ï¸';
       }
-      showToast('Robo sedang mendengarkan... Silakan katakan pertanyaanmu! 🎙️', 'info');
+      showToast('Robo sedang mendengarkan... Silakan katakan pertanyaanmu! ðŸŽ™ï¸', 'info');
     };
 
     recognition.onresult = (e) => {
@@ -18802,7 +18863,7 @@ function mulaiBicaraKeRobo(event) {
       console.log('Suara siswa berhasil ditangkap:', hasil);
       isRoboListening = false;
 
-      if (micText) micText.innerText = 'Bicara 🎙️';
+      if (micText) micText.innerText = 'Bicara ðŸŽ™ï¸';
       if (micBtn) {
         micBtn.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse', 'bg-rose-500', 'text-white');
       }
@@ -18824,7 +18885,7 @@ function mulaiBicaraKeRobo(event) {
     recognition.onerror = (e) => {
       console.warn('SpeechRecognition error:', e.error);
       isRoboListening = false;
-      if (micText) micText.innerText = 'Bicara 🎙️';
+      if (micText) micText.innerText = 'Bicara ðŸŽ™ï¸';
       if (micBtn) {
         micBtn.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse', 'bg-rose-500', 'text-white');
       }
@@ -18837,15 +18898,15 @@ function mulaiBicaraKeRobo(event) {
         if (speechBubbleText) speechBubbleText.innerText = 'Izin mikrofon belum aktif di browser. Klik izin mikrofon atau ketik pertanyaanmu ya!';
         showToast('Izin mikrofon belum aktif. Izinkan akses mikrofon di browser.', 'warning');
       } else if (e.error === 'no-speech') {
-        if (speechBubbleText) speechBubbleText.innerText = 'Belum ada suara terdengar. Klik tombol "Bicara 🎙️" lagi dan coba bicara lebih dekat ya!';
+        if (speechBubbleText) speechBubbleText.innerText = 'Belum ada suara terdengar. Klik tombol "Bicara ðŸŽ™ï¸" lagi dan coba bicara lebih dekat ya!';
       } else {
-        if (speechBubbleText) speechBubbleText.innerText = 'Klik tombol "Bicara 🎙️" untuk memberi pertanyaan lewat suara padaku!';
+        if (speechBubbleText) speechBubbleText.innerText = 'Klik tombol "Bicara ðŸŽ™ï¸" untuk memberi pertanyaan lewat suara padaku!';
       }
     };
 
     recognition.onend = () => {
       isRoboListening = false;
-      if (micText) micText.innerText = 'Bicara 🎙️';
+      if (micText) micText.innerText = 'Bicara ðŸŽ™ï¸';
       if (micBtn) {
         micBtn.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse', 'bg-rose-500', 'text-white');
       }
@@ -18855,7 +18916,7 @@ function mulaiBicaraKeRobo(event) {
   } catch(err) {
     console.error('Error memulai SpeechRecognition:', err);
     if (speechBubbleText) {
-      speechBubbleText.innerText = 'Klik tombol "Bicara 🎙️" untuk bertanya padaku!';
+      speechBubbleText.innerText = 'Klik tombol "Bicara ðŸŽ™ï¸" untuk bertanya padaku!';
     }
   }
 }
@@ -18919,46 +18980,36 @@ const SEED_STUDENTS = [
     nis: '6000',
     nama: 'Pelajar Uji Coba 6A',
     kelas: '6A',
-    absen: '01',
+    absen: '00',
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Januari 2015',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 50,
-    statusKkm: 'Tuntas',
-    catatanGuru: 'Akun Uji Coba Kelas 6 SD • 4 Pilar Computational Thinking'
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 50, statusKkm: 'Tuntas',
+    catatanGuru: 'Akun Uji Coba Kelas 6 SD â€¢ 4 Pilar Computational Thinking'
+  },
+  {
+    id: 'STD-5A-5000',
+    nis: '5000',
+    nama: 'Pelajar Uji Coba 5A',
+    kelas: '5A',
+    absen: '00',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 Januari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 50, statusKkm: 'Tuntas',
+    catatanGuru: 'Akun Uji Coba Kelas 5 SD â€¢ Portofolio Digital & AI'
   },
   {
     id: 'STD-4A-3000',
     nis: '3000',
-    nama: 'Siswa Contoh (3000)',
+    nama: 'Pelajar Uji Coba 4A',
     kelas: '4A',
-    absen: '30',
+    absen: '00',
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Januari 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
-    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 50, statusKkm: 'Tuntas',
+    catatanGuru: 'Akun Uji Coba Kelas 4 SD â€¢ Budaya Budi Pekerti & IT'
   },
   {
     id: 'STD-4A-3201',
@@ -18969,41 +19020,19 @@ const SEED_STUDENTS = [
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '10 Februari 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3204',
     nis: '3204',
-    nama: 'ADHYASTHA PUTRA PRATAMA',
+    nama: 'ADHYASTHA PUTRA PRATAMA CETTA',
     kelas: '4A',
     absen: '02',
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '23 Desember 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
@@ -19015,179 +19044,91 @@ const SEED_STUDENTS = [
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '05 April 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3236',
     nis: '3236',
-    nama: 'ALKHALIFI GHAISAN',
+    nama: 'ALKHALIFI GHAISAN ZAHRI',
     kelas: '4A',
     absen: '04',
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '30 Maret 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3298',
     nis: '3298',
-    nama: 'ALVIAN LEWIS PUTRA',
+    nama: 'ALVIAN LEWIS PUTRA UTOMO',
     kelas: '4A',
     absen: '05',
     jenisKelamin: 'L',
     tempatLahir: 'KUDUS',
     tanggalLahir: '23 Februari 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3331',
     nis: '3331',
-    nama: 'ANANDA DWI RIZKY',
+    nama: 'ANANDA DWI RIZQI RAMADHAN',
     kelas: '4A',
     absen: '06',
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '21 Juni 2015',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3382',
     nis: '3382',
-    nama: 'ANDITA SANELA ZAHRA',
+    nama: 'ANDITA SANELA ZHOU',
     kelas: '4A',
     absen: '07',
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '08 September 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3302',
     nis: '3302',
-    nama: 'ASSYLA KANSYAFA',
+    nama: 'ASSYLA KANSYAFANI',
     kelas: '4A',
     absen: '08',
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Mei 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3207',
     nis: '3207',
-    nama: 'BELLVANIA CHRISTABELL',
+    nama: 'BELLVANIA CHRISTEL',
     kelas: '4A',
     absen: '09',
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '17 April 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
     id: 'STD-4A-3304',
     nis: '3304',
-    nama: 'CALYSTA VANESYA',
+    nama: 'CALYSTA VANESYA WEN',
     kelas: '4A',
     absen: '10',
     jenisKelamin: 'P',
     tempatLahir: 'WONOSOBO',
     tanggalLahir: '21 April 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
@@ -19199,67 +19140,3803 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '05 Agustus 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
-    id: 'STD-4A-3312',
-    nis: '3312',
+    id: 'STD-4A-3212',
+    nis: '3212',
     nama: 'FLORINDA LIN',
     kelas: '4A',
     absen: '12',
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '21 Agustus 2017',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 0,
-    statusKkm: 'Remedial',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
-    id: 'STD-5A-5000',
-    nis: '5000',
-    nama: 'Pelajar Uji Coba 5A',
-    kelas: '5A',
+    id: 'STD-4A-3213',
+    nis: '3213',
+    nama: 'GABRIELA ZEFANYA TOAR',
+    kelas: '4A',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Februari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3278',
+    nis: '3278',
+    nama: 'GRANADA EMMA MAHASTRA',
+    kelas: '4A',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3217',
+    nis: '3217',
+    nama: 'GRAYVIEN AYCENT',
+    kelas: '4A',
+    absen: '15',
+    jenisKelamin: 'L',
+    tempatLahir: 'TEBAS',
+    tanggalLahir: '26 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3279',
+    nis: '3279',
+    nama: 'HANS JULIAN YU',
+    kelas: '4A',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 Juli 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3339',
+    nis: '3339',
+    nama: 'HERIQTIN',
+    kelas: '4A',
+    absen: '17',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 September 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3219',
+    nis: '3219',
+    nama: 'IAN HAYES',
+    kelas: '4A',
+    absen: '18',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Oktober 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3220',
+    nis: '3220',
+    nama: 'JOYCELINE VINATA DOMINIQUE',
+    kelas: '4A',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '24 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3251',
+    nis: '3251',
+    nama: 'KALANDRA PUTRA HAFUZEIN',
+    kelas: '4A',
+    absen: '20',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3252',
+    nis: '3252',
+    nama: 'KENZI LIM SURYA',
+    kelas: '4A',
+    absen: '21',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3344',
+    nis: '3344',
+    nama: 'KYLIAN SHAQUILLE PRILIAN',
+    kelas: '4A',
+    absen: '22',
+    jenisKelamin: 'L',
+    tempatLahir: 'KUNINGAN',
+    tanggalLahir: '14 Agustus 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3283',
+    nis: '3283',
+    nama: 'MARIO MONGKUT CHUANG',
+    kelas: '4A',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3254',
+    nis: '3254',
+    nama: 'MAXWELL TAN',
+    kelas: '4A',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3322',
+    nis: '3322',
+    nama: 'NATASYA LOUISA MANGGALA',
+    kelas: '4A',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'BOGOR',
+    tanggalLahir: '15 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3383',
+    nis: '3383',
+    nama: 'NATHANIA EILEEN GUNADI',
+    kelas: '4A',
+    absen: '26',
+    jenisKelamin: 'P',
+    tempatLahir: 'BANTUL',
+    tanggalLahir: '14 Februari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3287',
+    nis: '3287',
+    nama: 'NAYLA METTANIA CHANDRA',
+    kelas: '4A',
+    absen: '27',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3230',
+    nis: '3230',
+    nama: 'RAFY PUTERA ALFARIZI',
+    kelas: '4A',
+    absen: '28',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3260',
+    nis: '3260',
+    nama: 'RICARDO SETIAWAN',
+    kelas: '4A',
+    absen: '29',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Agustus 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4A-3000',
+    nis: '3000',
+    nama: 'anoname',
+    kelas: '4A',
+    absen: '30',
+    jenisKelamin: 'P',
+    tempatLahir: 'Jakarta',
+    tanggalLahir: '5 Mei 2006',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3266',
+    nis: '3266',
+    nama: 'ALICIA HANA IMANUELLA',
+    kelas: '4B',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 September 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3330',
+    nis: '3330',
+    nama: 'AMORA ALYA FUTRI',
+    kelas: '4B',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Juli 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3300',
+    nis: '3300',
+    nama: 'ANGELINE STEFANY',
+    kelas: '4B',
+    absen: '03',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3238',
+    nis: '3238',
+    nama: 'ARSEN CHRISTIAN IMANNUEL',
+    kelas: '4B',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3269',
+    nis: '3269',
+    nama: 'ARUMI NAFISHA RACHMAN',
+    kelas: '4B',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3303',
+    nis: '3303',
+    nama: 'BEVERLYN CALLYSTA',
+    kelas: '4B',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3241',
+    nis: '3241',
+    nama: 'CARELIN CAROLIN',
+    kelas: '4B',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3273',
+    nis: '3273',
+    nama: 'CLAIRE PATRICIA WHITE',
+    kelas: '4B',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Maret 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3211',
+    nis: '3211',
+    nama: 'ELVAN HEFIEL ELVITO',
+    kelas: '4B',
+    absen: '09',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Agustus 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3244',
+    nis: '3244',
+    nama: 'ERLYNNE MEYLICA WONG',
+    kelas: '4B',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3387',
+    nis: '3387',
+    nama: 'FELICIA SAPUTRA',
+    kelas: '4B',
+    absen: '11',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 Oktober 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3311',
+    nis: '3311',
+    nama: 'GABRIEL EXELINO',
+    kelas: '4B',
+    absen: '12',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3214',
+    nis: '3214',
+    nama: 'GAVARIEL SALUQ ALLO',
+    kelas: '4B',
+    absen: '13',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 September 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3216',
+    nis: '3216',
+    nama: 'GEVARIEL EIZEL GUNAWAN',
+    kelas: '4B',
+    absen: '14',
+    jenisKelamin: 'L',
+    tempatLahir: 'BEKASI',
+    tanggalLahir: '07 Mei 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3248',
+    nis: '3248',
+    nama: 'GRADIELA NALINE SETUNGGAL',
+    kelas: '4B',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'KEBUMEN',
+    tanggalLahir: '26 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3249',
+    nis: '3249',
+    nama: 'JAYDEN NICHOLAS LIE',
+    kelas: '4B',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 September 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3742',
+    nis: '3742',
+    nama: 'KENT RYSON',
+    kelas: '4B',
+    absen: '17',
+    jenisKelamin: 'L',
+    tempatLahir: 'KUBU RAYA',
+    tanggalLahir: '27 September 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3318',
+    nis: '3318',
+    nama: 'KIMBERLY VIOLETTA HARIANTO',
+    kelas: '4B',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 Maret 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3288',
+    nis: '3288',
+    nama: 'NAYSA DEWI SETIADY',
+    kelas: '4B',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Desember 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3323',
+    nis: '3323',
+    nama: 'NESHYA FREDELLA GOTAMI',
+    kelas: '4B',
+    absen: '20',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '27 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3364',
+    nis: '3364',
+    nama: 'NI PUTU CHELIN KIWANTORO',
+    kelas: '4B',
+    absen: '21',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '07 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3229',
+    nis: '3229',
+    nama: 'RACHELYN AINSLEY HERMAWAN',
+    kelas: '4B',
+    absen: '22',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3351',
+    nis: '3351',
+    nama: 'RICHIE KENLEE WONG',
+    kelas: '4B',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 Mei 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3352',
+    nis: '3352',
+    nama: 'RYONARDWYN HO',
+    kelas: '4B',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'MEDAN',
+    tanggalLahir: '16 Desember 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3291',
+    nis: '3291',
+    nama: 'SALMA ADZKIA KHOLIL',
+    kelas: '4B',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3293',
+    nis: '3293',
+    nama: 'SATRIA DVARA SATYA MARGA',
+    kelas: '4B',
+    absen: '26',
+    jenisKelamin: 'L',
+    tempatLahir: 'METRO',
+    tanggalLahir: '02 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3355',
+    nis: '3355',
+    nama: 'SHAKINA ZERRIN NAFFALION',
+    kelas: '4B',
+    absen: '27',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3384',
+    nis: '3384',
+    nama: 'SHALOM CHAIRA BR PURBA',
+    kelas: '4B',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4B-3327',
+    nis: '3327',
+    nama: 'STEVEN MARNIN LIN',
+    kelas: '4B',
+    absen: '29',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Maret 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3202',
+    nis: '3202',
+    nama: 'ABINAYA DHITAJAYANTI',
+    kelas: '4C',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'REMBANG',
+    tanggalLahir: '12 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3267',
+    nis: '3267',
+    nama: 'ALVENDO',
+    kelas: '4C',
+    absen: '02',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 September 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3299',
+    nis: '3299',
+    nama: 'ALVIN ARAYA MAHATAMA',
+    kelas: '4C',
+    absen: '03',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Juli 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3206',
+    nis: '3206',
+    nama: 'ARVINO NAZRIL MAULANA',
+    kelas: '4C',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 Juli 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3239',
+    nis: '3239',
+    nama: 'AXEL XAVIER TAN',
+    kelas: '4C',
+    absen: '05',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3208',
+    nis: '3208',
+    nama: 'CALLISTA TANIA WIJAYA',
+    kelas: '4C',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3271',
+    nis: '3271',
+    nama: 'CERILYN HUANG',
+    kelas: '4C',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Maret 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3305',
+    nis: '3305',
+    nama: 'CHERRY WIJAYA',
+    kelas: '4C',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '24 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3306',
+    nis: '3306',
+    nama: 'CLARISSA AURELIA CEN',
+    kelas: '4C',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '22 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3274',
+    nis: '3274',
+    nama: 'DEPRILLA ARLYN HERSINTA',
+    kelas: '4C',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3247',
+    nis: '3247',
+    nama: 'GEVAREL GRETEL GUNAWAN',
+    kelas: '4C',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'BEKASI',
+    tanggalLahir: '07 Mei 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3312',
+    nis: '3312',
+    nama: 'GISELLE GABRIELLA DESMITAL',
+    kelas: '4C',
+    absen: '12',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3337',
+    nis: '3337',
+    nama: 'GUSTI AYU KOMANG ASTHAVIANI',
+    kelas: '4C',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3218',
+    nis: '3218',
+    nama: 'HELEN ACACIA',
+    kelas: '4C',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '22 November 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3314',
+    nis: '3314',
+    nama: 'ISAAC DANZEL DOMINGUS',
+    kelas: '4C',
+    absen: '15',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3340',
+    nis: '3340',
+    nama: 'JEHAN ALLYSIA DANESH',
+    kelas: '4C',
+    absen: '16',
+    jenisKelamin: 'P',
+    tempatLahir: 'WONOSOBO',
+    tanggalLahir: '10 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3221',
+    nis: '3221',
+    nama: 'KARLYN CHEN',
+    kelas: '4C',
+    absen: '17',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3316',
+    nis: '3316',
+    nama: 'KAYZA ANINDITA MAKAILA',
+    kelas: '4C',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '08 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3222',
+    nis: '3222',
+    nama: 'KELYN FEBIOLA GUNAWAN',
+    kelas: '4C',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '08 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3342',
+    nis: '3342',
+    nama: 'KENICHI JOSHE CHAI',
+    kelas: '4C',
+    absen: '20',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Februari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3346',
+    nis: '3346',
+    nama: 'MARCELLIO LOUIS SAPUTRA LIM',
+    kelas: '4C',
+    absen: '21',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 Februari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3099',
+    nis: '3099',
+    nama: 'MIKHAYLA ANINDYA',
+    kelas: '4C',
+    absen: '22',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3285',
+    nis: '3285',
+    nama: 'MUHAMMAD ALFATIH',
+    kelas: '4C',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 Januari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3256',
+    nis: '3256',
+    nama: 'NATASYA XIE',
+    kelas: '4C',
+    absen: '24',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3290',
+    nis: '3290',
+    nama: 'ROONEY DOMINIC SUGIARTO',
+    kelas: '4C',
+    absen: '25',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 Januari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3353',
+    nis: '3353',
+    nama: 'SAFIRA NAURA SALSABILA',
+    kelas: '4C',
+    absen: '26',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Juli 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3354',
+    nis: '3354',
+    nama: 'SAKKA VIRYA GUPTA',
+    kelas: '4C',
+    absen: '27',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 Agustus 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3294',
+    nis: '3294',
+    nama: 'SHOFIE CANDICE',
+    kelas: '4C',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4C-3326',
+    nis: '3326',
+    nama: 'STEPHEN JOVIN',
+    kelas: '4C',
+    absen: '29',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 Agustus 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3329',
+    nis: '3329',
+    nama: 'ALEXA BENEDICTA ALVEY',
+    kelas: '4D',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3237',
+    nis: '3237',
+    nama: 'ALYCIA CHLOE HALIM',
+    kelas: '4D',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Agustus 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3268',
+    nis: '3268',
+    nama: 'ANNYSA ALYA SYABAN',
+    kelas: '4D',
+    absen: '03',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '25 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3240',
+    nis: '3240',
+    nama: 'BERRYL ABIDZAR REZANDRA',
+    kelas: '4D',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Agustus 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3270',
+    nis: '3270',
+    nama: 'CALLYSTA CLAIRE DARMAWAN',
+    kelas: '4D',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Maret 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3335',
+    nis: '3335',
+    nama: 'CLARESTA AVERY HARTONO',
+    kelas: '4D',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3308',
+    nis: '3308',
+    nama: 'DESYANA ZHAFIRA',
+    kelas: '4D',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3243',
+    nis: '3243',
+    nama: 'DHISYA WAFA AULIA INDRIANTO',
+    kelas: '4D',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'BANDAR LAMPUNG',
+    tanggalLahir: '30 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3275',
+    nis: '3275',
+    nama: 'DYLAN ANDREW WIJAYA',
+    kelas: '4D',
+    absen: '09',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3276',
+    nis: '3276',
+    nama: 'DZAKIRA DARLENE',
+    kelas: '4D',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 September 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3310',
+    nis: '3310',
+    nama: 'EZRA REAGAN GUNAWAN',
+    kelas: '4D',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3336',
+    nis: '3336',
+    nama: 'FELICIA ELORA ROMPAS',
+    kelas: '4D',
+    absen: '12',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Juli 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3246',
+    nis: '3246',
+    nama: 'GABRIELLA MELISA TJEMERLANG',
+    kelas: '4D',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3215',
+    nis: '3215',
+    nama: 'GEDE ASWINDRA BUDHA MAHOTAMA',
+    kelas: '4D',
+    absen: '14',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3313',
+    nis: '3313',
+    nama: 'HEAVENLY KEYLA GOUW',
+    kelas: '4D',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'PONTIANAK',
+    tanggalLahir: '10 November 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3250',
+    nis: '3250',
+    nama: 'JENNA NAUREN MAHARANI',
+    kelas: '4D',
+    absen: '16',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '31 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3315',
+    nis: '3315',
+    nama: 'JOHANNA SEKAR DANU',
+    kelas: '4D',
+    absen: '17',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Maret 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3343',
+    nis: '3343',
+    nama: 'KEYLA KUSUMA SAFINA',
+    kelas: '4D',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'INDRAMAYU',
+    tanggalLahir: '23 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3255',
+    nis: '3255',
+    nama: 'METTA KESARI NG',
+    kelas: '4D',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3225',
+    nis: '3225',
+    nama: 'MUHAMMAD ALDRICH KENZO ALHARON',
+    kelas: '4D',
+    absen: '20',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Juli 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3226',
+    nis: '3226',
+    nama: 'MUHAMMAD RESTU AL - FARIZI',
+    kelas: '4D',
+    absen: '21',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 April 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3227',
+    nis: '3227',
+    nama: 'NABILA AMALIA SAFITRI',
+    kelas: '4D',
+    absen: '22',
+    jenisKelamin: 'P',
+    tempatLahir: 'CIANJUR',
+    tanggalLahir: '27 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3258',
+    nis: '3258',
+    nama: 'NUR GAYATRI KAMESWARY',
+    kelas: '4D',
+    absen: '23',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 April 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3324',
+    nis: '3324',
+    nama: 'RAKHA DWIPUTRA',
+    kelas: '4D',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 April 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3361',
+    nis: '3361',
+    nama: 'RICHARD AARON CHEN',
+    kelas: '4D',
+    absen: '25',
+    jenisKelamin: 'L',
+    tempatLahir: 'BEKASI',
+    tanggalLahir: '03 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3356',
+    nis: '3356',
+    nama: 'SYDNEY PRECIOUS GWYNETH TAHAPARY',
+    kelas: '4D',
+    absen: '26',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Februari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4D-3735',
+    nis: '3735',
+    nama: 'VALENCIA MIKAYLA AGHATAN',
+    kelas: '4D',
+    absen: '27',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3203',
+    nis: '3203',
+    nama: 'ABRISAM RIFQI SULAIMAN',
+    kelas: '4E',
     absen: '01',
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
-    tanggalLahir: '01 Januari 2016',
-    kuisSem1: 0,
-    kuisSem2: 0,
-    posterWord: 0,
-    nilaiPoster: 0,
-    excelTabel: 0,
-    nilaiExcel: 0,
-    nilaiDrive: 0,
-    koleksiDrive: 0,
-    nilaiScratch: 0,
-    nilaiRoboMind: 0,
-    poinBintang: 50,
-    statusKkm: 'Tuntas',
-    catatanGuru: 'Akun Uji Coba Kelas 5 SD • Portofolio Digital & AI'
+    tanggalLahir: '26 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3233',
+    nis: '3233',
+    nama: 'ADREENA FALIHAH QANITA',
+    kelas: '4E',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3301',
+    nis: '3301',
+    nama: 'ARSYA ALFARIZI IRAWAN',
+    kelas: '4E',
+    absen: '03',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3209',
+    nis: '3209',
+    nama: 'CAPRICE WU PRASETYA',
+    kelas: '4E',
+    absen: '04',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Juli 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3242',
+    nis: '3242',
+    nama: 'DHEA PUTRI DAMAYANTI',
+    kelas: '4E',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3309',
+    nis: '3309',
+    nama: 'EL ZAFRAN GIBRAN RAHMANTA',
+    kelas: '4E',
+    absen: '06',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 Desember 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3245',
+    nis: '3245',
+    nama: 'FEYNMAN JENSON',
+    kelas: '4E',
+    absen: '07',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Juni 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3363',
+    nis: '3363',
+    nama: 'FRANKY LUCKYANTO',
+    kelas: '4E',
+    absen: '08',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '08 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3277',
+    nis: '3277',
+    nama: 'GHAZIYA ELLA MAHASTRA',
+    kelas: '4E',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3338',
+    nis: '3338',
+    nama: 'HEPTA GABRIEL DINATA',
+    kelas: '4E',
+    absen: '10',
+    jenisKelamin: 'L',
+    tempatLahir: 'INDRAMAYU',
+    tanggalLahir: '08 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3386',
+    nis: '3386',
+    nama: 'HOWARD TANDERSON',
+    kelas: '4E',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'MEDAN',
+    tanggalLahir: '08 Agustus 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3281',
+    nis: '3281',
+    nama: 'KALLYNE TIFFANY LIM',
+    kelas: '4E',
+    absen: '12',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 Juli 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3282',
+    nis: '3282',
+    nama: 'KEYZIE HANATA HUANG',
+    kelas: '4E',
+    absen: '13',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3253',
+    nis: '3253',
+    nama: 'KIMBERLY JESSLYN FERDINAND',
+    kelas: '4E',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '22 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3569',
+    nis: '3569',
+    nama: 'KLEYRINE DEERENT',
+    kelas: '4E',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '09 November 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3568',
+    nis: '3568',
+    nama: 'LEONEL LUXIE TADEUS',
+    kelas: '4E',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3224',
+    nis: '3224',
+    nama: 'MARCO JUAN THAM',
+    kelas: '4E',
+    absen: '17',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3347',
+    nis: '3347',
+    nama: 'MARK EFATA',
+    kelas: '4E',
+    absen: '18',
+    jenisKelamin: 'L',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '06 September 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3284',
+    nis: '3284',
+    nama: 'MUHAMMAD ALFARIZI RABBANI',
+    kelas: '4E',
+    absen: '19',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 Oktober 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3228',
+    nis: '3228',
+    nama: 'NAURA RAMADHANI PRAMADA',
+    kelas: '4E',
+    absen: '20',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3259',
+    nis: '3259',
+    nama: 'QUEENCIA VALLERYNN',
+    kelas: '4E',
+    absen: '21',
+    jenisKelamin: 'P',
+    tempatLahir: 'MEDAN',
+    tanggalLahir: '07 Agustus 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3231',
+    nis: '3231',
+    nama: 'RAIHAN SULAEMAN',
+    kelas: '4E',
+    absen: '22',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Mei 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3570',
+    nis: '3570',
+    nama: 'REINHART EADBERTO RADCLIFF',
+    kelas: '4E',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 November 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3261',
+    nis: '3261',
+    nama: 'SAPPHIRA CALLISTA LUO',
+    kelas: '4E',
+    absen: '24',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 Juni 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3292',
+    nis: '3292',
+    nama: 'SASIKIRANA WIDYANINGTYAS',
+    kelas: '4E',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'KEBUMEN',
+    tanggalLahir: '10 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3357',
+    nis: '3357',
+    nama: 'THANIA ZENA PUTRI HITA',
+    kelas: '4E',
+    absen: '26',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Juli 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3262',
+    nis: '3262',
+    nama: 'THEMILLION KHENRO WIJAYA',
+    kelas: '4E',
+    absen: '27',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 April 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-4E-3360',
+    nis: '3360',
+    nama: 'VIOLA ARCELIA DJAN',
+    kelas: '4E',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 Januari 2017',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3107',
+    nis: '3107',
+    nama: 'ABDUL GHONI',
+    kelas: '5D',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 Januari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3042',
+    nis: '3042',
+    nama: 'AILSA GWYNNE',
+    kelas: '5D',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 Juli 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3067',
+    nis: '3067',
+    nama: 'ALBY GUIZA ARRAEVAL',
+    kelas: '5D',
+    absen: '03',
+    jenisKelamin: 'L',
+    tempatLahir: 'TULANG BAWANG BARAT',
+    tanggalLahir: '14 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3109',
+    nis: '3109',
+    nama: 'ALDRIC FAITH AKMAL',
+    kelas: '5D',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3076',
+    nis: '3076',
+    nama: 'ALOKA YASAVAPUTRA APRIYANTO',
+    kelas: '5D',
+    absen: '05',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Oktober 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-2832',
+    nis: '2832',
+    nama: 'ARBIAN HWONG',
+    kelas: '5D',
+    absen: '06',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 Februari 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3146',
+    nis: '3146',
+    nama: 'CAROLINE SUSANTO',
+    kelas: '5D',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 November 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3559',
+    nis: '3559',
+    nama: 'CHERSEA HANYOORA',
+    kelas: '5D',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'PEKANBARU',
+    tanggalLahir: '29 September 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3014',
+    nis: '3014',
+    nama: 'CITRA ALDILLA SAPUTRI',
+    kelas: '5D',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Juli 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3082',
+    nis: '3082',
+    nama: 'CONCITA WINOLA EVINKA',
+    kelas: '5D',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3564',
+    nis: '3564',
+    nama: 'DALTON HARTONO',
+    kelas: '5D',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '25 Desember 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3016',
+    nis: '3016',
+    nama: 'DAVE TOWOR',
+    kelas: '5D',
+    absen: '12',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Desember 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3114',
+    nis: '3114',
+    nama: 'DIAMONIQUE NOVTHALIA CHANDRA',
+    kelas: '5D',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'BEKASI',
+    tanggalLahir: '07 November 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3084',
+    nis: '3084',
+    nama: 'DIEGO AL GHAZALI HARIYANTO',
+    kelas: '5D',
+    absen: '14',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Desember 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3052',
+    nis: '3052',
+    nama: 'DOMINIQUE VALENCIA SETIAWAN',
+    kelas: '5D',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Februari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3018',
+    nis: '3018',
+    nama: 'ELDEON GILLIES JOHNANDRO',
+    kelas: '5D',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 Agustus 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3118',
+    nis: '3118',
+    nama: 'FELCIA SEREFINA',
+    kelas: '5D',
+    absen: '17',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3021',
+    nis: '3021',
+    nama: 'GISELLA GUIVELYN',
+    kelas: '5D',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 November 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3058',
+    nis: '3058',
+    nama: 'GRACE ANGEL VICTORIA',
+    kelas: '5D',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3059',
+    nis: '3059',
+    nama: 'HANA AISH SALMA',
+    kelas: '5D',
+    absen: '20',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Oktober 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3025',
+    nis: '3025',
+    nama: 'HILDA ATMARINI WIJAYA',
+    kelas: '5D',
+    absen: '21',
+    jenisKelamin: 'P',
+    tempatLahir: 'PANDEGLANG',
+    tanggalLahir: '31 Agustus 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3026',
+    nis: '3026',
+    nama: 'JESLYN SAURA YUAN',
+    kelas: '5D',
+    absen: '22',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3092',
+    nis: '3092',
+    nama: 'JOEL JAN KULLIT',
+    kelas: '5D',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Januari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3061',
+    nis: '3061',
+    nama: 'JOHANNES EMMANUEL SURYAPUTRA',
+    kelas: '5D',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Desember 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3096',
+    nis: '3096',
+    nama: 'KEN LIENARDO',
+    kelas: '5D',
+    absen: '25',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Februari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3097',
+    nis: '3097',
+    nama: 'LLIYYIN DHYALESHA SUTARNO',
+    kelas: '5D',
+    absen: '26',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Februari 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3159',
+    nis: '3159',
+    nama: 'MARSHELLA TALITA',
+    kelas: '5D',
+    absen: '27',
+    jenisKelamin: 'P',
+    tempatLahir: 'PALEMBANG',
+    tanggalLahir: '30 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3064',
+    nis: '3064',
+    nama: 'MICHAEL OCTAVIANUS',
+    kelas: '5D',
+    absen: '28',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Maret 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3098',
+    nis: '3098',
+    nama: 'MICHELLE KENT',
+    kelas: '5D',
+    absen: '29',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 April 2016',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3567',
+    nis: '3567',
+    nama: 'MIKHA ALEA MURTANO',
+    kelas: '5D',
+    absen: '30',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3130',
+    nis: '3130',
+    nama: 'MUHAMMAD GAVINE MALIQ',
+    kelas: '5D',
+    absen: '31',
+    jenisKelamin: 'L',
+    tempatLahir: 'WONOGIRI',
+    tanggalLahir: '10 Agustus 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-5D-3032',
+    nis: '3032',
+    nama: 'MUHAMMAD RIZKY ALHAFIZ',
+    kelas: '5D',
+    absen: '32',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 September 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2828',
+    nis: '2828',
+    nama: 'AERILLYNE LETISHA ADZKIA RAHMANTA',
+    kelas: '6A',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3736',
+    nis: '3736',
+    nama: 'ANNABEL KARTIKA MIKA SIANIPAR',
+    kelas: '6A',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2856',
+    nis: '2856',
+    nama: 'ARASCHEL TJAHYADI PUTERI WIDANTA',
+    kelas: '6A',
+    absen: '03',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2833',
+    nis: '2833',
+    nama: 'ARCHEN DEVAN RAFANDRA',
+    kelas: '6A',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'WONOGIRI',
+    tanggalLahir: '30 April 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2947',
+    nis: '2947',
+    nama: 'BERNARD CELLINO PANGDWINATA',
+    kelas: '6A',
+    absen: '05',
+    jenisKelamin: 'L',
+    tempatLahir: 'SAMBAS',
+    tanggalLahir: '07 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2888',
+    nis: '2888',
+    nama: 'CATHERIN CAROLIN',
+    kelas: '6A',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '08 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2949',
+    nis: '2949',
+    nama: 'DANIEL',
+    kelas: '6A',
+    absen: '07',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2892',
+    nis: '2892',
+    nama: 'DIO SOEHARDJO',
+    kelas: '6A',
+    absen: '08',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3003',
+    nis: '3003',
+    nama: 'ELVIRA AGATHA',
+    kelas: '6A',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2924',
+    nis: '2924',
+    nama: 'EMILY SYLVANIA',
+    kelas: '6A',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2893',
+    nis: '2893',
+    nama: 'EVELYN VEGLIA BONG',
+    kelas: '6A',
+    absen: '11',
+    jenisKelamin: 'P',
+    tempatLahir: 'SINGKAWANG',
+    tanggalLahir: '18 September 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2926',
+    nis: '2926',
+    nama: 'FAKHRY ZAFRAN AMKAS',
+    kelas: '6A',
+    absen: '12',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2840',
+    nis: '2840',
+    nama: 'GAVRIEL KENNETH WIJAYA',
+    kelas: '6A',
+    absen: '13',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2865',
+    nis: '2865',
+    nama: 'GRACIA JESSLYN ANG',
+    kelas: '6A',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3005',
+    nis: '3005',
+    nama: 'INAYA AZMI MAULANA',
+    kelas: '6A',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '01 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3380',
+    nis: '3380',
+    nama: 'JADDENSON MAVERICK KWOK',
+    kelas: '6A',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Oktober 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3174',
+    nis: '3174',
+    nama: 'JARVIS WU',
+    kelas: '6A',
+    absen: '17',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Oktober 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2844',
+    nis: '2844',
+    nama: 'JASON RAYMOND HUANG',
+    kelas: '6A',
+    absen: '18',
+    jenisKelamin: 'L',
+    tempatLahir: 'MEDAN',
+    tanggalLahir: '08 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2845',
+    nis: '2845',
+    nama: 'JESSELYN PHELIA WIJAYA',
+    kelas: '6A',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3194',
+    nis: '3194',
+    nama: 'MAISIE YOCELYN HARIYANTO',
+    kelas: '6A',
+    absen: '20',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '24 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2958',
+    nis: '2958',
+    nama: 'MARCELLA SETIAWAN',
+    kelas: '6A',
+    absen: '21',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '20 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-3560',
+    nis: '3560',
+    nama: 'MARCUS TROY LENADI',
+    kelas: '6A',
+    absen: '22',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2959',
+    nis: '2959',
+    nama: 'MARQUEZ YAP PUTRA',
+    kelas: '6A',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2964',
+    nis: '2964',
+    nama: 'NATASHA PRISCYLIA',
+    kelas: '6A',
+    absen: '24',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '27 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2909',
+    nis: '2909',
+    nama: 'NAZHIFA PUTRI PURNOMO',
+    kelas: '6A',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '20 Juli 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2940',
+    nis: '2940',
+    nama: 'NURIYAH HASANAH',
+    kelas: '6A',
+    absen: '26',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2942',
+    nis: '2942',
+    nama: 'RAMADHAN ARDIANSYAH',
+    kelas: '6A',
+    absen: '27',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '22 Juli 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2854',
+    nis: '2854',
+    nama: 'SELEENA KATHLEEN LIM',
+    kelas: '6A',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2883',
+    nis: '2883',
+    nama: 'VANIA CHARLOTTE AURELIA',
+    kelas: '6A',
+    absen: '29',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2855',
+    nis: '2855',
+    nama: 'VITA AULIA',
+    kelas: '6A',
+    absen: '30',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6A-2884',
+    nis: '2884',
+    nama: 'WILLIAM FERDINAND HENDARMIN',
+    kelas: '6A',
+    absen: '31',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '25 Juli 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2885',
+    nis: '2885',
+    nama: 'AILEEN HYUGYA',
+    kelas: '6B',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '29 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2946',
+    nis: '2946',
+    nama: 'ATISHA XU MULYONO',
+    kelas: '6B',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2859',
+    nis: '2859',
+    nama: 'CANDY NIJANANDA LIM',
+    kelas: '6B',
+    absen: '03',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2948',
+    nis: '2948',
+    nama: 'CAROLINE ANGELINA CEN',
+    kelas: '6B',
+    absen: '04',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2919',
+    nis: '2919',
+    nama: 'CATHERINE YUKINO KINAYA SALUDUNG',
+    kelas: '6B',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2922',
+    nis: '2922',
+    nama: 'DOMINIQUE IMMANUEL SALIM',
+    kelas: '6B',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-3001',
+    nis: '3001',
+    nama: 'ELLENA CHRISTINE',
+    kelas: '6B',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'BOGOR',
+    tanggalLahir: '20 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2894',
+    nis: '2894',
+    nama: 'FELICIA LIAN',
+    kelas: '6B',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2838',
+    nis: '2838',
+    nama: 'FIOLA RAYA PUTRI FIRDAUS',
+    kelas: '6B',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '22 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2952',
+    nis: '2952',
+    nama: 'GILBERT ALVARO',
+    kelas: '6B',
+    absen: '10',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2867',
+    nis: '2867',
+    nama: 'HANS MIRACLE',
+    kelas: '6B',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2899',
+    nis: '2899',
+    nama: 'INDRA BAYU PRASETYO HAKI',
+    kelas: '6B',
+    absen: '12',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2869',
+    nis: '2869',
+    nama: 'JAZZY IXCHELA ARIAWAN',
+    kelas: '6B',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'SEMARANG',
+    tanggalLahir: '18 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2902',
+    nis: '2902',
+    nama: 'JESLYN CHRISTABEL CHARLES',
+    kelas: '6B',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-3381',
+    nis: '3381',
+    nama: 'JOANNE PEARL',
+    kelas: '6B',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2903',
+    nis: '2903',
+    nama: 'JUNEVAN FATHIAN PUHERTI',
+    kelas: '6B',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Juni 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2847',
+    nis: '2847',
+    nama: 'JUNITA PARAMITHA CHUA',
+    kelas: '6B',
+    absen: '17',
+    jenisKelamin: 'P',
+    tempatLahir: 'PEKANBARU',
+    tanggalLahir: '21 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2870',
+    nis: '2870',
+    nama: 'KATHLEEN ILONA LIM',
+    kelas: '6B',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'BATAM',
+    tanggalLahir: '10 Februari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2906',
+    nis: '2906',
+    nama: 'LUH GEDE SURI ADNYANI',
+    kelas: '6B',
+    absen: '19',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2907',
+    nis: '2907',
+    nama: 'MARCELLO ALVARO AKBAR',
+    kelas: '6B',
+    absen: '20',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 April 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-3189',
+    nis: '3189',
+    nama: 'MIKHAEL WYLBERT TJANDRA',
+    kelas: '6B',
+    absen: '21',
+    jenisKelamin: 'L',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '23 September 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2670',
+    nis: '2670',
+    nama: 'MUHAMMAD KHADAFI ANSYAHBAN',
+    kelas: '6B',
+    absen: '22',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Juni 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2938',
+    nis: '2938',
+    nama: 'NICHELLYN KHEIREN XIE',
+    kelas: '6B',
+    absen: '23',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2853',
+    nis: '2853',
+    nama: 'NICKO HANGGARA PUTRA',
+    kelas: '6B',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Januari 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2878',
+    nis: '2878',
+    nama: 'RANU SHALIH AZZAMY',
+    kelas: '6B',
+    absen: '25',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2881',
+    nis: '2881',
+    nama: 'SAKHA JEVANDAI',
+    kelas: '6B',
+    absen: '26',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 April 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2968',
+    nis: '2968',
+    nama: 'SHANE RICHIE CHAN',
+    kelas: '6B',
+    absen: '27',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2882',
+    nis: '2882',
+    nama: 'SHEVI SELYNA',
+    kelas: '6B',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '18 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-3737',
+    nis: '3737',
+    nama: 'TRISTAN YUWEN CHEN',
+    kelas: '6B',
+    absen: '29',
+    jenisKelamin: 'L',
+    tempatLahir: 'SINGKAWANG',
+    tanggalLahir: '14 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6B-2492',
+    nis: '2492',
+    nama: 'VIYONA NAURA ANJANI',
+    kelas: '6B',
+    absen: '30',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Januari 2013',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2829',
+    nis: '2829',
+    nama: 'ALBERT LIE',
+    kelas: '6C',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2831',
+    nis: '2831',
+    nama: 'ANINDITA TIARANIA NUR AZIZAH',
+    kelas: '6C',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'PONOROGO',
+    tanggalLahir: '16 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2886',
+    nis: '2886',
+    nama: 'ARZACHEL YOSANDO',
+    kelas: '6C',
+    absen: '03',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2917',
+    nis: '2917',
+    nama: 'AULIA WULANDARI',
+    kelas: '6C',
+    absen: '04',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '31 Mei 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2834',
+    nis: '2834',
+    nama: 'BELLVANIE ORZSEBET SANJAYA',
+    kelas: '6C',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Oktober 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2918',
+    nis: '2918',
+    nama: 'BERNARD YEO MARVIN',
+    kelas: '6C',
+    absen: '06',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 Februari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2857',
+    nis: '2857',
+    nama: 'BRIANNA ISABELLA ZHENG',
+    kelas: '6C',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'BOGOR',
+    tanggalLahir: '29 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2858',
+    nis: '2858',
+    nama: 'CALISTA SOFIE',
+    kelas: '6C',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3002',
+    nis: '3002',
+    nama: 'CLAUDYA CAROLYNE',
+    kelas: '6C',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'SINGKAWANG',
+    tanggalLahir: '23 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2950',
+    nis: '2950',
+    nama: 'DAVICKA EVELINE TAN',
+    kelas: '6C',
+    absen: '10',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '27 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2862',
+    nis: '2862',
+    nama: 'EZKIL LIGAR ARUNA YURI',
+    kelas: '6C',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 Juli 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2928',
+    nis: '2928',
+    nama: 'FIONA CLARISSA',
+    kelas: '6C',
+    absen: '12',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3191',
+    nis: '3191',
+    nama: 'FLORENCIA LIN',
+    kelas: '6C',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3557',
+    nis: '3557',
+    nama: 'GISELLE PRAMANA YANG',
+    kelas: '6C',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 September 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2841',
+    nis: '2841',
+    nama: 'GREYZEL KAYONA CHEN',
+    kelas: '6C',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3006',
+    nis: '3006',
+    nama: 'JANSEN',
+    kelas: '6C',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'MEDAN',
+    tanggalLahir: '08 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2900',
+    nis: '2900',
+    nama: 'JASON LIMBERT',
+    kelas: '6C',
+    absen: '17',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2904',
+    nis: '2904',
+    nama: 'KANAYA ANASTASYA GUNAWAN',
+    kelas: '6C',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3193',
+    nis: '3193',
+    nama: 'KENDRICK ILLYA LIU',
+    kelas: '6C',
+    absen: '19',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 September 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2872',
+    nis: '2872',
+    nama: 'MARCELLINE VICTORIA WIJAYA',
+    kelas: '6C',
+    absen: '20',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2934',
+    nis: '2934',
+    nama: 'MICHELL',
+    kelas: '6C',
+    absen: '21',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2935',
+    nis: '2935',
+    nama: 'MUHAMMAD HISYAM AR RAFIF',
+    kelas: '6C',
+    absen: '22',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2937',
+    nis: '2937',
+    nama: 'NAZEERA KHANSA SANTIKA',
+    kelas: '6C',
+    absen: '23',
+    jenisKelamin: 'P',
+    tempatLahir: 'CIREBON',
+    tanggalLahir: '03 Februari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2910',
+    nis: '2910',
+    nama: 'RACHEL SHAFIRA WEN',
+    kelas: '6C',
+    absen: '24',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2879',
+    nis: '2879',
+    nama: 'REGATHA ELICIA SIRAIT',
+    kelas: '6C',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2880',
+    nis: '2880',
+    nama: 'RICHARD KARUNA WIJAYA',
+    kelas: '6C',
+    absen: '26',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2967',
+    nis: '2967',
+    nama: 'RICHIE ALFIAN SARIPUTRA',
+    kelas: '6C',
+    absen: '27',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Februari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2971',
+    nis: '2971',
+    nama: 'SITI NUR YANAH',
+    kelas: '6C',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '24 Juli 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-3379',
+    nis: '3379',
+    nama: 'SKYLER ORLANDO KHO',
+    kelas: '6C',
+    absen: '29',
+    jenisKelamin: 'L',
+    tempatLahir: 'BINJAI',
+    tanggalLahir: '26 Oktober 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6C-2972',
+    nis: '2972',
+    nama: 'WILSON ADINATA YIE',
+    kelas: '6C',
+    absen: '30',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2827',
+    nis: '2827',
+    nama: 'ABRAHAM BUDIANTO',
+    kelas: '6D',
+    absen: '01',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2944',
+    nis: '2944',
+    nama: 'ALMEERA AZKY',
+    kelas: '6D',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2916',
+    nis: '2916',
+    nama: 'ALVARO GAVRIEL CHRISEL PRATAMA',
+    kelas: '6D',
+    absen: '03',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Mei 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-3196',
+    nis: '3196',
+    nama: 'BRYAN GIDEON DESMITAL',
+    kelas: '6D',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2860',
+    nis: '2860',
+    nama: 'CARISA FARHANNA SETIAWAN',
+    kelas: '6D',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '07 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2889',
+    nis: '2889',
+    nama: 'CHERYL ELVARETTA',
+    kelas: '6D',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '19 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2835',
+    nis: '2835',
+    nama: 'DARREN PRASETYO',
+    kelas: '6D',
+    absen: '07',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '09 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2923',
+    nis: '2923',
+    nama: 'EDLYN XAVIERA VALENCIA',
+    kelas: '6D',
+    absen: '08',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '05 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2864',
+    nis: '2864',
+    nama: 'FIORENZ NATASHA TJHANG',
+    kelas: '6D',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '22 Agustus 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-3562',
+    nis: '3562',
+    nama: 'GARRY ALVARO',
+    kelas: '6D',
+    absen: '10',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2896',
+    nis: '2896',
+    nama: 'GLORY JACOB',
+    kelas: '6D',
+    absen: '11',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 September 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2866',
+    nis: '2866',
+    nama: 'GRIZEL SJAHLIM',
+    kelas: '6D',
+    absen: '12',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '17 Agustus 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2897',
+    nis: '2897',
+    nama: 'GUSTI MADE ATHALIA AISWARYA',
+    kelas: '6D',
+    absen: '13',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2842',
+    nis: '2842',
+    nama: 'GWEN LAVINIA BUDIANTO',
+    kelas: '6D',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2843',
+    nis: '2843',
+    nama: 'HYORIN ERZHU TANZIL',
+    kelas: '6D',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2930',
+    nis: '2930',
+    nama: 'JOSE ANDREAS CHANDRA',
+    kelas: '6D',
+    absen: '16',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2955',
+    nis: '2955',
+    nama: 'KADEK DEVICA VAHIRA',
+    kelas: '6D',
+    absen: '17',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 April 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2956',
+    nis: '2956',
+    nama: 'KENNETH STANLEY SUN',
+    kelas: '6D',
+    absen: '18',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '26 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2931',
+    nis: '2931',
+    nama: 'KENTLEY VISUDDHA CHANDRA',
+    kelas: '6D',
+    absen: '19',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '02 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2851',
+    nis: '2851',
+    nama: 'LOUIS XAVIER LIM',
+    kelas: '6D',
+    absen: '20',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 April 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2852',
+    nis: '2852',
+    nama: 'MAEZA RIZKI WARYONO',
+    kelas: '6D',
+    absen: '21',
+    jenisKelamin: 'L',
+    tempatLahir: 'BANYUMAS',
+    tanggalLahir: '14 Mei 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2873',
+    nis: '2873',
+    nama: 'MICHELLE ANGELICA LIMBERTA',
+    kelas: '6D',
+    absen: '22',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2874',
+    nis: '2874',
+    nama: 'MONICA SAMARA BANJARNAHOR',
+    kelas: '6D',
+    absen: '23',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '12 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2962',
+    nis: '2962',
+    nama: 'MUHAMAD RAFFA PERMANA',
+    kelas: '6D',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2936',
+    nis: '2936',
+    nama: 'NAFEEZA KHANSA SANTIKA',
+    kelas: '6D',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'CIREBON',
+    tanggalLahir: '03 Februari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2965',
+    nis: '2965',
+    nama: 'NICHOLAS SYAHPUTRA',
+    kelas: '6D',
+    absen: '26',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2877',
+    nis: '2877',
+    nama: 'OCTAVIO SADDHANA SATRIYADI',
+    kelas: '6D',
+    absen: '27',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2911',
+    nis: '2911',
+    nama: 'RAYYA AQUEELA',
+    kelas: '6D',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'SEMARANG',
+    tanggalLahir: '29 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-3554',
+    nis: '3554',
+    nama: 'SASMITHA GITA SARASWATI',
+    kelas: '6D',
+    absen: '29',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 Mei 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2912',
+    nis: '2912',
+    nama: 'SHALOOM PRESLEY VENEZIA TAHAPARY',
+    kelas: '6D',
+    absen: '30',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6D-2913',
+    nis: '2913',
+    nama: 'VINCENT JOHNATHAN LIM',
+    kelas: '6D',
+    absen: '31',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '06 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2914',
+    nis: '2914',
+    nama: 'AERILYN BELLVANIA GUNAWAN',
+    kelas: '6E',
+    absen: '01',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '10 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2915',
+    nis: '2915',
+    nama: 'AFIFAH SAKHA HERMANTO',
+    kelas: '6E',
+    absen: '02',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2830',
+    nis: '2830',
+    nama: 'ALEISHA AULIA ANINDITA',
+    kelas: '6E',
+    absen: '03',
+    jenisKelamin: 'P',
+    tempatLahir: 'BOGOR',
+    tanggalLahir: '19 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3558',
+    nis: '3558',
+    nama: 'ALVARO GAVRIEL',
+    kelas: '6E',
+    absen: '04',
+    jenisKelamin: 'L',
+    tempatLahir: 'PEKANBARU',
+    tanggalLahir: '14 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2920',
+    nis: '2920',
+    nama: 'CHELYNE DHAMMADITYA DIMARA',
+    kelas: '6E',
+    absen: '05',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '03 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2891',
+    nis: '2891',
+    nama: 'CHRISTABELLE LETICIA SYARIEF',
+    kelas: '6E',
+    absen: '06',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '13 Maret 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2861',
+    nis: '2861',
+    nama: 'CORDELIA CALLYSTA',
+    kelas: '6E',
+    absen: '07',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2921',
+    nis: '2921',
+    nama: 'DARZELL HENDERSON HUI',
+    kelas: '6E',
+    absen: '08',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3190',
+    nis: '3190',
+    nama: 'DELICIA ANGELICA SUN',
+    kelas: '6E',
+    absen: '09',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '27 April 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2836',
+    nis: '2836',
+    nama: 'DERREN JESANAEL',
+    kelas: '6E',
+    absen: '10',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3376',
+    nis: '3376',
+    nama: 'EDWARD MANGGALA HATANO',
+    kelas: '6E',
+    absen: '11',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '23 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2925',
+    nis: '2925',
+    nama: 'ENXING LAU',
+    kelas: '6E',
+    absen: '12',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2898',
+    nis: '2898',
+    nama: 'HAFIZH ALFARIZI JULIO DINOV',
+    kelas: '6E',
+    absen: '13',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3192',
+    nis: '3192',
+    nama: 'HANA WIJAYA',
+    kelas: '6E',
+    absen: '14',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2953',
+    nis: '2953',
+    nama: 'JACINDA EIFFEL LUVENA',
+    kelas: '6E',
+    absen: '15',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '15 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2954',
+    nis: '2954',
+    nama: 'JANETTE ABIGAIL CHANDRA',
+    kelas: '6E',
+    absen: '16',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '30 Januari 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2868',
+    nis: '2868',
+    nama: 'JAYVYN NATHAN',
+    kelas: '6E',
+    absen: '17',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3004',
+    nis: '3004',
+    nama: 'JECONIA KIMORA YANG',
+    kelas: '6E',
+    absen: '18',
+    jenisKelamin: 'P',
+    tempatLahir: 'TANGERANG',
+    tanggalLahir: '12 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3377',
+    nis: '3377',
+    nama: 'JONATHAN GALANG ADHIMUKTI',
+    kelas: '6E',
+    absen: '19',
+    jenisKelamin: 'L',
+    tempatLahir: 'GUNUNGKIDUL',
+    tanggalLahir: '24 Oktober 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2848',
+    nis: '2848',
+    nama: 'KELVIN NOVELIO',
+    kelas: '6E',
+    absen: '20',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 November 2013',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2850',
+    nis: '2850',
+    nama: 'KENZOU LIMINDRA',
+    kelas: '6E',
+    absen: '21',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '11 Juni 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2905',
+    nis: '2905',
+    nama: 'KEYSHA ANINDHITA SUTANTO',
+    kelas: '6E',
+    absen: '22',
+    jenisKelamin: 'P',
+    tempatLahir: 'LAMPUNG',
+    tanggalLahir: '15 Agustus 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2933',
+    nis: '2933',
+    nama: 'MAXWELL HIROSHI CHANDRA',
+    kelas: '6E',
+    absen: '23',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '29 Juni 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3378',
+    nis: '3378',
+    nama: 'MICHAEL',
+    kelas: '6E',
+    absen: '24',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '28 Mei 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2908',
+    nis: '2908',
+    nama: 'NAMIA NOVITA GUNAWAN',
+    kelas: '6E',
+    absen: '25',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '04 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3007',
+    nis: '3007',
+    nama: 'NOEL NATHANAEL KAM',
+    kelas: '6E',
+    absen: '26',
+    jenisKelamin: 'L',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '24 Desember 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2876',
+    nis: '2876',
+    nama: 'NOVIA ECA PUTRI FERINA',
+    kelas: '6E',
+    absen: '27',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '16 November 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2969',
+    nis: '2969',
+    nama: 'SHAQILA PUTRI NURMARHALI',
+    kelas: '6E',
+    absen: '28',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 September 2014',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-2970',
+    nis: '2970',
+    nama: 'SHELLYS CHOW',
+    kelas: '6E',
+    absen: '29',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '21 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
+  },
+  {
+    id: 'STD-6E-3362',
+    nis: '3362',
+    nama: 'STELLA JESSLYN',
+    kelas: '6E',
+    absen: '30',
+    jenisKelamin: 'P',
+    tempatLahir: 'JAKARTA',
+    tanggalLahir: '14 Juli 2015',
+    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   }
 ];
+
 
 // Daftar Nama Siswa Contoh / Dummy Fiktif Bawaan (Hapus Permanen)
 const DAFTAR_NAMA_SISWA_CONTOH = [
@@ -19367,7 +23044,7 @@ function hapusSemuaSiswaContohPermanen(quiet = false) {
       localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(list));
       if (!quiet) {
         playSound('success');
-        showToast(`🧹 Berhasil menghapus permanen ${deletedCount} data siswa contoh! Daftar siswa kini urut sesuai nomor absen 📋`, 'success');
+        showToast(`ðŸ§¹ Berhasil menghapus permanen ${deletedCount} data siswa contoh! Daftar siswa kini urut sesuai nomor absen ðŸ“‹`, 'success');
         if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
         if (typeof renderDasborGuru === 'function') renderDasborGuru();
       }
@@ -19390,7 +23067,7 @@ function pulihkanSemuaSiswaDefault(quiet = false) {
     if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     if (typeof renderDasborGuru === 'function') renderDasborGuru();
     if (!quiet) {
-      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... ☁️`, 'info');
+      showToast(`âœ… Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... â˜ï¸`, 'info');
     }
     // Otomatis sinkronkan juga dari tab "DATA SISWA LMS" di Google Sheets
     if (typeof sinkronkanMasterDataSiswaLMS === 'function') {
@@ -19889,7 +23566,7 @@ function verifikasiPinGuru() {
       setTimeout(() => input.classList.remove('animate-shake', 'border-rose-500'), 500);
       input.focus();
     }
-    showToast('⚠️ Masukkan PIN Guru terlebih dahulu!', 'warning');
+    showToast('âš ï¸ Masukkan PIN Guru terlebih dahulu!', 'warning');
     return;
   }
 
@@ -19909,7 +23586,7 @@ function verifikasiPinGuru() {
     if (isMasterOverride && !isCustomMatch) {
       clearTeacherPin();
       perbaruiTampilanStatusPinGuru();
-      showToast('🔑 Akses Master Terverifikasi! PIN Dasbor Guru aktif.', 'info');
+      showToast('ðŸ”‘ Akses Master Terverifikasi! PIN Dasbor Guru aktif.', 'info');
     }
 
     tutupModalLoginGuru();
@@ -19925,7 +23602,7 @@ function verifikasiPinGuru() {
     if (typeof renderDasborGuru === 'function') {
       renderDasborGuru();
     }
-    showToast('Akses Guru Terverifikasi! Selamat datang Ibu Darningsih, S.T. 👩‍🏫', 'success');
+    showToast('Akses Guru Terverifikasi! Selamat datang Ibu Darningsih, S.T. ðŸ‘©â€ðŸ«', 'success');
   } else {
     try { playSound('error'); } catch (e) {}
     if (errorMsg) {
@@ -19938,7 +23615,7 @@ function verifikasiPinGuru() {
       input.value = '';
       input.focus();
     }
-    showToast('❌ PIN Guru salah! Akses dasbor ditolak.', 'error');
+    showToast('âŒ PIN Guru salah! Akses dasbor ditolak.', 'error');
   }
 }
 window.verifikasiPinGuru = verifikasiPinGuru;
@@ -20049,8 +23726,8 @@ function eksekusiResetPinViaEmail() {
   }
 
   const msgPemberitahuan = newPinVal 
-    ? `✅ Verifikasi email ningdrn79@gmail.com berhasil! PIN baru telah aktif. Silakan masuk Dasbor.`
-    : `✅ Verifikasi email ningdrn79@gmail.com berhasil! PIN Dasbor Guru dipulihkan ke default standar.`;
+    ? `âœ… Verifikasi email ningdrn79@gmail.com berhasil! PIN baru telah aktif. Silakan masuk Dasbor.`
+    : `âœ… Verifikasi email ningdrn79@gmail.com berhasil! PIN Dasbor Guru dipulihkan ke default standar.`;
 
   showToast(msgPemberitahuan, 'success');
 }
@@ -20062,7 +23739,7 @@ function kirimEmailNotifikasiReset() {
   const body = encodeURIComponent(`Halo Ibu Darningsih, S.T.,\n\nIni adalah konfirmasi permohonan pemulihan PIN Dasbor Guru pada Aplikasi Pembelajaran EduCodeAI SDS Cinta Kasih Tzu Chi.\n\nEmail Resmi Terdaftar: ${GURU_OFFICIAL_EMAIL}\nWaktu Permintaan: ${new Date().toLocaleString('id-ID')}\n\nJika ini adalah Anda, silakan lakukan reset PIN melalui formulir verifikasi email di aplikasi.`);
   const mailtoUrl = `mailto:${GURU_OFFICIAL_EMAIL}?subject=${subject}&body=${body}`;
   window.open(mailtoUrl, '_blank');
-  showToast('Membuka aplikasi email untuk pengiriman konfirmasi ke ningdrn79@gmail.com ✉️', 'info');
+  showToast('Membuka aplikasi email untuk pengiriman konfirmasi ke ningdrn79@gmail.com âœ‰ï¸', 'info');
 }
 window.kirimEmailNotifikasiReset = kirimEmailNotifikasiReset;
 
@@ -20183,7 +23860,7 @@ function keluarModeGuru() {
   } catch (eStatus) {}
 
   try {
-    if (typeof showToast === 'function') showToast('Telah keluar dari mode Dasbor Guru 🔒', 'info');
+    if (typeof showToast === 'function') showToast('Telah keluar dari mode Dasbor Guru ðŸ”’', 'info');
   } catch (eToast) {}
 }
 window.keluarModeGuru = keluarModeGuru;
@@ -20322,7 +23999,7 @@ function simpanPinGuruBaru() {
     playSound('success');
     tutupModalUbahPinGuru();
     perbaruiTampilanStatusPinGuru();
-    showToast('✅ Berhasil! PIN Dasbor Guru telah diperbarui dan tersimpan permanen.', 'success');
+    showToast('âœ… Berhasil! PIN Dasbor Guru telah diperbarui dan tersimpan permanen.', 'success');
   } catch (e) {
     console.error('Gagal menyimpan PIN baru:', e);
     tampilkanError('Gagal menyimpan PIN ke penyimpanan browser.', inNew);
@@ -20342,7 +24019,7 @@ function resetPinGuruKeDefault() {
     clearTeacherPin();
     playSound('success');
     perbaruiTampilanStatusPinGuru();
-    showToast('🔄 PIN Dasbor Guru berhasil dikembalikan ke default standar!', 'success');
+    showToast('ðŸ”„ PIN Dasbor Guru berhasil dikembalikan ke default standar!', 'success');
   }
 }
 window.resetPinGuruKeDefault = resetPinGuruKeDefault;
@@ -20394,8 +24071,8 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
   const elPeriode = document.getElementById('card-rapor-periode-label');
   if (elPeriode) {
     elPeriode.innerText = isSem2Open
-      ? 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 & 2)'
-      : 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 / Ganjil)';
+      ? 'SDS Cinta Kasih Tzu Chi â€¢ Tahun Ajaran 2026/2027 (Semester 1 & 2)'
+      : 'SDS Cinta Kasih Tzu Chi â€¢ Tahun Ajaran 2026/2027 (Semester 1 / Ganjil)';
   }
 
   // 4. Status KKM Keseluruhan (Murni bersumber dari Nilai Semester 1 yang sedang aktif)
@@ -20418,10 +24095,10 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
 
   if (elStatusBadge) {
     if (isTeacherMode) {
-      elStatusBadge.innerText = 'DATA RESMI GURU 👩‍🏫';
+      elStatusBadge.innerText = 'DATA RESMI GURU ðŸ‘©â€ðŸ«';
       elStatusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 border border-amber-300 uppercase tracking-wide';
     } else {
-      elStatusBadge.innerText = 'PELAJAR AKTIF 🎓';
+      elStatusBadge.innerText = 'PELAJAR AKTIF ðŸŽ“';
       elStatusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/30 uppercase tracking-wide';
     }
   }
@@ -20497,7 +24174,7 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
   const elBintang = document.getElementById('card-siswa-bintang');
   if (elBintang) {
     const pts = student.poinBintang !== undefined ? student.poinBintang : (state.userPoints || 0);
-    elBintang.innerText = `${pts} ⭐`;
+    elBintang.innerText = `${pts} â­`;
   }
 
   const elCatatan = document.getElementById('card-siswa-catatan');
@@ -20541,7 +24218,7 @@ function bukaRaporDigitalDariGuru(studentId) {
   const db = getStudentDatabase();
   const student = db.find(s => s.id === studentId || s.nis === studentId);
   if (!student) {
-    showToast('⚠️ Data siswa tidak ditemukan di database.', 'warning');
+    showToast('âš ï¸ Data siswa tidak ditemukan di database.', 'warning');
     return;
   }
   isiDataRaporDigital(student, true);
@@ -20698,7 +24375,7 @@ async function loginDenganNis() {
       errorEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-amber-500"></i> Ketik nomor NIS kamu terlebih dahulu ya!';
       errorEl.classList.remove('hidden');
     }
-    showToast('⚠️ Ketik nomor NIS kamu terlebih dahulu ya!', 'warning');
+    showToast('âš ï¸ Ketik nomor NIS kamu terlebih dahulu ya!', 'warning');
     if (inputEl) inputEl.focus();
     return;
   }
@@ -20731,7 +24408,7 @@ async function loginDenganNis() {
         errorEl.innerHTML = msgHtml;
         errorEl.classList.remove('hidden');
       }
-      showToast(`❌ Nomor NIS "${nisVal}" tidak ada di database Google Sheet! Akses ditolak.`, 'error');
+      showToast(`âŒ Nomor NIS "${nisVal}" tidak ada di database Google Sheet! Akses ditolak.`, 'error');
       if (inputEl) {
         inputEl.classList.add('border-rose-500', 'bg-rose-50', 'animate-shake');
         setTimeout(() => {
@@ -20776,7 +24453,7 @@ async function loginDenganNis() {
     try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (eUI) {}
     try { switchTab(targetTab); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
 
-    showToast(`Selamat datang, ${student.nama}! (Kelas ${student.kelas} • NIS: ${student.nis}) 🎉`, 'success');
+    showToast(`Selamat datang, ${student.nama}! (Kelas ${student.kelas} â€¢ NIS: ${student.nis}) ðŸŽ‰`, 'success');
   } catch (err) {
     console.error('Error saat verifikasi NIS:', err);
     // Jika sesi ternyata sudah tersimpan, tutup modal dan lanjutkan tanpa menampilkan error palsu
@@ -20890,7 +24567,7 @@ function eksekusiLogoutSiswa() {
   const bintangWrap = document.getElementById('welcome-siswa-bintang-wrap');
 
   if (elAvatar) {
-    elAvatar.innerText = '👤';
+    elAvatar.innerText = 'ðŸ‘¤';
     elAvatar.className = 'w-11 h-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center font-black text-lg shadow-inner flex-shrink-0';
   }
   if (elNama) elNama.innerText = 'Belum Ada Siswa Masuk';
@@ -20898,7 +24575,7 @@ function eksekusiLogoutSiswa() {
     elKelas.innerText = 'Akun Belum Aktif';
     elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-300';
   }
-  if (elSub) elSub.innerText = 'Lab Komputer • Belum Masuk Akun';
+  if (elSub) elSub.innerText = 'Lab Komputer â€¢ Belum Masuk Akun';
   if (elPing) elPing.classList.add('hidden');
   if (bintangWrap) bintangWrap.classList.add('hidden');
 
@@ -20954,7 +24631,7 @@ function eksekusiLogoutSiswa() {
   try { switchTab('beranda'); } catch (e) {}
   try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) {}
 
-  showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info');
+  showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan ðŸ”’`, 'info');
 }
 window.eksekusiLogoutSiswa = eksekusiLogoutSiswa;
 
@@ -20977,7 +24654,7 @@ function renderOpsiPilihSiswa() {
     sortedStudentsInClass.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s.id;
-      opt.innerText = `NIS: ${s.nis || '-'} • No.${s.absen || '-'} - ${s.nama}`;
+      opt.innerText = `NIS: ${s.nis || '-'} â€¢ No.${s.absen || '-'} - ${s.nama}`;
       if (s.id === currentProfile.id || (currentProfile.nis && s.nis === currentProfile.nis)) {
         opt.selected = true;
       }
@@ -21019,7 +24696,7 @@ function pilihSiswaDariDropdown(studentId) {
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTab);
-  showToast(`Berhasil masuk sebagai ${student.nama} (${student.kelas} • NIS: ${student.nis})! 🎉`, 'success');
+  showToast(`Berhasil masuk sebagai ${student.nama} (${student.kelas} â€¢ NIS: ${student.nis})! ðŸŽ‰`, 'success');
 }
 
 function simpanProfilSiswa() {
@@ -21086,7 +24763,7 @@ function simpanProfilSiswa() {
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTabSimpan);
-  showToast(`Halo ${nama}! Profilmu (${kelas} • NIS: ${nis}) berhasil disimpan & aktif 🎉`, 'success');
+  showToast(`Halo ${nama}! Profilmu (${kelas} â€¢ NIS: ${nis}) berhasil disimpan & aktif ðŸŽ‰`, 'success');
 }
 
 // ==========================================
@@ -21247,10 +24924,10 @@ function muatProfilSiswa() {
     if (heroSemBtns) heroSemBtns.classList.add('hidden');
     if (heroGuestBtn) heroGuestBtn.classList.remove('hidden');
     if (welcomeAvatar) {
-      welcomeAvatar.innerText = '👤';
+      welcomeAvatar.innerText = 'ðŸ‘¤';
       welcomeAvatar.className = 'w-11 h-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center font-black text-lg shadow-inner flex-shrink-0';
     }
-    if (welcomeSubText) welcomeSubText.innerText = 'Lab Komputer • Belum Masuk Akun';
+    if (welcomeSubText) welcomeSubText.innerText = 'Lab Komputer â€¢ Belum Masuk Akun';
     if (welcomePing) welcomePing.classList.add('hidden');
     if (welcomeNama) welcomeNama.innerText = 'Belum Ada Siswa Masuk';
     if (welcomeKelas) {
@@ -21322,21 +24999,21 @@ function muatProfilSiswa() {
       if (cardsSiswa4) cardsSiswa4.classList.add('hidden');
       if (cardsSiswa5) cardsSiswa5.classList.add('hidden');
       if (cardsSiswa6) cardsSiswa6.classList.remove('hidden');
-      if (heroBadge) heroBadge.innerText = 'EduCode AI • Fase C (Kelas 6 SD)';
+      if (heroBadge) heroBadge.innerText = 'EduCode AI â€¢ Fase C (Kelas 6 SD)';
       if (heroTitle) heroTitle.innerText = '4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!';
       if (heroDesc) heroDesc.innerText = 'Pelajari Dekomposisi, Pengenalan Pola, Abstraksi, dan Algoritma secara interaktif untuk memecahkan masalah sehari-hari.';
       if (heroSemBtns) {
         heroSemBtns.innerHTML = `
           <button type="button" onclick="switchTab('petualangan6')" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-5 py-2.5 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
             <i class="fa-solid fa-brain text-slate-950"></i>
-            <span>Buka 4 Pilar Komputasi 🚀</span>
+            <span>Buka 4 Pilar Komputasi ðŸš€</span>
             <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </button>
           <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-            <span>🧩 Dekomposisi</span>
+            <span>ðŸ§© Dekomposisi</span>
           </button>
           <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-            <span>🧸 Pola</span>
+            <span>ðŸ§¸ Pola</span>
           </button>
         `;
       }
@@ -21344,18 +25021,18 @@ function muatProfilSiswa() {
       if (cardsSiswa4) cardsSiswa4.classList.add('hidden');
       if (cardsSiswa6) cardsSiswa6.classList.add('hidden');
       if (cardsSiswa5) cardsSiswa5.classList.remove('hidden');
-      if (heroBadge) heroBadge.innerText = 'EduCode AI • Fase C (Kelas 5 SD)';
+      if (heroBadge) heroBadge.innerText = 'EduCode AI â€¢ Fase C (Kelas 5 SD)';
       if (heroTitle) heroTitle.innerText = 'Portofolio Digital & AI Siswa Kelas 5 SD';
       if (heroDesc) heroDesc.innerText = 'Pelajari presentasi PowerPoint vs Gemini AI, sertifikat Hour of Code, poster Canva, dan game Scratch.';
       if (heroSemBtns) {
         heroSemBtns.innerHTML = `
           <button type="button" onclick="switchTab('petualangan5')" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white px-5 py-2.5 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-purple-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
             <i class="fa-solid fa-rocket text-yellow-300"></i>
-            <span>Buka 4 Misi Kelas 5 🚀</span>
+            <span>Buka 4 Misi Kelas 5 ðŸš€</span>
             <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </button>
           <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-            <span>📊 Presentasi</span>
+            <span>ðŸ“Š Presentasi</span>
           </button>
         `;
       }
@@ -21364,7 +25041,7 @@ function muatProfilSiswa() {
       if (cardsSiswa4) cardsSiswa4.classList.remove('hidden');
       if (cardsSiswa5) cardsSiswa5.classList.add('hidden');
       if (cardsSiswa6) cardsSiswa6.classList.add('hidden');
-      if (heroBadge) heroBadge.innerText = (state.currentSemester === 2 ? 'EduCode AI • Semester 2' : 'EduCode AI • Semester 1');
+      if (heroBadge) heroBadge.innerText = (state.currentSemester === 2 ? 'EduCode AI â€¢ Semester 2' : 'EduCode AI â€¢ Semester 1');
       if (heroTitle) heroTitle.innerText = 'Belajar Coding & AI Bersama, Untuk Masa Depan';
       if (heroDesc) heroDesc.innerText = 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan budi pekerti bersama SDS Cinta Kasih Tzu Chi.';
     }
@@ -21376,7 +25053,7 @@ function muatProfilSiswa() {
     if (welcomePing) welcomePing.classList.remove('hidden');
     if (welcomeNama) welcomeNama.innerText = profile.nama || 'Siswa';
     if (welcomeKelas) {
-      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas6 ? '6A' : (isKelas5 ? '5D' : '4A'))} • Absen ${profile.absen || '-'}`;
+      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas6 ? '6A' : (isKelas5 ? '5D' : '4A'))} â€¢ Absen ${profile.absen || '-'}`;
       welcomeKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
     }
 
@@ -21446,7 +25123,7 @@ function muatProfilSiswa() {
         wordAvatar.innerText = initials;
         wordName.innerText = profile.nama;
       } else {
-        wordAvatar.innerText = '👤';
+        wordAvatar.innerText = 'ðŸ‘¤';
         wordName.innerText = 'Tamu (Belum Masuk)';
       }
     }
@@ -21503,9 +25180,9 @@ function muatProfilSiswa() {
 
     if (btnTextSertifikatModul) {
       if (hasFinishedKuis) {
-        btnTextSertifikatModul.innerText = 'Lihat Sertifikat Digital Saya 🏆';
+        btnTextSertifikatModul.innerText = 'Lihat Sertifikat Digital Saya ðŸ†';
       } else {
-        btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat 🏆';
+        btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat ðŸ†';
       }
     }
   } catch (eKuisCert) {}
@@ -21575,7 +25252,7 @@ function catatHasilKuisSiswa(semNumber, score) {
   try {
     const profile = getActiveStudentProfile();
     if (!profile) {
-      showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu agar skor kuismu tercatat!', 'warning');
+      showToast('âš ï¸ Silakan masuk/pilih akun siswa terlebih dahulu agar skor kuismu tercatat!', 'warning');
       bukaPilihSiswaCepat();
       return;
     }
@@ -21776,13 +25453,13 @@ function tampilkanHasilPenilaianOtomatis(tipe, evaluasi, judul) {
   el.innerHTML = `
     <div class="flex items-start justify-between gap-3 mb-2.5">
       <div class="flex items-center gap-2">
-        <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 text-white flex items-center justify-center text-sm font-bold shadow-md">🤖</span>
+        <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 text-white flex items-center justify-center text-sm font-bold shadow-md">ðŸ¤–</span>
         <div>
           <h5 class="font-title font-bold text-xs text-indigo-300 leading-tight">Penilaian Otomatis Sistem (AI)</h5>
           <span class="text-[10px] text-slate-400">${namaAspek}</span>
         </div>
       </div>
-      <button onclick="document.getElementById('toast-evaluasi-ai').remove()" class="w-6 h-6 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs transition">✕</button>
+      <button onclick="document.getElementById('toast-evaluasi-ai').remove()" class="w-6 h-6 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs transition">âœ•</button>
     </div>
     <div class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700 mb-2.5 flex items-center justify-between">
       <div>
@@ -21814,7 +25491,7 @@ function tampilkanHasilPenilaianOtomatis(tipe, evaluasi, judul) {
     </div>
     <div class="mt-2.5 text-[10px] text-emerald-300 flex items-center gap-1.5 font-medium">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
-      <span>Nilai otomatis dicatat ke Dasbor Guru (+25 ⭐)</span>
+      <span>Nilai otomatis dicatat ke Dasbor Guru (+25 â­)</span>
     </div>
   `;
   document.body.appendChild(el);
@@ -21829,7 +25506,7 @@ function catatPosterSiswa(title, previewDataUrl) {
   try {
     const profile = getActiveStudentProfile();
     if (!profile) {
-      showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu agar karya poster tersimpan ke buku nilai!', 'warning');
+      showToast('âš ï¸ Silakan masuk/pilih akun siswa terlebih dahulu agar karya poster tersimpan ke buku nilai!', 'warning');
       bukaPilihSiswaCepat();
       return;
     }
@@ -21874,7 +25551,7 @@ function catatLatihanExcelSiswa(namaLatihan = 'Praktik Spreadsheet Excel') {
   try {
     const profile = getActiveStudentProfile();
     if (!profile) {
-      showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu agar latihan tersimpan ke buku nilai!', 'warning');
+      showToast('âš ï¸ Silakan masuk/pilih akun siswa terlebih dahulu agar latihan tersimpan ke buku nilai!', 'warning');
       bukaPilihSiswaCepat();
       return;
     }
@@ -22005,7 +25682,7 @@ function renderDasborGuru() {
 function muatUlangDataDasbor() {
   playSound('click');
   renderDasborGuru();
-  showToast('Data Dasbor Guru berhasil disegarkan 🔄', 'info');
+  showToast('Data Dasbor Guru berhasil disegarkan ðŸ”„', 'info');
 }
 
 // --------------------------------------------------------------------------
@@ -22058,12 +25735,12 @@ function pilihKelasGuruNav(tingkat) {
     state.filterKelasGuru = 'semua';
     updateFilterKelasTabs('all');
     filterDanCariSiswa();
-    showToast('Menampilkan Seluruh Siswa Pengampu Darningsih, S.T. 👩‍🏫', 'info');
+    showToast('Menampilkan Seluruh Siswa Pengampu Darningsih, S.T. ðŸ‘©â€ðŸ«', 'info');
   } else {
     state.filterKelasGuru = `tingkat_${tingkat}`;
     updateFilterKelasTabs(tingkat);
     filterDanCariSiswa();
-    showToast(`Menampilkan Data Siswa Kelas ${tingkat} • Pengampu Darningsih, S.T. 🎓`, 'success');
+    showToast(`Menampilkan Data Siswa Kelas ${tingkat} â€¢ Pengampu Darningsih, S.T. ðŸŽ“`, 'success');
   }
 }
 window.pilihKelasGuruNav = pilihKelasGuruNav;
@@ -22608,7 +26285,7 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <span class="font-title font-black ${szTag} px-3 py-1.5 rounded-xl shadow-2xs inline-flex items-center gap-1.5 ${isSem1Pass ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
-            ${isSem1Pass ? '✅ TUNTAS' : '⚠️ REMEDIAL'}
+            ${isSem1Pass ? 'âœ… TUNTAS' : 'âš ï¸ REMEDIAL'}
           </span>
         </td>
         <td class="${padRow} px-3">
@@ -22683,7 +26360,7 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <span class="font-title font-black ${szTag} px-3 py-1.5 rounded-xl shadow-2xs inline-flex items-center gap-1.5 ${isSem2Pass ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
-            ${isSem2Pass ? '✅ TUNTAS' : '⚠️ REMEDIAL'}
+            ${isSem2Pass ? 'âœ… TUNTAS' : 'âš ï¸ REMEDIAL'}
           </span>
         </td>
         <td class="${padRow} px-3">
@@ -22832,7 +26509,7 @@ function bukaModalMonitoringDriveGuru(studentId) {
                   <span class="w-5 h-5 rounded-md bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold shrink-0">${cfg.slotNumber}</span>
                   <span class="truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</span>
                 </span>
-                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full shrink-0">✓ Ada</span>
+                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full shrink-0">âœ“ Ada</span>
               </div>
               <div class="relative w-full aspect-video bg-slate-100 rounded-xl overflow-hidden my-2 border border-slate-200">
                 <img src="${imgSrc}" alt="${cfg.cleanTitle}" class="w-full h-full object-cover">
@@ -22841,7 +26518,7 @@ function bukaModalMonitoringDriveGuru(studentId) {
             </div>
             <div class="pt-1.5 border-t border-slate-100 text-[10px] space-y-1">
               <div class="font-mono text-slate-700 truncate font-semibold" title="${fileName || 'Tanpa nama'}">
-                📄 ${fileName || '<i class="text-slate-400 font-normal">Belum dinamai</i>'}
+                ðŸ“„ ${fileName || '<i class="text-slate-400 font-normal">Belum dinamai</i>'}
               </div>
               <div class="flex items-center gap-1">
                 ${checkName.valid 
@@ -23097,7 +26774,7 @@ function simpanPerubahanDataSiswaModal() {
     }
 
     playSound('success');
-    showToast(`Data & nilai "${nama}" (NIS: ${nis}) berhasil diperbarui! 🎉`, 'success');
+    showToast(`Data & nilai "${nama}" (NIS: ${nis}) berhasil diperbarui! ðŸŽ‰`, 'success');
     tutupModalDetailSiswa();
     renderDasborGuru();
   }
@@ -23142,7 +26819,7 @@ function hapusSiswaById(studentId) {
     }
 
     playSound('success');
-    showToast(`Data siswa "${student.nama}" berhasil dihapus 🗑️`, 'info');
+    showToast(`Data siswa "${student.nama}" berhasil dihapus ðŸ—‘ï¸`, 'info');
     renderDasborGuru();
   }
 }
@@ -23238,7 +26915,7 @@ function simpanSiswaBaruManual() {
   tutupModalTambahSiswa();
 
   if (state.isGuruLoggedIn) {
-    showToast(`Siswa "${nama}" (NIS: ${nis}) berhasil ditambahkan ke Kelas ${kelas}! 🎉`, 'success');
+    showToast(`Siswa "${nama}" (NIS: ${nis}) berhasil ditambahkan ke Kelas ${kelas}! ðŸŽ‰`, 'success');
     renderDasborGuru();
   } else {
     // Siswa mendaftar mandiri: langsung aktifkan sesi login siswa!
@@ -23257,7 +26934,7 @@ function simpanSiswaBaruManual() {
     muatProfilSiswa();
     setHeaderNavMode('sem1');
     bukaModalProfilSiswa();
-    showToast(`Pendaftaran Berhasil! Selamat datang, ${nama} (Kelas ${kelas} • NIS: ${nis}) 🚀`, 'success');
+    showToast(`Pendaftaran Berhasil! Selamat datang, ${nama} (Kelas ${kelas} â€¢ NIS: ${nis}) ðŸš€`, 'success');
   }
 }
 
@@ -23363,7 +27040,7 @@ function eksporNilaiCSV() {
   link.click();
   document.body.removeChild(link);
 
-  showToast(`Rekap nilai "${filename}" berhasil diunduh! 📊`, 'success');
+  showToast(`Rekap nilai "${filename}" berhasil diunduh! ðŸ“Š`, 'success');
 }
 
 // --------------------------------------------------------------------------
@@ -23374,7 +27051,7 @@ function pilihSemesterGaleriGuru(sem) {
   const isUnlocked = isSemester2Unlocked();
   if (sem === 2 && !isUnlocked) {
     playSound('warning');
-    showToast('⚠️ Galeri Semester 2 (Coding & AI) belum diaktifkan oleh Guru! Aktifkan terlebih dahulu melalui tombol "Buka Akses Semester 2" di Dasbor Guru.', 'warning');
+    showToast('âš ï¸ Galeri Semester 2 (Coding & AI) belum diaktifkan oleh Guru! Aktifkan terlebih dahulu melalui tombol "Buka Akses Semester 2" di Dasbor Guru.', 'warning');
     return;
   }
   state.galeriSemester = sem;
@@ -23388,7 +27065,7 @@ function bukaDemoCodingLangsung() {
     pilihSemester(2);
   }
   switchTab('coding');
-  showToast('Semester 2: Studio Visual Coding Scratch Dibuka! 💻', 'info');
+  showToast('Semester 2: Studio Visual Coding Scratch Dibuka! ðŸ’»', 'info');
 }
 window.bukaDemoCodingLangsung = bukaDemoCodingLangsung;
 
@@ -23550,7 +27227,7 @@ function pilihSemesterGaleriGuru(sem) {
   const isUnlocked = isSemester2Unlocked();
   if (sem === 2 && !isUnlocked) {
     playSound('warning');
-    showToast('⚠️ Galeri Semester 2 (Coding & AI) belum diaktifkan oleh Guru! Aktifkan terlebih dahulu melalui tombol "Buka Akses Semester 2" di Dasbor Guru.', 'warning');
+    showToast('âš ï¸ Galeri Semester 2 (Coding & AI) belum diaktifkan oleh Guru! Aktifkan terlebih dahulu melalui tombol "Buka Akses Semester 2" di Dasbor Guru.', 'warning');
     return;
   }
   state.galeriSemester = sem;
@@ -23564,7 +27241,7 @@ function bukaDemoCodingLangsung() {
     pilihSemester(2);
   }
   switchTab('coding');
-  showToast('Semester 2: Studio Visual Coding Scratch Dibuka! 💻', 'info');
+  showToast('Semester 2: Studio Visual Coding Scratch Dibuka! ðŸ’»', 'info');
 }
 window.bukaDemoCodingLangsung = bukaDemoCodingLangsung;
 
@@ -23607,7 +27284,7 @@ function renderGaleriGuru() {
         <button type="button" onclick="pilihSemesterGaleriGuru(2)" class="px-4 py-2 rounded-xl text-xs font-title font-bold bg-slate-50 text-slate-400 border border-dashed border-slate-300 flex items-center gap-2 cursor-pointer transition hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700" title="Klik untuk petunjuk aktivasi Semester 2">
           <i class="fa-solid fa-lock text-xs text-amber-500"></i>
           <span>Semester 2: Projek Coding & AI</span>
-          <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">🔒 Belum Aktif</span>
+          <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">ðŸ”’ Belum Aktif</span>
         </button>
       `;
     }
@@ -23639,7 +27316,7 @@ function renderGaleriGuru() {
 
     if (semPill) {
       semPill.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-pink-100 text-pink-700 border border-pink-200';
-      semPill.innerText = 'Semester 1 • TP 2.1 - TP 2.4';
+      semPill.innerText = 'Semester 1 â€¢ TP 2.1 - TP 2.4';
     }
     if (galeriTitle) {
       galeriTitle.innerHTML = '<i class="fa-solid fa-palette text-pink-600"></i> Hasil Poster Siswa (Semester 1)';
@@ -23769,9 +27446,9 @@ function renderGaleriGuru() {
                   </div>
                   <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5 flex-wrap">
                     <span class="font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">Kelas ${escapeXml(s.kelas)}</span>
-                    <span>•</span>
+                    <span>â€¢</span>
                     <span>NIS: ${escapeXml(s.nis || '-')}</span>
-                    <span>•</span>
+                    <span>â€¢</span>
                     <span>Absen: ${escapeXml(s.absen || '-')}</span>
                   </div>
                 </div>
@@ -23832,9 +27509,9 @@ function renderGaleriGuru() {
                   </div>
                   <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5 flex-wrap">
                     <span class="font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200">Kelas ${escapeXml(s.kelas)}</span>
-                    <span>•</span>
+                    <span>â€¢</span>
                     <span>NIS: ${escapeXml(s.nis || '-')}</span>
-                    <span>•</span>
+                    <span>â€¢</span>
                     <span>Absen: ${escapeXml(s.absen || '-')}</span>
                   </div>
                 </div>
@@ -23953,7 +27630,7 @@ function renderGaleriGuru() {
 
     if (semPill) {
       semPill.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-700 border border-purple-200';
-      semPill.innerText = 'Semester 2 • TP 3.1 - TP 4.2';
+      semPill.innerText = 'Semester 2 â€¢ TP 3.1 - TP 4.2';
     }
     if (galeriTitle) {
       galeriTitle.innerHTML = '<i class="fa-solid fa-robot text-purple-600"></i> Galeri Hasil Karya Coding & AI Siswa (Semester 2)';
@@ -24112,13 +27789,13 @@ function beriNilaiKaryaGuru(title, author, tipeMateri = 'poster') {
   }
 
   playSound('success');
-  showToast(`Nilai ${numScore} berhasil disimpan untuk "${title}"! 🏆`, 'success');
+  showToast(`Nilai ${numScore} berhasil disimpan untuk "${title}"! ðŸ†`, 'success');
 }
 window.beriNilaiKaryaGuru = beriNilaiKaryaGuru;
 
 function beriBintangKaryaGuru(title) {
   playSound('success');
-  showToast(`Apresiasi Bintang 5 Guru diberikan untuk "${title}"! ⭐⭐⭐⭐⭐`, 'success');
+  showToast(`Apresiasi Bintang 5 Guru diberikan untuk "${title}"! â­â­â­â­â­`, 'success');
 }
 
 // --------------------------------------------------------------------------
@@ -24265,9 +27942,9 @@ function renderMonitoringDrive7KGuru() {
               </h4>
               <div class="text-[11px] text-slate-500 flex items-center gap-1.5 flex-wrap">
                 <span class="font-bold text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200">Kelas ${escapeXml(s.kelas)}</span>
-                <span>•</span>
+                <span>â€¢</span>
                 <span>NIS: ${escapeXml(s.nis || '-')}</span>
-                <span>•</span>
+                <span>â€¢</span>
                 <span>Absen: ${escapeXml(s.absen || '-')}</span>
               </div>
             </div>
@@ -24292,8 +27969,8 @@ function renderMonitoringDrive7KGuru() {
             ${habitIconsHtml}
           </div>
           <div class="flex items-center gap-1 text-[10px] font-bold flex-wrap">
-            <span class="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200" title="Kesesuaian 3 Gambar Paint Mandiri">🎨 ${ev.paintCount || 0}/3 Paint</span>
-            <span class="text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200" title="Kesesuaian 4 Gambar Studio AI">🤖 ${ev.aiCount || 0}/4 AI</span>
+            <span class="text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200" title="Kesesuaian 3 Gambar Paint Mandiri">ðŸŽ¨ ${ev.paintCount || 0}/3 Paint</span>
+            <span class="text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200" title="Kesesuaian 4 Gambar Studio AI">ðŸ¤– ${ev.aiCount || 0}/4 AI</span>
             <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" title="Format Baku: Kelas_Nama_File">${ev.validNameCount}/7 Baku</span>
           </div>
         </div>
@@ -24353,26 +28030,26 @@ function bukaModalMonitoringDriveGuru(studentId) {
   if (kkmBadge) {
     if (evalData.filledCount === 7) {
       kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950';
-      kkmBadge.innerText = '✅ TUNTAS 100';
+      kkmBadge.innerText = 'âœ… TUNTAS 100';
     } else if (evalData.totalSkor >= 80) {
       kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-300 text-slate-900';
-      kkmBadge.innerText = '✅ TUNTAS (≥80)';
+      kkmBadge.innerText = 'âœ… TUNTAS (â‰¥80)';
     } else {
       kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-400 text-white';
-      kkmBadge.innerText = '⚠️ PERLU REMEDIAL';
+      kkmBadge.innerText = 'âš ï¸ PERLU REMEDIAL';
     }
   }
 
-  if (progText) progText.innerText = `${evalData.filledCount} dari 7 Terkumpul (${percent}%) • ${evalData.catatanAnalisis || ''}`;
+  if (progText) progText.innerText = `${evalData.filledCount} dari 7 Terkumpul (${percent}%) â€¢ ${evalData.catatanAnalisis || ''}`;
   if (progBar) progBar.style.width = `${percent}%`;
   if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${evalData.totalSkor}`;
   if (penamaanBadge) {
     penamaanBadge.innerHTML = `
       <span class="font-bold">${evalData.validNameCount}/7 Format Baku</span>
-      <span class="mx-1 text-slate-300">•</span>
-      <span class="text-purple-700 font-bold">🎨 ${evalData.paintCount || 0}/3 Paint</span>
-      <span class="mx-1 text-slate-300">•</span>
-      <span class="text-indigo-700 font-bold">🤖 ${evalData.aiCount || 0}/4 AI</span>
+      <span class="mx-1 text-slate-300">â€¢</span>
+      <span class="text-purple-700 font-bold">ðŸŽ¨ ${evalData.paintCount || 0}/3 Paint</span>
+      <span class="mx-1 text-slate-300">â€¢</span>
+      <span class="text-indigo-700 font-bold">ðŸ¤– ${evalData.aiCount || 0}/4 AI</span>
     `;
   }
 
@@ -24427,7 +28104,7 @@ function bukaModalMonitoringDriveGuru(studentId) {
                 <div class="text-slate-400 font-medium text-[9px]">Nama File:</div>
                 <div class="font-bold truncate text-slate-800" title="${escapeXml(fileName)}">${escapeXml(fileName)}</div>
                 <div class="mt-1 flex items-center justify-between">
-                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku ✅</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku ⚠️</span>'}
+                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku âœ…</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku âš ï¸</span>'}
                   <span class="text-[9px] text-slate-400">${item.timestamp ? item.timestamp.slice(0, 10) : ''}</span>
                 </div>
               </div>
@@ -24634,9 +28311,16 @@ function renderRingkasanKoneksiKelas() {
     const c = cfg[cls] || DEFAULT_CLASS_SHEETS_CONFIG[cls] || { sheetUrl: '', tabName: cls };
     const countInDb = db.filter(s => s.kelas === cls).length;
     const hasUrl = Boolean(c.sheetUrl);
-    const badge = hasUrl
-      ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Terhubung</span>`
-      : `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">Belum Ada Link</span>`;
+    const isMissingGsheetTab = ['5A', '5B', '5C', '5E'].includes(cls);
+
+    let badge = '';
+    if (isMissingGsheetTab) {
+      badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1" title="Tab ${cls} belum dibuat di Spreadsheet. Baru tersedia tab 5D."><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Tab Belum di Sheet</span>`;
+    } else if (hasUrl) {
+      badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Terhubung</span>`;
+    } else {
+      badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">Belum Ada Link</span>`;
+    }
 
     return `
       <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2 flex flex-col justify-between">
@@ -24647,6 +28331,7 @@ function renderRingkasanKoneksiKelas() {
         <div class="text-[11px] text-slate-500 space-y-0.5">
           <div>Tab Sheet: <strong class="text-slate-700 font-mono">${c.tabName || cls}</strong></div>
           <div>Database: <strong class="text-indigo-600">${countInDb} Siswa</strong> ${c.lastSynced ? `• <span class="text-[10px] text-slate-400">${c.lastSynced}</span>` : ''}</div>
+          ${isMissingGsheetTab ? `<div class="text-[10px] text-amber-600 font-medium">💡 Silakan tambah tab "${cls}" di Spreadsheet</div>` : ''}
         </div>
         <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between">
           <button type="button" onclick="pilihKelasSheetConfigTab('${cls}')" class="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer">
@@ -24690,7 +28375,7 @@ function simpanPengaturanSheetKelasAktif() {
   playSound('success');
   renderTabsKelasSheet();
   renderRingkasanKoneksiKelas();
-  showToast(`Pengaturan Google Sheet untuk Kelas ${activeKey} berhasil disimpan! ☁️`, 'success');
+  showToast(`Pengaturan Google Sheet untuk Kelas ${activeKey} berhasil disimpan! â˜ï¸`, 'success');
 }
 window.simpanPengaturanSheetKelasAktif = simpanPengaturanSheetKelasAktif;
 
@@ -24726,7 +28411,7 @@ function terapkanLinkKeSemuaKelas() {
   playSound('success');
   renderTabsKelasSheet();
   renderRingkasanKoneksiKelas();
-  showToast('✅ Link Google Spreadsheet berhasil diterapkan & tersimpan permanen ke seluruh 15 kelas! ☁️🎉', 'success');
+  showToast('âœ… Link Google Spreadsheet berhasil diterapkan & tersimpan permanen ke seluruh 15 kelas! â˜ï¸ðŸŽ‰', 'success');
 }
 window.terapkanLinkKeSemuaKelas = terapkanLinkKeSemuaKelas;
 
@@ -24822,43 +28507,63 @@ function parseGoogleSheetTable(parsed, defaultKelas = '4A') {
   // 2. Deteksi baris judul kolom otomatis (Mendukung kop surat / judul sekolah di baris 1-12)
   let startIndex = 0;
   let foundHeader = false;
-  const scanLimit = Math.min(rows.length, 12);
-  for (let rIdx = 0; rIdx < scanLimit; rIdx++) {
-    const rCells = rows[rIdx] ? (rows[rIdx].c || []) : [];
-    let hasNis = false;
-    let hasNama = false;
-    rCells.forEach(cell => {
-      if (!cell) return;
-      const str = ((cell.f || cell.v || '') + '').toLowerCase().trim();
-      if ((str.includes('nis') || str.includes('induk')) && !str.includes('jenis')) hasNis = true;
-      if (str.includes('nama')) hasNama = true;
-    });
 
-    if (hasNis || hasNama) {
-      foundHeader = true;
-      startIndex = rIdx + 1;
-      rCells.forEach((cell, idx) => {
-        if (!cell) return;
-        const txt = ((cell.f || cell.v || '') + '').trim();
-        checkHeaderField(txt, idx);
-      });
-      break;
+  // Jika kolom NIS dan Nama sudah ditemukan dari metadata cols (seperti tabel standar Google Sheet)
+  if (colMap.nis !== -1 && colMap.nama !== -1) {
+    foundHeader = true;
+    startIndex = 0;
+    // Cek apakah baris 0 menduplikasi teks label header (misal sel berisi tulisan 'nis' atau 'nama')
+    if (rows.length > 0 && rows[0] && rows[0].c) {
+      const firstRow = rows[0].c;
+      const getRaw = (cell) => ((cell ? (cell.f || cell.v || '') : '') + '').trim().toLowerCase();
+      const cNis = getRaw(firstRow[colMap.nis]);
+      const cNama = getRaw(firstRow[colMap.nama]);
+      if (cNis === 'nis' || cNis === 'no. nis' || cNis === 'nomor induk' || cNama === 'nama' || cNama === 'nama siswa') {
+        startIndex = 1;
+      }
     }
-  }
+  } else {
+    // Scan baris 0-11 untuk mencari baris header jika cols belum berlabel
+    const scanLimit = Math.min(rows.length, 12);
+    for (let rIdx = 0; rIdx < scanLimit; rIdx++) {
+      const rCells = rows[rIdx] ? (rows[rIdx].c || []) : [];
+      let hasNis = false;
+      let hasNama = false;
+      rCells.forEach(cell => {
+        if (!cell) return;
+        const str = ((cell.f || cell.v || '') + '').toLowerCase().trim();
+        if ((str === 'nis' || str === 'no. nis' || str === 'no nis' || str === 'nomor induk') && !str.includes('jenis')) hasNis = true;
+        if (str === 'nama' || str === 'nama siswa' || str === 'nama lengkap') hasNama = true;
+      });
 
-  if (!foundHeader && rows.length > 0) {
-    const firstRow = rows[0].c || [];
-    firstRow.forEach((cell, idx) => {
-      if (!cell) return;
-      const txt = ((cell.f || cell.v || '') + '').trim();
-      checkHeaderField(txt, idx);
-    });
-    const firstRowHasHeader = firstRow.some(cell => {
-      if (!cell) return false;
-      const str = ((cell.f || cell.v || '') + '').toLowerCase();
-      return str.includes('nis') || str.includes('nama') || str.includes('urut') || str.includes('kelamin') || str.includes('lahir');
-    });
-    if (firstRowHasHeader) startIndex = 1;
+      if (hasNis || hasNama) {
+        foundHeader = true;
+        startIndex = rIdx + 1;
+        rCells.forEach((cell, idx) => {
+          if (!cell) return;
+          const txt = ((cell.f || cell.v || '') + '').trim();
+          checkHeaderField(txt, idx);
+        });
+        break;
+      }
+    }
+
+    if (!foundHeader && rows.length > 0) {
+      const firstRow = rows[0].c || [];
+      const firstRowHasHeader = firstRow.some(cell => {
+        if (!cell) return false;
+        const str = ((cell.f || cell.v || '') + '').toLowerCase().trim();
+        return str === 'nis' || str === 'nama' || str === 'nama siswa' || str === 'no urut' || str === 'urut';
+      });
+      if (firstRowHasHeader) {
+        startIndex = 1;
+        firstRow.forEach((cell, idx) => {
+          if (!cell) return;
+          const txt = ((cell.f || cell.v || '') + '').trim();
+          checkHeaderField(txt, idx);
+        });
+      }
+    }
   }
 
   // 3. Fallback cerdas untuk format Buku Nilai (A: Urut, B: NIS, C: Nama Siswa)
@@ -24937,7 +28642,110 @@ function parseGoogleSheetTable(parsed, defaultKelas = '4A') {
 // SINKRONISASI DATA SISWA GOOGLE SHEETS MULTI-KELAS (PENYIMPANAN BERBEDA PER KELAS)
 // --------------------------------------------------------------------------
 
-// 0. SINKRONISASI TERPUSAT MASTER TAB "DATA SISWA LMS" (Semua Kelas Sekaligus dalam 1 Permintaan JSONP Super Cepat)
+// 0. SINKRONISASI SEMUA ROMBEL KELAS SEKALIGUS (Kelas 4A-4E, 5D, 6A-6E dalam 1 Klik Cerdas)
+async function sinkronkanSemuaKelasSekaligus(silent = false) {
+  const masterUrl = (localStorage.getItem(SPREADSHEET_ID_KEY) || DEFAULT_MASTER_SPREADSHEET_URL || '').trim();
+  if (!masterUrl) {
+    if (!silent) {
+      playSound('error');
+      showToast('Link Google Spreadsheet belum diatur!', 'warning');
+    }
+    return [];
+  }
+
+  const sheetId = extractGoogleSpreadsheetId(masterUrl);
+  if (!sheetId) return [];
+
+  if (!silent) {
+    showToast('⚡ Memulai sinkronisasi seluruh rombel kelas (4, 5, 6) dari Google Spreadsheet...', 'info');
+  }
+
+  // Daftar seluruh rombel kelas resmi sekolah
+  const targetClasses = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
+  const cfg = getClassSheetsConfig();
+  const existingDb = getStudentDatabase();
+  const existingMap = new Map();
+  existingDb.forEach(s => {
+    if (s.nis) existingMap.set(String(s.nis).trim().toLowerCase(), s);
+    if (s.id) existingMap.set(String(s.id).trim().toLowerCase(), s);
+  });
+
+  let totalUpdated = 0;
+  let successfulClasses = [];
+  let missingTabs = [];
+  const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+
+  let finalAllStudents = existingDb.slice();
+
+  for (const cls of targetClasses) {
+    const c = cfg[cls] || DEFAULT_CLASS_SHEETS_CONFIG[cls] || { tabName: cls };
+    const tabName = (c.tabName || cls).trim();
+    try {
+      const parsedData = await queryGoogleSheetJsonp(sheetId, tabName, 6000);
+      const parsed = parseGoogleSheetTable(parsedData, cls);
+      if (parsed && parsed.length > 0) {
+        // Hapus siswa kelas ini yang lama dari list, perbarui dengan data resmi terbaru
+        finalAllStudents = finalAllStudents.filter(s => s.kelas !== cls);
+        parsed.forEach(newS => {
+          const keyNis = newS.nis ? String(newS.nis).trim().toLowerCase() : '';
+          const keyId = newS.id ? String(newS.id).trim().toLowerCase() : '';
+          const ex = (keyNis && existingMap.get(keyNis)) || (keyId && existingMap.get(keyId));
+          const mergedStudent = ex ? {
+            ...newS,
+            kuisSem1: ex.kuisSem1 || 0,
+            kuisSem2: ex.kuisSem2 || 0,
+            posterWord: ex.posterWord || 0,
+            nilaiPoster: ex.nilaiPoster !== undefined ? ex.nilaiPoster : 0,
+            excelTabel: ex.excelTabel || 0,
+            nilaiExcel: ex.nilaiExcel !== undefined ? ex.nilaiExcel : 0,
+            nilaiDrive: ex.nilaiDrive !== undefined ? ex.nilaiDrive : 0,
+            koleksiDrive: ex.koleksiDrive !== undefined ? ex.koleksiDrive : 0,
+            nilaiScratch: ex.nilaiScratch !== undefined ? ex.nilaiScratch : 0,
+            nilaiRoboMind: ex.nilaiRoboMind !== undefined ? ex.nilaiRoboMind : 0,
+            poinBintang: ex.poinBintang || 0,
+            statusKkm: ex.statusKkm || 'Tuntas',
+            catatanGuru: ex.catatanGuru || newS.catatanGuru,
+            driveData: ex.driveData || newS.driveData
+          } : newS;
+          finalAllStudents.push(mergedStudent);
+        });
+
+        if (!cfg[cls]) cfg[cls] = { ...DEFAULT_CLASS_SHEETS_CONFIG[cls] };
+        cfg[cls].count = parsed.length;
+        cfg[cls].lastSynced = nowStr;
+        cfg[cls].sheetUrl = masterUrl;
+        totalUpdated += parsed.length;
+        successfulClasses.push(`${cls} (${parsed.length})`);
+      } else {
+        missingTabs.push(cls);
+      }
+    } catch (e) {
+      missingTabs.push(cls);
+    }
+  }
+
+  saveStudentDatabase(finalAllStudents);
+  saveClassSheetsConfig(cfg);
+
+  renderTabsKelasSheet();
+  renderRingkasanKoneksiKelas();
+  if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+  if (typeof renderDasborGuru === 'function') renderDasborGuru();
+
+  if (!silent) {
+    playSound('success');
+    let msg = `✅ Berhasil menyinkronkan ${totalUpdated} siswa dari ${successfulClasses.length} rombel (${successfulClasses.join(', ')})! 🎉`;
+    if (missingTabs.length > 0) {
+      msg += `\n(Info: Tab ${missingTabs.join(', ')} belum dibuat di Google Spreadsheet)`;
+    }
+    showToast(msg, 'success');
+  }
+
+  return finalAllStudents;
+}
+window.sinkronkanSemuaKelasSekaligus = sinkronkanSemuaKelasSekaligus;
+
+// 1. SINKRONISASI TERPUSAT MASTER TAB "DATA SISWA LMS" (Atau otomatis sinkron multi-rombel jika tab master tidak ada)
 async function sinkronkanMasterDataSiswaLMS(silent = false) {
   const masterUrl = (localStorage.getItem(SPREADSHEET_ID_KEY) || DEFAULT_MASTER_SPREADSHEET_URL || '').trim();
   if (!masterUrl) {
@@ -24951,14 +28759,13 @@ async function sinkronkanMasterDataSiswaLMS(silent = false) {
   const sheetId = extractGoogleSpreadsheetId(masterUrl);
   if (!sheetId) return [];
 
+  // Jika file spreadsheet menggunakan tab per kelas (4A, 4B, ..., 6E) dan tidak ada master tab terpisah,
+  // jalankan langsung sinkronisasi semua rombel sekaligus!
   const masterTabs = [
     (localStorage.getItem(SHEET_TAB_NAME_KEY) || DEFAULT_SHEET_TAB_NAME || 'DATA SISWA LMS').trim(),
     'DATA SISWA LMS',
     'DATA SISWA',
-    'DATA_SISWA',
-    'DATA SISWA 4A',
-    '4A',
-    '' // Fallback ke tab lembar pertama
+    'DATA_SISWA'
   ];
   const uniqueMasterTabs = [...new Set(masterTabs.map(t => (t || '').trim()))];
 
@@ -24980,11 +28787,8 @@ async function sinkronkanMasterDataSiswaLMS(silent = false) {
   }
 
   if (fetchedAll.length === 0) {
-    if (!silent) {
-      playSound('error');
-      showToast('Data siswa di Google Sheets belum berhasil ditarik. Pastikan sheet dibagikan publik ("Anyone with the link can view").', 'warning');
-    }
-    return [];
+    // Spreadsheet tidak memiliki tab tunggal gabungan, jalankan sinkronisasi multi-rombel otomatis!
+    return await sinkronkanSemuaKelasSekaligus(silent);
   }
 
   // Gabungkan ke database lokal secara aman dengan mempertahankan nilai/progres yang sudah dicapai
@@ -25056,7 +28860,7 @@ async function sinkronkanMasterDataSiswaLMS(silent = false) {
 
   if (!silent) {
     playSound('success');
-    showToast(`✅ Berhasil menyinkronkan ${mergedDb.length} data siswa dari Google Sheet "${resolvedTabName}"! 🎉`, 'success');
+    showToast(`âœ… Berhasil menyinkronkan ${mergedDb.length} data siswa dari Google Sheet "${resolvedTabName}"! ðŸŽ‰`, 'success');
   }
 
   return mergedDb;
@@ -25101,7 +28905,7 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   if (!rawSheet) {
     if (!silent) {
       playSound('error');
-      showToast(`Masukkan Link Google Spreadsheet untuk Kelas ${kelasKey} terlebih dahulu! ☁️`, 'warning');
+      showToast(`Masukkan Link Google Spreadsheet untuk Kelas ${kelasKey} terlebih dahulu! â˜ï¸`, 'warning');
       setActiveSheetClassKey(kelasKey);
       renderTabsKelasSheet();
       pilihSubTabGuru('cloud');
@@ -25207,7 +29011,11 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
     console.warn(`Tidak dapat menemukan data pada tab Google Sheets untuk Kelas ${kelasKey}.`);
     if (!silent) {
       playSound('error');
-      alert(`⚠️ Data untuk Kelas ${kelasKey} belum berhasil ditarik dari Google Spreadsheet!\n\nPastikan hal berikut:\n1. Hak Akses: Klik tombol 'Bagikan (Share)' di Google Sheets, pastikan Akses Umum adalah 'Siapa saja yang memiliki link dapat melihat' (Anyone with the link can view).\n2. Nama Tab: Pastikan ada tab sheet bernama '${primaryTab}' atau 'Kelas ${kelasKey}' di file Google Sheet Anda.\n3. Kolom: Pastikan ada Kolom Urut, NIS, dan Nama Siswa.`);
+      if (['5A', '5B', '5C', '5E'].includes(kelasKey)) {
+        alert(`â„¹ï¸ Tab Sheet "${primaryTab}" belum dibuat di Google Spreadsheet Anda!\n\nSaat ini di file Spreadsheet baru tersedia tab: 4A, 4B, 4C, 4D, 4E, 5D, 6A, 6B, 6C, 6D, 6E.\n\nCara Menambahkan Tab Kelas ${kelasKey}:\n1. Buka Google Spreadsheet Buku Nilai Anda.\n2. Klik ikon (+) di kiri bawah untuk membuat sheet baru, beri nama "${primaryTab}".\n3. Buat kolom: No Urut, NIS, dan Nama Siswa.`);
+      } else {
+        alert(`âš ï¸ Data untuk Kelas ${kelasKey} belum berhasil ditarik dari Google Spreadsheet!\n\nPastikan hal berikut:\n1. Hak Akses: Klik tombol 'Bagikan (Share)' di Google Sheets, pastikan Akses Umum adalah 'Siapa saja yang memiliki link dapat melihat' (Anyone with the link can view).\n2. Nama Tab: Pastikan ada tab sheet bernama '${primaryTab}' atau 'Kelas ${kelasKey}' di file Google Sheet Anda.\n3. Kolom: Pastikan ada Kolom Urut, NIS, dan Nama Siswa.`);
+      }
     }
     return [];
   }
@@ -25255,7 +29063,7 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
 
     if (!silent) {
       playSound('success');
-      showToast(`Berhasil menyinkronkan ${fetchedStudents.length} siswa Kelas ${kelasKey} dari Google Sheet "${resolvedTab || primaryTab || kelasKey}"! 🎉`, 'success');
+      showToast(`Berhasil menyinkronkan ${fetchedStudents.length} siswa Kelas ${kelasKey} dari Google Sheet "${resolvedTab || primaryTab || kelasKey}"! ðŸŽ‰`, 'success');
     }
     return fetchedStudents;
   } else {
@@ -25282,7 +29090,7 @@ async function sinkronkanRombelTingkat(tingkat, silent = false) {
         if (typeof renderDasborGuru === 'function') renderDasborGuru();
         if (!silent) {
           playSound('success');
-          showToast(`⚡ Cepat & Instan! ${countTingkat} siswa Tingkat ${tingkat} tersinkronisasi dari Master Sheet! 🎉`, 'success');
+          showToast(`âš¡ Cepat & Instan! ${countTingkat} siswa Tingkat ${tingkat} tersinkronisasi dari Master Sheet! ðŸŽ‰`, 'success');
         }
         return countTingkat;
       }
@@ -25302,7 +29110,7 @@ async function sinkronkanRombelTingkat(tingkat, silent = false) {
   if (!silent) {
     if (total > 0) {
       playSound('success');
-      showToast(`Berhasil menyinkronkan total ${total} siswa Tingkat ${tingkat} (${rombels.join(', ')})! 🎉`, 'success');
+      showToast(`Berhasil menyinkronkan total ${total} siswa Tingkat ${tingkat} (${rombels.join(', ')})! ðŸŽ‰`, 'success');
     } else {
       playSound('warning');
       showToast(`Pastikan link Google Sheets untuk Kelas ${tingkat} sudah diatur.`, 'warning');
@@ -25320,7 +29128,7 @@ async function sinkronkanSemuaKelasGoogleSheet(silent = false) {
   let syncedClasses = [];
 
   if (!silent) {
-    showToast('Memulai sinkronisasi data seluruh kelas dari Google Sheets... ⏳', 'info');
+    showToast('Memulai sinkronisasi data seluruh kelas dari Google Sheets... â³', 'info');
   }
 
   for (const cls of classes) {
@@ -25345,7 +29153,7 @@ async function sinkronkanSemuaKelasGoogleSheet(silent = false) {
   if (syncedClasses.length > 0) {
     if (!silent) {
       playSound('success');
-      showToast(`Selesai! Berhasil sinkronisasi ${totalSynced} siswa dari kelas: ${syncedClasses.join(', ')} 🎉`, 'success');
+      showToast(`Selesai! Berhasil sinkronisasi ${totalSynced} siswa dari kelas: ${syncedClasses.join(', ')} ðŸŽ‰`, 'success');
     }
   } else {
     if (!silent) {
@@ -25423,7 +29231,7 @@ async function cekNisGoogleSheet(nisVal) {
       absen: '01',
       statusKkm: 'Tuntas',
       poinBintang: 50,
-      catatanGuru: 'Akun Uji Coba Kelas 6 SD • 4 Pilar Computational Thinking'
+      catatanGuru: 'Akun Uji Coba Kelas 6 SD â€¢ 4 Pilar Computational Thinking'
     };
     try {
       let db = getStudentDatabase();
@@ -25447,7 +29255,7 @@ async function cekNisGoogleSheet(nisVal) {
       absen: '01',
       statusKkm: 'Tuntas',
       poinBintang: 50,
-      catatanGuru: 'Akun Uji Coba Kelas 5 SD • Portofolio Digital & AI'
+      catatanGuru: 'Akun Uji Coba Kelas 5 SD â€¢ Portofolio Digital & AI'
     };
     try {
       let db = getStudentDatabase();
@@ -25585,10 +29393,10 @@ async function ujiCekNisGuru() {
 
   if (student) {
     playSound('success');
-    alert(`✅ NIS "${nisTest}" TERDAFTAR!\n\nNama: ${student.nama}\nKelas: ${student.kelas}\nNo. Absen: ${student.absen}\nSheet: ${tabName}`);
+    alert(`âœ… NIS "${nisTest}" TERDAFTAR!\n\nNama: ${student.nama}\nKelas: ${student.kelas}\nNo. Absen: ${student.absen}\nSheet: ${tabName}`);
   } else {
     playSound('error');
-    alert(`❌ NIS "${nisTest}" TIDAK DITEMUKAN di sheet "${tabName}"!\n\nPastikan nomor NIS sudah terdaftar di baris Google Spreadsheet Anda.`);
+    alert(`âŒ NIS "${nisTest}" TIDAK DITEMUKAN di sheet "${tabName}"!\n\nPastikan nomor NIS sudah terdaftar di baris Google Spreadsheet Anda.`);
   }
 }
 
@@ -25832,7 +29640,7 @@ function doPost(e) {
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(scriptCode).then(() => {
-      showToast('Kode Google Apps Script berhasil disalin ke clipboard! 📋', 'success');
+      showToast('Kode Google Apps Script berhasil disalin ke clipboard! ðŸ“‹', 'success');
       alert('Kode Google Apps Script telah disalin!\n\nCara pasang:\n1. Di Google Sheets, klik Extensions > Apps Script.\n2. Tempel kode ini lalu Deploy > New deployment > Web app (Anyone can access).\n3. Salin URL Web app-nya ke aplikasi.');
     }).catch(() => {
       prompt('Salin manual skrip ini:', scriptCode);
@@ -25849,7 +29657,7 @@ function simpanWebhookGuruForm() {
   if (val) {
     savePersistentWebhookUrl(val);
     playSound('success');
-    showToast('URL Webhook Google Apps Script berhasil disimpan permanen! 🔗', 'success');
+    showToast('URL Webhook Google Apps Script berhasil disimpan permanen! ðŸ”—', 'success');
   } else {
     const existing = getPersistentWebhookUrl();
     if (existing) {
@@ -25882,14 +29690,14 @@ function ujiKirimWebhookGuru() {
       setTimeout(() => input.classList.remove('animate-shake', 'border-rose-500'), 600);
       input.focus();
     }
-    showToast('⚠️ Masukkan Link Webhook Google Apps Script terlebih dahulu di kolom sebelah kiri! (Klik "Cara Pasang" untuk melihat panduan)', 'warning');
+    showToast('âš ï¸ Masukkan Link Webhook Google Apps Script terlebih dahulu di kolom sebelah kiri! (Klik "Cara Pasang" untuk melihat panduan)', 'warning');
     return;
   }
 
   // Otomatis simpan URL jika ada di input
   savePersistentWebhookUrl(url);
 
-  showToast('✈️ Mengirim data uji coba ke Google Sheets... Periksa tab "REKAP NILAI SISWA" di Spreadsheet Anda 📊', 'info');
+  showToast('âœˆï¸ Mengirim data uji coba ke Google Sheets... Periksa tab "REKAP NILAI SISWA" di Spreadsheet Anda ðŸ“Š', 'info');
   kirimKeWebhookSheets({
     event: 'uji_coba_koneksi',
     nis: '4101',
@@ -25914,11 +29722,11 @@ function kirimKeWebhookSheets(payload) {
     body: JSON.stringify(payload)
   }).then(() => {
     playSound('success');
-    showToast('✅ Data uji coba terkirim ke Google Sheets! Silakan periksa Spreadsheet Anda.', 'success');
+    showToast('âœ… Data uji coba terkirim ke Google Sheets! Silakan periksa Spreadsheet Anda.', 'success');
   }).catch(err => {
     console.warn('Gagal sinkronisasi Google Sheets:', err);
     playSound('error');
-    showToast('❌ Gagal mengirim ke Webhook. Pastikan izin Deploy Web App disetel "Anyone" (Siapa Saja).', 'error');
+    showToast('âŒ Gagal mengirim ke Webhook. Pastikan izin Deploy Web App disetel "Anyone" (Siapa Saja).', 'error');
   });
 }
 window.kirimKeWebhookSheets = kirimKeWebhookSheets;
@@ -25933,7 +29741,7 @@ function eksporDatabaseJSON() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  showToast('Cadangan Database JSON berhasil diunduh! 💾', 'success');
+  showToast('Cadangan Database JSON berhasil diunduh! ðŸ’¾', 'success');
 }
 
 function imporDatabaseJSON(event) {
@@ -25947,7 +29755,7 @@ function imporDatabaseJSON(event) {
       if (Array.isArray(data)) {
         saveStudentDatabase(data);
         playSound('success');
-        showToast(`Berhasil memulihkan ${data.length} data siswa! 🎉`, 'success');
+        showToast(`Berhasil memulihkan ${data.length} data siswa! ðŸŽ‰`, 'success');
         renderDasborGuru();
       } else {
         showToast('Format berkas JSON tidak sesuai!', 'error');
@@ -26025,7 +29833,7 @@ function pulihkanSemuaSiswaDefault(quiet = false) {
     if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     if (typeof renderDasborGuru === 'function') renderDasborGuru();
     if (!quiet) {
-      showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... ☁️`, 'info');
+      showToast(`âœ… Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... â˜ï¸`, 'info');
     }
     // Otomatis sinkronkan juga dari tab "DATA SISWA LMS" di Google Sheets
     if (typeof sinkronkanMasterDataSiswaLMS === 'function') {
@@ -26111,7 +29919,7 @@ window.masukCepatKelas6 = function() {
   muatProfilSiswa();
   setHeaderNavMode('kelas6');
   switchTab('petualangan6');
-  showToast('Berhasil masuk sebagai Pelajar Uji Coba 6A (Fase C • Computational Thinking)! 🚀💡', 'success');
+  showToast('Berhasil masuk sebagai Pelajar Uji Coba 6A (Fase C â€¢ Computational Thinking)! ðŸš€ðŸ’¡', 'success');
 };
 
 window.masukCepatKelas5 = function() {
@@ -26128,7 +29936,7 @@ window.masukCepatKelas5 = function() {
   muatProfilSiswa();
   setHeaderNavMode('kelas5');
   switchTab('petualangan5');
-  showToast('Berhasil masuk sebagai Pelajar Uji Coba 5A (Fase C • Portofolio Digital)! 🚀🎨', 'success');
+  showToast('Berhasil masuk sebagai Pelajar Uji Coba 5A (Fase C â€¢ Portofolio Digital)! ðŸš€ðŸŽ¨', 'success');
 };
 window.setPraktikSubtab = typeof setPraktikSubtab === 'function' ? setPraktikSubtab : function(){};
 window.bukaModulDetail = typeof bukaModulDetail === 'function' ? bukaModulDetail : function(){};
@@ -26652,7 +30460,7 @@ async function simpanDanUjiFirebase() {
     btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Menghubungkan ke Cloud...';
   }
 
-  showToast(`🔄 Menguji sambungan ke Firebase (${parsed.projectId})...`, 'info');
+  showToast(`ðŸ”„ Menguji sambungan ke Firebase (${parsed.projectId})...`, 'info');
 
   try {
     // 1. Muat SDK Firebase secara dinamis jika belum termuat
@@ -26661,7 +30469,7 @@ async function simpanDanUjiFirebase() {
       localStorage.setItem('educode_firebase_enabled_v1', 'false');
       isFirebaseConnected = false;
       perbaruiStatusFirebaseUI(parsed);
-      showToast(`⚡ Kunci ${parsed.projectId} tersimpan! Jaringan memblokir koneksi SDK Google, aplikasi tetap berjalan lancar di Mode Lokal.`, 'info');
+      showToast(`âš¡ Kunci ${parsed.projectId} tersimpan! Jaringan memblokir koneksi SDK Google, aplikasi tetap berjalan lancar di Mode Lokal.`, 'info');
       tampilkanModalStatusFirebase(parsed, false, 'SDK Firebase tidak dapat diakses dari jaringan lab ini. Aplikasi otomatis berjalan cepat dan aman dalam Mode Lokal.');
       return;
     }
@@ -26710,7 +30518,7 @@ async function simpanDanUjiFirebase() {
       isFirebaseConnected = true;
       perbaruiStatusFirebaseUI(parsed);
       try { playSound('fanfare'); } catch (e) {}
-      showToast(`✅ BERHASIL TERHUBUNG! Cloud Firebase (${parsed.projectId}) aktif & siap digunakan! ☁️🎉`, 'success');
+      showToast(`âœ… BERHASIL TERHUBUNG! Cloud Firebase (${parsed.projectId}) aktif & siap digunakan! â˜ï¸ðŸŽ‰`, 'success');
       tampilkanModalStatusFirebase(parsed, true);
     } else {
       // Jika ping belum sukses, jangan biarkan background retry loop membekukan browser
@@ -26718,7 +30526,7 @@ async function simpanDanUjiFirebase() {
       isFirebaseConnected = false;
       perbaruiStatusFirebaseUI(parsed);
       try { playSound('notification'); } catch (e) {}
-      showToast(`⚠️ Konfigurasi ${parsed.projectId} tersimpan! Berjalan dalam Mode Lokal cepat.`, 'warning');
+      showToast(`âš ï¸ Konfigurasi ${parsed.projectId} tersimpan! Berjalan dalam Mode Lokal cepat.`, 'warning');
       tampilkanModalStatusFirebase(parsed, false, pingErrMsg);
     }
   } catch (err) {
@@ -26726,7 +30534,7 @@ async function simpanDanUjiFirebase() {
     localStorage.setItem('educode_firebase_enabled_v1', 'false');
     isFirebaseConnected = false;
     perbaruiStatusFirebaseUI();
-    showToast(`❌ Gagal terhubung ke Firebase: ${err.message}`, 'error');
+    showToast(`âŒ Gagal terhubung ke Firebase: ${err.message}`, 'error');
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -26825,7 +30633,7 @@ function putusKoneksiFirebase() {
     firebaseStorageInstance = null;
     if (typeof bersihkanCachePerforma === 'function') bersihkanCachePerforma();
     perbaruiStatusFirebaseUI();
-    showToast('⚡ Mode Cepat Lokal Aktif! Aplikasi berjalan 100% lancar dan bebas lag.', 'success');
+    showToast('âš¡ Mode Cepat Lokal Aktif! Aplikasi berjalan 100% lancar dan bebas lag.', 'success');
   }
 }
 window.putusKoneksiFirebase = putusKoneksiFirebase;
@@ -26838,7 +30646,7 @@ function aktifkanModeCepatLokal() {
   firebaseStorageInstance = null;
   if (typeof bersihkanCachePerforma === 'function') bersihkanCachePerforma();
   perbaruiStatusFirebaseUI();
-  showToast('⚡ Mode Cepat Lokal Aktif! Kecepatan instan dipulihkan 100%.', 'success');
+  showToast('âš¡ Mode Cepat Lokal Aktif! Kecepatan instan dipulihkan 100%.', 'success');
 }
 window.aktifkanModeCepatLokal = aktifkanModeCepatLokal;
 
@@ -26996,7 +30804,7 @@ function pasangRealtimeSyncDrive(studentNis) {
               const grid = document.getElementById('drive-7kebiasaan-grid');
               if (grid && state.currentTab === 'praktik') {
                 renderDrive7KebiasaanGrid();
-                showToast('⚡ Sinkronisasi realtime: Gambar terbaru dari komputer lain berhasil dimuat!', 'success');
+                showToast('âš¡ Sinkronisasi realtime: Gambar terbaru dari komputer lain berhasil dimuat!', 'success');
               }
             }
           }
@@ -27013,14 +30821,14 @@ window.pasangRealtimeSyncDrive = pasangRealtimeSyncDrive;
 // 2C. Tombol Paksa Sinkronisasi Drive Cloud Manual & Auto-Merge Cerdas Antar-Komputer
 async function paksaSinkronDriveManual() {
   playSound('click');
-  showToast('⚡ Menguji koneksi Cloud Firebase & menyinkronkan gambar...', 'info');
+  showToast('âš¡ Menguji koneksi Cloud Firebase & menyinkronkan gambar...', 'info');
 
   if (!firebaseFirestoreInstance) {
     if (typeof initFirebaseClient === 'function') initFirebaseClient();
   }
 
   if (!firebaseFirestoreInstance) {
-    alert('⚠️ Firebase SDK belum siap. Periksa koneksi internet komputer Anda.');
+    alert('âš ï¸ Firebase SDK belum siap. Periksa koneksi internet komputer Anda.');
     return;
   }
 
@@ -27077,22 +30885,22 @@ async function paksaSinkronDriveManual() {
 
     playSound('fanfare');
     const totalGambar = Object.keys(merged).filter(k => (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined') && DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
-    alert(`🎉 SINKRONISASI CLOUD BERHASIL!\n\nKoleksi gambar komputer ini dan cloud telah digabungkan secara lengkap (${totalGambar} dari 7 gambar).\n\nSekarang buka komputer kedua dan klik tombol "⚡ Sinkron Cloud", maka semua gambar akan langsung sama persis! ✨`);
-    showToast(`✅ Sinkronisasi Cloud sukses! Total ${totalGambar} gambar aktif.`, 'success');
+    alert(`ðŸŽ‰ SINKRONISASI CLOUD BERHASIL!\n\nKoleksi gambar komputer ini dan cloud telah digabungkan secara lengkap (${totalGambar} dari 7 gambar).\n\nSekarang buka komputer kedua dan klik tombol "âš¡ Sinkron Cloud", maka semua gambar akan langsung sama persis! âœ¨`);
+    showToast(`âœ… Sinkronisasi Cloud sukses! Total ${totalGambar} gambar aktif.`, 'success');
   } catch (err) {
     console.error('Error manual sync:', err);
     if (err && (err.code === 'permission-denied' || (err.message && err.message.toLowerCase().includes('permission')))) {
       alert(
-        `⚠️ AKSES FIREBASE CLOUD DITOLAK (Permission Denied)!\n\n` +
+        `âš ï¸ AKSES FIREBASE CLOUD DITOLAK (Permission Denied)!\n\n` +
         `Hal ini terjadi karena di Firebase Console aturan "Rules" belum diubah ke "allow read, write: if true;".\n\n` +
         `Cara Memperbaikinya Sangat Mudah:\n` +
         `1. Buka tab "Rules" di Firebase Console (di sebelah tab Data).\n` +
         `2. Ganti kata "if false;" menjadi "if true;".\n` +
         `3. Klik tombol biru "Publish" di kanan atas.\n\n` +
-        `Setelah itu, klik tombol [⚡ Sinkron Cloud] ini lagi, dan semua gambar akan langsung tersinkron di kedua komputer!`
+        `Setelah itu, klik tombol [âš¡ Sinkron Cloud] ini lagi, dan semua gambar akan langsung tersinkron di kedua komputer!`
       );
     } else {
-      alert(`⚠️ Kendala Sinkronisasi: ${err.message || 'Gagal tersambung ke Firebase Cloud.'}`);
+      alert(`âš ï¸ Kendala Sinkronisasi: ${err.message || 'Gagal tersambung ke Firebase Cloud.'}`);
     }
   }
 }
@@ -27179,11 +30987,11 @@ window.sinkronkanKaryaSiswaDariCloud = sinkronkanKaryaSiswaDariCloud;
 // 4. Unggah Semua Karya Lokal ke Cloud (Untuk Migrasi Komputer Guru / Siswa yang Sudah Ada)
 async function unggahSemuaKaryaLokalKeCloud() {
   if (!isFirebaseConnected || !firebaseFirestoreInstance) {
-    showToast('⚠️ Hubungkan ke Google Firebase terlebih dahulu sebelum melakukan sinkronisasi massal!', 'warning');
+    showToast('âš ï¸ Hubungkan ke Google Firebase terlebih dahulu sebelum melakukan sinkronisasi massal!', 'warning');
     return;
   }
 
-  showToast('🔄 Mengunggah seluruh hasil karya poster & Drive siswa ke Server Cloud...', 'info');
+  showToast('ðŸ”„ Mengunggah seluruh hasil karya poster & Drive siswa ke Server Cloud...', 'info');
 
   let uploadedCount = 0;
   try {
@@ -27210,7 +31018,7 @@ async function unggahSemuaKaryaLokalKeCloud() {
     }
 
     try { playSound('fanfare'); } catch (e) {}
-    showToast(`✅ Berhasil mengunggah ${uploadedCount} karya poster siswa ke Cloud Firebase! ☁️✨`, 'success');
+    showToast(`âœ… Berhasil mengunggah ${uploadedCount} karya poster siswa ke Cloud Firebase! â˜ï¸âœ¨`, 'success');
   } catch (err) {
     console.error('Error sinkronisasi massal:', err);
     showToast('Terjadi kendala saat sinkronisasi massal: ' + err.message, 'error');
@@ -27239,6 +31047,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 500);
 });
+
+
 
 
 
