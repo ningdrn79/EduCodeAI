@@ -22487,6 +22487,9 @@ function renderTabelGradebook(students, totalAll) {
               <button onclick="sinkronkanDataSiswaPerKelas('${targetClass}')" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title text-xs font-bold shadow-lg shadow-blue-500/25 flex items-center gap-2 cursor-pointer transition active:scale-95">
                 <i class="fa-solid fa-arrows-rotate"></i> Tarik Data Google Sheets Kelas ${targetClass} Sekarang
               </button>
+              <button onclick="bukaModalTambahSiswa(); const inK = document.getElementById('tambah-siswa-kelas'); if(inK) inK.value='${targetClass}';" class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+                <i class="fa-solid fa-user-plus"></i> Tambah Siswa Manual
+              </button>
               <button onclick="pilihSubTabGuru('cloud'); if(typeof pilihKelasSheetConfigTab==='function') pilihKelasSheetConfigTab('${targetClass}');" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                 <i class="fa-solid fa-link"></i> Atur Link / Tab Sheet
               </button>
@@ -24816,25 +24819,46 @@ function parseGoogleSheetTable(parsed, defaultKelas = '4A') {
     checkHeaderField(label, idx);
   });
 
-  // 2. Cek baris pertama untuk deteksi judul kolom
+  // 2. Deteksi baris judul kolom otomatis (Mendukung kop surat / judul sekolah di baris 1-12)
   let startIndex = 0;
-  if (rows.length > 0) {
+  let foundHeader = false;
+  const scanLimit = Math.min(rows.length, 12);
+  for (let rIdx = 0; rIdx < scanLimit; rIdx++) {
+    const rCells = rows[rIdx] ? (rows[rIdx].c || []) : [];
+    let hasNis = false;
+    let hasNama = false;
+    rCells.forEach(cell => {
+      if (!cell) return;
+      const str = ((cell.f || cell.v || '') + '').toLowerCase().trim();
+      if ((str.includes('nis') || str.includes('induk')) && !str.includes('jenis')) hasNis = true;
+      if (str.includes('nama')) hasNama = true;
+    });
+
+    if (hasNis || hasNama) {
+      foundHeader = true;
+      startIndex = rIdx + 1;
+      rCells.forEach((cell, idx) => {
+        if (!cell) return;
+        const txt = ((cell.f || cell.v || '') + '').trim();
+        checkHeaderField(txt, idx);
+      });
+      break;
+    }
+  }
+
+  if (!foundHeader && rows.length > 0) {
     const firstRow = rows[0].c || [];
     firstRow.forEach((cell, idx) => {
       if (!cell) return;
       const txt = ((cell.f || cell.v || '') + '').trim();
       checkHeaderField(txt, idx);
     });
-
     const firstRowHasHeader = firstRow.some(cell => {
       if (!cell) return false;
       const str = ((cell.f || cell.v || '') + '').toLowerCase();
       return str.includes('nis') || str.includes('nama') || str.includes('urut') || str.includes('kelamin') || str.includes('lahir');
     });
-
-    if (firstRowHasHeader) {
-      startIndex = 1;
-    }
+    if (firstRowHasHeader) startIndex = 1;
   }
 
   // 3. Fallback cerdas untuk format Buku Nilai (A: Urut, B: NIS, C: Nama Siswa)
@@ -25091,14 +25115,21 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const primaryTab = (c.tabName || kelasKey).trim();
   let fetchedStudents = [];
 
-  // Daftar variasi nama tab ringkas & cepat (prioritas cerdas per rombel & master tab)
+  // Daftar variasi nama tab cerdas (prioritas rombel spesifik, format spasi, dan tab master)
   const candidateTabs = [
     primaryTab,
-    'DATA SISWA LMS',
+    primaryTab.replace(/([0-9])([A-Z])/i, '$1 $2'),
     `Kelas ${kelasKey}`,
+    `Kelas ${kelasKey.replace(/([0-9])([A-Z])/i, '$1 $2')}`,
     `KELAS ${kelasKey}`,
+    `KELAS ${kelasKey.replace(/([0-9])([A-Z])/i, '$1 $2')}`,
     `DATA SISWA ${kelasKey}`,
-    kelasKey
+    `DATA SISWA ${kelasKey.replace(/([0-9])([A-Z])/i, '$1 $2')}`,
+    'DATA SISWA LMS',
+    'DATA SISWA',
+    'DATA_SISWA',
+    kelasKey,
+    '' // Fallback ke tab pertama lembar kerja jika nama tab berbeda
   ];
   if (c.tabName && !candidateTabs.includes(c.tabName)) {
     candidateTabs.unshift(c.tabName);
@@ -25107,11 +25138,12 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
   const uniqueTabs = [...new Set(candidateTabs.map(t => (t || '').trim()))];
   let resolvedTab = primaryTab;
 
-  // Coba query variasi nama tab dengan timeout kilat (1200ms)
+  // Coba query variasi nama tab dengan toleransi jaringan yang aman (3500ms)
   for (const tName of uniqueTabs) {
     try {
-      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 1200);
+      const parsedData = await queryGoogleSheetJsonp(sheetId, tName, 3500);
       const parsed = parseGoogleSheetTable(parsedData, kelasKey);
+      
       if (parsed && parsed.length > 0) {
         fetchedStudents = parsed;
         resolvedTab = tName;
@@ -25121,9 +25153,8 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
           saveClassSheetsConfig(cfg);
         }
 
-        // Optimasi Cerdas Terpusat: Jika sheet ini adalah tab master "DATA SISWA LMS",
-        // simpan juga data siswa kelas lainnya sekaligus agar rombel lain instan 0 detik!
-        if (tName === 'DATA SISWA LMS' || tName === 'DATA SISWA') {
+        // Simpan juga data siswa kelas lainnya jika ini adalah sheet master
+        if (tName === 'DATA SISWA LMS' || tName === 'DATA SISWA' || tName === '') {
           try {
             const allParsed = parseGoogleSheetTable(parsedData, 'semua');
             if (allParsed && allParsed.length > 0) {
@@ -25143,6 +25174,29 @@ async function sinkronkanDataSiswaPerKelas(kelasKey, silent = false) {
           } catch (eAll) {}
         }
         break;
+      } else if (parsedData && parsedData.table && Array.isArray(parsedData.table.rows) && parsedData.table.rows.length > 0) {
+        // Tab ini berhasil dimuat! Coba ekstrak seluruh siswa untuk menemukan kelas ini
+        try {
+          const allParsed = parseGoogleSheetTable(parsedData, 'semua');
+          const matchThis = allParsed.filter(s => s.kelas === kelasKey);
+          if (matchThis.length > 0) {
+            fetchedStudents = matchThis;
+            resolvedTab = tName;
+            const curDb = getStudentDatabase();
+            const mapCur = new Map();
+            curDb.forEach(s => { if (s.nis) mapCur.set(String(s.nis).trim().toLowerCase(), s); });
+            let addedAny = false;
+            allParsed.forEach(s => {
+              const k = String(s.nis || '').trim().toLowerCase();
+              if (!mapCur.has(k)) {
+                curDb.push(s);
+                addedAny = true;
+              }
+            });
+            if (addedAny) saveStudentDatabase(curDb);
+            break;
+          }
+        } catch (eMatch) {}
       }
     } catch (eTry) {
       // Lanjut coba kandidat nama tab berikutnya
