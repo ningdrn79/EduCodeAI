@@ -25664,6 +25664,7 @@ function renderDasborGuru() {
     filterDanCariSiswa();
   } else if (state.subTabGuru === 'drive7k') {
     renderMonitoringDrive7KGuru();
+    if (typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') tarikSemuaHasilDriveSiswaDariCloud(true);
   } else if (state.subTabGuru === 'galeri') {
     renderGaleriGuru();
   } else if (state.subTabGuru === 'bank-soal') {
@@ -25837,6 +25838,7 @@ function pilihSubTabGuru(tabName) {
       if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     } else if (tabName === 'drive7k') {
       if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+      if (typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') tarikSemuaHasilDriveSiswaDariCloud(true);
     } else if (tabName === 'galeri') {
       if (typeof renderGaleriGuru === 'function') renderGaleriGuru();
     } else if (tabName === 'bank-soal') {
@@ -27819,7 +27821,10 @@ function setFilterDrive7KStatus(status) {
 }
 window.setFilterDrive7KStatus = setFilterDrive7KStatus;
 
-function renderMonitoringDrive7KGuru() {
+function renderMonitoringDrive7KGuru(isFromRealtime = false) {
+  if (!isFromRealtime && typeof mulaiRealtimeMonitoringDriveGuru === 'function') {
+    mulaiRealtimeMonitoringDriveGuru();
+  }
   const grid = document.getElementById('guru-drive7k-grid');
   const emptyBox = document.getElementById('guru-drive7k-empty');
   if (!grid) return;
@@ -30791,36 +30796,319 @@ async function unggahPosterKeCloud(posterItem) {
 }
 window.unggahPosterKeCloud = unggahPosterKeCloud;
 
-// 2. Unggah Drive 7 Kebiasaan Siswa ke Firestore (Realtime Sync)
+// 2. Unggah Drive 7 Kebiasaan Siswa ke Firestore (Realtime Multi-Device Sync)
 async function unggahDriveKeCloud(data) {
-  if (!firebaseFirestoreInstance) {
-    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+  let db = firebaseFirestoreInstance;
+  if (!db && typeof getInlineFirestore === 'function') {
+    db = getInlineFirestore();
   }
-  if (!isFirebaseConnected || !firebaseFirestoreInstance) return;
+  if (!db) {
+    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+    db = firebaseFirestoreInstance;
+  }
+  if (!db) return;
 
   try {
     const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     const studentNis = activeStudent ? (activeStudent.nis || activeStudent.id) : 'global';
 
+    // Salin dan kompres gambar dataUrl agar aman dari batasan 1 MB Firestore
+    const dataToUpload = { ...data };
+    for (const k of Object.keys(dataToUpload)) {
+      if (dataToUpload[k] && dataToUpload[k].imageSrc && dataToUpload[k].imageSrc.startsWith('data:image/')) {
+        if (typeof kompresGambarUntukCloud === 'function') {
+          try {
+            dataToUpload[k].imageSrc = await kompresGambarUntukCloud(dataToUpload[k].imageSrc);
+          } catch (eComp) {}
+        }
+      }
+    }
+
     const payload = {
-      studentNis: studentNis,
+      studentNis: String(studentNis),
       studentName: activeStudent ? activeStudent.nama : 'Umum',
       studentClass: activeStudent ? activeStudent.kelas : 'Kelas 4',
-      driveData: JSON.stringify(data),
+      driveData: JSON.stringify(dataToUpload),
+      totalGambar: Object.keys(dataToUpload).length || 0,
       points: (typeof state !== 'undefined' && state.userPoints) ? state.userPoints : 0,
       updatedAt: Date.now()
     };
 
-    await firebaseFirestoreInstance.collection('student_drives').doc(String(studentNis)).set(payload, { merge: true });
-    
+    const autoText = document.getElementById('drive-auto-cloud-text');
+    if (autoText) autoText.innerText = 'Menyimpan...';
+
+    await db.collection('student_drives').doc(String(studentNis)).set(payload, { merge: true });
+
+    if (autoText) {
+      autoText.innerText = 'Tersimpan Otomatis';
+      setTimeout(() => {
+        const el = document.getElementById('drive-auto-cloud-text');
+        if (el) el.innerText = 'Auto-Save Cloud Aktif';
+      }, 3500);
+    }
+
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    localStorage.setItem(FIREBASE_LAST_SYNC_KEY, nowStr);
-    perbaruiStatusFirebaseUI();
+    try { localStorage.setItem(FIREBASE_LAST_SYNC_KEY, nowStr); } catch (e) {}
+    if (typeof perbaruiStatusFirebaseUI === 'function') perbaruiStatusFirebaseUI();
   } catch (err) {
     console.warn('Gagal mengunggah Drive ke Firebase Cloud:', err);
   }
 }
 window.unggahDriveKeCloud = unggahDriveKeCloud;
+
+// 2A-0. Pemantauan Realtime Firestore Tanpa Perlu Menekan Tombol (Live Antar-Komputer)
+let _guruDriveRealtimeUnsubscribe = null;
+
+function mulaiRealtimeMonitoringDriveGuru() {
+  let db = firebaseFirestoreInstance;
+  if (!db && typeof getInlineFirestore === 'function') {
+    db = getInlineFirestore();
+  }
+  if (!db) {
+    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+    db = firebaseFirestoreInstance;
+  }
+  if (!db) return;
+
+  if (_guruDriveRealtimeUnsubscribe) {
+    return; // Listener realtime sudah aktif
+  }
+
+  const liveBadge = document.getElementById('badge-live-realtime-drive-guru');
+  if (liveBadge) {
+    liveBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>Realtime Live Aktif</span>';
+    liveBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-2xs';
+  }
+
+  try {
+    _guruDriveRealtimeUnsubscribe = db.collection('student_drives').onSnapshot((snapshot) => {
+      if (!snapshot) return;
+
+      const currentDb = getStudentDatabase();
+      let hasChange = false;
+
+      snapshot.docChanges().forEach((change) => {
+        const data = change.doc.data();
+        if (!data) return;
+        const targetNis = String(data.studentNis || change.doc.id).trim();
+        let driveObj = null;
+
+        if (data.driveData) {
+          try {
+            driveObj = typeof data.driveData === 'string' ? JSON.parse(data.driveData) : data.driveData;
+          } catch (eP) {}
+        }
+
+        if (driveObj && typeof driveObj === 'object') {
+          const localKey = 'educode_drive_7kebiasaan_' + targetNis;
+          try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch (eL) {}
+          _driveDataCache.delete(targetNis);
+
+          const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+          if (sIdx >= 0) {
+            const evalData = hitungNilaiDrive7Kebiasaan(driveObj);
+            currentDb[sIdx].driveData = driveObj;
+            currentDb[sIdx].koleksiDrive = evalData.filledCount;
+            currentDb[sIdx].nilaiDrive = evalData.totalSkor;
+            currentDb[sIdx].terakhirAktif = 'Baru saja (Live)';
+            hasChange = true;
+          }
+        }
+      });
+
+      if (hasChange) {
+        saveStudentDatabase(currentDb);
+        _driveDataCache.clear();
+        renderMonitoringDrive7KGuru(true);
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      }
+    }, (err) => {
+      console.warn('Realtime listener error:', err);
+      _guruDriveRealtimeUnsubscribe = null;
+    });
+  } catch (errListener) {
+    console.warn('Gagal memasang realtime listener:', errListener);
+  }
+}
+window.mulaiRealtimeMonitoringDriveGuru = mulaiRealtimeMonitoringDriveGuru;
+
+// 2A. Tarik Seluruh Hasil Drive 7 Kebiasaan Siswa dari Cloud Server (Untuk Akun Guru)
+async function tarikSemuaHasilDriveSiswaDariCloud(silent = false) {
+  const btn = document.getElementById('btn-sync-cloud-drive-guru');
+  const oriHtml = btn ? btn.innerHTML : '<i class="fa-solid fa-cloud-arrow-down text-amber-300"></i> <span>Tarik dari Cloud</span>';
+
+  if (btn && btn.disabled) return 0;
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+    btn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-amber-300"></i> <span>Menghubungkan Cloud...</span>';
+  }
+
+  let db = firebaseFirestoreInstance;
+  if (!db && typeof getInlineFirestore === 'function') {
+    db = getInlineFirestore();
+  }
+  if (!db) {
+    if (typeof initFirebaseClient === 'function') initFirebaseClient();
+    db = firebaseFirestoreInstance;
+  }
+
+  if (!db) {
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-75', 'cursor-not-allowed');
+      btn.innerHTML = oriHtml;
+    }
+    if (!silent) {
+      try { playSound('error'); } catch (e) {}
+      showToast('âš ï¸ Koneksi Firebase Cloud belum tersambung atau internet lab terputus.', 'warning');
+    }
+    return 0;
+  }
+
+  try {
+    if (!silent) {
+      showToast('âš¡ Sedang memeriksa data siswa di Cloud Server...', 'info');
+    }
+
+    const snapshot = await db.collection('student_drives').get();
+    if (snapshot.empty) {
+      if (!silent) {
+        try { playSound('notification'); } catch (e) {}
+        showToast('Belum ada data karya siswa yang tersimpan di Cloud Server.', 'info');
+      }
+      return 0;
+    }
+
+    let updatedCount = 0;
+    const currentDb = getStudentDatabase();
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (!data) return;
+      const targetNis = String(data.studentNis || doc.id).trim();
+      let driveObj = null;
+
+      if (data.driveData) {
+        try {
+          driveObj = typeof data.driveData === 'string' ? JSON.parse(data.driveData) : data.driveData;
+        } catch (eP) {}
+      }
+
+      if (driveObj && typeof driveObj === 'object') {
+        // Simpan ke storage lokal komputer guru agar persisten
+        const localKey = 'educode_drive_7kebiasaan_' + targetNis;
+        try {
+          localStorage.setItem(localKey, JSON.stringify(driveObj));
+        } catch (eL) {}
+
+        // Bersihkan cache performa untuk siswa ini
+        _driveDataCache.delete(targetNis);
+
+        // Sinkronkan ke database guru
+        const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+        if (sIdx >= 0) {
+          const evalData = hitungNilaiDrive7Kebiasaan(driveObj);
+          currentDb[sIdx].driveData = driveObj;
+          currentDb[sIdx].koleksiDrive = evalData.filledCount;
+          currentDb[sIdx].nilaiDrive = evalData.totalSkor;
+        }
+        updatedCount++;
+      }
+    });
+
+    saveStudentDatabase(currentDb);
+    _driveDataCache.clear();
+    renderMonitoringDrive7KGuru();
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+
+    if (!silent) {
+      try { playSound('success'); } catch (e) {}
+      showToast(`ðŸŽ‰ Sukses! Berhasil menyinkronkan data karya dari ${updatedCount} siswa dari Cloud!`, 'success');
+    }
+    return updatedCount;
+  } catch (err) {
+    console.error('Error saat menarik data dari Cloud:', err);
+    if (!silent) {
+      try { playSound('error'); } catch (e) {}
+      showToast('Gagal menarik data dari Cloud: ' + (err.message || 'Periksa koneksi internet'), 'error');
+    }
+    return 0;
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-75', 'cursor-not-allowed');
+      btn.innerHTML = oriHtml;
+    }
+  }
+}
+window.tarikSemuaHasilDriveSiswaDariCloud = tarikSemuaHasilDriveSiswaDariCloud;
+
+// 2B. Impor Berkas Cadangan (.JSON) Siswa Secara Massal (Bebas Internet / Offline Lab)
+function imporDataDriveMassalGuru() {
+  playSound('click');
+  let input = document.getElementById('input-impor-drive-massal-guru');
+  if (!input) {
+    input = document.createElement('input');
+    input.type = 'file';
+    input.id = 'input-impor-drive-massal-guru';
+    input.multiple = true;
+    input.accept = '.json,application/json';
+    input.style.display = 'none';
+    input.onchange = async function(e) {
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
+
+      let importedCount = 0;
+      const currentDb = getStudentDatabase();
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        try {
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+
+          let driveData = parsed.driveData || (parsed.slot_1 || parsed.bangun_tidur ? parsed : null);
+          let studentNis = parsed.student ? parsed.student.nis : (parsed.studentNis || null);
+
+          if (!studentNis) {
+            const m = file.name.match(/(\\d{4,})/);
+            if (m) studentNis = m[1];
+          }
+
+          if (driveData && studentNis) {
+            const targetNis = String(studentNis).trim();
+            localStorage.setItem('educode_drive_7kebiasaan_' + targetNis, JSON.stringify(driveData));
+            _driveDataCache.delete(targetNis);
+
+            const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+            if (sIdx >= 0) {
+              const evalData = hitungNilaiDrive7Kebiasaan(driveData);
+              currentDb[sIdx].driveData = driveData;
+              currentDb[sIdx].koleksiDrive = evalData.filledCount;
+              currentDb[sIdx].nilaiDrive = evalData.totalSkor;
+            }
+            importedCount++;
+          }
+        } catch (err) {
+          console.warn('Gagal membaca file:', file.name, err);
+        }
+      }
+
+      saveStudentDatabase(currentDb);
+      _driveDataCache.clear();
+      renderMonitoringDrive7KGuru();
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      try { playSound('fanfare'); } catch (e) {}
+      showToast(`ðŸŽ‰ Berhasil mengimpor karya ${importedCount} siswa dari berkas cadangan!`, 'success');
+      e.target.value = '';
+    };
+    document.body.appendChild(input);
+  }
+  input.value = '';
+  input.click();
+}
+window.imporDataDriveMassalGuru = imporDataDriveMassalGuru;
 
 // 2B. Listener Sinkronisasi Realtime Firestore Antar-Komputer (Multi-Device Live Sync)
 let _driveRealtimeUnsubscribe = null;
