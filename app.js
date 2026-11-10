@@ -14552,7 +14552,7 @@ const EXCEL_TEMPLATES = {
     rowCount: 7,
     cells: {
       'A1': 'No', 'B1': 'Mata Pelajaran', 'C1': 'Tugas 1', 'D1': 'Tugas 2', 'E1': 'Ulangan', 'F1': 'Rata-rata', 'G1': 'Tertinggi',
-      'A2': '1', 'B2': 'Informatika (TIK)', 'C2': '90', 'D2': '95', 'E2': '92', 'F2': '=AVERAGE(C2:E2)', 'G2': '=MAX(C2:E2)',
+      'A2': '1', 'B2': 'Koding & AI (KKA)', 'C2': '90', 'D2': '95', 'E2': '92', 'F2': '=AVERAGE(C2:E2)', 'G2': '=MAX(C2:E2)',
       'A3': '2', 'B3': 'Matematika', 'C3': '85', 'D3': '88', 'E3': '90', 'F3': '=AVERAGE(C3:E3)', 'G3': '=MAX(C3:E3)',
       'A4': '3', 'B4': 'Ilmu Pengetahuan Alam', 'C4': '88', 'D4': '92', 'E4': '86', 'F4': '=AVERAGE(C4:E4)', 'G4': '=MAX(C4:E4)',
       'A5': '4', 'B5': 'Bahasa Indonesia', 'C5': '92', 'D5': '90', 'E5': '94', 'F5': '=AVERAGE(C5:E5)', 'G5': '=MAX(C5:E5)',
