@@ -7522,7 +7522,7 @@ function prosesFileGambarKeSlot(file, habitKey) {
   const reader = new FileReader();
   reader.onload = function(e) {
     const rawDataUrl = e.target.result;
-    kompresiGambarDataUrl(rawDataUrl, 600, 0.8, function(optimizedDataUrl) {
+    kompresiGambarDataUrl(rawDataUrl, 480, 0.65, function(optimizedDataUrl) {
       const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === habitKey);
       const cleanUploadName = file.name.replace(/\.[^/.]+$/, '');
       const checkUpload = periksaFormatNamaFile(cleanUploadName);
@@ -30869,49 +30869,94 @@ window.unggahPosterKeCloud = unggahPosterKeCloud;
 
 // 2. Unggah Drive 7 Kebiasaan Siswa ke Firestore (Realtime Multi-Device Sync)
 async function unggahDriveKeCloud(data) {
-  let db = firebaseFirestoreInstance;
-  if (!db && typeof getInlineFirestore === 'function') {
-    db = getInlineFirestore();
-  }
-  if (!db) {
-    if (typeof initFirebaseClient === 'function') initFirebaseClient();
-    db = firebaseFirestoreInstance;
-  }
-  if (!db) return;
-
   try {
     const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     const studentNis = activeStudent ? (activeStudent.nis || activeStudent.id) : 'global';
+    const autoText = document.getElementById('drive-auto-cloud-text');
+    if (autoText) autoText.innerText = 'Menyimpan...';
 
-    // Salin dan kompres gambar dataUrl agar aman dari batasan 1 MB Firestore
+    // 1. Salin dan kompres gambar dataUrl agar sangat ringan (< 40 KB per gambar)
     const dataToUpload = { ...data };
     for (const k of Object.keys(dataToUpload)) {
       if (dataToUpload[k] && dataToUpload[k].imageSrc && dataToUpload[k].imageSrc.startsWith('data:image/')) {
         if (typeof kompresGambarUntukCloud === 'function') {
           try {
-            dataToUpload[k].imageSrc = await kompresGambarUntukCloud(dataToUpload[k].imageSrc);
+            dataToUpload[k].imageSrc = await kompresGambarUntukCloud(dataToUpload[k].imageSrc, 480, 0.65);
           } catch (eComp) {}
         }
       }
     }
 
-    const payload = {
-      studentNis: String(studentNis),
-      studentName: activeStudent ? activeStudent.nama : 'Umum',
-      studentClass: activeStudent ? activeStudent.kelas : 'Kelas 4',
-      driveData: JSON.stringify(dataToUpload),
-      totalGambar: Object.keys(dataToUpload).length || 0,
-      points: (typeof state !== 'undefined' && state.userPoints) ? state.userPoints : 0,
-      updatedAt: Date.now()
-    };
+    const driveJsonStr = JSON.stringify(dataToUpload);
+    const totalGbr = Object.keys(dataToUpload).length || 0;
+    const studentNama = activeStudent ? activeStudent.nama : 'Umum';
+    const studentKls = activeStudent ? activeStudent.kelas : 'Kelas 4';
+    const userPts = (typeof state !== 'undefined' && state.userPoints) ? state.userPoints : 0;
+    const timeNow = Date.now();
 
-    const autoText = document.getElementById('drive-auto-cloud-text');
-    if (autoText) autoText.innerText = 'Menyimpan...';
+    let uploaded = false;
 
-    await db.collection('student_drives').doc(String(studentNis)).set(payload, { merge: true });
+    // 2. Jalur A: Coba via SDK Firestore jika tersedia dengan batas timeout 3.5 detik
+    let db = firebaseFirestoreInstance;
+    if (!db && typeof getInlineFirestore === 'function') db = getInlineFirestore();
+    if (!db && typeof initFirebaseClient === 'function') {
+      try { initFirebaseClient(); db = firebaseFirestoreInstance; } catch(eInit) {}
+    }
+
+    if (db && typeof db.collection === 'function') {
+      try {
+        const payload = {
+          studentNis: String(studentNis),
+          studentName: studentNama,
+          studentClass: studentKls,
+          driveData: driveJsonStr,
+          totalGambar: totalGbr,
+          points: userPts,
+          updatedAt: timeNow
+        };
+        const setPromise = db.collection('student_drives').doc(String(studentNis)).set(payload, { merge: true });
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 3500));
+        await Promise.race([setPromise, timeoutPromise]);
+        uploaded = true;
+      } catch (eSdk) {
+        console.warn('SDK upload error/timeout, beralih ke REST API:', eSdk);
+      }
+    }
+
+    // 3. Jalur B: Direct Google Cloud REST API (100% cepat, bebas blokir firewall/gRPC)
+    if (!uploaded) {
+      try {
+        const restUrl = `https://firestore.googleapis.com/v1/projects/sd-tzuchi-kelas4/databases/(default)/documents/student_drives/${studentNis}?key=AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y`;
+        const restBody = {
+          fields: {
+            studentNis: { stringValue: String(studentNis) },
+            studentName: { stringValue: String(studentNama) },
+            studentClass: { stringValue: String(studentKls) },
+            driveData: { stringValue: driveJsonStr },
+            totalGambar: { integerValue: totalGbr },
+            points: { integerValue: userPts },
+            updatedAt: { integerValue: timeNow }
+          }
+        };
+        const controller = new AbortController();
+        const tId = setTimeout(() => controller.abort(), 4500);
+        const res = await fetch(restUrl, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(restBody),
+          signal: controller.signal
+        });
+        clearTimeout(tId);
+        if (res.ok) {
+          uploaded = true;
+        }
+      } catch (eRest) {
+        console.warn('REST API upload error:', eRest);
+      }
+    }
 
     if (autoText) {
-      autoText.innerText = 'Tersimpan Otomatis';
+      autoText.innerText = uploaded ? 'Tersimpan Otomatis' : 'Tersimpan Lokal';
       setTimeout(() => {
         const el = document.getElementById('drive-auto-cloud-text');
         if (el) el.innerText = 'Auto-Save Cloud Aktif';
