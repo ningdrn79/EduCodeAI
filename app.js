@@ -6968,6 +6968,16 @@ function renderDrive7KebiasaanGrid() {
     const quickLabel = document.getElementById('drive-quick-status-label');
     const penamaanBadge = document.getElementById('drive-penamaan-badge');
 
+    const guestBanner = document.getElementById('drive-guest-alert-banner');
+    if (guestBanner) {
+      const isGuest = !profile || String(profile.nis || '') === '3000' || String(profile.id || '') === 'STD-4A-3000' || (profile.nama && profile.nama.includes('Uji Coba'));
+      if (isGuest) {
+        guestBanner.classList.remove('hidden');
+      } else {
+        guestBanner.classList.add('hidden');
+      }
+    }
+
     const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) â€” ` : '';
     if (titleEl) titleEl.innerHTML = `${studentPrefix}Progres Koleksi: ${filledCount} dari ${totalCount} Gambar Terkumpul`;
     if (barEl) barEl.style.width = `${percent}%`;
