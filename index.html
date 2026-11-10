@@ -352,9 +352,11 @@
         try { ssVal = sessionStorage.getItem(key); } catch (e) {}
 
         var raw = null;
-        if (lsVal && lsVal !== 'LOGGED_OUT' && lsVal !== 'null' && lsVal !== 'undefined' && lsVal.indexOf('{') !== -1) {
+        if (lsVal === 'LOGGED_OUT' || ssVal === 'LOGGED_OUT') {
+          raw = null; // Siswa sengaja keluar! JANGAN pulihkan dari cookie!
+        } else if (lsVal && lsVal !== 'null' && lsVal !== 'undefined' && lsVal.indexOf('{') !== -1) {
           raw = lsVal;
-        } else if (ssVal && ssVal !== 'LOGGED_OUT' && ssVal !== 'null' && ssVal !== 'undefined' && ssVal.indexOf('{') !== -1) {
+        } else if (ssVal && ssVal !== 'null' && ssVal !== 'undefined' && ssVal.indexOf('{') !== -1) {
           raw = ssVal;
         } else {
           try {
@@ -873,73 +875,46 @@
       };
 
       window.konfirmasiKeluarSiswa = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        var modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
-        if (modalLogout) {
-          modalLogout.classList.remove('hidden');
-          modalLogout.style.removeProperty('display');
-          modalLogout.style.setProperty('display', 'flex', 'important');
-          modalLogout.style.setProperty('pointer-events', 'auto', 'important');
-          modalLogout.style.setProperty('visibility', 'visible', 'important');
-          modalLogout.style.setProperty('z-index', '999999', 'important');
-        } else {
-          if (confirm('Keluar dari Akun Siswa?')) {
-            localStorage.removeItem('educode_active_student_v1');
-            sessionStorage.removeItem('educode_active_student_v1');
-            location.reload();
-          }
-        }
-      };
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      window.eksekusiLogoutSiswa();
+    };
 
-      window.tutupModalKonfirmasiLogoutSiswa = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        var modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
-        if (modalLogout) {
-          modalLogout.classList.add('hidden');
-          modalLogout.style.setProperty('display', 'none', 'important');
-          modalLogout.style.setProperty('pointer-events', 'none', 'important');
-          modalLogout.style.setProperty('visibility', 'hidden', 'important');
-          modalLogout.style.setProperty('z-index', '-9999', 'important');
-        }
-      };
+    window.tutupModalKonfirmasiLogoutSiswa = function() {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      var modalLogout = document.getElementById('modal-konfirmasi-logout-siswa');
+      if (modalLogout) {
+        modalLogout.classList.add('hidden');
+        modalLogout.style.setProperty('display', 'none', 'important');
+        modalLogout.style.setProperty('pointer-events', 'none', 'important');
+        modalLogout.style.setProperty('visibility', 'hidden', 'important');
+        modalLogout.style.setProperty('z-index', '-9999', 'important');
+      }
+    };
 
-      window.bukaKuisAtauSertifikatSiswa = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('kuis');
-      };
-      window.bukaRoboMindLangsung = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('demo');
-      };
-      window.setPraktikSubtab = function(pKey) {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('praktik');
-      };
-      window.gulirKeTabelProta = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('modul');
-      };
-      window.bukaAplikasiPaintTerbaru = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('praktik');
-      };
-      window.bukaPraktikWordTP2_2 = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('msword');
-      };
-      window.bukaGaleriHasilPosterSiswa = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        window.switchTab('praktik');
-      };
-
-      window.eksekusiLogoutSiswa = function() {
-        try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
-        localStorage.removeItem('educode_active_student_v1');
-        sessionStorage.removeItem('educode_active_student_v1');
-        window.tutupModalKonfirmasiLogoutSiswa();
-        window.tutupModalProfilSiswa();
-        location.reload();
-      };
+    window.eksekusiLogoutSiswa = function() {
+      try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+      try {
+        window.__ACTIVE_STUDENT_PROFILE__ = null;
+        window.__ACTIVE_STUDENT_RESTORED__ = null;
+        localStorage.setItem('educode_active_student_v1', 'LOGGED_OUT');
+        sessionStorage.setItem('educode_active_student_v1', 'LOGGED_OUT');
+        localStorage.removeItem('educode_student_active_tab_v1');
+        sessionStorage.removeItem('educode_student_active_tab_v1');
+        localStorage.removeItem('educode_student_active_sem_v1');
+        sessionStorage.removeItem('educode_student_active_sem_v1');
+        var paths = ['/', '', window.location.pathname];
+        paths.forEach(function(p) {
+          document.cookie = 'educode_active_student_v1=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' + p + ';';
+          document.cookie = 'educode_active_student_v1=LOGGED_OUT; max-age=0; path=' + p + ';';
+          document.cookie = 'educode_active_student_v1=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' + p + ';';
+        });
+        var earlyStyle = document.getElementById('style-early-student-session');
+        if (earlyStyle) earlyStyle.remove();
+      } catch(e) {}
+      try { if (typeof window.tutupModalKonfirmasiLogoutSiswa === 'function') window.tutupModalKonfirmasiLogoutSiswa(); } catch(e){}
+      try { if (typeof window.tutupModalProfilSiswa === 'function') window.tutupModalProfilSiswa(); } catch(e){}
+      location.reload();
+    };
 
       window.verifikasiPinGuru = function() {
         var input = document.getElementById('input-pin-guru');
@@ -1748,7 +1723,7 @@
           <button id="btn-welcome-ganti" onclick="bukaPilihSiswaCepat()" class="hidden px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Ganti Siswa / Masuk Akun Lain">
             <i class="fa-solid fa-arrow-right-arrow-left text-xs"></i> <span>Ganti</span>
           </button>
-          <button id="btn-welcome-logout" onclick="eksekusiLogoutSiswa()" class="hidden px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Keluar dari Akun Siswa">
+          <button type="button" id="btn-welcome-logout" onclick="eksekusiLogoutSiswa()" class="hidden px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Keluar dari Akun Siswa">
             <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i> <span>Keluar</span>
           </button>
           <button type="button" id="btn-welcome-login" onclick="event.stopPropagation(); if(window.bukaPilihSiswaCepat){window.bukaPilihSiswaCepat();}else{var m=document.getElementById('modal-profil-siswa');if(m){m.classList.remove('hidden');m.style.setProperty('display','flex','important');}var f=document.getElementById('profil-view-form');if(f){f.classList.remove('hidden');f.style.setProperty('display','block','important');}var c=document.getElementById('profil-view-card');if(c){c.classList.add('hidden');c.style.setProperty('display','none','important');}}" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/30 cursor-pointer">
@@ -20118,7 +20093,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261110_dual_engine_sync_v132"></script>
+  <script src="app.js?v=20261111_logout_fix_v133"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

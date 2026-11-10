@@ -210,6 +210,22 @@ window.setTeacherSessionActive = setTeacherSessionActive;
 // Helper: Ambil Profil Siswa Aktif (Dukungan Multi-Lapisan: window, localStorage, sessionStorage, Cookie)
 function getActiveStudentProfile() {
   try {
+    // 0. Cek penanda keluar eksplisit terlebih dahulu
+    try {
+      const lsCheck = localStorage.getItem(ACTIVE_STUDENT_KEY);
+      if (lsCheck === 'LOGGED_OUT') {
+        window.__ACTIVE_STUDENT_PROFILE__ = null;
+        window.__ACTIVE_STUDENT_RESTORED__ = null;
+        return null;
+      }
+      const ssCheck = sessionStorage.getItem(ACTIVE_STUDENT_KEY);
+      if (ssCheck === 'LOGGED_OUT') {
+        window.__ACTIVE_STUDENT_PROFILE__ = null;
+        window.__ACTIVE_STUDENT_RESTORED__ = null;
+        return null;
+      }
+    } catch (eCheck) {}
+
     // 1. Cek cache memori window
     if (window.__ACTIVE_STUDENT_PROFILE__ && (window.__ACTIVE_STUDENT_PROFILE__.nama || window.__ACTIVE_STUDENT_PROFILE__.nis || window.__ACTIVE_STUDENT_PROFILE__.id)) {
       return window.__ACTIVE_STUDENT_PROFILE__;
@@ -382,13 +398,17 @@ window.saveActiveStudentSession = saveActiveStudentSession;
 function clearActiveStudentSession() {
   window.__ACTIVE_STUDENT_PROFILE__ = null;
   window.__ACTIVE_STUDENT_RESTORED__ = null;
-  try { localStorage.removeItem(ACTIVE_STUDENT_KEY); } catch (e) {}
-  try { sessionStorage.removeItem(ACTIVE_STUDENT_KEY); } catch (e) {}
   try { localStorage.setItem(ACTIVE_STUDENT_KEY, 'LOGGED_OUT'); } catch (e) {}
   try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, 'LOGGED_OUT'); } catch (e) {}
-  try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; } catch (e) {}
-  try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; path=/; max-age=0;'; } catch (e) {}
-  try { document.cookie = ACTIVE_STUDENT_KEY + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'; } catch (e) {}
+  
+  // Hapus cookie di seluruh variasi path browser
+  const paths = ['/', '', window.location.pathname];
+  paths.forEach(p => {
+    try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' + p + ';'; } catch(e){}
+    try { document.cookie = ACTIVE_STUDENT_KEY + '=LOGGED_OUT; max-age=0; path=' + p + ';'; } catch(e){}
+    try { document.cookie = ACTIVE_STUDENT_KEY + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' + p + ';'; } catch(e){}
+  });
+
   try { localStorage.removeItem(ACTIVE_TAB_KEY); } catch (e) {}
   try { sessionStorage.removeItem(ACTIVE_TAB_KEY); } catch (e) {}
   try { localStorage.removeItem(ACTIVE_SEM_KEY); } catch (e) {}
@@ -24546,7 +24566,7 @@ window.tutupModalKonfirmasiLogoutSiswa = tutupModalKonfirmasiLogoutSiswa;
 
 function eksekusiLogoutSiswa() {
   try { playSound('click'); } catch (e) {}
-  const profile = getActiveStudentProfile();
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const elWelcomeNama = document.getElementById('welcome-siswa-nama');
   const nama = profile ? profile.nama : (elWelcomeNama ? elWelcomeNama.innerText.trim() : 'Siswa');
 
@@ -24561,7 +24581,7 @@ function eksekusiLogoutSiswa() {
   }
 
   // 2. Tutup semua modal siswa terkait
-  try { tutupModalKonfirmasiLogoutSiswa(); } catch (e) {}
+  try { if (typeof tutupModalKonfirmasiLogoutSiswa === 'function') tutupModalKonfirmasiLogoutSiswa(); } catch (e) {}
   const modalProfil = document.getElementById('modal-profil-siswa');
   if (modalProfil) {
     modalProfil.classList.add('hidden');
@@ -24588,11 +24608,7 @@ function eksekusiLogoutSiswa() {
   try { if (typeof resetPaintCanvasUntukSiswa === 'function') resetPaintCanvasUntukSiswa(); } catch (e) {}
   try { if (typeof restartQuiz === 'function') restartQuiz(); } catch (e) {}
 
-  // 6. Muat ulang tampilan profil siswa ke status Tamu / Belum Masuk
-  try { muatProfilSiswa(); } catch (e) {}
-  try { setHeaderNavMode('utama'); } catch (e) {}
-
-  // 7. Perbarui elemen bar sambutan siswa secara eksplisit seketika
+  // 6. Perbarui elemen bar sambutan siswa secara eksplisit seketika ke status Belum Masuk
   const elAvatar = document.getElementById('welcome-siswa-avatar');
   const elNama = document.getElementById('welcome-siswa-nama');
   const elKelas = document.getElementById('welcome-siswa-kelas');
@@ -24606,7 +24622,7 @@ function eksekusiLogoutSiswa() {
   const bintangWrap = document.getElementById('welcome-siswa-bintang-wrap');
 
   if (elAvatar) {
-    elAvatar.innerText = 'ðŸ‘¤';
+    elAvatar.innerText = '👤';
     elAvatar.className = 'w-11 h-11 rounded-2xl bg-slate-200 text-slate-500 flex items-center justify-center font-black text-lg shadow-inner flex-shrink-0';
   }
   if (elNama) elNama.innerText = 'Belum Ada Siswa Masuk';
@@ -24614,7 +24630,7 @@ function eksekusiLogoutSiswa() {
     elKelas.innerText = 'Akun Belum Aktif';
     elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-300';
   }
-  if (elSub) elSub.innerText = 'Lab Komputer â€¢ Belum Masuk Akun';
+  if (elSub) elSub.innerText = 'Lab Komputer • Belum Masuk Akun';
   if (elPing) elPing.classList.add('hidden');
   if (bintangWrap) bintangWrap.classList.add('hidden');
 
@@ -24625,18 +24641,22 @@ function eksekusiLogoutSiswa() {
   }
   if (btnLogout) { 
     btnLogout.classList.add('hidden'); 
+    btnLogout.style.removeProperty('display'); 
     btnLogout.style.setProperty('display', 'none', 'important'); 
   }
   if (btnRapor) { 
     btnRapor.classList.add('hidden'); 
+    btnRapor.style.removeProperty('display'); 
     btnRapor.style.setProperty('display', 'none', 'important'); 
   }
   if (btnGanti) { 
     btnGanti.classList.add('hidden'); 
+    btnGanti.style.removeProperty('display'); 
     btnGanti.style.setProperty('display', 'none', 'important'); 
   }
   if (btnSemToggle) { 
     btnSemToggle.classList.add('hidden'); 
+    btnSemToggle.style.removeProperty('display'); 
     btnSemToggle.style.setProperty('display', 'none', 'important'); 
   }
 
@@ -24648,29 +24668,20 @@ function eksekusiLogoutSiswa() {
   const cardsSiswa = document.getElementById('beranda-fitur-cards-siswa');
   if (cardsSiswa) cardsSiswa.classList.add('hidden');
 
-  const navUtama = document.getElementById('navbar-tampilan-utama');
-  if (navUtama) { 
-    navUtama.classList.remove('hidden'); 
-    navUtama.style.removeProperty('display');
-    navUtama.style.setProperty('display', 'flex', 'important'); 
-  }
-  const navSem1 = document.getElementById('navbar-tampilan-sem1');
-  if (navSem1) { 
-    navSem1.classList.add('hidden'); 
-    navSem1.style.setProperty('display', 'none', 'important'); 
-  }
-  const navKelas5 = document.getElementById('navbar-tampilan-kelas5');
-  if (navKelas5) { 
-    navKelas5.classList.add('hidden'); 
-    navKelas5.style.setProperty('display', 'none', 'important'); 
-  }
+  // 7. Kembalikan navbar ke tampilan utama (Tamu)
+  try { if (typeof setHeaderNavMode === 'function') setHeaderNavMode('utama'); } catch (e) {}
 
   try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (e) {}
   try { if (typeof renderDrive7KebiasaanGrid === 'function') renderDrive7KebiasaanGrid(); } catch (e) {}
-  try { switchTab('beranda'); } catch (e) {}
+  try { if (typeof switchTab === 'function') switchTab('beranda'); } catch (e) {}
   try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (e) {}
 
-  showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan ðŸ”’`, 'info');
+  try { if (typeof showToast === 'function') showToast(`Akun ${nama} berhasil keluar! Sesi telah diamankan 🔒`, 'info'); } catch(e){}
+
+  // 8. Muat ulang halaman secara halus untuk menjamin 100% pembersihan memori browser
+  setTimeout(function() {
+    location.reload();
+  }, 250);
 }
 window.eksekusiLogoutSiswa = eksekusiLogoutSiswa;
 
