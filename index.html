@@ -560,7 +560,11 @@
           if (tabName === 'gradebook') {
             if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
           } else if (tabName === 'drive7k') {
+            if (typeof state !== 'undefined' && state.filterDrive7KStatus === 'lengkap') {
+              state.filterDrive7KStatus = 'semua';
+            }
             if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+            if (typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') tarikSemuaHasilDriveSiswaDariCloud(true);
           } else if (tabName === 'galeri') {
             if (typeof renderGaleriGuru === 'function') renderGaleriGuru();
           } else if (tabName === 'bank-soal') {
@@ -16431,6 +16435,10 @@
             <button type="button" onclick="renderMonitoringDrive7KGuru()" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Segarkan Tampilan Lokal">
               <i class="fa-solid fa-rotate text-xs"></i>
             </button>
+            <button type="button" onclick="window.location.reload(true)" class="px-3 py-2 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-500 text-slate-900 transition flex items-center gap-1.5 cursor-pointer shadow-xs" title="Muat Ulang Halaman Browser Lengkap">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span class="hidden sm:inline">Refresh</span>
+            </button>
           </div>
         </div>
 
@@ -16440,14 +16448,26 @@
         </div>
 
         <!-- Empty State Drive 7K -->
-        <div id="guru-drive7k-empty" class="hidden p-12 text-center space-y-3 bg-white rounded-3xl border border-dashed border-slate-300">
-          <div class="w-16 h-16 rounded-full bg-purple-50 text-purple-400 flex items-center justify-center mx-auto text-2xl">
+        <div id="guru-drive7k-empty" class="hidden p-8 sm:p-12 text-center space-y-4 bg-white rounded-3xl border-2 border-dashed border-purple-200 shadow-sm">
+          <div class="w-16 h-16 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto text-2xl shadow-xs">
             <i class="fa-solid fa-folder-open"></i>
           </div>
-          <h4 class="font-title font-bold text-slate-700 text-sm">Tidak ada siswa yang sesuai filter</h4>
-          <p class="text-xs text-slate-500 max-w-sm mx-auto">
-            Coba pilih status "Semua" atau sesuaikan kata kunci pencarian.
-          </p>
+          <div>
+            <h4 class="font-title font-extrabold text-slate-800 text-base" id="guru-drive7k-empty-title">Tidak ada siswa pada filter status ini</h4>
+            <p class="text-xs text-slate-500 max-w-md mx-auto mt-1.5 leading-relaxed" id="guru-drive7k-empty-desc">
+              Jika Anda sedang memilih filter <b>"Lengkap (7/7)"</b>, belum ada siswa yang tuntas seluruh 7 gambar. Klik tombol <b>"Semua"</b> atau tombol di bawah untuk melihat siswa yang sedang mengumpulkan.
+            </p>
+          </div>
+          <div class="flex items-center justify-center gap-2 flex-wrap">
+            <button type="button" onclick="setFilterDrive7KStatus('semua')" class="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-filter"></i>
+              <span>Tampilkan Semua Siswa</span>
+            </button>
+            <button type="button" onclick="tarikSemuaHasilDriveSiswaDariCloud()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span>Tarik Kiriman Siswa dari Cloud</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -20004,7 +20024,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261110_realtime_cloud_sync_v130"></script>
+  <script src="app.js?v=20261110_fix_drive7k_v131"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
@@ -20187,6 +20207,152 @@
       if (btn) btn.disabled = false;
     }
   };
+  
+  // ========================================================
+  // INLINE IMPLEMENTATION: MONITORING DRIVE 7 KEBIASAAN GURU
+  // ========================================================
+  window.setFilterKelasDrive7K = function(kelas) {
+    try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+    if (typeof state !== 'undefined') {
+      state.filterKelasDrive7K = kelas;
+      state.filterKelasGuru = kelas;
+    }
+    if (typeof renderMonitoringDrive7KGuru === 'function') {
+      renderMonitoringDrive7KGuru();
+    }
+  };
+
+  window.tarikSemuaHasilDriveSiswaDariCloud = async function(silent = false) {
+    const btn = document.getElementById('btn-sync-cloud-drive-guru');
+    const oriHtml = btn ? '<i class="fa-solid fa-cloud-arrow-down text-amber-300"></i> <span>Tarik dari Cloud</span>' : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add('opacity-75', 'cursor-not-allowed');
+      btn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-amber-300"></i> <span>Menghubungkan Cloud...</span>';
+    }
+
+    let docsList = [];
+    try {
+      if (!silent && typeof showToast === 'function') {
+        showToast('☁️ Menghubungkan ke Cloud Server sd-tzuchi-kelas4...', 'info');
+      }
+
+      // Gunakan Direct Google REST API (Paling cepat, 0 lag, bebas timeout)
+      const restUrl = 'https://firestore.googleapis.com/v1/projects/sd-tzuchi-kelas4/databases/(default)/documents/student_drives?key=AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y';
+      const controller = new AbortController();
+      const tId = setTimeout(() => controller.abort(), 4000);
+      try {
+        const res = await fetch(restUrl, { signal: controller.signal });
+        clearTimeout(tId);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && Array.isArray(json.documents)) {
+            json.documents.forEach(docItem => {
+              const nameParts = (docItem.name || '').split('/');
+              const docId = nameParts[nameParts.length - 1];
+              const f = docItem.fields || {};
+              const driveDataStr = f.driveData && f.driveData.stringValue;
+              const nisStr = (f.studentNis && f.studentNis.stringValue) || docId;
+              if (driveDataStr) {
+                docsList.push({
+                  nis: String(nisStr).trim(),
+                  data: {
+                    studentNis: nisStr,
+                    studentName: f.studentName && f.studentName.stringValue,
+                    studentClass: f.studentClass && f.studentClass.stringValue,
+                    driveData: driveDataStr,
+                    totalGambar: f.totalGambar ? Number(f.totalGambar.integerValue || 0) : 0
+                  }
+                });
+              }
+            });
+          }
+        }
+      } catch (eF) {
+        clearTimeout(tId);
+        console.warn('Direct REST fetch error:', eF);
+      }
+
+      // Simpan data hasil unduhan ke penyimpanan lokal komputer guru
+      let updatedCount = 0;
+      let currentDb = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+
+      docsList.forEach(item => {
+        const targetNis = item.nis;
+        const data = item.data;
+        let driveObj = null;
+        if (data.driveData) {
+          try {
+            driveObj = typeof data.driveData === 'string' ? JSON.parse(data.driveData) : data.driveData;
+          } catch(eP) {}
+        }
+        if (driveObj && typeof driveObj === 'object') {
+          const localKey = 'educode_drive_7kebiasaan_' + targetNis;
+          try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch(eL){}
+          if (typeof _driveDataCache !== 'undefined' && _driveDataCache.delete) {
+            _driveDataCache.delete(targetNis);
+          }
+          const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+          if (sIdx >= 0) {
+            const evalData = (typeof hitungNilaiDrive7Kebiasaan === 'function')
+              ? hitungNilaiDrive7Kebiasaan(driveObj)
+              : { totalSkor: 0, filledCount: Object.keys(driveObj).length };
+            currentDb[sIdx].driveData = driveObj;
+            currentDb[sIdx].koleksiDrive = evalData.filledCount;
+            currentDb[sIdx].nilaiDrive = evalData.totalSkor;
+            currentDb[sIdx].terakhirAktif = 'Tersinkron Cloud';
+          }
+          updatedCount++;
+        }
+      });
+
+      if (updatedCount > 0 && typeof saveStudentDatabase === 'function') {
+        saveStudentDatabase(currentDb);
+        if (typeof _driveDataCache !== 'undefined' && _driveDataCache.clear) {
+          _driveDataCache.clear();
+        }
+      }
+
+      if (typeof renderMonitoringDrive7KGuru === 'function') {
+        renderMonitoringDrive7KGuru(true);
+      }
+      if (typeof filterDanCariSiswa === 'function') {
+        filterDanCariSiswa();
+      }
+
+      if (!silent && typeof showToast === 'function') {
+        if (updatedCount > 0) {
+          try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+          showToast(`Berhasil menyinkronkan karya ${updatedCount} siswa dari Cloud!`, 'success');
+        } else {
+          showToast('Data di komputer sudah yang paling mutakhir.', 'info');
+        }
+      }
+      return updatedCount;
+    } catch(err) {
+      console.warn('Tarik cloud error:', err);
+      if (typeof renderMonitoringDrive7KGuru === 'function') {
+        renderMonitoringDrive7KGuru(true);
+      }
+      return 0;
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        btn.innerHTML = oriHtml;
+      }
+    }
+  };
+
+  // Otomatis tarik data cloud saat halaman pertama dibuka
+  setTimeout(() => {
+    try {
+      if (typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') {
+        tarikSemuaHasilDriveSiswaDariCloud(true);
+      }
+    } catch(e) {}
+  }, 1200);
+
   </script>
 </body>
 </html>
