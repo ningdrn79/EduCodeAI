@@ -733,13 +733,13 @@ const i18nDict = {
     heroDescSem2: 'Mempelajari pemrograman visual (Scratch/Blockly), logika percabangan robot cerdas, dan pengenalan sensor kamera AI bersama SDS Cinta Kasih Tzu Chi.',
     roboBadge: 'Jawaban Robo',
     btnReplayVoice: 'Ulangi Suara',
-    youAsked: 'ðŸ‘¦ Kamu Bertanya: ',
-    roboSpeaking: 'Robo berbicara... ðŸ”Š',
+    youAsked: '👦 Kamu Bertanya: ',
+    roboSpeaking: 'Robo berbicara... 🔊',
     mascotBadge: 'Maskot EduCode',
-    moodBadge: 'â­ Ceria',
-    btnGreet: 'ðŸ‘‹ Sapa',
-    btnTalkToRobo: 'Bicara ke Robo ðŸŽ™ï¸',
-    initialSpeechRobo: 'Halo teman pintar! Aku Robo. Klik tombol <strong>"Bicara ke Robo ðŸŽ™ï¸"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! âœ¨'
+    moodBadge: '⭐ Ceria',
+    btnGreet: '👋 Sapa',
+    btnTalkToRobo: 'Bicara ke Robo 🎙️',
+    initialSpeechRobo: 'Halo teman pintar! Aku Robo. Klik tombol <strong>"Bicara ke Robo 🎙️"</strong> di samping kanan untuk menanyakan apa saja padaku, dan aku akan langsung menjawabnya dengan suaraku! ✨'
   },
   en: {
     beranda: 'Home',
@@ -767,13 +767,13 @@ const i18nDict = {
     heroDescSem2: 'Learning visual block coding (Scratch/Blockly), smart robot branching logic, and AI vision sensors with SDS Cinta Kasih Tzu Chi.',
     roboBadge: 'Robo Answer',
     btnReplayVoice: 'Replay Voice',
-    youAsked: 'ðŸ‘¦ You Asked: ',
-    roboSpeaking: 'Robo is speaking... ðŸ”Š',
+    youAsked: '👦 You Asked: ',
+    roboSpeaking: 'Robo is speaking... 🔊',
     mascotBadge: 'EduCode Mascot',
-    moodBadge: 'â­ Cheerful',
-    btnGreet: 'ðŸ‘‹ Greet',
-    btnTalkToRobo: 'Talk to Robo ðŸŽ™ï¸',
-    initialSpeechRobo: 'Hello smart friend! I am Robo. Click the <strong>"Talk to Robo ðŸŽ™ï¸"</strong> button on the right to ask me anything, and I will answer you right away with my voice! âœ¨'
+    moodBadge: '⭐ Cheerful',
+    btnGreet: '👋 Greet',
+    btnTalkToRobo: 'Talk to Robo 🎙️',
+    initialSpeechRobo: 'Hello smart friend! I am Robo. Click the <strong>"Talk to Robo 🎙️"</strong> button on the right to ask me anything, and I will answer you right away with my voice! ✨'
   }
 };
 
@@ -1176,12 +1176,12 @@ function bukaSemesterDariUtama(semNumber) {
 // INTERAKSI ROBOT MASKOT LUCU & AI SUARA EDUKASI (ROBO-TZU CHI)
 // ==========================================
 const sapaanRobotList = [
-  'ðŸ¤– "Halo teman pintar! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!" âœ¨',
-  'ðŸŽ‰ "Yey! Semangat belajar hari ini! Buka Modul Belajar atau Lab Word untuk mulai berkarya!" ðŸ“˜',
-  'ðŸ’¡ "Tahukah kamu? Komputer bekerja dengan instruksi logika yang runtut dan rapi!" ðŸ§ ',
-  'ðŸŒŸ "Kamu anak yang hebat, kreatif, berbudi pekerti luhur, dan berhati penuh cinta kasih!" ðŸ’š',
-  'ðŸš€ "Ayo kumpulkan banyak bintang poin dan selesaikan seluruh misi belajarmu hari ini!" â­',
-  'ðŸŒ¸ "Gan En! Selalu bersyukur atas setiap kesempatan belajar dan berbuat baik kepada sesama!" ðŸª·'
+  '🤖 "Halo teman pintar! Aku Robo-Tzu Chi, ayo belajar Coding & AI bersama!" ✨',
+  '🎉 "Yey! Semangat belajar hari ini! Buka Modul Belajar atau Lab Word untuk mulai berkarya!" 📘',
+  '💡 "Tahukah kamu? Komputer bekerja dengan instruksi logika yang runtut dan rapi!" 🧠',
+  '🌟 "Kamu anak yang hebat, kreatif, berbudi pekerti luhur, dan berhati penuh cinta kasih!" 💚',
+  '🚀 "Ayo kumpulkan banyak bintang poin dan selesaikan seluruh misi belajarmu hari ini!" ⭐',
+  '🌸 "Gan En! Selalu bersyukur atas setiap kesempatan belajar dan berbuat baik kepada sesama!" 🪷'
 ];
 let sapaanRobotIndex = 0;
 let _isRoboListening = false;
@@ -1455,10 +1455,10 @@ function bukaModalBicaraRobo(event) {
 
   const statusText = document.getElementById('voice-status-text');
   if (statusText) {
-    statusText.innerText = 'ðŸŽ™ï¸ Siap mendengarkan! Klik mikrofon atau pilih topik di bawah untuk bertanya!';
+    statusText.innerText = '🎙️ Siap mendengarkan! Klik mikrofon atau pilih topik di bawah untuk bertanya!';
   }
 
-  showToast('Bicara dengan Robo Aktif ðŸŽ™ï¸âœ¨', 'info');
+  showToast('Bicara dengan Robo Aktif 🎙️✨', 'info');
 }
 window.bukaModalBicaraRobo = bukaModalBicaraRobo;
 
