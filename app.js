@@ -6733,6 +6733,66 @@ function muatDrive7Kebiasaan(studentProfile) {
 }
 window.muatDrive7Kebiasaan = muatDrive7Kebiasaan;
 
+// ==========================================
+// DETEKSI CERDAS SUMBER GAMBAR (PAINTBRUSH vs APLIKASI AI)
+// Sesuai Kriteria Ibu Guru Darningsih, S.T.:
+// 1. Slot 1, 5, 7: Wajib Dokumen Paintbrush (MS Paint / Paint Mandiri)
+// 2. Slot 2, 3, 4, 6: Wajib Aplikasi AI (Gemini AI / Mesin Kartun AI)
+// ==========================================
+function deteksiJenisSumberGambar(item, habitKey) {
+  if (!item) return 'none';
+
+  // 1. Explicit override jika sudah diset oleh Guru atau sistem
+  if (item.sourceType === 'paint') return 'paint';
+  if (item.sourceType === 'ai') return 'ai';
+
+  const srcStr = (
+    (item.sumber || '') + ' ' + 
+    (item.source || '') + ' ' + 
+    (item.sourceBadge || '') + ' ' + 
+    (item.sourceName || '') + ' ' + 
+    (item.fileName || '') + ' ' + 
+    (item.title || '')
+  ).toLowerCase();
+
+  // 2. Sinyal kuat Aplikasi AI
+  const aiKeywords = [
+    'gemini_generated', 'gemini', 'dall-e', 'dalle', 'midjourney', 'bing_ai',
+    'chatgpt', 'freepik', 'stablediffusion', 'pencarian ai', 'studio ai',
+    'mesin kartun', 'vektor hd', 'vektor', 'vector', 'pinterest', 'kartun',
+    'ai generatif', 'berkas ai'
+  ];
+  const isAiSignal = aiKeywords.some(kw => srcStr.includes(kw));
+
+  // 3. Sinyal kuat Dokumen Paintbrush
+  const paintKeywords = [
+    'paint', 'paintbrush', 'mspaint', 'kuas', 'kanvas', 'canvas', 'lukisan',
+    'gambar sendiri', 'gambar manual', 'sketsa', '.bmp', 'dokumen paint'
+  ];
+  const isPaintSignal = paintKeywords.some(kw => srcStr.includes(kw));
+
+  if (isAiSignal && !isPaintSignal) return 'ai';
+  if (isPaintSignal && !isAiSignal) return 'paint';
+
+  // Analisis nama berkas secara spesifik (misal upload dari komputer)
+  const fn = (item.fileName || '').toLowerCase();
+  if (fn.startsWith('gemini') || fn.includes('generated') || fn.includes('_ai')) {
+    return 'ai';
+  }
+  if (fn.includes('paint') || fn.includes('kuas') || fn.includes('sketsa') || fn.endsWith('.bmp') || fn.includes('drawing')) {
+    return 'paint';
+  }
+
+  // Fallback berdasarkan slot target jika diunggah tanpa nama spesifik:
+  const paintKeys = ['bangun_pagi', 'belajar_membaca', 'tidur_tepat'];
+  if (paintKeys.includes(habitKey)) {
+    return isAiSignal ? 'ai' : 'paint';
+  } else {
+    return isPaintSignal ? 'paint' : 'ai';
+  }
+}
+window.deteksiJenisSumberGambar = deteksiJenisSumberGambar;
+
 function hitungNilaiDrive7Kebiasaan(driveData) {
   if (!driveData || typeof driveData !== 'object') {
     return {
@@ -6745,88 +6805,94 @@ function hitungNilaiDrive7Kebiasaan(driveData) {
       paintValid: false,
       aiValid: false,
       isSesuaiKategori: false,
+      paintScore: 0,
+      aiScore: 0,
+      namaScore: 0,
+      slotDetails: {},
       catatanAnalisis: 'Belum ada gambar yang dikumpulkan di Drive.'
     };
   }
 
-  const keys = Object.keys(driveData).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k));
-  const filledCount = keys.filter(k => driveData[k] && (driveData[k].imageSrc || driveData[k].gambar)).length;
-  const validNameCount = keys.filter(k => {
-    const item = driveData[k];
-    return item && item.fileName && periksaFormatNamaFile(item.fileName).valid;
-  }).length;
+  const paintKeys = ['bangun_pagi', 'belajar_membaca', 'tidur_tepat']; // Slot 1, 5, 7 (Bobot 15 poin x 3 = 45 poin)
+  const aiKeys = ['beribadah', 'olahraga', 'makan_sehat', 'rukun_berbagi']; // Slot 2, 3, 4, 6 (Bobot 10 poin x 4 = 40 poin)
 
-  if (filledCount === 0) {
-    return {
-      totalSkor: 0,
-      filledCount: 0,
-      validNameCount: 0,
-      statusKkm: 'Remedial',
-      paintCount: 0,
-      aiCount: 0,
-      paintValid: false,
-      aiValid: false,
-      isSesuaiKategori: false,
-      catatanAnalisis: 'Belum ada gambar yang dikumpulkan di Drive.'
-    };
-  }
+  let paintMatchCount = 0;
+  let aiMatchCount = 0;
+  let paintScoreTotal = 0;
+  let aiScoreTotal = 0;
+  let filledCount = 0;
+  let validNameCount = 0;
+  const slotDetails = {};
 
-  // 1. Analisis 3 Tema Wajib Gambar Sendiri (Aplikasi Paint Terbaru)
-  // Tema: 1. Bangun Pagi, 5. Gemar Belajar & Membaca, 7. Tidur Tepat Waktu
-  const paintKeys = ['bangun_pagi', 'tidur_tepat', 'belajar_membaca'];
-  let paintScoreCount = 0;
+  // Periksa 3 Slot Paint (1, 5, 7)
   paintKeys.forEach(pk => {
     const item = driveData[pk];
-    if (item && (item.imageSrc || item.gambar)) {
-      const srcStr = (item.sumber || item.source || '').toLowerCase();
-      if (srcStr.includes('paint') || srcStr.includes('gambar') || srcStr.includes('sendiri') || srcStr.includes('manual') || srcStr.includes('komputer')) {
-        paintScoreCount += 1;
-      } else {
-        paintScoreCount += 0.8;
+    const isFilled = !!(item && (item.imageSrc || item.gambar || item.dataUrl));
+    if (isFilled) {
+      filledCount++;
+      if (item.fileName && typeof periksaFormatNamaFile === 'function' && periksaFormatNamaFile(item.fileName).valid) {
+        validNameCount++;
       }
+      const type = deteksiJenisSumberGambar(item, pk);
+      if (type === 'paint') {
+        paintMatchCount++;
+        paintScoreTotal += 15;
+        slotDetails[pk] = { status: 'sesuai', type: 'paint', target: 'paint', score: 15, maxScore: 15, label: 'Sesuai (Dokumen Paintbrush)' };
+      } else {
+        paintScoreTotal += 7.5; // Parsial (terisi tapi terdeteksi AI)
+        slotDetails[pk] = { status: 'tidak_sesuai', type: 'ai', target: 'paint', score: 7.5, maxScore: 15, label: 'Terdeteksi Berkas AI (Wajib Paintbrush)' };
+      }
+    } else {
+      slotDetails[pk] = { status: 'kosong', type: 'none', target: 'paint', score: 0, maxScore: 15, label: 'Kosong' };
     }
   });
 
-  // 2. Analisis 4 Tema Wajib Gambar AI (Studio Gambar AI Generatif)
-  // Tema: 2. Beribadah & Berdoa, 3. Berolahraga, 4. Makan Sehat & Bergizi, 6. Hidup Rukun & Berbagi
-  const aiKeys = ['beribadah', 'olahraga', 'makan_sehat', 'rukun_berbagi'];
-  let aiScoreCount = 0;
+  // Periksa 4 Slot AI (2, 3, 4, 6)
   aiKeys.forEach(ak => {
     const item = driveData[ak];
-    if (item && (item.imageSrc || item.gambar)) {
-      const srcStr = (item.sumber || item.source || '').toLowerCase();
-      if (srcStr.includes('ai') || srcStr.includes('generatif') || srcStr.includes('kartun') || srcStr.includes('vektor') || srcStr.includes('pinterest')) {
-        aiScoreCount += 1;
-      } else {
-        aiScoreCount += 0.8;
+    const isFilled = !!(item && (item.imageSrc || item.gambar || item.dataUrl));
+    if (isFilled) {
+      filledCount++;
+      if (item.fileName && typeof periksaFormatNamaFile === 'function' && periksaFormatNamaFile(item.fileName).valid) {
+        validNameCount++;
       }
+      const type = deteksiJenisSumberGambar(item, ak);
+      if (type === 'ai') {
+        aiMatchCount++;
+        aiScoreTotal += 10;
+        slotDetails[ak] = { status: 'sesuai', type: 'ai', target: 'ai', score: 10, maxScore: 10, label: 'Sesuai (Aplikasi AI)' };
+      } else {
+        aiScoreTotal += 5; // Parsial (terisi tapi terdeteksi Paint)
+        slotDetails[ak] = { status: 'tidak_sesuai', type: 'paint', target: 'ai', score: 5, maxScore: 10, label: 'Terdeteksi Dokumen Paint (Wajib Aplikasi AI)' };
+      }
+    } else {
+      slotDetails[ak] = { status: 'kosong', type: 'none', target: 'ai', score: 0, maxScore: 10, label: 'Kosong' };
     }
   });
 
+  // Skor Nama Baku: Maksimal 15 Poin (proporsional 7 slot)
+  const namaScoreTotal = Math.round((validNameCount / 7) * 15);
+
+  // Total Skor Gabungan (Maksimal 100)
+  const rawTotal = paintScoreTotal + aiScoreTotal + namaScoreTotal;
+  const totalSkor = Math.min(100, Math.round(rawTotal));
+
   const isAll7 = (filledCount === 7);
-  const paintValid = (paintScoreCount >= 2.6);
-  const aiValid = (aiScoreCount >= 3.6);
+  const paintValid = (paintMatchCount === 3);
+  const aiValid = (aiMatchCount === 4);
   const isSesuaiKategori = paintValid && aiValid;
 
-  // Aturan Penilaian Ibu Guru Darningsih, S.T.:
-  // Syarat Nilai 100 (Tuntas): Seluruh 7 slot terisi lengkap (7/7) dan sesuai komposisi 3 Paint + 4 AI
-  let totalSkor = 0;
   let catatanAnalisis = '';
-
   if (isAll7) {
-    if (isSesuaiKategori) {
-      totalSkor = 100;
-      catatanAnalisis = 'Luar Biasa! 7/7 gambar lengkap dan sesuai kategori (3 Paint mandiri + 4 Studio AI). TUNTAS 100! ðŸŒŸ';
+    if (isSesuaiKategori && validNameCount === 7) {
+      catatanAnalisis = 'Luar Biasa Sempurna! 7/7 gambar lengkap (3 Paintbrush + 4 Aplikasi AI) dengan seluruh nama file baku. Nilai 100 TUNTAS! 🌟✨';
+    } else if (isSesuaiKategori) {
+      catatanAnalisis = `Koleksi 7/7 lengkap & sesuai kriteria (3 Paint & 4 AI). Format nama baku: ${validNameCount}/7. Nilai: ${totalSkor} (Tuntas).`;
     } else {
-      totalSkor = 90;
-      catatanAnalisis = 'Koleksi 7/7 lengkap (Tuntas). Sebagian sumber gambar masih bisa disempurnakan (3 Paint & 4 AI).';
+      catatanAnalisis = `Koleksi 7/7 lengkap. Kesesuaian kriteria: ${paintMatchCount}/3 Paint & ${aiMatchCount}/4 AI. Nilai: ${totalSkor}.`;
     }
   } else {
-    // Belum lengkap 7/7 -> belum mencapai KKM 80 (skor bertahap proporsional)
-    const skorGambar = Math.round((filledCount / 7) * 65);
-    const skorNama = Math.round((validNameCount / 7) * 10);
-    totalSkor = Math.min(75, skorGambar + skorNama);
-    catatanAnalisis = `Koleksi baru ${filledCount} dari 7 gambar. Lengkapi sisa ${7 - filledCount} slot gambar lagi untuk meraih Nilai 100!`;
+    catatanAnalisis = `Terkumpul ${filledCount} dari 7 gambar (${paintMatchCount}/3 Paint, ${aiMatchCount}/4 AI, ${validNameCount}/7 Baku). Nilai berjalan: ${totalSkor}. Lengkapi sisa ${7 - filledCount} slot lagi!`;
   }
 
   const statusKkm = totalSkor >= 80 ? 'Tuntas' : 'Remedial';
@@ -6836,11 +6902,15 @@ function hitungNilaiDrive7Kebiasaan(driveData) {
     filledCount,
     validNameCount,
     statusKkm,
-    paintCount: Math.round(paintScoreCount),
-    aiCount: Math.round(aiScoreCount),
+    paintCount: paintMatchCount,
+    aiCount: aiMatchCount,
     paintValid,
     aiValid,
     isSesuaiKategori,
+    paintScore: paintScoreTotal,
+    aiScore: aiScoreTotal,
+    namaScore: namaScoreTotal,
+    slotDetails,
     catatanAnalisis
   };
 }
@@ -7028,7 +7098,6 @@ function renderDrive7KebiasaanGrid() {
   let profile = null;
   try {
     profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-    // Pasang listener realtime Firebase secara otomatis untuk akun siswa ini
     if (profile && (profile.nis || profile.id) && typeof pasangRealtimeSyncDrive === 'function') {
       pasangRealtimeSyncDrive(profile.nis || profile.id);
     }
@@ -7046,6 +7115,8 @@ function renderDrive7KebiasaanGrid() {
   const totalCount = (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined' && Array.isArray(DRIVE_7KEBIASAAN_CONFIG)) ? DRIVE_7KEBIASAAN_CONFIG.length : 7;
   const filledCount = Object.keys(drive).filter(k => (typeof DRIVE_7KEBIASAAN_CONFIG !== 'undefined') && DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length;
   const percent = Math.round((filledCount / totalCount) * 100);
+
+  const evalData = (typeof hitungNilaiDrive7Kebiasaan === 'function') ? hitungNilaiDrive7Kebiasaan(drive) : { totalSkor: percent, paintCount: 0, aiCount: 0, validNameCount: 0, slotDetails: {} };
 
   // Update Header Bar Status dengan Nama Siswa Aktif
   try {
@@ -7067,41 +7138,35 @@ function renderDrive7KebiasaanGrid() {
       }
     }
 
-    const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) â€” ` : '';
+    const studentPrefix = profile ? `Drive 7 Kebiasaan: <b>${profile.nama}</b> (${profile.kelas}) — ` : '';
     if (titleEl) titleEl.innerHTML = `${studentPrefix}Progres Koleksi: ${filledCount} dari ${totalCount} Gambar Terkumpul`;
     if (barEl) barEl.style.width = `${percent}%`;
-    if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${percent}`;
+    if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${evalData.totalSkor}`;
 
-    // Hitung jumlah penamaan file baku
-    let validNamesCount = 0;
-    try {
-      validNamesCount = Object.keys(drive).filter(k => {
-        const it = drive[k];
-        return it && it.fileName && (typeof periksaFormatNamaFile === 'function') && periksaFormatNamaFile(it.fileName).valid;
-      }).length;
-    } catch (eVal) { validNamesCount = 0; }
+    let validNamesCount = evalData.validNameCount || 0;
 
     if (penamaanBadge) {
-      if (validNamesCount >= totalCount) {
-        penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs flex items-center gap-1';
-        penamaanBadge.innerHTML = `<i class="fa-solid fa-star text-amber-500"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b> (+${validNamesCount * 20} Poin)`;
-      } else {
-        penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 shadow-xs flex items-center gap-1';
-        penamaanBadge.innerHTML = `<i class="fa-solid fa-pen-ruler text-blue-600"></i> <b>Penamaan File: ${validNamesCount}/${totalCount} Baku</b>`;
-      }
+      penamaanBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-300 shadow-xs flex items-center gap-1.5 flex-wrap';
+      penamaanBadge.innerHTML = `
+        <span class="text-purple-700">🎨 <b>${evalData.paintCount || 0}/3 Paint</b></span>
+        <span class="text-slate-300">•</span>
+        <span class="text-indigo-700">🤖 <b>${evalData.aiCount || 0}/4 AI</b></span>
+        <span class="text-slate-300">•</span>
+        <span class="text-emerald-700">📝 <b>${validNamesCount}/${totalCount} Baku</b></span>
+      `;
     }
 
     if (kkmBadge) {
-      if (filledCount >= totalCount) {
+      if (evalData.totalSkor >= 80) {
         kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs';
-        kkmBadge.innerHTML = 'ðŸŽ‰ TUNTAS: Nilai 100 (Sangat Baik)';
-        if (hintEl) hintEl.innerHTML = 'âœ¨ <b>Hebat sekali!</b> Semua 7 kebiasaan sudah terkumpul lengkap! Nilai TP 2.1 terpenuhi 100.';
-        if (quickLabel) quickLabel.innerHTML = 'ðŸŽ‰ <b>Drive Lengkap 7/7!</b> Nilai TP 2.1: 100 (Tuntas)';
+        kkmBadge.innerHTML = `🎉 TUNTAS: Nilai ${evalData.totalSkor}`;
+        if (hintEl) hintEl.innerHTML = `✨ <b>Hebat sekali!</b> Skor TP 2.1: ${evalData.totalSkor} (Tuntas). ${evalData.catatanAnalisis}`;
+        if (quickLabel) quickLabel.innerHTML = `🎉 <b>Tuntas!</b> Nilai TP 2.1: ${evalData.totalSkor}`;
       } else {
         kkmBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
-        kkmBadge.innerText = `Belum Lengkap (${filledCount}/${totalCount})`;
-        if (hintEl) hintEl.innerText = `Kumpulkan sisa ${totalCount - filledCount} gambar lagi untuk mendapatkan Nilai 100 (Tuntas) pada TP 2.1!`;
-        if (quickLabel) quickLabel.innerText = `ðŸ“ Kumpulkan ${totalCount - filledCount} gambar lagi untuk nilai 100!`;
+        kkmBadge.innerText = `Skor: ${evalData.totalSkor} (Remedial < 80)`;
+        if (hintEl) hintEl.innerText = evalData.catatanAnalisis;
+        if (quickLabel) quickLabel.innerText = `📊 Nilai TP 2.1: ${evalData.totalSkor} (Target KKM: 80)`;
       }
     }
   } catch (eHead) {
@@ -7113,131 +7178,143 @@ function renderDrive7KebiasaanGrid() {
     grid.innerHTML = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
       const item = drive[cfg.key];
       const isFilled = !!(item && item.imageSrc);
+      const isPaintTarget = [1, 5, 7].includes(cfg.slotNumber);
+      const detail = (evalData.slotDetails && evalData.slotDetails[cfg.key]) ? evalData.slotDetails[cfg.key] : {};
+      const targetBadge = isPaintTarget 
+        ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-200" title="Wajib Dokumen Paintbrush (MS Paint)">🎨 Wajib Paint</span>'
+        : '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200" title="Wajib Aplikasi AI (Gemini AI / Kartun)">🤖 Wajib AI</span>';
 
-    if (isFilled) {
-      const fileName = item.fileName || buatSaranNamaFileBaku(cfg.cleanTitle);
-      const checkName = periksaFormatNamaFile(fileName);
+      if (isFilled) {
+        const fileName = item.fileName || buatSaranNamaFileBaku(cfg.cleanTitle);
+        const checkName = periksaFormatNamaFile(fileName);
+        const matchBadge = (detail.status === 'sesuai')
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300" title="${detail.label}"><i class="fa-solid fa-check"></i> Sesuai (+${detail.score}p)</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300" title="${detail.label}"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i> ${isPaintTarget ? 'Perlu Paint' : 'Perlu AI'} (+${detail.score}p)</span>`;
 
-      return `
-        <div class="bg-white rounded-3xl border-2 border-emerald-300 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between">
-          <!-- Header Slot -->
-          <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center">${cfg.slotNumber}</span>
-              <h5 class="font-title font-bold text-xs text-slate-800 truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</h5>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-              <i class="fa-solid fa-check"></i> Terkumpul
-            </span>
-          </div>
-
-          <!-- Preview Gambar -->
-          <div class="relative w-full aspect-square bg-slate-50 overflow-hidden group cursor-pointer" onclick="pasangSlotDriveKeWord('${cfg.key}')" title="Klik untuk pasang gambar ini ke lembar Word">
-            <img src="${item.imageSrc}" referrerpolicy="no-referrer" alt="${cfg.cleanTitle}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-            
-            <!-- Sumber Badge Top-Left -->
-            <div class="absolute top-2 left-2 pointer-events-none">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-900/80 text-white shadow-xs backdrop-blur-xs">
-                ${item.sourceBadge || 'Gambar'}
-              </span>
-            </div>
-
-            <!-- Overlay Hover -->
-            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-2 text-white">
-              <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shadow-md">
-                <i class="fa-solid fa-file-word"></i>
-              </span>
-              <span class="text-[11px] font-title font-bold text-center">Pasang ke Word ðŸ“„</span>
-            </div>
-          </div>
-
-          <!-- Nama File & Validasi Format Baku -->
-          <div class="px-3 py-1.5 bg-slate-50 border-t border-slate-100 flex flex-col gap-1">
-            <div class="flex items-center justify-between gap-1">
-              <div class="flex items-center gap-1.5 overflow-hidden min-w-0" title="${fileName}">
-                <i class="fa-regular fa-file-image ${checkName.valid ? 'text-emerald-600' : 'text-amber-500'} text-xs shrink-0"></i>
-                <span class="text-[11px] font-mono font-bold text-slate-700 truncate">${fileName}</span>
+        return `
+          <div class="bg-white rounded-3xl border-2 ${detail.status === 'sesuai' ? 'border-emerald-300' : 'border-amber-300'} shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between">
+            <!-- Header Slot -->
+            <div class="p-3 bg-gradient-to-r ${detail.status === 'sesuai' ? 'from-emerald-50 to-teal-50 border-emerald-100' : 'from-amber-50 to-orange-50 border-amber-100'} border-b flex items-center justify-between gap-1 flex-wrap">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="w-6 h-6 rounded-lg ${isPaintTarget ? 'bg-purple-600' : 'bg-indigo-600'} text-white font-black text-xs flex items-center justify-center shrink-0">${cfg.slotNumber}</span>
+                <h5 class="font-title font-bold text-xs text-slate-800 truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</h5>
               </div>
-              <button type="button" onclick="ubahNamaFileSlotDrive('${cfg.key}')" class="px-1.5 py-0.5 text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition shrink-0 cursor-pointer" title="Ubah Nama File">
-                <i class="fa-solid fa-pen-to-square"></i> Ubah
+              <div class="flex items-center gap-1 shrink-0">
+                ${targetBadge}
+                ${matchBadge}
+              </div>
+            </div>
+
+            <!-- Preview Gambar -->
+            <div class="relative w-full aspect-square bg-slate-50 overflow-hidden group cursor-pointer" onclick="pasangSlotDriveKeWord('${cfg.key}')" title="Klik untuk pasang gambar ini ke lembar Word">
+              <img src="${item.imageSrc}" referrerpolicy="no-referrer" alt="${cfg.cleanTitle}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              
+              <!-- Sumber Badge Top-Left -->
+              <div class="absolute top-2 left-2 pointer-events-none">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-900/80 text-white shadow-xs backdrop-blur-xs">
+                  ${item.sourceBadge || (detail.type === 'paint' ? '🎨 Dokumen Paint' : '🤖 Berkas AI')}
+                </span>
+              </div>
+
+              <!-- Overlay Hover -->
+              <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-2 text-white">
+                <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shadow-md">
+                  <i class="fa-solid fa-file-word"></i>
+                </span>
+                <span class="text-[11px] font-title font-bold text-center">Pasang ke Word 📄</span>
+              </div>
+            </div>
+
+            <!-- Nama File & Validasi Format Baku -->
+            <div class="px-3 py-1.5 bg-slate-50 border-t border-slate-100 flex flex-col gap-1">
+              <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5 overflow-hidden min-w-0" title="${fileName}">
+                  <i class="fa-regular fa-file-image ${checkName.valid ? 'text-emerald-600' : 'text-amber-500'} text-xs shrink-0"></i>
+                  <span class="text-[11px] font-mono font-bold text-slate-700 truncate">${fileName}</span>
+                </div>
+                <button type="button" onclick="ubahNamaFileSlotDrive('${cfg.key}')" class="px-1.5 py-0.5 text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition shrink-0 cursor-pointer" title="Ubah Nama File">
+                  <i class="fa-solid fa-pen-to-square"></i> Ubah
+                </button>
+              </div>
+              <div>
+                ${checkName.valid
+                  ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku</span>'
+                  : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded cursor-pointer" onclick="ubahNamaFileSlotDrive(\'' + cfg.key + '\')"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Format Belum Baku (Klik Ubah)</span>'}
+              </div>
+            </div>
+
+            <!-- Keterangan & Tombol Aksi -->
+            <div class="p-3 bg-white space-y-2 border-t border-slate-100">
+              <p class="text-[10px] text-slate-500 line-clamp-1 italic font-medium">"${cfg.slogan}"</p>
+              <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-100">
+                <button type="button" onclick="pasangSlotDriveKeWord('${cfg.key}')" class="py-1.5 px-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Pasang ke Word">
+                  <i class="fa-solid fa-file-word text-[9px]"></i> Word
+                </button>
+                <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="py-1.5 px-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Ganti gambar ini">
+                  <i class="fa-solid fa-rotate text-[9px]"></i> Ganti
+                </button>
+                <button type="button" onclick="hapusGambarDariSlotDrive('${cfg.key}')" class="py-1.5 px-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Kosongkan slot ini">
+                  <i class="fa-solid fa-trash-can text-[9px]"></i> Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Slot Kosong dengan Upload File Langsung & Dukungan Drag and Drop
+        return `
+          <div class="bg-slate-50/80 rounded-3xl border-2 border-dashed border-slate-300 hover:border-blue-400 transition-all p-4 flex flex-col justify-between space-y-3">
+            <!-- Header Slot Kosong -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">${cfg.slotNumber}</span>
+                <h5 class="font-title font-bold text-xs text-slate-700">${cfg.cleanTitle}</h5>
+              </div>
+              <div class="flex items-center gap-1">
+                ${targetBadge}
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
+                  Kosong
+                </span>
+              </div>
+            </div>
+
+            <!-- Hidden Direct Input File -->
+            <input type="file" id="input-direct-slot-${cfg.key}" accept="image/*" class="hidden" onchange="handleDirectSlotFileUpload(event, '${cfg.key}')">
+
+            <!-- Placeholder Area: 1-Klik Buka File atau Drag-and-Drop Gambar Langsung -->
+            <div class="w-full aspect-square rounded-2xl bg-white border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 flex flex-col items-center justify-center text-center p-3 cursor-pointer group transition" 
+                 onclick="triggerUploadFileSlotDrive('${cfg.key}')" 
+                 ondragover="event.preventDefault(); this.classList.add('border-blue-500', 'bg-blue-50');" 
+                 ondragleave="this.classList.remove('border-blue-500', 'bg-blue-50');" 
+                 ondrop="handleSlotFileDrop(event, '${cfg.key}')" 
+                 title="Klik untuk memilih foto dari komputer/HP atau tarik gambar ke sini!">
+              <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2 transition transform group-hover:scale-110">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 font-title group-hover:text-blue-700 transition">+ Upload Gambar</span>
+              <p class="text-[10px] text-slate-400 mt-1 max-w-[160px] leading-tight">Klik atau Tarik Foto ke sini (.jpg, .png)</p>
+            </div>
+
+            <!-- Tombol Aksi Bawah: Upload File Utama & Menu Pilihan Lain -->
+            <div class="flex items-center gap-1.5 w-full">
+              <button type="button" onclick="triggerUploadFileSlotDrive('${cfg.key}')" class="flex-1 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Upload langsung file gambar dari Laptop/HP">
+                <i class="fa-solid fa-upload text-[10px]"></i> Upload File
+              </button>
+              <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="py-2 px-2.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1 cursor-pointer shrink-0" title="Pilihan Lain: Vektor HD, AI Studio, Paint, Kartun">
+                <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Lainnya
               </button>
             </div>
-            <div>
-              ${checkName.valid
-                ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin â­)</span>'
-                : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded cursor-pointer" onclick="ubahNamaFileSlotDrive(\'' + cfg.key + '\')"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Format Belum Baku (Klik Ubah)</span>'}
-            </div>
           </div>
-
-          <!-- Keterangan & Tombol Aksi -->
-          <div class="p-3 bg-white space-y-2 border-t border-slate-100">
-            <p class="text-[10px] text-slate-500 line-clamp-1 italic font-medium">"${cfg.slogan}"</p>
-            <div class="grid grid-cols-3 gap-1 pt-1 border-t border-slate-100">
-              <button type="button" onclick="pasangSlotDriveKeWord('${cfg.key}')" class="py-1.5 px-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Pasang ke Word">
-                <i class="fa-solid fa-file-word text-[9px]"></i> Word
-              </button>
-              <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="py-1.5 px-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Ganti gambar ini">
-                <i class="fa-solid fa-rotate text-[9px]"></i> Ganti
-              </button>
-              <button type="button" onclick="hapusGambarDariSlotDrive('${cfg.key}')" class="py-1.5 px-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg font-bold text-[10px] transition flex items-center justify-center gap-1 cursor-pointer" title="Kosongkan slot ini">
-                <i class="fa-solid fa-trash-can text-[9px]"></i> Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    } else {
-      // Slot Kosong dengan Upload File Langsung & Dukungan Drag and Drop
-      return `
-        <div class="bg-slate-50/80 rounded-3xl border-2 border-dashed border-slate-300 hover:border-blue-400 transition-all p-4 flex flex-col justify-between space-y-3">
-          <!-- Header Slot Kosong -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-lg bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">${cfg.slotNumber}</span>
-              <h5 class="font-title font-bold text-xs text-slate-700">${cfg.cleanTitle}</h5>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600">
-              Kosong
-            </span>
-          </div>
-
-          <!-- Hidden Direct Input File -->
-          <input type="file" id="input-direct-slot-${cfg.key}" accept="image/*" class="hidden" onchange="handleDirectSlotFileUpload(event, '${cfg.key}')">
-
-          <!-- Placeholder Area: 1-Klik Buka File atau Drag-and-Drop Gambar Langsung -->
-          <div class="w-full aspect-square rounded-2xl bg-white border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 flex flex-col items-center justify-center text-center p-3 cursor-pointer group transition" 
-               onclick="triggerUploadFileSlotDrive('${cfg.key}')" 
-               ondragover="event.preventDefault(); this.classList.add('border-blue-500', 'bg-blue-50');" 
-               ondragleave="this.classList.remove('border-blue-500', 'bg-blue-50');" 
-               ondrop="handleSlotFileDrop(event, '${cfg.key}')" 
-               title="Klik untuk memilih foto dari komputer/HP atau tarik gambar ke sini!">
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-2 transition transform group-hover:scale-110">
-              <i class="fa-solid fa-cloud-arrow-up"></i>
-            </div>
-            <span class="text-xs font-bold text-slate-700 font-title group-hover:text-blue-700 transition">+ Upload Gambar</span>
-            <p class="text-[10px] text-slate-400 mt-1 max-w-[160px] leading-tight">Klik atau Tarik Foto ke sini (.jpg, .png)</p>
-          </div>
-
-          <!-- Tombol Aksi Bawah: Upload File Utama & Menu Pilihan Lain -->
-          <div class="flex items-center gap-1.5 w-full">
-            <button type="button" onclick="triggerUploadFileSlotDrive('${cfg.key}')" class="flex-1 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer" title="Upload langsung file gambar dari Laptop/HP">
-              <i class="fa-solid fa-upload text-[10px]"></i> Upload File
-            </button>
-            <button type="button" onclick="bukaModalPilihSumberSlot('${cfg.key}')" class="py-2 px-2.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl font-title font-bold text-xs transition flex items-center justify-center gap-1 cursor-pointer shrink-0" title="Pilihan Lain: Vektor HD, AI Studio, Paint, Kartun">
-              <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Lainnya
-            </button>
-          </div>
-        </div>
-      `;
-    }
-  }).join('');
+        `;
+      }
+    }).join('');
   } catch (eCards) {
     console.error('Gagal render grid kartu Drive:', eCards);
   }
 }
 window.renderDrive7KebiasaanGrid = renderDrive7KebiasaanGrid;
 
-function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun', sourceBadge = 'ðŸŽ¨ Kartun', customFileName = null) {
+function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun', sourceBadge = '🎨 Kartun', customFileName = null, sourceType = null) {
   if (!habitKey || !imageSrc) return;
   const drive = muatDrive7Kebiasaan();
   const wasCompleteBefore = Object.keys(drive).filter(k => DRIVE_7KEBIASAAN_CONFIG.some(c => c.key === k)).length >= 7;
@@ -7245,10 +7322,18 @@ function simpanGambarKeSlotDrive(habitKey, imageSrc, sourceName = 'Gambar Kartun
   const defaultFileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : habitKey);
   const finalFileName = customFileName || (drive[habitKey] && drive[habitKey].fileName) || defaultFileName;
 
+  const detectedType = sourceType || (typeof deteksiJenisSumberGambar === 'function' ? deteksiJenisSumberGambar({
+    sumber: sourceName,
+    sourceName: sourceName,
+    sourceBadge: sourceBadge,
+    fileName: finalFileName
+  }, habitKey) : 'paint');
+
   drive[habitKey] = {
     imageSrc: imageSrc,
     sourceName: sourceName,
     sourceBadge: sourceBadge,
+    sourceType: detectedType,
     fileName: finalFileName,
     dateAdded: new Date().toLocaleDateString('id-ID')
   };
@@ -7616,7 +7701,32 @@ function prosesFileGambarKeSlot(file, habitKey) {
       const cleanUploadName = file.name.replace(/\.[^/.]+$/, '');
       const checkUpload = periksaFormatNamaFile(cleanUploadName);
       const chosenName = checkUpload.valid ? cleanUploadName : buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Upload');
-      simpanGambarKeSlotDrive(habitKey, optimizedDataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), 'ðŸ“¤ File Komputer', chosenName);
+
+      // Deteksi cerdas sumber berkas
+      const lowerName = file.name.toLowerCase();
+      let detectedType = 'komputer';
+      let sourceBadge = '💻 File Komputer';
+
+      const isAiFile = lowerName.startsWith('gemini') || lowerName.includes('generated') || lowerName.includes('dall-e') || lowerName.includes('bing') || lowerName.includes('ai') || lowerName.includes('midjourney');
+      const isPaintFile = lowerName.includes('paint') || lowerName.includes('kuas') || lowerName.includes('drawing') || lowerName.endsWith('.bmp') || lowerName.includes('sketsa');
+
+      const paintKeys = ['bangun_pagi', 'belajar_membaca', 'tidur_tepat'];
+
+      if (isAiFile) {
+        detectedType = 'ai';
+        sourceBadge = '🤖 Berkas AI';
+      } else if (isPaintFile) {
+        detectedType = 'paint';
+        sourceBadge = '🎨 Dokumen Paint';
+      } else if (paintKeys.includes(habitKey)) {
+        detectedType = 'paint';
+        sourceBadge = '🎨 Dokumen Paint';
+      } else {
+        detectedType = 'ai';
+        sourceBadge = '🤖 Berkas AI';
+      }
+
+      simpanGambarKeSlotDrive(habitKey, optimizedDataUrl, file.name || (cfg ? cfg.cleanTitle : 'File Komputer'), sourceBadge, chosenName, detectedType);
     });
   };
   reader.onerror = function() {
@@ -7704,7 +7814,7 @@ function tempelPinterestKeSlot(habitKey) {
   }
 
   const fileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : 'Pinterest');
-  simpanGambarKeSlotDrive(habitKey, urlBersih, `Pinterest: ${cfg ? cfg.cleanTitle : ''}`, 'ðŸ“Œ Pinterest', fileName);
+  simpanGambarKeSlotDrive(habitKey, urlBersih, `Pinterest: ${cfg ? cfg.cleanTitle : ''}`, '📌 Pinterest AI', fileName, 'ai');
 }
 window.tempelPinterestKeSlot = tempelPinterestKeSlot;
 
@@ -7729,7 +7839,7 @@ function simpanKartunItemKeDrive(kartunId) {
   const dataUrl = item.dataUrl || dapatkanDataUrlKartun(item);
   const cfg = DRIVE_7KEBIASAAN_CONFIG.find(c => c.key === targetKey);
   const fileName = buatSaranNamaFileBaku(cfg ? cfg.cleanTitle : item.title);
-  simpanGambarKeSlotDrive(targetKey, dataUrl, item.title, item.source || 'ðŸŽ¨ Kartun', fileName);
+  simpanGambarKeSlotDrive(targetKey, dataUrl, item.title, item.source || '🎨 Mesin Kartun AI', fileName, 'ai');
   setModeAIStudio('drive');
 }
 window.simpanKartunItemKeDrive = simpanKartunItemKeDrive;
@@ -7750,7 +7860,7 @@ function simpanGambarAIKeDrive() {
   }
 
   const fileName = buatSaranNamaFileBaku(habit.title);
-  simpanGambarKeSlotDrive(habitKey, imageSrc, `Gambar AI: ${habit.title}`, 'ðŸ¤– AI Generatif', fileName);
+  simpanGambarKeSlotDrive(habitKey, imageSrc, `Gambar AI: ${habit.title}`, '🤖 AI Generatif', fileName, 'ai');
   setModeAIStudio('drive');
   showToast(`Gambar AI "${habit.title}" berhasil disimpan ke Drive 7 Kebiasaan! ðŸ“âœ¨`, 'success');
 }
@@ -28146,7 +28256,7 @@ function renderMonitoringDrive7KGuru(isFromRealtime = false) {
 window.renderMonitoringDrive7KGuru = renderMonitoringDrive7KGuru;
 
 function bukaModalMonitoringDriveGuru(studentId) {
-  playSound('click');
+  try { playSound('click'); } catch (e) {}
   const db = getStudentDatabase();
   const student = db.find(s => s.id === studentId || s.nis === studentId || (s.nama && s.nama.toLowerCase() === (studentId || '').toLowerCase()));
   if (!student) {
@@ -28181,28 +28291,26 @@ function bukaModalMonitoringDriveGuru(studentId) {
   if (absenEl) absenEl.innerText = `Absen: ${student.absen || '-'}`;
 
   if (kkmBadge) {
-    if (evalData.filledCount === 7) {
+    if (evalData.totalSkor >= 80) {
       kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950';
-      kkmBadge.innerText = 'âœ… TUNTAS 100';
-    } else if (evalData.totalSkor >= 80) {
-      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-300 text-slate-900';
-      kkmBadge.innerText = 'âœ… TUNTAS (â‰¥80)';
+      kkmBadge.innerText = `✅ TUNTAS (${evalData.totalSkor}/100)`;
     } else {
       kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-400 text-white';
-      kkmBadge.innerText = 'âš ï¸ PERLU REMEDIAL';
+      kkmBadge.innerText = `⚠️ PERLU REMEDIAL (${evalData.totalSkor}/100)`;
     }
   }
 
-  if (progText) progText.innerText = `${evalData.filledCount} dari 7 Terkumpul (${percent}%) â€¢ ${evalData.catatanAnalisis || ''}`;
+  if (progText) progText.innerText = `${evalData.filledCount} dari 7 Terkumpul (${percent}%) • ${evalData.catatanAnalisis || ''}`;
   if (progBar) progBar.style.width = `${percent}%`;
   if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${evalData.totalSkor}`;
   if (penamaanBadge) {
+    penamaanBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 shadow-xs flex items-center gap-1.5 flex-wrap';
     penamaanBadge.innerHTML = `
-      <span class="font-bold">${evalData.validNameCount}/7 Format Baku</span>
-      <span class="mx-1 text-slate-300">â€¢</span>
-      <span class="text-purple-700 font-bold">ðŸŽ¨ ${evalData.paintCount || 0}/3 Paint</span>
-      <span class="mx-1 text-slate-300">â€¢</span>
-      <span class="text-indigo-700 font-bold">ðŸ¤– ${evalData.aiCount || 0}/4 AI</span>
+      <span class="text-purple-700">🎨 <b>${evalData.paintCount || 0}/3 Paint (${evalData.paintScore || 0}p)</b></span>
+      <span class="text-slate-300">•</span>
+      <span class="text-indigo-700">🤖 <b>${evalData.aiCount || 0}/4 AI (${evalData.aiScore || 0}p)</b></span>
+      <span class="text-slate-300">•</span>
+      <span class="text-emerald-700">📝 <b>${evalData.validNameCount || 0}/7 Baku (${evalData.namaScore || 0}p)</b></span>
     `;
   }
 
@@ -28220,23 +28328,37 @@ function bukaModalMonitoringDriveGuru(studentId) {
     DRIVE_7KEBIASAAN_CONFIG.forEach(cfg => {
       const item = driveData[cfg.key];
       const isFilled = item && (item.imageSrc || item.gambar || item.dataUrl);
+      const isPaintTarget = [1, 5, 7].includes(cfg.slotNumber);
+      const detail = (evalData.slotDetails && evalData.slotDetails[cfg.key]) ? evalData.slotDetails[cfg.key] : {};
+      const targetBadge = isPaintTarget 
+        ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-200">🎨 Wajib Paint (15p)</span>'
+        : '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">🤖 Wajib AI (10p)</span>';
 
       const slotCard = document.createElement('div');
       if (isFilled) {
         const imgSrc = item.imageSrc || item.gambar || item.dataUrl;
         const fileName = item.fileName || '-';
         const check = periksaFormatNamaFile(fileName);
-        const sourceLabel = item.sumber || item.source || 'Gambar Terunggah';
+        const sourceLabel = item.sumber || item.source || item.sourceBadge || 'Gambar Terunggah';
+        const currentType = detail.type || (isPaintTarget ? 'paint' : 'ai');
+        const nextType = (currentType === 'paint') ? 'ai' : 'paint';
 
-        slotCard.className = 'p-3 bg-white rounded-2xl border-2 border-purple-200 shadow-xs space-y-2 flex flex-col justify-between';
+        const matchBadge = (detail.status === 'sesuai')
+          ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">✅ Sesuai (+${detail.score}p)</span>`
+          : `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">⚠️ Tidak Sesuai (+${detail.score}/${detail.maxScore}p)</span>`;
+
+        slotCard.className = `p-3 bg-white rounded-2xl border-2 ${detail.status === 'sesuai' ? 'border-emerald-300' : 'border-amber-300'} shadow-xs space-y-2 flex flex-col justify-between`;
         slotCard.innerHTML = `
           <div>
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1 gap-1 flex-wrap">
               <span class="flex items-center gap-1.5 truncate">
                 <span>${cfg.emoji}</span>
                 <span class="truncate">${cfg.cleanTitle}</span>
               </span>
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">Ada</span>
+              <div class="flex items-center gap-1 shrink-0">
+                ${targetBadge}
+                ${matchBadge}
+              </div>
             </div>
 
             <!-- Thumbnail -->
@@ -28251,20 +28373,25 @@ function bukaModalMonitoringDriveGuru(studentId) {
             <div class="mt-2 space-y-1">
               <div class="flex items-center justify-between text-[10px]">
                 <span class="text-slate-500 font-medium">Sumber:</span>
-                <span class="font-bold text-purple-700 bg-purple-50 px-1 rounded">${escapeXml(sourceLabel)}</span>
+                <span class="font-bold text-purple-700 bg-purple-50 px-1 rounded truncate max-w-[150px]">${escapeXml(sourceLabel)}</span>
               </div>
               <div class="text-[10px] text-slate-600 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
                 <div class="text-slate-400 font-medium text-[9px]">Nama File:</div>
                 <div class="font-bold truncate text-slate-800" title="${escapeXml(fileName)}">${escapeXml(fileName)}</div>
                 <div class="mt-1 flex items-center justify-between">
-                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku âœ…</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku âš ï¸</span>'}
-                  <span class="text-[9px] text-slate-400">${item.timestamp ? item.timestamp.slice(0, 10) : ''}</span>
+                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku ✅</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku ⚠️</span>'}
+                  <span class="text-[9px] font-bold ${detail.status === 'sesuai' ? 'text-emerald-700' : 'text-amber-700'}">${detail.score}/${detail.maxScore} Poin</span>
                 </div>
               </div>
+              
+              <!-- Tombol Koreksi Guru -->
+              <button type="button" onclick="guruUbahSumberSlot('${student.id || student.nis}', '${cfg.key}', '${nextType}')" class="w-full mt-1 py-1 px-2 text-[9px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs" title="Ubah status jenis sumber berkas ini">
+                <i class="fa-solid fa-arrows-rotate"></i> Koreksi: ${nextType === 'paint' ? '🎨 Ubah ke Paint' : '🤖 Ubah ke AI'}
+              </button>
             </div>
           </div>
 
-          <button type="button" onclick="bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')" class="w-full py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <button type="button" onclick="bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')" class="w-full mt-2 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-expand text-[10px]"></i> Lihat Ukuran Penuh
           </button>
         `;
@@ -28272,12 +28399,15 @@ function bukaModalMonitoringDriveGuru(studentId) {
         slotCard.className = 'p-3 bg-slate-50/70 rounded-2xl border-2 border-dashed border-slate-300 space-y-2 flex flex-col justify-between text-center';
         slotCard.innerHTML = `
           <div>
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1 gap-1 flex-wrap">
               <span class="flex items-center gap-1.5 truncate">
                 <span>${cfg.emoji}</span>
                 <span class="truncate">${cfg.cleanTitle}</span>
               </span>
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-500 shrink-0">Kosong</span>
+              <div class="flex items-center gap-1 shrink-0">
+                ${targetBadge}
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-500 shrink-0">0/${isPaintTarget ? 15 : 10}p</span>
+              </div>
             </div>
 
             <div class="h-28 bg-white rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center p-3 text-slate-400">
@@ -28288,7 +28418,7 @@ function bukaModalMonitoringDriveGuru(studentId) {
           </div>
 
           <span class="text-[10px] font-medium text-slate-400 italic">
-            Slot #${cfg.slotNumber} belum dikumpulkan
+            Slot #${cfg.slotNumber} belum dikumpulkan (0 Poin)
           </span>
         `;
       }
@@ -28310,6 +28440,46 @@ function tutupModalMonitoringDriveGuru() {
   }
 }
 window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
+
+// Koreksi Sumber Dokumen oleh Guru (Mengubah Klasifikasi Paint vs AI secara manual)
+function guruUbahSumberSlot(studentId, habitKey, newType) {
+  try { playSound('click'); } catch (e) {}
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === studentId || s.nis === studentId || (s.nama && s.nama.toLowerCase() === (studentId || '').toLowerCase()));
+  if (!student) {
+    showToast('Data siswa tidak ditemukan!', 'warning');
+    return;
+  }
+  const drive = dapatkanDriveSiswa(student);
+  if (!drive || !drive[habitKey]) {
+    showToast('Slot tersebut belum memiliki berkas gambar.', 'warning');
+    return;
+  }
+
+  drive[habitKey].sourceType = newType;
+  drive[habitKey].sourceBadge = (newType === 'paint') ? '🎨 Dokumen Paint' : '🤖 Berkas AI';
+  drive[habitKey].sumber = (newType === 'paint') ? 'Dokumen Paintbrush (Koreksi Guru)' : 'Aplikasi AI (Koreksi Guru)';
+
+  student.driveData = drive;
+  const evalData = hitungNilaiDrive7Kebiasaan(drive);
+  student.nilaiDrive = evalData.totalSkor;
+  saveStudentDatabase(db);
+
+  // Jika ini akun siswa aktif saat ini, update juga di sesi lokal
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (activeStudent && (activeStudent.id === student.id || activeStudent.nis === student.nis)) {
+    activeStudent.driveData = drive;
+    activeStudent.nilaiDrive = evalData.totalSkor;
+    saveActiveStudentSession(activeStudent);
+    simpanDrive7Kebiasaan(drive);
+  }
+
+  showToast(`Sumber slot diubah ke: ${newType === 'paint' ? '🎨 Dokumen Paintbrush' : '🤖 Aplikasi AI'}! Nilai baru: ${evalData.totalSkor}`, 'success');
+  bukaModalMonitoringDriveGuru(studentId);
+  if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+  if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+}
+window.guruUbahSumberSlot = guruUbahSumberSlot;
 
 // --------------------------------------------------------------------------
 // CLOUD GOOGLE SPREADSHEET (TAB "DATA SISWA LMS") & WEBHOOK
@@ -30008,7 +30178,7 @@ window.simpanDanNilaiExcel = simpanDanNilaiExcel;
 window.hitungRubrikOtomatisPosterWord = hitungRubrikOtomatisPosterWord;
 window.hitungRubrikOtomatisExcel = hitungRubrikOtomatisExcel;
 window.loginDenganNis = loginDenganNis;
-window.simpanPengaturanGoogleSheet = simpanPengaturanGoogleSheet;
+if (typeof simpanPengaturanGoogleSheet !== 'undefined') window.simpanPengaturanGoogleSheet = simpanPengaturanGoogleSheet;
 window.sinkronkanDataSiswaGoogleSheet = sinkronkanDataSiswaGoogleSheet;
 window.sinkronkanMasterDataSiswaLMS = sinkronkanMasterDataSiswaLMS;
 window.ujiCekNisGuru = ujiCekNisGuru;
@@ -30409,15 +30579,15 @@ setTimeout(updateScrollNavVisibility, 300);
 // Menjamin keamanan data karya ~200 siswa antar PC Lab & restart
 // ========================================================
 
-const FIREBASE_CONFIG_KEY = 'educode_firebase_config_v1';
-const FIREBASE_LAST_SYNC_KEY = 'educode_firebase_last_sync_v1';
-let firebaseAppInstance = null;
-let firebaseFirestoreInstance = null;
-let firebaseStorageInstance = null;
-let isFirebaseConnected = false;
+var FIREBASE_CONFIG_KEY = 'educode_firebase_config_v1';
+var FIREBASE_LAST_SYNC_KEY = 'educode_firebase_last_sync_v1';
+var firebaseAppInstance = null;
+var firebaseFirestoreInstance = null;
+var firebaseStorageInstance = null;
+var isFirebaseConnected = false;
 
 // Konfigurasi Resmi Proyek Firebase SDS Cinta Kasih Tzu Chi (sd-tzuchi-kelas4)
-const DEFAULT_FIREBASE_CONFIG = {
+var DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y",
   authDomain: "sd-tzuchi-kelas4.firebaseapp.com",
   projectId: "sd-tzuchi-kelas4",
