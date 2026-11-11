@@ -31271,6 +31271,22 @@ window.unggahDriveKeCloud = unggahDriveKeCloud;
 // 2A-0. Pemantauan Realtime Firestore Tanpa Perlu Menekan Tombol (Live Antar-Komputer)
 let _guruDriveRealtimeUnsubscribe = null;
 
+function cekStatusRealtimeDriveGuru() {
+  if (typeof mulaiRealtimeMonitoringDriveGuru === 'function') {
+    mulaiRealtimeMonitoringDriveGuru();
+  }
+  if (typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') {
+    tarikSemuaHasilDriveSiswaDariCloud(false);
+  } else if (typeof renderMonitoringDrive7KGuru === 'function') {
+    renderMonitoringDrive7KGuru();
+  }
+  try { if (typeof playSound === 'function') playSound('pop'); } catch(e) {}
+  if (typeof showToast === 'function') {
+    showToast('🟢 Pemantauan Realtime Aktif: Terhubung langsung ke Cloud Firestore!', 'success');
+  }
+}
+window.cekStatusRealtimeDriveGuru = cekStatusRealtimeDriveGuru;
+
 function mulaiRealtimeMonitoringDriveGuru() {
   let db = firebaseFirestoreInstance;
   if (!db && typeof getInlineFirestore === 'function') {
@@ -31289,7 +31305,8 @@ function mulaiRealtimeMonitoringDriveGuru() {
   const liveBadge = document.getElementById('badge-live-realtime-drive-guru');
   if (liveBadge) {
     liveBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>Realtime Live Aktif</span>';
-    liveBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-2xs';
+    liveBadge.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-2xs cursor-pointer transition active:scale-95';
+    liveBadge.onclick = cekStatusRealtimeDriveGuru;
   }
 
   try {

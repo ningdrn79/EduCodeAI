@@ -16558,7 +16558,7 @@
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
-            <div id="badge-live-realtime-drive-guru" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-2xs" title="Pemantauan Realtime Aktif: Setiap siswa yang mengunggah gambar akan langsung muncul detik ini juga tanpa perlu menekan tombol">
+            <div id="badge-live-realtime-drive-guru" onclick="cekStatusRealtimeDriveGuru()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 flex items-center gap-1.5 shadow-2xs cursor-pointer transition active:scale-95" title="Pemantauan Realtime Aktif: Klik untuk cek status koneksi atau sinkronkan data langsung dari Cloud">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Realtime Live Aktif</span>
             </div>
@@ -20166,7 +20166,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261111_drive_sync_fix_v136"></script>
+  <script src="app.js?v=20261111_realtime_badge_v137"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
@@ -20451,6 +20451,10 @@
           } catch(eP) {}
         }
         if (driveObj && typeof driveObj === 'object') {
+          if (typeof bersihkanKontaminasiDriveUjiCoba === 'function') {
+            const sMatch = currentDb.find(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+            driveObj = bersihkanKontaminasiDriveUjiCoba(driveObj, sMatch || { nis: targetNis });
+          }
           const localKey = 'educode_drive_7kebiasaan_' + targetNis;
           try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch(eL){}
           if (typeof _driveDataCache !== 'undefined' && _driveDataCache.delete) {
