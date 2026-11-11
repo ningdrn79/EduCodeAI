@@ -776,6 +776,79 @@
       }
     };
 
+    window.bukaModulDetail = window.bukaModulDetail || function(tpKey) {
+      try {
+        if (typeof switchTab === 'function') switchTab('modul');
+        var aliasMap = { 'tp1': 'tp2_1', 'tp2': 'tp2_2', 'tp3': 'tp2_3', 'tp4': 'tp2_4' };
+        var targetKey = aliasMap[tpKey] || tpKey;
+        var allTps = ['tp1_1', 'tp1_2', 'tp1_3', 'tp1_4', 'tp2_1', 'tp2_2', 'tp2_3', 'tp2_4'];
+        allTps.forEach(function(tp) {
+          var content = document.getElementById('konten-modul-' + tp) ||
+            (tp === 'tp2_1' ? document.getElementById('konten-modul-tp1') : null) ||
+            (tp === 'tp2_2' ? document.getElementById('konten-modul-tp2') : null) ||
+            (tp === 'tp2_3' ? document.getElementById('konten-modul-tp3') : null) ||
+            (tp === 'tp2_4' ? document.getElementById('konten-modul-tp4') : null);
+          if (content) {
+            if (tp === targetKey) content.classList.remove('hidden');
+            else content.classList.add('hidden');
+          }
+        });
+        setTimeout(function() {
+          var targetEl = document.getElementById('konten-modul-' + targetKey) ||
+            (targetKey === 'tp2_1' ? document.getElementById('konten-modul-tp1') : null) ||
+            (targetKey === 'tp2_2' ? document.getElementById('konten-modul-tp2') : null) ||
+            (targetKey === 'tp2_3' ? document.getElementById('konten-modul-tp3') : null) ||
+            (targetKey === 'tp2_4' ? document.getElementById('konten-modul-tp4') : null);
+          if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } catch(e) {}
+    };
+
+    window.bukaDrive7KebiasaanDariProta = window.bukaDrive7KebiasaanDariProta || function() {
+      try {
+        if (typeof switchTab === 'function') switchTab('praktik');
+        if (typeof setPraktikSubtab === 'function') setPraktikSubtab('praktik-tp2');
+        setTimeout(function() {
+          var el = document.getElementById('praktik-tp2');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } catch(e) {}
+    };
+
+    window.bukaAplikasiPaintTerbaru = window.bukaAplikasiPaintTerbaru || function() {
+      try {
+        if (typeof switchTab === 'function') switchTab('praktik');
+        if (typeof setPraktikSubtab === 'function') setPraktikSubtab('praktik-tp1');
+        if (typeof setModePraktik1 === 'function') setModePraktik1('gambar');
+        setTimeout(function() {
+          var paintArea = document.getElementById('p1-area-gambar') || document.getElementById('praktik-tp1');
+          if (paintArea) paintArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      } catch(e) {}
+    };
+
+    window.bukaPraktikWordTP2_2 = window.bukaPraktikWordTP2_2 || function() {
+      try {
+        if (typeof switchTab === 'function') switchTab('msword');
+        setTimeout(function() {
+          var el = document.getElementById('tab-msword');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } catch(e) {}
+    };
+
+    window.bukaGaleriHasilPosterSiswa = window.bukaGaleriHasilPosterSiswa || function() {
+      try {
+        if (typeof switchTab === 'function') switchTab('praktik');
+        if (typeof setPraktikSubtab === 'function') setPraktikSubtab('praktik-tp1');
+        if (typeof setModePraktik1 === 'function') setModePraktik1('word');
+        setTimeout(function() {
+          var el = document.getElementById('p1-word-poster-gallery');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      } catch(e) {}
+    };
+
     window.bukaModalLoginGuru = function() {
         try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
         var modal = document.getElementById('modal-login-guru');
@@ -5668,7 +5741,7 @@
                         <button onclick="bukaModulDetail('tp2_1')" class="text-[10px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-md transition cursor-pointer" title="Buka Modul TP 2.1">
                           Buka Modul 📖
                         </button>
-                        <button onclick="switchTab('praktik'); setPraktikSubtab('praktik-tp2')" class="text-[10px] font-bold text-white bg-purple-600 hover:bg-purple-700 px-2.5 py-1 rounded-md shadow-xs transition flex items-center gap-1 cursor-pointer transform hover:scale-105 active:scale-95" title="Buka Drive 7 Kebiasaan TP 2.1">
+                        <button onclick="bukaDrive7KebiasaanDariProta()" class="text-[10px] font-bold text-white bg-purple-600 hover:bg-purple-700 px-2.5 py-1 rounded-md shadow-xs transition flex items-center gap-1 cursor-pointer transform hover:scale-105 active:scale-95" title="Buka Drive 7 Kebiasaan TP 2.1">
                           <i class="fa-solid fa-folder-open"></i> Drive 7 Kebiasaan 📁
                         </button>
                       </div>
@@ -20093,7 +20166,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261111_logout_fix_v133"></script>
+  <script src="app.js?v=20261111_modul_buttons_v134"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

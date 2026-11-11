@@ -2683,13 +2683,22 @@ function gameOverAntariksa() {
 // 5. MODUL DETAIL TAB SWITCHER
 // ==========================================
 function bukaModulDetail(tpKey) {
-  playSound('click');
-  window.speechSynthesis && window.speechSynthesis.cancel();
-  if (typeof tutupModalGambarMateri === 'function') tutupModalGambarMateri();
+  try { playSound('click'); } catch (e) {}
+  if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis.cancel) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+  }
+  if (typeof tutupModalGambarMateri === 'function') {
+    try { tutupModalGambarMateri(); } catch (e) {}
+  }
+
+  // Pastikan berada di Semester 1 untuk TP Semester 1
+  if (typeof pilihSemester === 'function' && typeof state !== 'undefined' && state.currentSemester !== 1) {
+    try { pilihSemester(1); } catch (e) {}
+  }
 
   // Beralih ke tab modul jika belum di tab modul
-  if (state.currentTab !== 'modul') {
-    switchTab('modul');
+  if (typeof state !== 'undefined' && state.currentTab !== 'modul') {
+    if (typeof switchTab === 'function') switchTab('modul');
   }
 
   // Pemetaan alias key
@@ -2738,9 +2747,26 @@ function bukaModulDetail(tpKey) {
     }
   });
 
-  state.currentModul = targetKey;
+  if (typeof state !== 'undefined') {
+    state.currentModul = targetKey;
+  }
 
-  // Gulir halus ke kartu rangkuman modul yang dipilih
+  const labelMap = {
+    'tp1_1': 'TP 1.1: Pengenalan Microsoft Excel',
+    'tp1_2': 'TP 1.2: Memasukkan & Mengatur Data di Excel',
+    'tp1_3': 'TP 1.3: Analisis Data & Rumus SUM, AVERAGE, COUNT',
+    'tp1_4': 'TP 1.4: Grafik & Diagram Pengelolaan Uang',
+    'tp2_1': 'TP 2.1: Konten Digital Sederhana & Drive 7 Kebiasaan',
+    'tp2_2': 'TP 2.2: Menyusun Beberapa Konten Secara Terpisah',
+    'tp2_3': 'TP 2.3: Praktik Lab Word - Tata Letak Poster Menarik',
+    'tp2_4': 'TP 2.4: Galeri Hasil Poster Siswa & Diseminasi'
+  };
+  const toastMsg = labelMap[targetKey] ? `Membuka ${labelMap[targetKey]} 📖✨` : `Membuka Modul TP ${targetKey} 📖✨`;
+  if (typeof showToast === 'function') {
+    showToast(toastMsg, 'info');
+  }
+
+  // Gulir halus langsung ke kartu rangkuman modul yang dipilih
   setTimeout(() => {
     let targetEl = document.getElementById(`konten-modul-${targetKey}`);
     if (!targetEl) {
@@ -2750,10 +2776,31 @@ function bukaModulDetail(tpKey) {
       if (targetKey === 'tp2_4') targetEl = document.getElementById('konten-modul-tp4');
     }
     if (targetEl) {
-      targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, 100);
 }
+window.bukaModulDetail = bukaModulDetail;
+
+// Link Cepat Membuka Drive 7 Kebiasaan langsung dari Tabel PROTA (TP 2.1)
+function bukaDrive7KebiasaanDariProta() {
+  try { playSound('click'); } catch (e) {}
+  if (typeof switchTab === 'function') switchTab('praktik');
+  if (typeof setPraktikSubtab === 'function') {
+    setPraktikSubtab('praktik-tp2');
+  }
+  if (typeof setModeAIStudio === 'function') {
+    setModeAIStudio('drive');
+  }
+  if (typeof showToast === 'function') {
+    showToast('Membuka Drive Koleksi 7 Kebiasaan Anak Indonesia Hebat (TP 2.1)! 📁✨', 'info');
+  }
+  setTimeout(() => {
+    const el = document.getElementById('praktik-tp2');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 150);
+}
+window.bukaDrive7KebiasaanDariProta = bukaDrive7KebiasaanDariProta;
 
 // Fungsi gulir langsung ke tabel PROTA
 function gulirKeTabelProta() {
@@ -2986,7 +3033,6 @@ function tutupModalGambarMateri() {
     modal.style.setProperty('opacity', '0', 'important');
   }
 }
-}
 
 // Buka Tab Kuis & Ambil Sertifikat Resmi Siswa
 function bukaKuisAtauSertifikatSiswa() {
@@ -3013,17 +3059,6 @@ function bukaRoboMindLangsung() {
   }
 }
 window.bukaRoboMindLangsung = bukaRoboMindLangsung;
-
-// Navigasi Subtab Studio Praktik
-function setPraktikSubtab(pKey) {
-  try { playSound('click'); } catch (e) {}
-  if (typeof selectPraktik === 'function') {
-    selectPraktik(pKey);
-  } else if (typeof setModePraktik1 === 'function') {
-    if (pKey === 'praktik-tp1') setModePraktik1('word');
-  }
-}
-window.setPraktikSubtab = setPraktikSubtab;
 
 window.bukaModulDetail = bukaModulDetail;
 window.gulirKeTabelProta = gulirKeTabelProta;
@@ -3252,9 +3287,14 @@ function setPraktikSubtab(pKey) {
       setTimeout(renderGaleriPosterWord, 50);
     }
   } else if (pKey === 'praktik-tp2') {
-    setTimeout(initAIStudioPraktik2, 50);
+    setTimeout(() => {
+      if (typeof initAIStudioPraktik2 === 'function') initAIStudioPraktik2();
+      const el = document.getElementById('praktik-tp2');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
   }
 }
+window.setPraktikSubtab = setPraktikSubtab;
 
 function setModePraktik1(mode) {
   playSound('click');
