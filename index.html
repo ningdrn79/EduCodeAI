@@ -20166,7 +20166,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261111_drive_criteria_v135"></script>
+  <script src="app.js?v=20261111_drive_sync_fix_v136"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
@@ -20260,14 +20260,22 @@
       const studentNama = activeStudent ? (activeStudent.nama || 'Pelajar Uji Coba') : 'Pelajar Uji Coba';
       const studentKelas = activeStudent ? (activeStudent.kelas || '4A') : '4A';
 
-      // 3. Ambil data lokal dari semua kemungkinan kunci storage browser
+      // 3. Ambil data lokal dari kunci penyimpanan siswa aktif (khusus akun siswa ini saja)
       let localDrive = {};
+      const isUjiCoba = (targetId === '3000') || (activeStudent && ((activeStudent.nama || '').toLowerCase().includes('uji coba')));
       const possibleKeys = [
-        'educode_drive_7kebiasaan_' + targetId,
-        'educode_drive_7kebiasaan_3000',
-        'educode_drive_7kebiasaan_tamu_umum',
-        'educode_drive_7kebiasaan_Pelajar Uji Coba'
+        'educode_drive_7kebiasaan_' + targetId
       ];
+      if (activeStudent) {
+        if (activeStudent.id && activeStudent.id !== targetId) possibleKeys.push('educode_drive_7kebiasaan_' + activeStudent.id);
+        if (activeStudent.nama) possibleKeys.push('educode_drive_7kebiasaan_' + activeStudent.nama);
+      }
+      if (isUjiCoba) {
+        possibleKeys.push('educode_drive_7kebiasaan_3000');
+        possibleKeys.push('educode_drive_7kebiasaan_tamu_umum');
+        possibleKeys.push('educode_drive_7kebiasaan_Pelajar Uji Coba');
+      }
+
       for (let k of possibleKeys) {
         try {
           const raw = localStorage.getItem(k);
@@ -20296,6 +20304,20 @@
       // 5. Gabungkan kedua sisi (Auto-Merge Cerdas Antar-Komputer)
       const merged = { ...cloudDrive, ...localDrive };
 
+      // Pembersihan otomatis jika akun siswa asli pernah terinfeksi berkas Pelajar Uji Coba (3000)
+      if (!isUjiCoba) {
+        for (const slotKey of Object.keys(merged)) {
+          const itm = merged[slotKey];
+          if (itm && typeof itm === 'object') {
+            const fn = String(itm.fileName || '');
+            const title = String(itm.title || '');
+            if (fn.includes('Pelajar Uji Coba') || fn.includes('3000') || title.includes('Pelajar Uji Coba')) {
+              delete merged[slotKey];
+            }
+          }
+        }
+      }
+
       // 6. Kompresi gambar besar agar muat aman di limit 1 MB Firestore
       if (label) label.innerHTML = '⏳ Mengoptimasi & Mengunggah...';
       for (const k of Object.keys(merged)) {
@@ -20316,7 +20338,7 @@
 
       await docRef.set(payload, { merge: true });
 
-      // 8. Simpan kembali ke penyimpanan lokal komputer ini
+      // 8. Simpan kembali ke penyimpanan lokal komputer ini (khusus kunci siswa aktif)
       for (let k of possibleKeys) {
         try { localStorage.setItem(k, JSON.stringify(merged)); } catch (e) {}
       }

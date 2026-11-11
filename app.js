@@ -6687,6 +6687,28 @@ function kompresiGambarDataUrl(dataUrl, maxDimension = 600, quality = 0.8, callb
 }
 window.kompresiGambarDataUrl = kompresiGambarDataUrl;
 
+function bersihkanKontaminasiDriveUjiCoba(driveObj, studentProfile) {
+  if (!driveObj || typeof driveObj !== 'object') return driveObj;
+  const activeStudent = studentProfile || ((typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null);
+  const isUjiCoba = !activeStudent || String(activeStudent.nis || '') === '3000' || String(activeStudent.id || '') === 'STD-4A-3000' || ((activeStudent.nama || '').toLowerCase().includes('uji coba'));
+  if (isUjiCoba) return driveObj;
+
+  let cleaned = false;
+  for (const k of Object.keys(driveObj)) {
+    const item = driveObj[k];
+    if (item && typeof item === 'object') {
+      const fn = String(item.fileName || '');
+      const title = String(item.title || '');
+      if (fn.includes('Pelajar Uji Coba') || fn.includes('3000') || title.includes('Pelajar Uji Coba')) {
+        delete driveObj[k];
+        cleaned = true;
+      }
+    }
+  }
+  return driveObj;
+}
+window.bersihkanKontaminasiDriveUjiCoba = bersihkanKontaminasiDriveUjiCoba;
+
 function muatDrive7Kebiasaan(studentProfile) {
   const activeStudent = studentProfile || ((typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null);
   const key = getDriveStorageKey(activeStudent);
@@ -6726,6 +6748,30 @@ function muatDrive7Kebiasaan(studentProfile) {
 
     if (activeStudent.driveData && typeof activeStudent.driveData === 'object') {
       driveObj = { ...activeStudent.driveData, ...driveObj };
+    }
+  }
+
+  // 3. Bersihkan sisa kontaminasi siswa uji coba (3000) pada profil siswa asli
+  const isUjiCoba = !activeStudent || String(activeStudent.nis || '') === '3000' || String(activeStudent.id || '') === 'STD-4A-3000' || ((activeStudent.nama || '').toLowerCase().includes('uji coba'));
+  if (!isUjiCoba && driveObj) {
+    let wasCleaned = false;
+    for (const k of Object.keys(driveObj)) {
+      const item = driveObj[k];
+      if (item && typeof item === 'object') {
+        const fn = String(item.fileName || '');
+        const title = String(item.title || '');
+        if (fn.includes('Pelajar Uji Coba') || fn.includes('3000') || title.includes('Pelajar Uji Coba')) {
+          delete driveObj[k];
+          wasCleaned = true;
+        }
+      }
+    }
+    if (wasCleaned) {
+      try { localStorage.setItem(key, JSON.stringify(driveObj)); } catch (e) {}
+      if (activeStudent && activeStudent.driveData) {
+        activeStudent.driveData = driveObj;
+        try { localStorage.setItem('educode_active_student_v1', JSON.stringify(activeStudent)); } catch (e) {}
+      }
     }
   }
 
@@ -31266,6 +31312,9 @@ function mulaiRealtimeMonitoringDriveGuru() {
         }
 
         if (driveObj && typeof driveObj === 'object') {
+          const sMatch = currentDb.find(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+          driveObj = bersihkanKontaminasiDriveUjiCoba(driveObj, sMatch || { nis: targetNis });
+
           const localKey = 'educode_drive_7kebiasaan_' + targetNis;
           try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch (eL) {}
           _driveDataCache.delete(targetNis);
@@ -31396,6 +31445,9 @@ async function tarikSemuaHasilDriveSiswaDariCloud(silent = false) {
       }
 
       if (driveObj && typeof driveObj === 'object') {
+        const sMatch = currentDb.find(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+        driveObj = bersihkanKontaminasiDriveUjiCoba(driveObj, sMatch || { nis: targetNis });
+
         const localKey = 'educode_drive_7kebiasaan_' + targetNis;
         try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch (eL) {}
         _driveDataCache.delete(targetNis);
@@ -31545,7 +31597,10 @@ function pasangRealtimeSyncDrive(studentNis) {
             const localParsed = localRaw ? JSON.parse(localRaw) : {};
 
             // Penggabungan Cerdas (Auto-Merge): gabungkan data cloud dengan data lokal
-            const merged = { ...localParsed, ...parsed };
+            let merged = { ...localParsed, ...parsed };
+            if (typeof bersihkanKontaminasiDriveUjiCoba === 'function') {
+              merged = bersihkanKontaminasiDriveUjiCoba(merged);
+            }
             const isDiff = JSON.stringify(merged) !== localRaw;
             if (isDiff) {
               localStorage.setItem(driveKey, JSON.stringify(merged));
@@ -31717,7 +31772,10 @@ async function sinkronkanKaryaSiswaDariCloud(profile) {
         const dData = driveDoc.data();
         if (dData && dData.driveData) {
           try {
-            const parsed = JSON.parse(dData.driveData);
+            let parsed = JSON.parse(dData.driveData);
+            if (typeof bersihkanKontaminasiDriveUjiCoba === 'function') {
+              parsed = bersihkanKontaminasiDriveUjiCoba(parsed, activeStudent);
+            }
             const driveKey = getDriveStorageKey();
             localStorage.setItem(driveKey, JSON.stringify(parsed));
           } catch (e) {}
