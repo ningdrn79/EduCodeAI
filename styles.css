@@ -8,8 +8,8 @@
 html {
   margin: 0 !important;
   padding: 0 !important;
-  scroll-behavior: smooth;
-  text-rendering: optimizeLegibility;
+  scroll-behavior: auto;
+  text-rendering: optimizeSpeed;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -87,25 +87,33 @@ h1, h2, h3, h4, h5, h6, .font-title {
 
 
 
-/* 1. Capsule Dock Container 3D (Floating Glass Cyber Dock) */
+/* 1. Capsule Dock Container 3D (Floating Glass Cyber Dock - GPU Optimized) */
 .nav-dock-3d {
-  background: linear-gradient(180deg, rgba(26, 36, 56, 0.95) 0%, rgba(13, 19, 36, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(22, 32, 52, 0.98) 0%, rgba(11, 17, 34, 0.99) 100%);
   border-top: 1.5px solid rgba(255, 255, 255, 0.28);
   border-bottom: 2.5px solid rgba(2, 6, 23, 0.95);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-right: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
-    0 14px 35px -4px rgba(0, 0, 0, 0.8),
-    0 6px 12px rgba(0, 0, 0, 0.6),
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    inset 0 -2px 5px rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+    0 12px 28px -4px rgba(0, 0, 0, 0.75),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22);
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  will-change: transform;
   position: relative;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Optimasi Performa Scroll & Klik (60 FPS pada Daftar Ratusan Kartu Siswa) */
+#guru-drive7k-grid > div,
+#drive-7kebiasaan-grid > div,
+#kartun-grid-results > div,
+#guru-galeri-grid > div {
+  contain: layout style paint;
+}
+
+[class*="backdrop-blur"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 
@@ -2068,10 +2076,9 @@ body.word-fs-active #tab-sem1 > div:not(#word-simulator-window):not(#word-floati
   bottom: -28px;
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(15, 23, 42, 0.96);
   border: 1px solid rgba(56, 189, 248, 0.5);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 10px rgba(56, 189, 248, 0.3);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   color: #ffffff;
   font-family: 'Fredoka', 'Nunito', sans-serif;
   font-weight: 700;

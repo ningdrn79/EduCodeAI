@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261110_modal_zindex_fix_v120">
+  <link rel="stylesheet" href="styles.css?v=20261112_perf_boost_v140">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -1192,13 +1192,10 @@
   <!-- ======================================================== -->
   <!-- BACKGROUND ANTARIKSA (Hitam Penuh Bintang & Planet) -->
   <!-- ======================================================== -->
-  <div id="cosmic-universe-bg" class="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden" style="perspective: 1200px; transform-style: preserve-3d;">
-    <!-- Deep space base & glowing nebulas -->
+  <div id="cosmic-universe-bg" class="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden" style="contain: strict; transform: translateZ(0);">
+    <!-- Deep space base & glowing nebulas (GPU Radial-Gradient ringan tanpa lag blur filter) -->
     <div class="absolute inset-0 bg-[#050714]"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(14,165,233,0.18),rgba(5,7,20,0))]"></div>
-    <div class="absolute top-10 right-0 w-[600px] h-[600px] bg-purple-600/15 rounded-full blur-[130px] animate-pulse-nebula"></div>
-    <div class="absolute bottom-0 left-0 w-[650px] h-[650px] bg-blue-600/15 rounded-full blur-[140px] animate-pulse-nebula" style="animation-delay: 2.5s;"></div>
-    <div class="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-[120px] animate-pulse-nebula" style="animation-delay: 4s;"></div>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(14,165,233,0.18), transparent 70%), radial-gradient(circle 420px at 88% 18%, rgba(147,51,234,0.16), transparent 75%), radial-gradient(circle 460px at 12% 85%, rgba(37,99,235,0.16), transparent 75%), radial-gradient(circle 380px at 35% 55%, rgba(236,72,153,0.10), transparent 75%);"></div>
 
     <!-- ======================================================== -->
     <!-- 1. BUMI 3D (EARTH): BERPUTAR PADA POROS DENGAN BENUA & AWAN -->
@@ -4801,6 +4798,16 @@
           } else {
             if (typeof showToast === 'function') showToast('Data lokal tersinkron dengan aman di perangkat ini!', 'success');
           }
+        };
+
+        // Muat Ulang / Reset Misi Kelas 6
+        window.resetMisiKelas6 = function() {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          if (typeof window.sinkronCloudKelas6 === 'function') {
+            window.sinkronCloudKelas6();
+          }
+          if (typeof renderMisiKelas6 === 'function') renderMisiKelas6();
+          if (typeof showToast === 'function') showToast('Daftar misi Kelas 6 berhasil dimuat ulang! 🚀', 'info');
         };
 
         // Klaim Lencana Karya Kelas 6
@@ -12902,7 +12909,7 @@
           </div>
 
           <!-- Hidden Input untuk Upload Gambar ke Slot Tertentu -->
-          <input type="file" id="drive-slot-upload-input" accept="image/*" class="hidden" onchange="handleDriveSlotUpload(event)">
+          <input type="file" id="drive-slot-upload-input" accept="image/*,.jpg,.jpeg,.png,.webp,.bmp,.gif,.jfif,.svg,.dib,.ico,.avif" style="position:fixed;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px;" onchange="handleDriveSlotUpload(event)">
         </div>
 
         <!-- ======================================================== -->
@@ -20166,7 +20173,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script src="app.js?v=20261111_fix_mojibake_v138"></script>
+  <script charset="UTF-8" src="app.js?v=20261112_full_audit_v140"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
@@ -20199,7 +20206,8 @@
 
   // Kompresi helper sederhana untuk memastikan gambar tidak melebihi batas 1 MB Firestore
   async function kompresGambarUntukCloud(dataUrl, maxSide = 480, quality = 0.65) {
-    if (!dataUrl || typeof dataUrl !== 'string' || dataUrl.length < 80000) return dataUrl;
+    const threshold = maxSide < 480 ? 35000 : 80000;
+    if (!dataUrl || typeof dataUrl !== 'string' || dataUrl.length < threshold) return dataUrl;
     if (dataUrl.startsWith('data:image/svg+xml')) return dataUrl;
     return new Promise((resolve) => {
       const img = new Image();
@@ -20401,14 +20409,21 @@
         showToast('☁️ Menghubungkan ke Cloud Server sd-tzuchi-kelas4...', 'info');
       }
 
-      // Gunakan Direct Google REST API (Paling cepat, 0 lag, bebas timeout)
-      const restUrl = 'https://firestore.googleapis.com/v1/projects/sd-tzuchi-kelas4/databases/(default)/documents/student_drives?key=AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y';
-      const controller = new AbortController();
-      const tId = setTimeout(() => controller.abort(), 4000);
-      try {
-        const res = await fetch(restUrl, { signal: controller.signal });
-        clearTimeout(tId);
-        if (res.ok) {
+      // Gunakan Direct Google REST API dengan Pagination Lengkap (?pageSize=100 + nextPageToken)
+      // Agar SELURUH siswa (tidak terpotong 20 dokumen pertama) terunduh sempurna
+      const baseRestUrl = 'https://firestore.googleapis.com/v1/projects/sd-tzuchi-kelas4/databases/(default)/documents/student_drives?key=AIzaSyDs1XJQTKymX0YG5g28yi9ImSLcn4RtZ5Y&pageSize=100';
+      let nextPageToken = null;
+      let pageLoop = 0;
+
+      while (pageLoop < 20) {
+        pageLoop++;
+        const pageUrl = nextPageToken ? `${baseRestUrl}&pageToken=${encodeURIComponent(nextPageToken)}` : baseRestUrl;
+        const controller = new AbortController();
+        const tId = setTimeout(() => controller.abort(), 15000);
+        try {
+          const res = await fetch(pageUrl, { signal: controller.signal });
+          clearTimeout(tId);
+          if (!res.ok) break;
           const json = await res.json();
           if (json && Array.isArray(json.documents)) {
             json.documents.forEach(docItem => {
@@ -20431,18 +20446,21 @@
               }
             });
           }
+          nextPageToken = json && json.nextPageToken ? json.nextPageToken : null;
+          if (!nextPageToken) break;
+        } catch (eF) {
+          clearTimeout(tId);
+          console.warn('Direct REST fetch error:', eF);
+          break;
         }
-      } catch (eF) {
-        clearTimeout(tId);
-        console.warn('Direct REST fetch error:', eF);
       }
 
-      // Simpan data hasil unduhan ke penyimpanan lokal komputer guru
+      // Simpan data hasil unduhan langsung ke in-memory cache dan penyimpanan komputer guru
       let updatedCount = 0;
       let currentDb = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
 
       docsList.forEach(item => {
-        const targetNis = item.nis;
+        const targetNis = String(item.nis).trim();
         const data = item.data;
         let driveObj = null;
         if (data.driveData) {
@@ -20451,23 +20469,47 @@
           } catch(eP) {}
         }
         if (driveObj && typeof driveObj === 'object') {
+          // Cari siswa berdasarkan NIS, ID, atau fallback Nama + Kelas
+          const docNameClean = String(data.studentName || '').trim().toLowerCase();
+          const docClassClean = String(data.studentClass || '').trim().toLowerCase().replace(/^kelas\s*/i, '');
+          let sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+          if (sIdx < 0 && docNameClean) {
+            sIdx = currentDb.findIndex(s => {
+              const sNameClean = String(s.nama || '').trim().toLowerCase();
+              const sClassClean = String(s.kelas || '').trim().toLowerCase().replace(/^kelas\s*/i, '');
+              return sNameClean === docNameClean && (!docClassClean || sClassClean === docClassClean);
+            });
+          }
+
+          const sMatch = sIdx >= 0 ? currentDb[sIdx] : { nis: targetNis, nama: data.studentName || '' };
           if (typeof bersihkanKontaminasiDriveUjiCoba === 'function') {
-            const sMatch = currentDb.find(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
-            driveObj = bersihkanKontaminasiDriveUjiCoba(driveObj, sMatch || { nis: targetNis });
+            driveObj = bersihkanKontaminasiDriveUjiCoba(driveObj, sMatch);
           }
-          const localKey = 'educode_drive_7kebiasaan_' + targetNis;
+
+          // 1. Simpan langsung ke runtime memory cache dengan semua key pengenal siswa!
+          if (typeof _driveDataCache !== 'undefined') {
+            _driveDataCache.set(targetNis, driveObj);
+            if (sIdx >= 0) {
+              const matched = currentDb[sIdx];
+              if (matched.nis) _driveDataCache.set(String(matched.nis).trim(), driveObj);
+              if (matched.id) _driveDataCache.set(String(matched.id).trim(), driveObj);
+              if (matched.nama) _driveDataCache.set(String(matched.nama).trim(), driveObj);
+            }
+          }
+
+          // 2. Simpan ke local storage siswa (aman dari kuota penuh)
+          const storageNis = (sIdx >= 0 && currentDb[sIdx].nis) ? String(currentDb[sIdx].nis).trim() : targetNis;
+          const localKey = 'educode_drive_7kebiasaan_' + storageNis;
           try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch(eL){}
-          if (typeof _driveDataCache !== 'undefined' && _driveDataCache.delete) {
-            _driveDataCache.delete(targetNis);
-          }
-          const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+
+          // 3. Update data status siswa di database
           if (sIdx >= 0) {
             const evalData = (typeof hitungNilaiDrive7Kebiasaan === 'function')
               ? hitungNilaiDrive7Kebiasaan(driveObj)
               : { totalSkor: 0, filledCount: Object.keys(driveObj).length };
-            currentDb[sIdx].driveData = driveObj;
             currentDb[sIdx].koleksiDrive = evalData.filledCount;
             currentDb[sIdx].nilaiDrive = evalData.totalSkor;
+            currentDb[sIdx].driveData = driveObj;
             currentDb[sIdx].terakhirAktif = 'Tersinkron Cloud';
           }
           updatedCount++;
@@ -20476,9 +20518,6 @@
 
       if (updatedCount > 0 && typeof saveStudentDatabase === 'function') {
         saveStudentDatabase(currentDb);
-        if (typeof _driveDataCache !== 'undefined' && _driveDataCache.clear) {
-          _driveDataCache.clear();
-        }
       }
 
       if (typeof renderMonitoringDrive7KGuru === 'function') {
@@ -20491,7 +20530,7 @@
       if (!silent && typeof showToast === 'function') {
         if (updatedCount > 0) {
           try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
-          showToast(`Berhasil menyinkronkan karya ${updatedCount} siswa dari Cloud!`, 'success');
+          showToast(`🎉 Berhasil menyinkronkan karya ${updatedCount} siswa dari Cloud!`, 'success');
         } else {
           showToast('Data di komputer sudah yang paling mutakhir.', 'info');
         }
