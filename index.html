@@ -530,6 +530,12 @@
               if (rawStd && rawStd !== 'LOGGED_OUT' && rawStd.indexOf('{') !== -1) {
                 var s = JSON.parse(rawStd);
                 if (s && (s.nama || s.nis)) {
+                  var avInfo = (typeof window.dapatkanGayaAvatarSiswa === 'function') ? window.dapatkanGayaAvatarSiswa(s) : {
+                    initial: (s.nama ? s.nama.charAt(0).toUpperCase() : 'S'),
+                    bgGradient: (s.jenisKelamin === 'P' ? 'bg-gradient-to-tr from-rose-500 via-pink-500 to-fuchsia-400 text-white' : (s.jenisKelamin === 'L' ? 'bg-gradient-to-tr from-blue-600 via-sky-500 to-cyan-400 text-white' : 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 text-white')),
+                    badgeBg: (s.jenisKelamin === 'P' ? 'bg-rose-50 text-rose-700 border-rose-200' : (s.jenisKelamin === 'L' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200')),
+                    gender: s.jenisKelamin || 'NETRAL'
+                  };
                   var elAvatar = document.getElementById('welcome-siswa-avatar');
                   var elNama = document.getElementById('welcome-siswa-nama');
                   var elKelas = document.getElementById('welcome-siswa-kelas');
@@ -538,10 +544,17 @@
                   var btnLogout = document.getElementById('btn-welcome-logout');
                   var btnRapor = document.getElementById('btn-welcome-rapor');
                   var btnGanti = document.getElementById('btn-welcome-ganti');
-                  if (elAvatar) { elAvatar.innerText = s.nama ? s.nama.charAt(0).toUpperCase() : 'S'; }
+                  if (elAvatar) { 
+                    elAvatar.innerText = avInfo.initial; 
+                    elAvatar.className = 'w-11 h-11 rounded-2xl ' + avInfo.bgGradient + ' flex items-center justify-center font-black text-base shadow-md flex-shrink-0';
+                  }
                   if (elSub) elSub.innerText = 'Selamat Belajar di Tzu Chi';
                   if (elNama) elNama.innerText = s.nama || 'Siswa';
-                  if (elKelas) elKelas.innerText = 'Kelas ' + (s.kelas || '4A') + ' • Absen ' + (s.absen || '-');
+                  if (elKelas) {
+                    var jkTag = (avInfo.gender === 'L') ? ' • 👦 L' : (avInfo.gender === 'P' ? ' • 👧 P' : '');
+                    elKelas.innerText = 'Kelas ' + (s.kelas || '4A') + ' • Absen ' + (s.absen || '-') + jkTag;
+                    elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold ' + avInfo.badgeBg + ' border';
+                  }
                   if (btnLogin) { btnLogin.classList.add('hidden'); btnLogin.style.setProperty('display', 'none', 'important'); }
                   if (btnLogout) { btnLogout.classList.remove('hidden'); btnLogout.style.setProperty('display', 'inline-flex', 'important'); }
                   if (btnRapor) { btnRapor.classList.remove('hidden'); btnRapor.style.setProperty('display', 'inline-flex', 'important'); }
@@ -1826,16 +1839,23 @@
             var heroGuest = document.getElementById('hero-guest-btn');
             var heroSem = document.getElementById('hero-sem-buttons');
 
+            var avInfo = (typeof window.dapatkanGayaAvatarSiswa === 'function') ? window.dapatkanGayaAvatarSiswa(s) : {
+              initial: (s.nama ? s.nama.charAt(0).toUpperCase() : 'S'),
+              bgGradient: (s.jenisKelamin === 'P' ? 'bg-gradient-to-tr from-rose-500 via-pink-500 to-fuchsia-400 text-white' : (s.jenisKelamin === 'L' ? 'bg-gradient-to-tr from-blue-600 via-sky-500 to-cyan-400 text-white' : 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 text-white')),
+              badgeBg: (s.jenisKelamin === 'P' ? 'bg-rose-50 text-rose-700 border-rose-200' : (s.jenisKelamin === 'L' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200')),
+              gender: s.jenisKelamin || 'NETRAL'
+            };
             if (elAvatar) {
-              elAvatar.innerText = s.nama ? s.nama.charAt(0).toUpperCase() : 'S';
-              elAvatar.className = 'w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center font-black text-base shadow-md flex-shrink-0';
+              elAvatar.innerText = avInfo.initial;
+              elAvatar.className = 'w-11 h-11 rounded-2xl ' + avInfo.bgGradient + ' flex items-center justify-center font-black text-base shadow-md flex-shrink-0';
             }
             if (elSub) elSub.innerText = 'Selamat Belajar di Tzu Chi';
             if (elPing) elPing.classList.remove('hidden');
             if (elNama) elNama.innerText = s.nama || 'Siswa';
             if (elKelas) {
-              elKelas.innerText = 'Kelas ' + (s.kelas || '4A') + ' • Absen ' + (s.absen || '-');
-              elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
+              var jkTag = (avInfo.gender === 'L') ? ' • 👦 L' : (avInfo.gender === 'P' ? ' • 👧 P' : '');
+              elKelas.innerText = 'Kelas ' + (s.kelas || '4A') + ' • Absen ' + (s.absen || '-') + jkTag;
+              elKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold ' + avInfo.badgeBg + ' border';
             }
             if (btnLogin) { 
               btnLogin.classList.add('hidden'); 
@@ -20173,7 +20193,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261112_lab_storage_safe_v141"></script>
+  <script charset="UTF-8" src="app.js?v=20261112_student_avatar_gender_v142"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

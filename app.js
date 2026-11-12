@@ -24333,6 +24333,90 @@ window.resetPinGuruKeDefault = resetPinGuruKeDefault;
 // --------------------------------------------------------------------------
 // PROFIL SISWA AKTIF & KARTU PELAJAR DIGITAL (BERSUMBER LANGSUNG DARI TABEL GURU)
 // --------------------------------------------------------------------------
+
+/**
+ * Menghasilkan inisial dan palet warna avatar dinamis berdasarkan nama & jenis kelamin siswa.
+ * - Laki-laki ('L'): Tema Biru/Cyan ceria & berwibawa
+ * - Perempuan ('P'): Tema Pink/Rose/Fuchsia anggun & ceria
+ * - Akun Uji Coba / Tamu / Belum terdata: Tema Hijau Zamrud (Emerald/Teal)
+ */
+function dapatkanGayaAvatarSiswa(studentOrProfile) {
+  if (!studentOrProfile) {
+    return {
+      initial: '👤',
+      bgGradient: 'bg-gradient-to-tr from-slate-400 to-slate-500 text-white',
+      badgeBg: 'bg-slate-100 text-slate-600 border-slate-300',
+      textColor: 'text-slate-600',
+      borderColor: 'border-slate-300',
+      gender: 'GUEST',
+      genderLabel: 'Tamu',
+      genderColor: 'text-slate-500'
+    };
+  }
+
+  const rawNama = String(studentOrProfile.nama || studentOrProfile.name || '').trim();
+  const initial = rawNama ? rawNama.charAt(0).toUpperCase() : 'S';
+
+  // 1. Ekstrak data jenis kelamin langsung dari objek
+  let jk = String(studentOrProfile.jenisKelamin || studentOrProfile.jk || studentOrProfile.gender || '').trim().toUpperCase();
+
+  // 2. Jika belum ada di objek profil (misal data sesi lama), telusuri dari database siswa
+  if (!jk && typeof getStudentDatabase === 'function') {
+    try {
+      const db = getStudentDatabase();
+      if (Array.isArray(db)) {
+        const found = db.find(s => 
+          (studentOrProfile.id && s.id === studentOrProfile.id) ||
+          (studentOrProfile.nis && s.nis === studentOrProfile.nis) ||
+          (rawNama && s.nama && s.nama.toLowerCase() === rawNama.toLowerCase() && (!studentOrProfile.kelas || s.kelas === studentOrProfile.kelas))
+        );
+        if (found && found.jenisKelamin) {
+          jk = String(found.jenisKelamin).trim().toUpperCase();
+        }
+      }
+    } catch (eJk) {}
+  }
+
+  const isUjiCoba = rawNama.toLowerCase().includes('uji coba') || rawNama.toLowerCase().includes('tamu');
+
+  if (!isUjiCoba && (jk === 'L' || jk.startsWith('LAKI') || jk === 'M' || jk === 'MALE')) {
+    return {
+      initial: initial,
+      bgGradient: 'bg-gradient-to-tr from-blue-600 via-sky-500 to-cyan-400 text-white shadow-md shadow-blue-500/25',
+      badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
+      textColor: 'text-blue-600',
+      borderColor: 'border-blue-400',
+      gender: 'L',
+      genderLabel: 'Laki-laki',
+      genderColor: 'text-sky-600'
+    };
+  } else if (!isUjiCoba && (jk === 'P' || jk.startsWith('PEREMPUAN') || jk === 'WANITA' || jk === 'F' || jk === 'FEMALE')) {
+    return {
+      initial: initial,
+      bgGradient: 'bg-gradient-to-tr from-rose-500 via-pink-500 to-fuchsia-400 text-white shadow-md shadow-pink-500/25',
+      badgeBg: 'bg-rose-50 text-rose-700 border-rose-200',
+      textColor: 'text-rose-600',
+      borderColor: 'border-rose-400',
+      gender: 'P',
+      genderLabel: 'Perempuan',
+      genderColor: 'text-pink-600'
+    };
+  }
+
+  // Akun Uji Coba atau Belum Terdata -> Emerald / Teal (Ciri Khas Tzu Chi)
+  return {
+    initial: initial,
+    bgGradient: 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 text-white shadow-md shadow-emerald-500/25',
+    badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    textColor: 'text-emerald-600',
+    borderColor: 'border-emerald-400',
+    gender: 'NETRAL',
+    genderLabel: isUjiCoba ? 'Pelajar Uji Coba' : 'Pelajar',
+    genderColor: 'text-emerald-600'
+  };
+}
+window.dapatkanGayaAvatarSiswa = dapatkanGayaAvatarSiswa;
+
 function isiDataRaporDigital(student, isTeacherMode = false) {
   if (!student) return;
 
@@ -24393,7 +24477,11 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
   const elStatusBadge = document.getElementById('card-siswa-status-badge');
   const elStatusKkm = document.getElementById('card-siswa-status-kkm');
 
-  if (elAvatar) elAvatar.innerText = student.nama ? student.nama.charAt(0).toUpperCase() : 'S';
+  if (elAvatar) {
+    const avatarInfo = dapatkanGayaAvatarSiswa(student);
+    elAvatar.innerText = avatarInfo.initial;
+    elAvatar.className = `w-14 h-14 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-black text-2xl shadow-lg flex-shrink-0 border-2 border-white/40`;
+  }
   if (elNama) elNama.innerText = student.nama || 'Siswa';
   if (elNis) elNis.innerText = `NIS: ${student.nis || '-'}`;
   if (elKelas) elKelas.innerText = `Kelas ${student.kelas || '4A'}`;
@@ -25003,7 +25091,8 @@ function pilihSiswaDariDropdown(studentId) {
     nis: student.nis || '4101',
     nama: student.nama,
     kelas: student.kelas,
-    absen: student.absen
+    absen: student.absen,
+    jenisKelamin: student.jenisKelamin || student.jk || student.gender || ''
   };
   const isKelas6 = String(profile.kelas || '').includes('6');
   const isKelas5 = String(profile.kelas || '').includes('5');
@@ -25048,20 +25137,24 @@ function simpanProfilSiswa() {
   }
 
   const id = `STD-${kelas}-${absen}`;
-  const profile = { id, nis, nama, kelas, absen };
+  const db = getStudentDatabase();
+  const existStudent = (Array.isArray(db)) ? db.find(s => s.id === id || s.nis === nis || (s.nama && s.nama.toLowerCase() === nama.toLowerCase() && s.kelas === kelas)) : null;
+  const jenisKelamin = (existStudent && (existStudent.jenisKelamin || existStudent.jk || existStudent.gender)) ? (existStudent.jenisKelamin || existStudent.jk || existStudent.gender) : '';
+
+  const profile = { id, nis, nama, kelas, absen, jenisKelamin };
   const isKelas6 = String(kelas || '').includes('6');
   const isKelas5 = String(kelas || '').includes('5');
   const targetTabSimpan = isKelas6 ? 'petualangan6' : (isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5' && state.currentTab !== 'petualangan6') ? state.currentTab : 'beranda'));
   saveActiveStudentSession(profile, targetTabSimpan);
 
   // Pastikan siswa ini ada di database guru
-  const db = getStudentDatabase();
   const existIdx = db.findIndex(s => s.id === id || s.nis === nis || (s.nama.toLowerCase() === nama.toLowerCase() && s.kelas === kelas));
   if (existIdx >= 0) {
     db[existIdx].nama = nama;
     db[existIdx].nis = nis;
     db[existIdx].kelas = kelas;
     db[existIdx].absen = absen;
+    if (jenisKelamin) db[existIdx].jenisKelamin = jenisKelamin;
     db[existIdx].poinBintang = Math.max(db[existIdx].poinBintang, state.userPoints);
     db[existIdx].terakhirAktif = 'Baru saja';
   } else {
@@ -25071,6 +25164,7 @@ function simpanProfilSiswa() {
       nama: nama,
       kelas: kelas,
       absen: absen,
+      jenisKelamin: jenisKelamin || 'L',
       kuisSem1: 0,
       kuisSem2: 0,
       tpSelesai: ['TP 1.1'],
@@ -25371,16 +25465,19 @@ function muatProfilSiswa() {
       if (heroTitle) heroTitle.innerText = 'Belajar Coding & AI Bersama, Untuk Masa Depan';
       if (heroDesc) heroDesc.innerText = 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan budi pekerti bersama SDS Cinta Kasih Tzu Chi.';
     }
+    const avatarInfo = dapatkanGayaAvatarSiswa(profile);
     if (welcomeAvatar) {
-      welcomeAvatar.innerText = profile.nama ? profile.nama.charAt(0).toUpperCase() : 'S';
-      welcomeAvatar.className = 'w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center font-black text-base shadow-md flex-shrink-0';
+      welcomeAvatar.innerText = avatarInfo.initial;
+      welcomeAvatar.className = `w-11 h-11 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-black text-base shadow-md flex-shrink-0 transition-transform duration-300 hover:scale-105`;
+      welcomeAvatar.title = `${profile.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
     }
     if (welcomeSubText) welcomeSubText.innerText = 'Selamat Belajar di Tzu Chi';
     if (welcomePing) welcomePing.classList.remove('hidden');
     if (welcomeNama) welcomeNama.innerText = profile.nama || 'Siswa';
     if (welcomeKelas) {
-      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas6 ? '6A' : (isKelas5 ? '5D' : '4A'))} • Absen ${profile.absen || '-'}`;
-      welcomeKelas.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300';
+      const jkBadge = (avatarInfo.gender === 'L') ? ' • 👦 L' : (avatarInfo.gender === 'P' ? ' • 👧 P' : '');
+      welcomeKelas.innerText = `Kelas ${profile.kelas || (isKelas6 ? '6A' : (isKelas5 ? '5D' : '4A'))} • Absen ${profile.absen || '-'}${jkBadge}`;
+      welcomeKelas.className = `px-2.5 py-0.5 rounded-full text-[11px] font-bold ${avatarInfo.badgeBg} border`;
     }
 
     // Tombol Keluar & Masuk - Eksplisit & Prioritas Tertinggi
@@ -26521,7 +26618,8 @@ function renderTabelGradebook(students, totalAll) {
     const tr = document.createElement('tr');
     tr.className = 'even:bg-slate-50/70 hover:bg-gradient-to-r hover:from-indigo-50/90 hover:via-purple-50/50 hover:to-indigo-50/30 transition-all border-b border-slate-200/90';
 
-    const initial = s.nama ? s.nama.charAt(0).toUpperCase() : 'S';
+    const avatarInfo = dapatkanGayaAvatarSiswa(s);
+    const initial = avatarInfo.initial;
 
     // Perhitungan Nilai Semester 1 (4 Komponen: Kuis Sem 1, Drive 7 Kebiasaan, Poster Word, Tabel Excel)
     let nilaiDrive = s.nilaiDrive;
@@ -26559,7 +26657,7 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[210px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama}">
+            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama} (${avatarInfo.genderLabel})">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
@@ -26644,7 +26742,7 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[210px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-600 to-sky-500 text-white flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama}">
+            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama} (${avatarInfo.genderLabel})">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
@@ -26716,7 +26814,7 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[200px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama}">
+            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama} (${avatarInfo.genderLabel})">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
@@ -26797,7 +26895,12 @@ function bukaModalMonitoringDriveGuru(studentId) {
   if (elKelas) elKelas.innerText = `Kelas ${student.kelas || '4A'}`;
   if (elNis) elNis.innerText = `NIS: ${student.nis || '-'}`;
   if (elAbsen) elAbsen.innerText = `Absen: ${student.absen || '-'}`;
-  if (elAvatar) elAvatar.innerText = student.nama ? student.nama.charAt(0).toUpperCase() : 'S';
+  if (elAvatar) {
+    const avatarInfo = dapatkanGayaAvatarSiswa(student);
+    elAvatar.innerText = avatarInfo.initial;
+    elAvatar.className = `w-11 h-11 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0 border border-white/30`;
+    elAvatar.title = `${student.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
+  }
 
   const driveData = muatDrive7Kebiasaan(student);
   const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
@@ -28323,7 +28426,9 @@ function renderMonitoringDrive7KGuru(isFromRealtime = false) {
       const safeKelas = (typeof escapeXml === 'function') ? escapeXml(s.kelas) : (s.kelas || '');
       const safeNis = (typeof escapeXml === 'function') ? escapeXml(s.nis || '-') : (s.nis || '-');
       const safeAbsen = (typeof escapeXml === 'function') ? escapeXml(s.absen || '-') : (s.absen || '-');
-      const initialLetter = (s.nama || 'S').charAt(0).toUpperCase();
+      const avatarInfo = dapatkanGayaAvatarSiswa(s);
+      const initialLetter = avatarInfo.initial;
+      const jkBadge = (avatarInfo.gender === 'L') ? '<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">👦 L</span>' : (avatarInfo.gender === 'P' ? '<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">👧 P</span>' : '');
 
       const card = document.createElement('div');
       card.className = `bg-white rounded-3xl border-2 ${borderStatusCls} p-4 sm:p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3.5`;
@@ -28331,7 +28436,7 @@ function renderMonitoringDrive7KGuru(isFromRealtime = false) {
         <div>
           <div class="flex items-start justify-between gap-2 mb-2">
             <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-title font-black text-sm flex items-center justify-center shadow-xs shrink-0">
+              <div class="w-10 h-10 rounded-2xl ${avatarInfo.bgGradient} font-title font-black text-sm flex items-center justify-center shadow-xs shrink-0" title="${avatarInfo.genderLabel}">
                 ${initialLetter}
               </div>
               <div class="min-w-0">
@@ -28344,6 +28449,7 @@ function renderMonitoringDrive7KGuru(isFromRealtime = false) {
                   <span>NIS: ${safeNis}</span>
                   <span>•</span>
                   <span>Absen: ${safeAbsen}</span>
+                  ${jkBadge ? `<span>•</span>${jkBadge}` : ''}
                 </div>
               </div>
             </div>
@@ -28423,7 +28529,12 @@ function bukaModalMonitoringDriveGuru(studentId) {
   const penamaanBadge = document.getElementById('mon-drive-penamaan-badge');
   const btnEditNilai = document.getElementById('btn-mon-drive-edit-nilai');
 
-  if (avatarEl) avatarEl.innerText = (student.nama || 'S').charAt(0).toUpperCase();
+  if (avatarEl) {
+    const avatarInfo = dapatkanGayaAvatarSiswa(student);
+    avatarEl.innerText = avatarInfo.initial;
+    avatarEl.className = `w-11 h-11 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0 border border-white/30`;
+    avatarEl.title = `${student.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
+  }
   if (namaEl) namaEl.innerText = student.nama;
   if (kelasEl) kelasEl.innerText = `Kelas ${student.kelas}`;
   if (nisEl) nisEl.innerText = `NIS: ${student.nis || '-'}`;
