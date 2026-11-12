@@ -23633,6 +23633,29 @@ function getStudentDatabase(forceRefresh = false) {
       return true;
     });
 
+    // Deduplikasi siswa: jika ada entri dengan NIS dan ID yang sama, gabungkan nilai terbaiknya
+    const seenMap = new Map();
+    const deduped = [];
+    parsed.forEach(s => {
+      const key = (s.id || '') + '___' + String(s.nis || '').trim() + '___' + String(s.nama || '').trim().toLowerCase();
+      if (!seenMap.has(key)) {
+        seenMap.set(key, s);
+        deduped.push(s);
+      } else {
+        const existing = seenMap.get(key);
+        existing.excelTabel = Math.max(existing.excelTabel || 0, s.excelTabel || 0);
+        existing.nilaiExcel = Math.max(existing.nilaiExcel || 0, s.nilaiExcel || 0);
+        existing.posterWord = Math.max(existing.posterWord || 0, s.posterWord || 0);
+        existing.nilaiPoster = Math.max(existing.nilaiPoster || 0, s.nilaiPoster || 0);
+        existing.kuisSem1 = Math.max(existing.kuisSem1 || 0, s.kuisSem1 || 0);
+        existing.kuisSem2 = Math.max(existing.kuisSem2 || 0, s.kuisSem2 || 0);
+        existing.nilaiDrive = Math.max(existing.nilaiDrive || 0, s.nilaiDrive || 0);
+        existing.koleksiDrive = Math.max(existing.koleksiDrive || 0, s.koleksiDrive || 0);
+        existing.poinBintang = Math.max(existing.poinBintang || 0, s.poinBintang || 0);
+      }
+    });
+    parsed = deduped;
+
     _cachedStudentDatabase = parsed;
     return _cachedStudentDatabase;
   } catch (err) {
@@ -25927,39 +25950,96 @@ function tampilkanHasilPenilaianOtomatis(tipe, evaluasi, judul) {
 // 4. Catat Poster Siswa ke Database Guru dengan Nilai Otomatis
 function catatPosterSiswa(title, previewDataUrl) {
   try {
-    const profile = getActiveStudentProfile();
+    let profile = getActiveStudentProfile();
+    if (!profile) {
+      // Coba pulihkan dari localStorage jika ada sesi
+      try {
+        const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+        if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+      } catch (eLs) {}
+    }
     if (!profile) {
       showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu agar karya poster tersimpan ke buku nilai!', 'warning');
       bukaPilihSiswaCepat();
       return;
     }
     const db = getStudentDatabase();
-    let student = db.find(s => s.id === profile.id || (s.nama.toLowerCase() === profile.nama.toLowerCase() && s.kelas === profile.kelas));
+    const findStudentMatch = (s) => {
+      if (!s) return false;
+      if (profile.id && s.id === profile.id) return true;
+      if (profile.nis && String(s.nis || '').trim() === String(profile.nis).trim()) return true;
+      if (profile.nama && s.nama && s.nama.trim().toLowerCase() === profile.nama.trim().toLowerCase() && (!profile.kelas || s.kelas === profile.kelas)) return true;
+      if (String(profile.nis || '') === '3000' && (String(s.nis || '') === '3000' || (s.nama && s.nama.includes('3000')))) return true;
+      return false;
+    };
+
+    let matches = db.filter(findStudentMatch);
+    if (matches.length === 0) {
+      const newStd = {
+        id: profile.id || `STD-${profile.kelas || '4A'}-${profile.absen || '01'}`,
+        nis: profile.nis || '3000',
+        nama: profile.nama || 'Pelajar Uji Coba (3000)',
+        kelas: profile.kelas || '4A',
+        absen: profile.absen || '01',
+        kuisSem1: 0,
+        kuisSem2: 0,
+        nilaiDrive: 0,
+        koleksiDrive: 0,
+        posterWord: 0,
+        nilaiPoster: 0,
+        excelTabel: 0,
+        nilaiExcel: 0,
+        poinBintang: 50,
+        tpSelesai: ['TP 1.1'],
+        statusKkm: 'Tuntas'
+      };
+      db.push(newStd);
+      matches = [newStd];
+    }
 
     const evaluasi = hitungRubrikOtomatisPosterWord(wordElements, title, wordPageBgColor, wordPageBorderStyle);
 
-    if (student) {
+    matches.forEach(student => {
       student.posterWord = (student.posterWord || 0) + 1;
       student.nilaiPoster = Math.max(student.nilaiPoster || 0, evaluasi.totalSkor);
+      if (!Array.isArray(student.tpSelesai)) student.tpSelesai = ['TP 1.1'];
       if (!student.tpSelesai.includes('TP 2.1')) student.tpSelesai.push('TP 2.1');
       student.poinBintang = (student.poinBintang || 0) + 25;
       student.terakhirAktif = 'Baru saja';
-      saveStudentDatabase(db);
+    });
 
-      // Sinkronkan ke Google Sheets via Webhook (jika guru mengaktifkan Webhook Google Apps Script)
-      if (typeof kirimKeWebhookSheets === 'function') {
+    saveStudentDatabase(db);
+
+    // Sinkronkan sesi siswa aktif
+    profile.posterWord = matches[0].posterWord;
+    profile.nilaiPoster = matches[0].nilaiPoster;
+    if (typeof saveActiveStudentSession === 'function') {
+      try { saveActiveStudentSession(profile); } catch (e) {}
+    }
+
+    // Segarkan tampilan dasbor guru seketika jika sedang terbuka
+    if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+    if (typeof renderKPI === 'function') { try { renderKPI(); } catch(e) {} }
+    if (typeof renderMonitoringDrive7KGuru === 'function') { try { renderMonitoringDrive7KGuru(); } catch(e) {} }
+
+    // Sinkronkan ke Google Sheets via Webhook (jika guru mengaktifkan Webhook Google Apps Script)
+    if (typeof kirimKeWebhookSheets === 'function') {
+      try {
+        const primary = matches[0];
         kirimKeWebhookSheets({
           event: 'simpan_poster',
           type: 'Poster Word',
-          nis: student.nis || profile.nis || '-',
-          nama: student.nama || profile.nama,
-          kelas: student.kelas || profile.kelas,
-          absen: student.absen || profile.absen,
+          nis: primary.nis || profile.nis || '-',
+          nama: primary.nama || profile.nama,
+          kelas: primary.kelas || profile.kelas,
+          absen: primary.absen || profile.absen,
           title: title || 'Poster_Word_Siswa',
           nilai: evaluasi.totalSkor,
           statusKkm: evaluasi.totalSkor >= 80 ? 'Tuntas' : 'Remedial',
           summary: `${wordElements.length} elemen poster (${evaluasi.grade})`
         });
+      } catch (eHook) {
+        console.warn('Webhook sync error:', eHook);
       }
     }
 
@@ -25972,40 +26052,97 @@ function catatPosterSiswa(title, previewDataUrl) {
 // 5. Catat Latihan Excel Siswa ke Database Guru dengan Nilai Otomatis
 function catatLatihanExcelSiswa(namaLatihan = 'Praktik Spreadsheet Excel') {
   try {
-    const profile = getActiveStudentProfile();
+    let profile = getActiveStudentProfile();
+    if (!profile) {
+      // Coba pulihkan dari localStorage jika ada sesi
+      try {
+        const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+        if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+      } catch (eLs) {}
+    }
     if (!profile) {
       showToast('⚠️ Silakan masuk/pilih akun siswa terlebih dahulu agar latihan tersimpan ke buku nilai!', 'warning');
       bukaPilihSiswaCepat();
       return;
     }
     const db = getStudentDatabase();
-    let student = db.find(s => s.id === profile.id || (s.nama.toLowerCase() === profile.nama.toLowerCase() && s.kelas === profile.kelas));
+    const findStudentMatch = (s) => {
+      if (!s) return false;
+      if (profile.id && s.id === profile.id) return true;
+      if (profile.nis && String(s.nis || '').trim() === String(profile.nis).trim()) return true;
+      if (profile.nama && s.nama && s.nama.trim().toLowerCase() === profile.nama.trim().toLowerCase() && (!profile.kelas || s.kelas === profile.kelas)) return true;
+      if (String(profile.nis || '') === '3000' && (String(s.nis || '') === '3000' || (s.nama && s.nama.includes('3000')))) return true;
+      return false;
+    };
+
+    let matches = db.filter(findStudentMatch);
+    if (matches.length === 0) {
+      const newStd = {
+        id: profile.id || `STD-${profile.kelas || '4A'}-${profile.absen || '01'}`,
+        nis: profile.nis || '3000',
+        nama: profile.nama || 'Pelajar Uji Coba (3000)',
+        kelas: profile.kelas || '4A',
+        absen: profile.absen || '01',
+        kuisSem1: 0,
+        kuisSem2: 0,
+        nilaiDrive: 0,
+        koleksiDrive: 0,
+        posterWord: 0,
+        nilaiPoster: 0,
+        excelTabel: 0,
+        nilaiExcel: 0,
+        poinBintang: 50,
+        tpSelesai: ['TP 1.1'],
+        statusKkm: 'Tuntas'
+      };
+      db.push(newStd);
+      matches = [newStd];
+    }
 
     const evaluasi = hitungRubrikOtomatisExcel();
 
-    if (student) {
+    matches.forEach(student => {
       student.excelTabel = (student.excelTabel || 0) + 1;
       student.nilaiExcel = Math.max(student.nilaiExcel || 0, evaluasi.totalSkor);
+      if (!Array.isArray(student.tpSelesai)) student.tpSelesai = ['TP 1.1'];
       if (!student.tpSelesai.includes('TP 1.2')) student.tpSelesai.push('TP 1.2');
       if (!student.tpSelesai.includes('TP 1.3')) student.tpSelesai.push('TP 1.3');
       student.poinBintang = (student.poinBintang || 0) + 25;
       student.terakhirAktif = 'Baru saja';
-      saveStudentDatabase(db);
+    });
 
-      // Sinkronkan ke Google Sheets via Webhook
-      if (typeof kirimKeWebhookSheets === 'function') {
+    saveStudentDatabase(db);
+
+    // Sinkronkan sesi siswa aktif
+    profile.excelTabel = matches[0].excelTabel;
+    profile.nilaiExcel = matches[0].nilaiExcel;
+    if (typeof saveActiveStudentSession === 'function') {
+      try { saveActiveStudentSession(profile); } catch (e) {}
+    }
+
+    // Segarkan tampilan dasbor guru seketika jika sedang terbuka
+    if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+    if (typeof renderKPI === 'function') { try { renderKPI(); } catch(e) {} }
+    if (typeof renderMonitoringDrive7KGuru === 'function') { try { renderMonitoringDrive7KGuru(); } catch(e) {} }
+
+    // Sinkronkan ke Google Sheets via Webhook
+    if (typeof kirimKeWebhookSheets === 'function') {
+      try {
+        const primary = matches[0];
         kirimKeWebhookSheets({
           event: 'latihan_excel',
           type: 'Tabel Excel',
-          nis: student.nis || profile.nis || '-',
-          nama: student.nama || profile.nama,
-          kelas: student.kelas || profile.kelas,
-          absen: student.absen || profile.absen,
+          nis: primary.nis || profile.nis || '-',
+          nama: primary.nama || profile.nama,
+          kelas: primary.kelas || profile.kelas,
+          absen: primary.absen || profile.absen,
           title: namaLatihan,
           nilai: evaluasi.totalSkor,
           statusKkm: evaluasi.totalSkor >= 80 ? 'Tuntas' : 'Remedial',
           summary: `Skor Praktik Spreadsheet (${evaluasi.grade})`
         });
+      } catch (eHook) {
+        console.warn('Webhook sync error:', eHook);
       }
     }
 

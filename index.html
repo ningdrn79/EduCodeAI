@@ -1581,9 +1581,9 @@
             <i class="fa-solid fa-image text-emerald-300 icon-3d-glow"></i> <span>3. Poster</span>
           </button>
 
-          <!-- Menu 4: Scratch Game / Animasi -->
-          <button type="button" onclick="bukaPetualanganZona('zona-scratch')" id="nav-p5-scratch" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 4: Scratch (Aplikasi Game & Animasi)">
-            <i class="fa-solid fa-gamepad text-purple-300 icon-3d-glow"></i> <span>4. Scratch</span>
+          <!-- Menu 4: Game & Coding (Pulau Tekno / Scratch) -->
+          <button type="button" onclick="bukaPetualanganZona('zona-scratch')" id="nav-p5-scratch" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 4: Game & Coding (Pulau Tekno / Scratch)">
+            <i class="fa-solid fa-gamepad text-purple-300 icon-3d-glow"></i> <span>4. Game & Coding</span>
           </button>
 
           <!-- Sound Orb -->
@@ -2618,11 +2618,11 @@
                 <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
                 <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
               </div>
-              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
-              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
             </div>
             <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
-              Buka Scratch &gt;
+              Buka Game &amp; Coding &gt;
             </button>
           </div>
         </div>
@@ -2978,11 +2978,11 @@
                 <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
                 <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
               </div>
-              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
-              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
             </div>
             <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
-              Buka Scratch &gt;
+              Buka Game &amp; Coding &gt;
             </button>
           </div>
         </div>
@@ -3094,15 +3094,15 @@
           </div>
         </button>
 
-        <!-- Menu 4: Scratch -->
+        <!-- Menu 4: Game & Coding -->
         <button type="button" onclick="bukaPetualanganZona('zona-scratch')" id="btn-p5-tab-zona-scratch" class="p-4 rounded-2xl bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-purple-400 hover:text-white shadow text-left transition transform hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between">
           <div class="flex items-center justify-between mb-2">
             <span class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg">🎮</span>
             <span class="text-[10px] font-mono font-bold bg-slate-800 px-2 py-0.5 rounded-full">Menu 4</span>
           </div>
           <div>
-            <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Scratch</h4>
-            <p class="text-[11px] opacity-80 mt-0.5">Aplikasi game &amp; animasi interaktif</p>
+            <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Game &amp; Coding</h4>
+            <p class="text-[11px] opacity-80 mt-0.5">Misi Pulau Tekno &amp; Scratch</p>
           </div>
         </button>
       </div>
@@ -3534,134 +3534,255 @@
       </div>
 
       <!-- ======================================================== -->
-      <!-- MENU 4: SCRATCH (APLIKASI GAME ATAU ANIMASI)             -->
+      <!-- MENU 4: GAME & CODING (PULAU TEKNO / PROYEK SCRATCH)       -->
       <!-- ======================================================== -->
       <div id="p5-zona-scratch" class="p5-zona-content hidden space-y-4">
         <div class="bg-white rounded-3xl border border-purple-200 p-5 sm:p-7 shadow-xl text-slate-800">
+          
+          <!-- Header Misi 4 -->
           <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl font-black">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center text-2xl font-black shadow-md">
               🎮
             </div>
             <div>
-              <span class="text-[11px] font-bold text-purple-600 uppercase tracking-wider bg-purple-50 px-2.5 py-0.5 rounded-full">Menu 4 • Pemrograman Visual</span>
-              <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">Studio Kreativitas Scratch: Aplikasi Game &amp; Animasi</h3>
-              <p class="text-xs text-slate-500">File berupa aplikasi game atau cerita animasi interaktif yang dibuat menggunakan Scratch (Unggah berkas .sb3 atau tautan proyek Scratch daring).</p>
+              <span class="text-[11px] font-bold text-purple-600 uppercase tracking-wider bg-purple-50 px-2.5 py-0.5 rounded-full">Menu 4 • Pemrograman &amp; Game Edukasi</span>
+              <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">Misi Game Interaktif &amp; Studio Coding</h3>
+              <p class="text-xs text-slate-500">Pilih salah satu dari <strong>2 alternatif seru</strong>: Selesaikan <strong>Game Petualangan AI Pulau Tekno</strong> atau rancang <strong>Proyek Game/Animasi Scratch</strong>.</p>
             </div>
           </div>
 
-          <!-- Petunjuk Pengerjaan Scratch -->
-          <div class="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 text-xs text-purple-950 space-y-1 mb-5 leading-relaxed">
-            <div class="font-bold flex items-center gap-1.5 text-sm text-purple-800">
-              <i class="fa-solid fa-code text-purple-600"></i> Ketentuan Pengumpulan Proyek Scratch:
-            </div>
-            <p class="text-purple-900 font-medium">
-              Kamu dapat mengumpulkan karyamu melalui salah satu dari <strong>2 metode fleksibel</strong> di bawah ini:
-            </p>
-            <ul class="list-disc list-inside space-y-0.5 text-purple-900 font-medium">
-              <li><strong>Metode 1 (Unggah File .sb3)</strong>: Simpan proyek dari Scratch ke komputermu (File &gt; Save to your computer) lalu unggah berkasnya di sini.</li>
-              <li><strong>Metode 2 (Tautan / Link Scratch Online)</strong>: Salin link proyek dari web <em>scratch.mit.edu/projects/...</em> yang sudah kamu bagikan (Share).</li>
-            </ul>
-          </div>
-
-          <!-- Form Input Proyek Scratch (2 Metode) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-            
-            <!-- METODE 1: UPLOAD BERKAS .SB3 -->
-            <div class="bg-slate-50 border-2 border-dashed border-purple-300 rounded-3xl p-5 flex flex-col justify-between hover:border-purple-500 transition shadow-2xs">
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-purple-700 bg-purple-100 px-3 py-1 rounded-full">
-                    <i class="fa-solid fa-file-arrow-up text-purple-600"></i> Metode 1: File .sb3
-                  </span>
-                  <span id="badge-status-scratch-file" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Belum Diunggah</span>
-                </div>
-                <h4 class="font-title font-bold text-base text-slate-800">Unggah Berkas Proyek Scratch</h4>
-                <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Unggah file (.sb3) aplikasi game atau animasi yang tersimpan di laptop/komputermu.</p>
-
-                <!-- Box File Upload -->
-                <div class="p-4 bg-white rounded-2xl border border-slate-200 text-center space-y-2">
-                  <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 mx-auto flex items-center justify-center text-xl shadow-inner">
-                    <i class="fa-solid fa-cat"></i>
-                  </div>
-                  <div class="text-xs font-semibold text-slate-700" id="label-file-scratch">Pilih berkas Scratch (.sb3)</div>
-                  <div class="text-[10px] text-slate-400" id="info-file-scratch">Format resmi Scratch 3.0</div>
-                  
-                  <input type="file" id="input-file-scratch" accept=".sb3" onchange="window.handleUploadScratchFile(event)" class="hidden">
-                  <button type="button" onclick="document.getElementById('input-file-scratch').click()" class="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
-                    <i class="fa-solid fa-folder-open"></i> <span>Pilih Berkas .sb3</span>
-                  </button>
-                </div>
-
-                <!-- Detail File Scratch -->
-                <div id="detail-scratch-file-box" class="hidden mt-3 p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-xs space-y-1">
-                  <div class="font-bold text-purple-950 truncate flex items-center gap-1.5">
-                    <i class="fa-solid fa-check text-emerald-600"></i> <span id="nama-file-scratch">Game_Petualangan_Robo.sb3</span>
-                  </div>
-                  <div class="text-[11px] text-slate-500 flex items-center justify-between">
-                    <span id="ukuran-file-scratch">Ukuran: -</span>
-                    <span id="waktu-file-scratch">Tanggal: -</span>
-                  </div>
-                  <div class="pt-2 flex items-center gap-2">
-                    <a id="link-unduh-scratch" href="#" download class="text-[11px] font-bold text-purple-600 hover:underline flex items-center gap-1">
-                      <i class="fa-solid fa-download"></i> Unduh Berkas .sb3
-                    </a>
-                    <span class="text-slate-300">•</span>
-                    <button type="button" onclick="window.hapusFileScratch()" class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
-                      Hapus / Ganti
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- METODE 2: TAUTAN / LINK PROYEK SCRATCH ONLINE -->
-            <div class="bg-slate-50 border-2 border-dashed border-indigo-300 rounded-3xl p-5 flex flex-col justify-between hover:border-indigo-500 transition shadow-2xs">
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full">
-                    <i class="fa-solid fa-link text-indigo-600"></i> Metode 2: Link Scratch Online
-                  </span>
-                  <span id="badge-status-scratch-link" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Tautan Web</span>
-                </div>
-                <h4 class="font-title font-bold text-base text-slate-800">Tautan Proyek Scratch Online</h4>
-                <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Tempelkan tautan URL proyek game atau animasimu yang sudah kamu publikasikan di website Scratch.</p>
-
-                <div class="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
-                  <label class="block text-xs font-bold text-slate-700">Tautan / URL Proyek Scratch:</label>
-                  <div class="flex gap-2">
-                    <input type="url" id="input-link-scratch" placeholder="https://scratch.mit.edu/projects/123456789/" class="flex-1 px-3 py-2 rounded-xl text-xs border border-slate-300 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-800">
-                    <button type="button" onclick="window.ujiBukaLinkScratch()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Buka dan uji coba game Scratch di tab baru">
-                      <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Uji Link</span>
-                    </button>
-                  </div>
-                  <p class="text-[10px] text-slate-400">Contoh: https://scratch.mit.edu/projects/987654321/</p>
-                </div>
-
-                <!-- Input Detail Game -->
-                <div class="mt-4 space-y-2 text-left">
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Judul Game / Animasi:</label>
-                    <input type="text" id="judul-game-scratch" placeholder="Contoh: Game Labirin Pemilah Sampah Bersama Robo" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-bold focus:ring-2 focus:ring-purple-500">
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Petunjuk Cara Bermain (Instruksi Tombol):</label>
-                    <textarea id="cara-main-scratch" rows="2" placeholder="Contoh: Tekan Spasi untuk melompat, gunakan panah kiri/kanan untuk menggerakkan karakter..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-sans"></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Tombol Final Kirim Proyek Scratch -->
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <div class="text-xs text-slate-500" id="status-keseluruhan-scratch">
-              <span class="font-bold text-slate-700">Status Scratch:</span> Siap dikumpulkan melalui berkas .sb3 atau tautan proyek daring.
-            </div>
-            <button type="button" onclick="window.simpanProyekScratchP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-              <i class="fa-solid fa-paper-plane"></i> <span>Kirim Proyek Scratch ke Guru 🎮</span>
+          <!-- Pilihan Tab Jalur Tugas Misi 4 -->
+          <div class="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl mb-5 flex-wrap">
+            <button type="button" onclick="window.pilihJalurMisi4('game')" id="btn-jalur-misi4-game" class="flex-1 min-w-[200px] py-2.5 px-4 rounded-xl font-title font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md cursor-pointer">
+              <span class="text-base">🚀</span>
+              <span>Alternatif 1: Misi Game Pulau Tekno (Rekomendasi)</span>
+            </button>
+            <button type="button" onclick="window.pilihJalurMisi4('scratch')" id="btn-jalur-misi4-scratch" class="flex-1 min-w-[200px] py-2.5 px-4 rounded-xl font-title font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 bg-transparent text-slate-600 hover:text-slate-900 cursor-pointer">
+              <span class="text-base">🐱</span>
+              <span>Alternatif 2: Proyek Scratch (.sb3 / Tautan Online)</span>
             </button>
           </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL A: MISI GAME PULAU TEKNO (https://misigamekelas5.netlify.app/) -->
+          <!-- ======================================================== -->
+          <div id="panel-misi4-game" class="space-y-4">
+            
+            <!-- Hero Card Misi Pulau Tekno -->
+            <div class="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-indigo-950 via-purple-950 to-slate-900 border-2 border-indigo-400/40 text-white shadow-xl relative overflow-hidden">
+              <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+              
+              <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                <div class="space-y-2 max-w-xl">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-bold font-title uppercase tracking-wide flex items-center gap-1.5">
+                      <span>🤖</span> Petualangan AI &amp; Coding Kelas 5 SD
+                    </span>
+                    <span id="badge-status-pulau-tekno" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[10px] font-bold border border-slate-700">
+                      Belum Selesai
+                    </span>
+                  </div>
+                  <h4 class="font-title font-extrabold text-xl sm:text-2xl text-white">
+                    Petualangan AI &amp; Coding: Misi Pulau Tekno 🚀
+                  </h4>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                    Ayo jelajahi Pulau Tekno bersama <strong>Kiko si Robo-Cat</strong>! Selesaikan mini game seru, pecahkan tantangan logika koding, kumpulkan bintang, dan jadilah Pahlawan Koding Kelas 5!
+                  </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-auto shrink-0">
+                  <button type="button" onclick="window.toggleIframePulauTekno()" id="btn-toggle-iframe-game" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-cyan-500/25 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                    <i class="fa-solid fa-gamepad"></i> <span>Mainkan di Halaman Ini 🎮</span>
+                  </button>
+                  <a href="https://misigamekelas5.netlify.app/" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-title font-bold text-xs sm:text-sm border border-white/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-amber-300"></i> <span>Buka Layar Penuh (Tab Baru) ↗️</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Iframe Embedded Game Box (Toggleable) -->
+              <div id="wrapper-iframe-pulau-tekno" class="hidden mt-5 pt-5 border-t border-indigo-400/30 space-y-2">
+                <div class="flex items-center justify-between text-xs text-cyan-200 pb-1">
+                  <span class="flex items-center gap-1.5 font-bold">
+                    <i class="fa-solid fa-display"></i> Layar Game Interaktif: Pulau Tekno (misigamekelas5.netlify.app)
+                  </span>
+                  <button type="button" onclick="window.toggleIframePulauTekno()" class="text-xs text-rose-300 hover:text-white font-bold cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-compress"></i> <span>Tutup Layar Game</span>
+                  </button>
+                </div>
+                <div class="rounded-2xl overflow-hidden border-2 border-indigo-400/60 shadow-2xl bg-slate-950 w-full h-[620px]">
+                  <iframe id="iframe-game-pulau-tekno" src="" class="w-full h-full border-0" allow="fullscreen; autoplay"></iframe>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Laporan Penyelesaian Misi Game Pulau Tekno -->
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+              <div class="flex items-center gap-2 text-slate-800 font-title font-bold text-sm">
+                <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-sm">📝</span>
+                <span>Konfirmasi Capaian Misi Game Pulau Tekno:</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Petualang / Karakter di Game:</label>
+                  <input type="text" id="input-nama-pemain-tekno" placeholder="Contoh: Kiko Jagoan / Nama Siswa" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-bold focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Bintang / XP yang Berhasil Diraih:</label>
+                  <input type="text" id="input-bintang-pemain-tekno" placeholder="Contoh: 15 Bintang ⭐ (Lengkap) / 250 XP" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-bold focus:ring-2 focus:ring-purple-500">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  Unggah Bukti Foto / Tangkapan Layar Game (Opsional):
+                </label>
+                <div class="flex items-center gap-3 flex-wrap">
+                  <input type="file" id="input-bukti-tekno" accept="image/*" onchange="window.handleUploadBuktiTekno(event)" class="hidden">
+                  <button type="button" onclick="document.getElementById('input-bukti-tekno').click()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-camera text-purple-600"></i> <span>Pilih Gambar Bukti</span>
+                  </button>
+                  <span id="label-bukti-tekno" class="text-xs text-slate-500 italic">Belum ada screenshot yang dipilih</span>
+                </div>
+                <div id="preview-bukti-tekno-wrap" class="hidden mt-2">
+                  <img id="preview-bukti-tekno" src="" alt="Bukti Game" class="h-28 rounded-xl border border-purple-200 shadow-sm object-cover">
+                </div>
+              </div>
+
+              <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
+                <span class="text-xs text-slate-500">
+                  <i class="fa-solid fa-circle-check text-emerald-600"></i> Menuntaskan Misi 4 &amp; menambah +25 Bintang ke akunmu.
+                </span>
+                <button type="button" onclick="window.simpanMisiPulauTeknoP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                  <i class="fa-solid fa-paper-plane"></i> <span>Kirim Capaian Game ke Guru 🚀</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- PANEL B: PROYEK SCRATCH (.SB3 / TAUTAN ONLINE)          -->
+          <!-- ======================================================== -->
+          <div id="panel-misi4-scratch" class="hidden space-y-4">
+            
+            <!-- Petunjuk Pengerjaan Scratch -->
+            <div class="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 text-xs text-purple-950 space-y-1 mb-2 leading-relaxed">
+              <div class="font-bold flex items-center gap-1.5 text-sm text-purple-800">
+                <i class="fa-solid fa-code text-purple-600"></i> Ketentuan Pengumpulan Proyek Scratch:
+              </div>
+              <p class="text-purple-900 font-medium">
+                Kamu dapat mengumpulkan karyamu melalui salah satu dari <strong>2 metode fleksibel</strong> di bawah ini:
+              </p>
+              <ul class="list-disc list-inside space-y-0.5 text-purple-900 font-medium">
+                <li><strong>Metode 1 (Unggah File .sb3)</strong>: Simpan proyek dari Scratch ke komputermu (File &gt; Save to your computer) lalu unggah berkasnya di sini.</li>
+                <li><strong>Metode 2 (Tautan / Link Scratch Online)</strong>: Salin link proyek dari web <em>scratch.mit.edu/projects/...</em> yang sudah kamu bagikan (Share).</li>
+              </ul>
+            </div>
+
+            <!-- Form Input Proyek Scratch (2 Metode) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-3">
+              
+              <!-- METODE 1: UPLOAD BERKAS .SB3 -->
+              <div class="bg-slate-50 border-2 border-dashed border-purple-300 rounded-3xl p-5 flex flex-col justify-between hover:border-purple-500 transition shadow-2xs">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-purple-700 bg-purple-100 px-3 py-1 rounded-full">
+                      <i class="fa-solid fa-file-arrow-up text-purple-600"></i> Metode 1: File .sb3
+                    </span>
+                    <span id="badge-status-scratch-file" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Belum Diunggah</span>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-slate-800">Unggah Berkas Proyek Scratch</h4>
+                  <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Unggah file (.sb3) aplikasi game atau animasi yang tersimpan di laptop/komputermu.</p>
+
+                  <!-- Box File Upload -->
+                  <div class="p-4 bg-white rounded-2xl border border-slate-200 text-center space-y-2">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+                      <i class="fa-solid fa-cat"></i>
+                    </div>
+                    <div class="text-xs font-semibold text-slate-700" id="label-file-scratch">Pilih berkas Scratch (.sb3)</div>
+                    <div class="text-[10px] text-slate-400" id="info-file-scratch">Format resmi Scratch 3.0</div>
+                    
+                    <input type="file" id="input-file-scratch" accept=".sb3" onchange="window.handleUploadScratchFile(event)" class="hidden">
+                    <button type="button" onclick="document.getElementById('input-file-scratch').click()" class="mt-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 mx-auto cursor-pointer">
+                      <i class="fa-solid fa-folder-open"></i> <span>Pilih Berkas .sb3</span>
+                    </button>
+                  </div>
+
+                  <!-- Detail File Scratch -->
+                  <div id="detail-scratch-file-box" class="hidden mt-3 p-3 bg-purple-50/70 border border-purple-200 rounded-xl text-xs space-y-1">
+                    <div class="font-bold text-purple-950 truncate flex items-center gap-1.5">
+                      <i class="fa-solid fa-check text-emerald-600"></i> <span id="nama-file-scratch">Game_Petualangan_Robo.sb3</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 flex items-center justify-between">
+                      <span id="ukuran-file-scratch">Ukuran: -</span>
+                      <span id="waktu-file-scratch">Tanggal: -</span>
+                    </div>
+                    <div class="pt-2 flex items-center gap-2">
+                      <a id="link-unduh-scratch" href="#" download class="text-[11px] font-bold text-purple-600 hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-download"></i> Unduh Berkas .sb3
+                      </a>
+                      <span class="text-slate-300">•</span>
+                      <button type="button" onclick="window.hapusFileScratch()" class="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
+                        Hapus / Ganti
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- METODE 2: TAUTAN / LINK PROYEK SCRATCH ONLINE -->
+              <div class="bg-slate-50 border-2 border-dashed border-indigo-300 rounded-3xl p-5 flex flex-col justify-between hover:border-indigo-500 transition shadow-2xs">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-title font-black uppercase text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full">
+                      <i class="fa-solid fa-link text-indigo-600"></i> Metode 2: Link Scratch Online
+                    </span>
+                    <span id="badge-status-scratch-link" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">Tautan Web</span>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-slate-800">Tautan Proyek Scratch Online</h4>
+                  <p class="text-xs text-slate-500 mt-1 mb-4 leading-snug">Tempelkan tautan URL proyek game atau animasimu yang sudah kamu publikasikan di website Scratch.</p>
+
+                  <div class="p-4 bg-white rounded-2xl border border-slate-200 space-y-3">
+                    <label class="block text-xs font-bold text-slate-700">Tautan / URL Proyek Scratch:</label>
+                    <div class="flex gap-2">
+                      <input type="url" id="input-link-scratch" placeholder="https://scratch.mit.edu/projects/123456789/" class="flex-1 px-3 py-2 rounded-xl text-xs border border-slate-300 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-800">
+                      <button type="button" onclick="window.ujiBukaLinkScratch()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="Buka dan uji coba game Scratch di tab baru">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Uji Link</span>
+                      </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400">Contoh: https://scratch.mit.edu/projects/987654321/</p>
+                  </div>
+
+                  <!-- Input Detail Game -->
+                  <div class="mt-4 space-y-2 text-left">
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Judul Game / Animasi:</label>
+                      <input type="text" id="judul-game-scratch" placeholder="Contoh: Game Labirin Pemilah Sampah Bersama Robo" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-bold focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Petunjuk Cara Bermain (Instruksi Tombol):</label>
+                      <textarea id="cara-main-scratch" rows="2" placeholder="Contoh: Tekan Spasi untuk melompat, gunakan panah kiri/kanan untuk menggerakkan karakter..." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs bg-white text-slate-800 font-sans"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Tombol Final Kirim Proyek Scratch -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200">
+              <div class="text-xs text-slate-500" id="status-keseluruhan-scratch">
+                <span class="font-bold text-slate-700">Status Scratch:</span> Siap dikumpulkan melalui berkas .sb3 atau tautan proyek daring.
+              </div>
+              <button type="button" onclick="window.simpanProyekScratchP5()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-paper-plane"></i> <span>Kirim Proyek Scratch ke Guru 🎮</span>
+              </button>
+            </div>
+
+          </div>
+
         </div>
       </div>
 
@@ -5457,7 +5578,161 @@
           if (typeof tambahPoin === 'function') tambahPoin(25);
         };
 
-        // --- MENU 4: SCRATCH (GAME ATAU ANIMASI) ---
+        // --- MENU 4: GAME & CODING (PULAU TEKNO / SCRATCH) ---
+        window.pilihJalurMisi4 = function(jalur) {
+          var btnGame = document.getElementById('btn-jalur-misi4-game');
+          var btnScratch = document.getElementById('btn-jalur-misi4-scratch');
+          var pGame = document.getElementById('panel-misi4-game');
+          var pScratch = document.getElementById('panel-misi4-scratch');
+
+          if (jalur === 'game') {
+            if (pGame) pGame.classList.remove('hidden');
+            if (pScratch) pScratch.classList.add('hidden');
+            if (btnGame) {
+              btnGame.className = 'flex-1 min-w-[200px] py-2.5 px-4 rounded-xl font-title font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md cursor-pointer';
+            }
+            if (btnScratch) {
+              btnScratch.className = 'flex-1 min-w-[200px] py-2.5 px-4 rounded-xl font-title font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 bg-transparent text-slate-600 hover:text-slate-900 cursor-pointer';
+            }
+          } else {
+            if (pGame) pGame.classList.add('hidden');
+            if (pScratch) pScratch.classList.remove('hidden');
+            if (btnGame) {
+              btnGame.className = 'flex-1 min-w-[200px] py-2.5 px-4 rounded-xl font-title font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 bg-transparent text-slate-600 hover:text-slate-900 cursor-pointer';
+            }
+            if (btnScratch) {
+              btnScratch.className = 'flex-1 min-w-[200px] py-2.5 px-4 rounded-xl font-title font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md cursor-pointer';
+            }
+          }
+        };
+
+        window.toggleIframePulauTekno = function() {
+          var wrap = document.getElementById('wrapper-iframe-pulau-tekno');
+          var ifr = document.getElementById('iframe-game-pulau-tekno');
+          var btn = document.getElementById('btn-toggle-iframe-game');
+          if (!wrap) return;
+          var isHidden = wrap.classList.contains('hidden');
+          if (isHidden) {
+            wrap.classList.remove('hidden');
+            if (ifr && (!ifr.src || ifr.src === 'about:blank' || ifr.src.indexOf('misigamekelas5.netlify.app') === -1)) {
+              ifr.src = 'https://misigamekelas5.netlify.app/';
+            }
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-compress"></i> <span>Tutup Layar Game 🔼</span>';
+            try { wrap.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
+          } else {
+            wrap.classList.add('hidden');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-gamepad"></i> <span>Mainkan di Halaman Ini 🎮</span>';
+          }
+        };
+
+        window.handleUploadBuktiTekno = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            var dataUrl = evt.target.result;
+            window._p5Data.scratch = window._p5Data.scratch || {};
+            window._p5Data.scratch.buktiGame = dataUrl;
+            var lbl = document.getElementById('label-bukti-tekno');
+            var img = document.getElementById('preview-bukti-tekno');
+            var wrap = document.getElementById('preview-bukti-tekno-wrap');
+            if (lbl) lbl.innerText = file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)';
+            if (img) img.src = dataUrl;
+            if (wrap) wrap.classList.remove('hidden');
+            simpanKeStorage();
+            try { if (typeof playSound === 'function') playSound('success'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Tangkapan layar bukti game berhasil diunggah! 📸', 'success');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        window.catatMisiGameKelas5KeGuru = function(namaMisi, skorText) {
+          namaMisi = namaMisi || 'Misi Game Pulau Tekno (AI & Coding)';
+          skorText = skorText || '100';
+          try {
+            var profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+            if (!profile) {
+              try {
+                var raw = localStorage.getItem('active_student_profile') || localStorage.getItem('ACTIVE_STUDENT_SESSION');
+                if (raw && raw !== 'LOGGED_OUT' && raw.indexOf('{') !== -1) profile = JSON.parse(raw);
+              } catch (eLs) {}
+            }
+            if (!profile) return;
+            var db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+            var findMatch = function(s) {
+              if (!s) return false;
+              if (profile.id && s.id === profile.id) return true;
+              if (profile.nis && String(s.nis || '').trim() === String(profile.nis).trim()) return true;
+              if (profile.nama && s.nama && s.nama.trim().toLowerCase() === profile.nama.trim().toLowerCase() && (!profile.kelas || s.kelas === profile.kelas)) return true;
+              return false;
+            };
+            var matches = db.filter(findMatch);
+            if (matches.length > 0) {
+              matches.forEach(function(student) {
+                student.projekScratch = Math.max(1, (student.projekScratch || 0) + 1);
+                student.nilaiScratch = 100;
+                student.poinBintang = (student.poinBintang || 0) + 25;
+                student.terakhirAktif = 'Baru saja';
+              });
+              if (typeof saveStudentDatabase === 'function') saveStudentDatabase(db);
+            }
+            profile.projekScratch = Math.max(1, (profile.projekScratch || 0) + 1);
+            profile.nilaiScratch = 100;
+            if (typeof saveActiveStudentSession === 'function') {
+              try { saveActiveStudentSession(profile); } catch(e) {}
+            }
+            if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+            if (typeof renderKPI === 'function') { try { renderKPI(); } catch(e) {} }
+            if (typeof kirimKeWebhookSheets === 'function') {
+              try {
+                kirimKeWebhookSheets({
+                  event: 'misi_kelas5_scratch',
+                  type: 'Game & Coding',
+                  nis: profile.nis || '-',
+                  nama: profile.nama,
+                  kelas: profile.kelas,
+                  absen: profile.absen,
+                  title: namaMisi,
+                  nilai: 100,
+                  statusKkm: 'Tuntas',
+                  summary: 'Menyelesaikan ' + namaMisi + ' (' + skorText + ')'
+                });
+              } catch (eHook) {}
+            }
+          } catch (err) {
+            console.warn('Gagal mencatat misi game kelas 5:', err);
+          }
+        };
+
+        window.simpanMisiPulauTeknoP5 = function() {
+          var inPemain = document.getElementById('input-nama-pemain-tekno');
+          var inBintang = document.getElementById('input-bintang-pemain-tekno');
+          var namaPemain = inPemain ? inPemain.value.trim() : '';
+          var bintangXP = inBintang ? inBintang.value.trim() : '';
+
+          if (!namaPemain && !bintangXP && (!window._p5Data.scratch || !window._p5Data.scratch.buktiGame)) {
+            try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+            if (typeof showToast === 'function') showToast('Isi nama karakter/pemain atau capaian bintang/XP di Game Pulau Tekno terlebih dahulu! 🚀', 'warning');
+            return;
+          }
+
+          window._p5Data.scratch = window._p5Data.scratch || {};
+          window._p5Data.scratch.jalur = 'game_pulau_tekno';
+          window._p5Data.scratch.namaPemain = namaPemain || 'Pahlawan Tekno';
+          window._p5Data.scratch.bintangXP = bintangXP || '15 Bintang ⭐ (Tuntas)';
+          window._p5Data.scratch.time = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+          simpanKeStorage();
+          window.renderScratchView();
+
+          if (typeof window.catatMisiGameKelas5KeGuru === 'function') {
+            window.catatMisiGameKelas5KeGuru('Game Pulau Tekno (AI & Coding)', window._p5Data.scratch.bintangXP);
+          }
+
+          try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+          if (typeof showToast === 'function') showToast('Misi Game Pulau Tekno berhasil dikonfirmasi & nilai tercatat ke Guru! 🚀🌟 (+25 Bintang)', 'success');
+          if (typeof tambahPoin === 'function') tambahPoin(25);
+        };
+
         window.handleUploadScratchFile = function(e) {
           var file = e.target.files && e.target.files[0];
           if (!file) return;
@@ -5510,7 +5785,33 @@
           var inJudul = document.getElementById('judul-game-scratch');
           var inCara = document.getElementById('cara-main-scratch');
 
+          // Pulau Tekno elements
+          var bTekno = document.getElementById('badge-status-pulau-tekno');
+          var inPemain = document.getElementById('input-nama-pemain-tekno');
+          var inBintang = document.getElementById('input-bintang-pemain-tekno');
+          var lblBukti = document.getElementById('label-bukti-tekno');
+          var imgBukti = document.getElementById('preview-bukti-tekno');
+          var wrapBukti = document.getElementById('preview-bukti-tekno-wrap');
+
           if (window._p5Data.scratch) {
+            if (window._p5Data.scratch.jalur === 'game_pulau_tekno' || window._p5Data.scratch.namaPemain) {
+              if (bTekno) {
+                bTekno.innerText = '✅ Selesai (Tuntas)';
+                bTekno.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/40';
+              }
+              if (inPemain && !inPemain.value && window._p5Data.scratch.namaPemain) {
+                inPemain.value = window._p5Data.scratch.namaPemain;
+              }
+              if (inBintang && !inBintang.value && window._p5Data.scratch.bintangXP) {
+                inBintang.value = window._p5Data.scratch.bintangXP;
+              }
+              if (window._p5Data.scratch.buktiGame) {
+                if (imgBukti) imgBukti.src = window._p5Data.scratch.buktiGame;
+                if (wrapBukti) wrapBukti.classList.remove('hidden');
+                if (lblBukti) lblBukti.innerText = 'Tangkapan layar telah diunggah';
+              }
+            }
+
             if (window._p5Data.scratch.dataUrl) {
               if (b) { b.innerText = '✅ Berkas Siap'; b.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full'; }
               if (d) d.classList.remove('hidden');
@@ -5541,10 +5842,16 @@
           }
 
           window._p5Data.scratch = window._p5Data.scratch || {};
+          window._p5Data.scratch.jalur = 'scratch';
           window._p5Data.scratch.link = inLink;
           window._p5Data.scratch.judul = inJudul || 'Proyek Game/Animasi Scratch';
           window._p5Data.scratch.caraMain = inCara;
           simpanKeStorage();
+
+          if (typeof window.catatMisiGameKelas5KeGuru === 'function') {
+            window.catatMisiGameKelas5KeGuru(window._p5Data.scratch.judul, '100');
+          }
+
           try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
           if (typeof showToast === 'function') showToast('Proyek Game/Animasi Scratch berhasil disimpan & dikirim ke Guru! 🎮✨ (+25 Bintang)', 'success');
           if (typeof tambahPoin === 'function') tambahPoin(25);
@@ -8171,8 +8478,8 @@
             </div>
             <div class="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2">
               <span class="text-2xl">🎮</span>
-              <h4 class="font-title font-bold text-sm text-purple-900">4. Proyek Scratch</h4>
-              <p class="text-xs text-slate-600">Unggah file (.sb3) atau tautan game / cerita animasi Scratch.</p>
+              <h4 class="font-title font-bold text-sm text-purple-900">4. Game & Coding (Pulau Tekno / Scratch)</h4>
+              <p class="text-xs text-slate-600">Mainkan Game AI Pulau Tekno atau kirim karya Scratch (.sb3).</p>
               <button type="button" onclick="switchTab('petualangan5'); bukaPetualanganZona('zona-scratch');" class="text-xs font-bold text-purple-700 hover:underline cursor-pointer">Buka Misi 4 &rarr;</button>
             </div>
           </div>
@@ -11649,11 +11956,11 @@
                 <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
                 <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
               </div>
-              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
-              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
             </div>
             <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
-              Buka Scratch &gt;
+              Buka Game &amp; Coding &gt;
             </button>
           </div>
         </div>
@@ -19249,11 +19556,11 @@
                 <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
                 <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
               </div>
-              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
-              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
             </div>
             <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
-              Buka Scratch &gt;
+              Buka Game &amp; Coding &gt;
             </button>
           </div>
         </div>
@@ -19616,11 +19923,11 @@
                 <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
                 <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
               </div>
-              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
-              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
             </div>
             <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
-              Buka Scratch &gt;
+              Buka Game &amp; Coding &gt;
             </button>
           </div>
         </div>
@@ -20140,11 +20447,11 @@
                 <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
                 <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
               </div>
-              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Scratch Proyek</h4>
-              <p class="text-xs text-slate-500 mt-1">Kirim berkas .sb3 atau link game &amp; animasi Scratch.</p>
+              <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
             </div>
             <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
-              Buka Scratch &gt;
+              Buka Game &amp; Coding &gt;
             </button>
           </div>
         </div>
@@ -20193,7 +20500,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261112_student_avatar_gender_v142"></script>
+  <script charset="UTF-8" src="app.js?v=20261112_kelas5_pulau_tekno_v144"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
