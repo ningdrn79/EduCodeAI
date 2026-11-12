@@ -20173,7 +20173,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261112_full_audit_v140"></script>
+  <script charset="UTF-8" src="app.js?v=20261112_lab_storage_safe_v141"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
@@ -20497,10 +20497,15 @@
             }
           }
 
-          // 2. Simpan ke local storage siswa (aman dari kuota penuh)
+          // 2. Simpan ke localStorage HANYA jika ini adalah siswa yang sedang login di perangkat ini
+          // (Mencegah 150+ foto siswa lain memenuhi kuota 5 MB localStorage PC Lab!)
           const storageNis = (sIdx >= 0 && currentDb[sIdx].nis) ? String(currentDb[sIdx].nis).trim() : targetNis;
-          const localKey = 'educode_drive_7kebiasaan_' + storageNis;
-          try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch(eL){}
+          try {
+            const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+            if (activeStd && (String(activeStd.nis || '').trim() === storageNis || String(activeStd.id || '').trim() === targetNis)) {
+              localStorage.setItem('educode_drive_7kebiasaan_' + storageNis, JSON.stringify(driveObj));
+            }
+          } catch(eL){}
 
           // 3. Update data status siswa di database
           if (sIdx >= 0) {
@@ -20551,10 +20556,14 @@
     }
   };
 
-  // Otomatis tarik data cloud saat halaman pertama dibuka
+  // Otomatis tarik seluruh data Cloud saat halaman dibuka HANYA jika akun Guru sedang aktif
+  // (Agar PC Lab siswa tidak ikut mengunduh 150+ foto siswa lain & memenuhi kuota browser)
   setTimeout(() => {
     try {
-      if (typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') {
+      const isGuruActive = (window.__TEACHER_SESSION_ACTIVE__ === true) ||
+        (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) ||
+        (localStorage.getItem('educode_teacher_session_v1') === 'ACTIVE');
+      if (isGuruActive && typeof tarikSemuaHasilDriveSiswaDariCloud === 'function') {
         tarikSemuaHasilDriveSiswaDariCloud(true);
       }
     } catch(e) {}

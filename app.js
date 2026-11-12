@@ -365,15 +365,15 @@ function saveActiveStudentSession(profile, targetTab = null) {
   window.__ACTIVE_STUDENT_PROFILE__ = profile;
   window.__ACTIVE_STUDENT_RESTORED__ = profile;
 
-  // PENTING: Untuk cookie browser, buang gambar base64 besar (driveData) agar tidak melampaui batas 4KB cookie
-  const cookieProfile = { ...profile };
-  delete cookieProfile.driveData;
-  const rawCookie = JSON.stringify(cookieProfile);
-  const raw = JSON.stringify(profile);
+  // PENTING: Untuk localStorage/sessionStorage/cookie, buang gambar base64 besar (driveData)
+  // agar tidak menduplikasi pemakaian kuota 5 MB (driveData disimpan terpisah di kunci Drive/IndexedDB & RAM)
+  const lightProfile = { ...profile };
+  delete lightProfile.driveData;
+  const rawLight = JSON.stringify(lightProfile);
 
-  try { localStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
-  try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, raw); } catch (e) {}
-  try { document.cookie = ACTIVE_STUDENT_KEY + '=' + encodeURIComponent(rawCookie) + '; path=/; max-age=31536000'; } catch (e) {}
+  try { localStorage.setItem(ACTIVE_STUDENT_KEY, rawLight); } catch (e) {}
+  try { sessionStorage.setItem(ACTIVE_STUDENT_KEY, rawLight); } catch (e) {}
+  try { document.cookie = ACTIVE_STUDENT_KEY + '=' + encodeURIComponent(rawLight) + '; path=/; max-age=31536000'; } catch (e) {}
 
   if (targetTab) {
     try { localStorage.setItem(ACTIVE_TAB_KEY, targetTab); } catch (e) {}
@@ -6964,28 +6964,75 @@ function hitungNilaiDrive7Kebiasaan(driveData) {
 }
 window.hitungNilaiDrive7Kebiasaan = hitungNilaiDrive7Kebiasaan;
 
+// Pembersih otomatis cache gambar siswa lain di PC Lab agar kuota 5 MB localStorage tidak pernah penuh
+function bersihkanCacheLokalSiswaLain(keepKey = null) {
+  try {
+    const bulkyPrefixes = [
+      'educode_drive_7kebiasaan_',
+      'educode_poster_galeri_',
+      'educode_word_posters_',
+      'educode_presentasi_',
+      'educode_paint_'
+    ];
+    const keysToEvict = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || k === keepKey) continue;
+      if (bulkyPrefixes.some(p => k.startsWith(p))) {
+        keysToEvict.push(k);
+      }
+    }
+    keysToEvict.forEach(k => {
+      try { localStorage.removeItem(k); } catch (eRem) {}
+    });
+    return keysToEvict.length;
+  } catch (e) {
+    return 0;
+  }
+}
+window.bersihkanCacheLokalSiswaLain = bersihkanCacheLokalSiswaLain;
+
+// Penyimpanan sekunder berkapasitas besar (IndexedDB > 500 MB) untuk ketahanan PC Lab
+function simpanDriveKeIndexedDB(storageKey, dataObj) {
+  try {
+    if (!window.indexedDB || !storageKey) return;
+    const req = window.indexedDB.open('EduCodeLabStorageV1', 1);
+    req.onupgradeneeded = function(ev) {
+      const db = ev.target.result;
+      if (!db.objectStoreNames.contains('drives')) {
+        db.createObjectStore('drives', { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = function(ev) {
+      try {
+        const db = ev.target.result;
+        const tx = db.transaction('drives', 'readwrite');
+        const store = tx.objectStore('drives');
+        store.put({ key: storageKey, data: dataObj, updatedAt: Date.now() });
+      } catch (eTx) {}
+    };
+  } catch (eIdb) {}
+}
+window.simpanDriveKeIndexedDB = simpanDriveKeIndexedDB;
+
 function simpanDrive7Kebiasaan(data) {
   const key = getDriveStorageKey();
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const serialized = JSON.stringify(data);
+
+  // 0. Cadangkan otomatis ke IndexedDB (kapasitas ratusan MB, anti penuh)
+  simpanDriveKeIndexedDB(key, data);
 
   // 1. Simpan ke localStorage dengan pemulihan otomatis jika kuota 5MB lab komputer penuh
   try {
     localStorage.setItem(key, serialized);
   } catch (e) {
     console.warn('Penyimpanan localStorage penuh, membersihkan cache siswa lama...', e);
+    bersihkanCacheLokalSiswaLain(key);
     try {
-      const keysToEvict = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('educode_drive_7kebiasaan_') && k !== key) {
-          keysToEvict.push(k);
-        }
-      }
-      keysToEvict.forEach(k => { try { localStorage.removeItem(k); } catch (eRem) {} });
       localStorage.setItem(key, serialized);
     } catch (eRetry) {
-      console.warn('Tetap melebihi kuota lokal, melanjutkan via memori & Cloud:', eRetry);
+      console.warn('Tetap melebihi kuota lokal, melanjutkan via IndexedDB, memori & Cloud:', eRetry);
     }
   }
 
@@ -7002,7 +7049,6 @@ function simpanDrive7Kebiasaan(data) {
         try {
           saveActiveStudentSession(profile);
         } catch (eSess) {
-          // Jika sesi gagal karena driveData besar, simpan sesi tanpa driveData
           const lightProfile = { ...profile };
           delete lightProfile.driveData;
           saveActiveStudentSession(lightProfile);
@@ -24707,6 +24753,18 @@ async function loginDenganNis() {
     // Tutup modal profil siswa langsung setelah verifikasi berhasil
     tutupModalProfilSiswa();
 
+    // Bersihkan cache gambar siswa lama di PC Lab secara proaktif jika kuota browser mulai terisi > 2 MB
+    try {
+      let approxBytes = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const lk = localStorage.key(i);
+        if (lk) approxBytes += (localStorage.getItem(lk) || '').length;
+      }
+      if (approxBytes > 2000000 && typeof bersihkanCacheLokalSiswaLain === 'function') {
+        bersihkanCacheLokalSiswaLain('educode_drive_7kebiasaan_' + (student.nis || student.id || ''));
+      }
+    } catch (eQuota) {}
+
     // Jalankan pembaruan UI secara aman
     try { muatProfilSiswa(); } catch (eUI) { console.warn('UI update muatProfilSiswa:', eUI); }
     try { setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1')); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
@@ -24771,9 +24829,26 @@ function eksekusiLogoutSiswa() {
   const elWelcomeNama = document.getElementById('welcome-siswa-nama');
   const nama = profile ? profile.nama : (elWelcomeNama ? elWelcomeNama.innerText.trim() : 'Siswa');
 
-  // Simpan pekerjaan Word & Excel siswa yang sedang keluar terlebih dahulu
+  // Simpan pekerjaan Word, Excel & cadangan IndexedDB siswa yang sedang keluar terlebih dahulu
   try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
   try { if (typeof simpanExcelDraftSiswa === 'function') simpanExcelDraftSiswa(); } catch (e) {}
+  try {
+    if (profile && typeof muatDrive7Kebiasaan === 'function' && typeof simpanDriveKeIndexedDB === 'function') {
+      const drv = muatDrive7Kebiasaan(profile);
+      if (drv && Object.keys(drv).length > 0) {
+        simpanDriveKeIndexedDB(getDriveStorageKey(profile), drv);
+      }
+    }
+    // Jaga agar PC Lab tetap lega (< 2 MB) untuk siswa sesi berikutnya
+    let approxBytes = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const lk = localStorage.key(i);
+      if (lk) approxBytes += (localStorage.getItem(lk) || '').length;
+    }
+    if (approxBytes > 2000000 && typeof bersihkanCacheLokalSiswaLain === 'function') {
+      bersihkanCacheLokalSiswaLain(null);
+    }
+  } catch (eClean) {}
 
   // 1. Bersihkan data sesi siswa di seluruh lapisan penyimpanan secara tuntas
   clearActiveStudentSession();
@@ -31390,8 +31465,12 @@ function mulaiRealtimeMonitoringDriveGuru() {
           }
 
           const storageNis = (sIdx >= 0 && currentDb[sIdx].nis) ? String(currentDb[sIdx].nis).trim() : targetNis;
-          const localKey = 'educode_drive_7kebiasaan_' + storageNis;
-          try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch (eL) {}
+          try {
+            const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+            if (activeStd && (String(activeStd.nis || '').trim() === storageNis || String(activeStd.id || '').trim() === targetNis)) {
+              localStorage.setItem('educode_drive_7kebiasaan_' + storageNis, JSON.stringify(driveObj));
+            }
+          } catch (eL) {}
 
           if (sIdx >= 0) {
             const evalData = hitungNilaiDrive7Kebiasaan(driveObj);
@@ -31552,8 +31631,12 @@ async function tarikSemuaHasilDriveSiswaDariCloud(silent = false) {
         }
 
         const storageNis = (sIdx >= 0 && currentDb[sIdx].nis) ? String(currentDb[sIdx].nis).trim() : targetNis;
-        const localKey = 'educode_drive_7kebiasaan_' + storageNis;
-        try { localStorage.setItem(localKey, JSON.stringify(driveObj)); } catch (eL) {}
+        try {
+          const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+          if (activeStd && (String(activeStd.nis || '').trim() === storageNis || String(activeStd.id || '').trim() === targetNis)) {
+            localStorage.setItem('educode_drive_7kebiasaan_' + storageNis, JSON.stringify(driveObj));
+          }
+        } catch (eL) {}
 
         if (sIdx >= 0) {
           const evalData = hitungNilaiDrive7Kebiasaan(driveObj);
