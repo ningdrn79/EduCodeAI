@@ -26552,7 +26552,9 @@ function filterDanCariSiswa() {
   const filterKkm = filterKkmSelect ? filterKkmSelect.value : 'semua';
   const mode = state.modePenilaianGuru || 1;
 
-  const filtered = db.filter(s => {
+  
+  if (typeof mulaiRealtimeMonitoringKelas5Guru === 'function') mulaiRealtimeMonitoringKelas5Guru();
+const filtered = db.filter(s => {
     if (!s) return false;
     // Filter Kelas / Tingkat (Disesuaikan dengan pengampu resmi Ibu Darningsih, S.T.)
     const activeFilter = state.filterKelasGuru || 'semua';
@@ -27311,11 +27313,86 @@ window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 // SISTEM PENILAIAN & MONITORING 4 MENU TUGAS KELAS 5 (PORTOFOLIO)
 // --------------------------------------------------------------------------
 let currentMonitoringK5StudentId = null;
+let _guruKelas5RealtimeUnsubscribe = null;
+const _p5CloudCache = new Map();
+
+function mulaiRealtimeMonitoringKelas5Guru() {
+  let db = (typeof firebaseFirestoreInstance !== 'undefined' && firebaseFirestoreInstance) 
+           ? firebaseFirestoreInstance 
+           : (typeof getInlineFirestore === 'function' ? getInlineFirestore() : null);
+  if (!db && typeof firebase !== 'undefined' && firebase.firestore) {
+    try { db = firebase.firestore(); } catch(e){}
+  }
+  if (!db || _guruKelas5RealtimeUnsubscribe) return;
+
+  try {
+    _guruKelas5RealtimeUnsubscribe = db.collection('karya_presentasi_kelas5').onSnapshot((snapshot) => {
+      if (!snapshot) return;
+      const currentDb = getStudentDatabase();
+      let hasChange = false;
+
+      snapshot.docChanges().forEach((change) => {
+        const data = change.doc.data();
+        if (!data) return;
+        const targetNis = String(data.studentNis || change.doc.id).trim();
+        const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+
+        if (sIdx >= 0) {
+          const student = currentDb[sIdx];
+          student.portofolioP5 = student.portofolioP5 || {};
+          if (data.ppt1) student.portofolioP5.ppt1 = data.ppt1;
+          if (data.ppt2) student.portofolioP5.ppt2 = data.ppt2;
+
+          _p5CloudCache.set(targetNis, student.portofolioP5);
+          if (student.id) _p5CloudCache.set(student.id, student.portofolioP5);
+
+          const rubrik = hitungRubrikPenilaianKelas5(student, student.portofolioP5);
+          student.nilaiPresentasi = rubrik.nilaiPresentasi;
+          student.nilaiAkhirKelas5 = rubrik.nilaiAkhir;
+          student.terakhirAktif = 'Baru saja';
+          hasChange = true;
+
+          if (change.type === 'added' || change.type === 'modified') {
+            if (typeof showToast === 'function') {
+              showToast(`🚀 [Tugas Masuk] ${student.nama} (${student.kelas}) baru saja mengirimkan Tugas Presentasi ke Cloud! ☁️`, 'success');
+            }
+            try { playSound('fanfare'); } catch(e){}
+          }
+
+          if (currentMonitoringK5StudentId && (currentMonitoringK5StudentId === student.id || currentMonitoringK5StudentId === targetNis)) {
+            bukaModalMonitoringPortofolioKelas5(student.id, true);
+          }
+        }
+      });
+
+      if (hasChange) {
+        saveStudentDatabase(currentDb);
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+        if (typeof renderKPI === 'function') renderKPI();
+      }
+    }, (err) => {
+      console.warn('Realtime listener Kelas 5 error:', err);
+      _guruKelas5RealtimeUnsubscribe = null;
+    });
+  } catch(e) {
+    console.warn('Gagal pasang realtime listener Kelas 5:', e);
+  }
+}
+window.mulaiRealtimeMonitoringKelas5Guru = mulaiRealtimeMonitoringKelas5Guru;
+
 
 function dapatkanPortofolioKelas5Siswa(student) {
   if (!student) return { ppt1: null, ppt2: null, sertifikat: null, poster: null, scratch: null };
   const sId = student.id;
   const sNis = student.nis;
+
+  // 1. Cek dari Cloud Cache (Realtime Firestore)
+  if (sNis && _p5CloudCache.has(String(sNis))) {
+    return _p5CloudCache.get(String(sNis));
+  }
+  if (sId && _p5CloudCache.has(String(sId))) {
+    return _p5CloudCache.get(String(sId));
+  }
 
   // 1. Coba dari properti student langsung
   if (student.portofolioP5 && typeof student.portofolioP5 === 'object') {
