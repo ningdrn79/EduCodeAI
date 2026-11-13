@@ -26902,8 +26902,8 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
-            <button onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring 4 Tugas Portofolio Kelas 5" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-folder-open"></i>
+            <button type="button" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}')" title="Monitoring 4 Tugas Portofolio Kelas 5" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
             <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-id-card"></i>
@@ -27021,8 +27021,8 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
-            <button onclick="bukaModalMonitoringDriveGuru('${s.id}')" title="Monitoring Drive 7 Kebiasaan Siswa" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-folder-open"></i>
+            <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id || s.nis || s.nama}')" title="Monitoring Drive 7 Kebiasaan Siswa" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
             <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-id-card"></i>
@@ -27167,131 +27167,207 @@ function renderTabelGradebook(students, totalAll) {
 // --------------------------------------------------------------------------
 function bukaModalMonitoringDriveGuru(studentId) {
   try { playSound('click'); } catch (e) {}
-  const db = getStudentDatabase();
-  const student = db.find(s => s.id === studentId || s.nis === studentId) || {
-    id: studentId,
+  const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+  const safeId = (studentId || '').toString().trim();
+  const student = db.find(s => 
+    (s.id && String(s.id).toLowerCase() === safeId.toLowerCase()) || 
+    (s.nis && String(s.nis) === safeId) || 
+    (s.nama && s.nama.toLowerCase() === safeId.toLowerCase())
+  ) || {
+    id: safeId || 'STD-4A-3201',
+    nis: safeId || '3201',
     nama: 'Siswa',
     kelas: '4A',
-    absen: '01',
-    nis: '-'
+    absen: '01'
   };
+
+  // Jika siswa kelas 5, otomatis buka modal monitoring Portofolio Kelas 5
+  if (student && String(student.kelas || '').includes('5')) {
+    if (typeof bukaModalMonitoringPortofolioKelas5 === 'function') {
+      bukaModalMonitoringPortofolioKelas5(student.id || student.nis || safeId);
+      return;
+    }
+  }
 
   const modal = document.getElementById('modal-monitoring-drive-guru');
   if (!modal) return;
 
-  const elNama = document.getElementById('mon-drive-nama');
-  const elKelas = document.getElementById('mon-drive-kelas');
-  const elNis = document.getElementById('mon-drive-nis');
-  const elAbsen = document.getElementById('mon-drive-absen');
-  const elAvatar = document.getElementById('mon-drive-avatar');
-  const elProgressText = document.getElementById('mon-drive-progress-text');
-  const elProgressBar = document.getElementById('mon-drive-progress-bar');
-  const elNilaiBadge = document.getElementById('mon-drive-nilai-badge');
-  const elPenamaanBadge = document.getElementById('mon-drive-penamaan-badge');
-  const elStatusKkm = document.getElementById('mon-drive-status-kkm');
-  const gridContainer = document.getElementById('mon-drive-grid');
+  const driveData = (typeof dapatkanDriveSiswa === 'function') ? dapatkanDriveSiswa(student) : ((typeof muatDrive7Kebiasaan === 'function') ? muatDrive7Kebiasaan(student) : {});
+  const evalData = (typeof hitungNilaiDrive7Kebiasaan === 'function') ? hitungNilaiDrive7Kebiasaan(driveData) : { filledCount: 0, totalSkor: 0 };
+  const percent = Math.round(((evalData.filledCount || 0) / 7) * 100);
 
-  if (elNama) elNama.innerText = student.nama || 'Siswa';
-  if (elKelas) elKelas.innerText = `Kelas ${student.kelas || '4A'}`;
-  if (elNis) elNis.innerText = `NIS: ${student.nis || '-'}`;
-  if (elAbsen) elAbsen.innerText = `Absen: ${student.absen || '-'}`;
-  if (elAvatar) {
-    const avatarInfo = dapatkanGayaAvatarSiswa(student);
-    elAvatar.innerText = avatarInfo.initial;
-    elAvatar.className = `w-11 h-11 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0 border border-white/30`;
-    elAvatar.title = `${student.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
+  // Set Profile info in Modal
+  const avatarEl = document.getElementById('mon-drive-avatar');
+  const namaEl = document.getElementById('mon-drive-nama');
+  const kelasEl = document.getElementById('mon-drive-kelas');
+  const nisEl = document.getElementById('mon-drive-nis');
+  const absenEl = document.getElementById('mon-drive-absen');
+  const kkmBadge = document.getElementById('mon-drive-status-kkm');
+  const progText = document.getElementById('mon-drive-progress-text');
+  const progBar = document.getElementById('mon-drive-progress-bar');
+  const nilaiBadge = document.getElementById('mon-drive-nilai-badge');
+  const penamaanBadge = document.getElementById('mon-drive-penamaan-badge');
+  const btnEditNilai = document.getElementById('btn-mon-drive-edit-nilai');
+
+  if (avatarEl) {
+    const avatarInfo = (typeof dapatkanGayaAvatarSiswa === 'function') ? dapatkanGayaAvatarSiswa(student) : { initial: 'S', bgGradient: 'bg-purple-600', genderLabel: 'Siswa' };
+    avatarEl.innerText = avatarInfo.initial;
+    avatarEl.className = `w-11 h-11 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0 border border-white/30`;
+    avatarEl.title = `${student.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
+  }
+  if (namaEl) namaEl.innerText = student.nama || 'Siswa';
+  if (kelasEl) kelasEl.innerText = `Kelas ${student.kelas || '4A'}`;
+  if (nisEl) nisEl.innerText = `NIS: ${student.nis || '-'}`;
+  if (absenEl) absenEl.innerText = `Absen: ${student.absen || '-'}`;
+
+  if (kkmBadge) {
+    if ((evalData.totalSkor || 0) >= 80) {
+      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950';
+      kkmBadge.innerText = `✅ TUNTAS (${evalData.totalSkor || 0}/100)`;
+    } else {
+      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-400 text-white';
+      kkmBadge.innerText = `⚠️ PERLU REMEDIAL (${evalData.totalSkor || 0}/100)`;
+    }
   }
 
-  const driveData = muatDrive7Kebiasaan(student);
-  const evalDrive = hitungNilaiDrive7Kebiasaan(driveData);
-
-  const filled = evalDrive.filledCount;
-  const validNames = evalDrive.validNameCount;
-  const total = 7;
-  const pct = Math.round((filled / total) * 100);
-
-  if (elProgressText) elProgressText.innerText = `${filled} dari 7 Gambar Terkumpul (${pct}%)`;
-  if (elProgressBar) elProgressBar.style.width = `${pct}%`;
-  if (elNilaiBadge) elNilaiBadge.innerText = `Nilai TP 2.1: ${evalDrive.totalSkor}`;
-  if (elPenamaanBadge) elPenamaanBadge.innerText = `${validNames}/7 Format Baku`;
-  if (elStatusKkm) {
-    elStatusKkm.innerText = evalDrive.statusKkm === 'Tuntas' ? 'TUNTAS KKM' : 'BELUM TUNTAS';
-    elStatusKkm.className = evalDrive.statusKkm === 'Tuntas' 
-      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300'
-      : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300';
+  if (progText) progText.innerText = `${evalData.filledCount || 0} dari 7 Terkumpul (${percent}%) • ${evalData.catatanAnalisis || ''}`;
+  if (progBar) progBar.style.width = `${percent}%`;
+  if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${evalData.totalSkor || 0}`;
+  if (penamaanBadge) {
+    penamaanBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 shadow-xs flex items-center gap-1.5 flex-wrap';
+    penamaanBadge.innerHTML = `
+      <span class="text-purple-700">🎨 <b>${evalData.paintCount || 0}/3 Paint (${evalData.paintScore || 0}p)</b></span>
+      <span class="text-slate-300">•</span>
+      <span class="text-indigo-700">🤖 <b>${evalData.aiCount || 0}/4 AI (${evalData.aiScore || 0}p)</b></span>
+      <span class="text-slate-300">•</span>
+      <span class="text-emerald-700">📝 <b>${evalData.validNameCount || 0}/7 Baku (${evalData.namaScore || 0}p)</b></span>
+    `;
   }
 
-  // Render 7 Cards
-  if (gridContainer && Array.isArray(DRIVE_7KEBIASAAN_CONFIG)) {
-    gridContainer.innerHTML = DRIVE_7KEBIASAAN_CONFIG.map(cfg => {
-      const item = driveData[cfg.key];
-      const isFilled = !!(item && (item.imageSrc || item.gambar));
-      const imgSrc = item ? (item.imageSrc || item.gambar) : '';
-      const sourceBadge = item ? (item.sourceBadge || 'Gambar') : '';
-      const fileName = item ? (item.fileName || '') : '';
-      const checkName = fileName ? periksaFormatNamaFile(fileName) : { valid: false };
-
-      if (isFilled) {
-        return `
-          <div class="p-3 bg-white rounded-2xl border-2 border-emerald-300 shadow-xs flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between pb-1.5 border-b border-emerald-100">
-                <span class="font-title font-bold text-xs text-slate-800 flex items-center gap-1.5 truncate">
-                  <span class="w-5 h-5 rounded-md bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold shrink-0">${cfg.slotNumber}</span>
-                  <span class="truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</span>
-                </span>
-                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full shrink-0">✓ Ada</span>
-              </div>
-              <div class="relative w-full aspect-video bg-slate-100 rounded-xl overflow-hidden my-2 border border-slate-200">
-                <img src="${imgSrc}" alt="${cfg.cleanTitle}" class="w-full h-full object-cover">
-                <span class="absolute top-1 left-1 text-[9px] font-bold bg-slate-900/80 text-white px-1.5 py-0.5 rounded shadow-2xs">${sourceBadge}</span>
-              </div>
-            </div>
-            <div class="pt-1.5 border-t border-slate-100 text-[10px] space-y-1">
-              <div class="font-mono text-slate-700 truncate font-semibold" title="${fileName || 'Tanpa nama'}">
-                📄 ${fileName || '<i class="text-slate-400 font-normal">Belum dinamai</i>'}
-              </div>
-              <div class="flex items-center gap-1">
-                ${checkName.valid 
-                  ? '<span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"><i class="fa-solid fa-check"></i> Format Baku</span>' 
-                  : '<span class="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200"><i class="fa-solid fa-triangle-exclamation"></i> Belum Baku</span>'}
-              </div>
-            </div>
-          </div>
-        `;
-      } else {
-        return `
-          <div class="p-3 bg-slate-50/80 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col justify-between text-center min-h-[160px]">
-            <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 text-slate-400">
-              <span class="font-title font-bold text-xs text-slate-500 flex items-center gap-1.5 truncate">
-                <span class="w-5 h-5 rounded-md bg-slate-200 text-slate-500 text-[10px] flex items-center justify-center font-bold shrink-0">${cfg.slotNumber}</span>
-                <span class="truncate" title="${cfg.cleanTitle}">${cfg.cleanTitle}</span>
-              </span>
-              <span class="text-[9px] font-bold text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded-full shrink-0">Kosong</span>
-            </div>
-            <div class="py-4 text-slate-300">
-              <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
-              <p class="text-[10px] text-slate-400 mt-1">Belum ada gambar</p>
-            </div>
-            <div class="text-[10px] text-slate-400 italic pt-1 border-t border-slate-200/60">
-              Slot ${cfg.slotNumber}
-            </div>
-          </div>
-        `;
-      }
-    }).join('');
-  }
-
-  const btnEdit = document.getElementById('btn-mon-drive-edit-nilai');
-  if (btnEdit) {
-    btnEdit.onclick = () => {
+  if (btnEditNilai) {
+    btnEditNilai.onclick = () => {
       tutupModalMonitoringDriveGuru();
-      bukaModalDetailSiswa(student.id);
+      if (typeof bukaModalDetailSiswa === 'function') {
+        bukaModalDetailSiswa(student.id || student.nis);
+      }
     };
   }
 
+  // Render 7 Slots in Grid
+  const gridEl = document.getElementById('mon-drive-grid');
+  if (gridEl && Array.isArray(DRIVE_7KEBIASAAN_CONFIG)) {
+    gridEl.innerHTML = '';
+    DRIVE_7KEBIASAAN_CONFIG.forEach(cfg => {
+      const item = driveData[cfg.key];
+      const isFilled = item && (item.imageSrc || item.gambar || item.dataUrl);
+      const isPaintTarget = [1, 5, 7].includes(cfg.slotNumber);
+      const detail = (evalData.slotDetails && evalData.slotDetails[cfg.key]) ? evalData.slotDetails[cfg.key] : {};
+      const targetBadge = isPaintTarget 
+        ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-200">🎨 Wajib Paint (15p)</span>'
+        : '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">🤖 Wajib AI (10p)</span>';
+
+      const slotCard = document.createElement('div');
+      if (isFilled) {
+        const imgSrc = item.imageSrc || item.gambar || item.dataUrl;
+        const fileName = item.fileName || '-';
+        const check = (typeof periksaFormatNamaFile === 'function') ? periksaFormatNamaFile(fileName) : { valid: true };
+        const sourceLabel = item.sumber || item.source || item.sourceBadge || 'Gambar Terunggah';
+        const currentType = detail.actualType || (sourceLabel.toLowerCase().includes('paint') ? 'paint' : 'ai');
+        const nextType = currentType === 'paint' ? 'ai' : 'paint';
+
+        slotCard.className = 'p-3 bg-white rounded-2xl border-2 border-purple-200 shadow-sm space-y-2 flex flex-col justify-between';
+        slotCard.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1 gap-1 flex-wrap">
+              <span class="flex items-center gap-1.5 truncate">
+                <span>${cfg.emoji}</span>
+                <span class="truncate">${cfg.cleanTitle}</span>
+              </span>
+              <div class="flex items-center gap-1 shrink-0">
+                ${targetBadge}
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-black ${detail.status === 'sesuai' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${detail.score || 0}/${detail.maxScore || 10}p
+                </span>
+              </div>
+            </div>
+
+            <!-- Preview Gambar dengan Thumbnail Clickable -->
+            <div class="relative w-full aspect-video bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center cursor-pointer group" onclick="if(typeof bukaModalGambarMateriDariSrc==='function') bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')">
+              <img src="${imgSrc}" alt="${escapeXml(cfg.cleanTitle)}" class="max-h-full max-w-full object-contain rounded group-hover:scale-105 transition">
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
+                <i class="fa-solid fa-expand"></i> Perbesar
+              </div>
+            </div>
+
+            <!-- Info Sumber & Format Nama File -->
+            <div class="mt-2 space-y-1">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-slate-500 font-medium">Sumber:</span>
+                <span class="font-bold text-purple-700 bg-purple-50 px-1 rounded truncate max-w-[150px]">${escapeXml(sourceLabel)}</span>
+              </div>
+              <div class="text-[10px] text-slate-600 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                <div class="text-slate-400 font-medium text-[9px]">Nama File:</div>
+                <div class="font-bold truncate text-slate-800" title="${escapeXml(fileName)}">${escapeXml(fileName)}</div>
+                <div class="mt-1 flex items-center justify-between">
+                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku ✅</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku ⚠️</span>'}
+                  <span class="text-[9px] font-bold ${detail.status === 'sesuai' ? 'text-emerald-700' : 'text-amber-700'}">${detail.score || 0}/${detail.maxScore || 10} Poin</span>
+                </div>
+              </div>
+              
+              <!-- Tombol Koreksi Guru -->
+              <button type="button" onclick="if(typeof guruUbahSumberSlot==='function') guruUbahSumberSlot('${student.id || student.nis}', '${cfg.key}', '${nextType}')" class="w-full mt-1 py-1 px-2 text-[9px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs" title="Ubah status jenis sumber berkas ini">
+                <i class="fa-solid fa-arrows-rotate"></i> Koreksi: ${nextType === 'paint' ? '🎨 Ubah ke Paint' : '🤖 Ubah ke AI'}
+              </button>
+            </div>
+          </div>
+
+          <button type="button" onclick="if(typeof bukaModalGambarMateriDariSrc==='function') bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')" class="w-full mt-2 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-expand text-[10px]"></i> Lihat Ukuran Penuh
+          </button>
+        `;
+      } else {
+        slotCard.className = 'p-3 bg-slate-50/70 rounded-2xl border-2 border-dashed border-slate-300 space-y-2 flex flex-col justify-between text-center';
+        slotCard.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1 gap-1 flex-wrap">
+              <span class="flex items-center gap-1.5 truncate">
+                <span>${cfg.emoji}</span>
+                <span class="truncate">${cfg.cleanTitle}</span>
+              </span>
+              <div class="flex items-center gap-1 shrink-0">
+                ${targetBadge}
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-500 shrink-0">0/${isPaintTarget ? 15 : 10}p</span>
+              </div>
+            </div>
+
+            <div class="h-28 bg-white rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center p-3 text-slate-400">
+              <span class="text-2xl mb-1 opacity-50">${cfg.emoji}</span>
+              <span class="text-[11px] font-bold text-slate-500">Belum Ada Gambar</span>
+              <span class="text-[9px] text-slate-400 mt-1 line-clamp-2">${cfg.slogan}</span>
+            </div>
+          </div>
+
+          <span class="text-[10px] font-medium text-slate-400 italic">
+            Slot #${cfg.slotNumber} belum dikumpulkan (0 Poin)
+          </span>
+        `;
+      }
+      gridEl.appendChild(slotCard);
+    });
+  }
+
+  // Tampilkan Modal Secara Bersih & Pasti Terlihat
   modal.classList.remove('hidden');
-  modal.style.display = 'flex';
+  modal.style.removeProperty('display');
+  modal.style.removeProperty('visibility');
+  modal.style.removeProperty('pointer-events');
+  modal.style.removeProperty('z-index');
+  modal.style.removeProperty('opacity');
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
+  modal.style.setProperty('pointer-events', 'auto', 'important');
+  modal.style.setProperty('z-index', '999999', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
 }
 window.bukaModalMonitoringDriveGuru = bukaModalMonitoringDriveGuru;
 
@@ -27300,6 +27376,11 @@ function tutupModalMonitoringDriveGuru() {
   const modal = document.getElementById('modal-monitoring-drive-guru');
   if (modal) {
     modal.classList.add('hidden');
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('visibility');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('z-index');
+    modal.style.removeProperty('opacity');
     modal.style.setProperty('display', 'none', 'important');
     modal.style.setProperty('pointer-events', 'none', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
@@ -27308,10 +27389,6 @@ function tutupModalMonitoringDriveGuru() {
 }
 window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 
-
-// --------------------------------------------------------------------------
-// SISTEM PENILAIAN & MONITORING 4 MENU TUGAS KELAS 5 (PORTOFOLIO)
-// --------------------------------------------------------------------------
 let currentMonitoringK5StudentId = null;
 let _guruKelas5RealtimeUnsubscribe = null;
 const _p5CloudCache = new Map();
@@ -27526,13 +27603,26 @@ window.hitungRubrikPenilaianKelas5 = hitungRubrikPenilaianKelas5;
 function bukaModalMonitoringPortofolioKelas5(studentId) {
   try { playSound('click'); } catch (e) {}
   const db = getStudentDatabase();
-  const student = db.find(s => s.id === studentId || s.nis === studentId) || {
-    id: studentId,
-    nama: 'Siswa',
+  const safeId = (studentId || '').toString().trim();
+  const student = db.find(s => 
+    (s.id && String(s.id).toLowerCase() === safeId.toLowerCase()) || 
+    (s.nis && String(s.nis) === safeId) || 
+    (s.nama && s.nama.toLowerCase() === safeId.toLowerCase())
+  ) || {
+    id: safeId || 'STD-5D-3107',
+    nis: safeId || '3107',
+    nama: 'Siswa Kelas 5',
     kelas: '5D',
-    absen: '01',
-    nis: '-'
+    absen: '01'
   };
+
+  // Jika siswa BUKAN kelas 5 (misal kelas 4), otomatis alihkan ke monitoring Drive 7 Kebiasaan
+  if (student && !String(student.kelas || '').includes('5')) {
+    if (typeof bukaModalMonitoringDriveGuru === 'function') {
+      bukaModalMonitoringDriveGuru(student.id || student.nis || safeId);
+      return;
+    }
+  }
   currentMonitoringK5StudentId = student.id;
 
   const modal = document.getElementById('modal-monitoring-portofolio-kelas5');
@@ -27738,7 +27828,16 @@ function bukaModalMonitoringPortofolioKelas5(studentId) {
   }
 
   modal.classList.remove('hidden');
-  modal.style.display = 'flex';
+  modal.style.removeProperty('display');
+  modal.style.removeProperty('visibility');
+  modal.style.removeProperty('pointer-events');
+  modal.style.removeProperty('z-index');
+  modal.style.removeProperty('opacity');
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
+  modal.style.setProperty('pointer-events', 'auto', 'important');
+  modal.style.setProperty('z-index', '999999', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
 }
 window.bukaModalMonitoringPortofolioKelas5 = bukaModalMonitoringPortofolioKelas5;
 
@@ -27747,6 +27846,11 @@ function tutupModalMonitoringPortofolioKelas5() {
   const modal = document.getElementById('modal-monitoring-portofolio-kelas5');
   if (modal) {
     modal.classList.add('hidden');
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('visibility');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('z-index');
+    modal.style.removeProperty('opacity');
     modal.style.setProperty('display', 'none', 'important');
     modal.style.setProperty('pointer-events', 'none', 'important');
     modal.style.setProperty('visibility', 'hidden', 'important');
@@ -29406,196 +29510,13 @@ function renderMonitoringDrive7KGuru(isFromRealtime = false) {
 }
 window.renderMonitoringDrive7KGuru = renderMonitoringDrive7KGuru;
 
-function bukaModalMonitoringDriveGuru(studentId) {
-  try { playSound('click'); } catch (e) {}
-  const db = getStudentDatabase();
-  const student = db.find(s => s.id === studentId || s.nis === studentId || (s.nama && s.nama.toLowerCase() === (studentId || '').toLowerCase()));
-  if (!student) {
-    showToast('Data siswa tidak ditemukan!', 'warning');
-    return;
-  }
-
-  const modal = document.getElementById('modal-monitoring-drive-guru');
-  if (!modal) return;
-
-  const driveData = dapatkanDriveSiswa(student);
-  const evalData = hitungNilaiDrive7Kebiasaan(driveData);
-  const percent = Math.round((evalData.filledCount / 7) * 100);
-
-  // Set Profile info in Modal
-  const avatarEl = document.getElementById('mon-drive-avatar');
-  const namaEl = document.getElementById('mon-drive-nama');
-  const kelasEl = document.getElementById('mon-drive-kelas');
-  const nisEl = document.getElementById('mon-drive-nis');
-  const absenEl = document.getElementById('mon-drive-absen');
-  const kkmBadge = document.getElementById('mon-drive-status-kkm');
-  const progText = document.getElementById('mon-drive-progress-text');
-  const progBar = document.getElementById('mon-drive-progress-bar');
-  const nilaiBadge = document.getElementById('mon-drive-nilai-badge');
-  const penamaanBadge = document.getElementById('mon-drive-penamaan-badge');
-  const btnEditNilai = document.getElementById('btn-mon-drive-edit-nilai');
-
-  if (avatarEl) {
-    const avatarInfo = dapatkanGayaAvatarSiswa(student);
-    avatarEl.innerText = avatarInfo.initial;
-    avatarEl.className = `w-11 h-11 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0 border border-white/30`;
-    avatarEl.title = `${student.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
-  }
-  if (namaEl) namaEl.innerText = student.nama;
-  if (kelasEl) kelasEl.innerText = `Kelas ${student.kelas}`;
-  if (nisEl) nisEl.innerText = `NIS: ${student.nis || '-'}`;
-  if (absenEl) absenEl.innerText = `Absen: ${student.absen || '-'}`;
-
-  if (kkmBadge) {
-    if (evalData.totalSkor >= 80) {
-      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950';
-      kkmBadge.innerText = `✅ TUNTAS (${evalData.totalSkor}/100)`;
-    } else {
-      kkmBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-400 text-white';
-      kkmBadge.innerText = `⚠️ PERLU REMEDIAL (${evalData.totalSkor}/100)`;
-    }
-  }
-
-  if (progText) progText.innerText = `${evalData.filledCount} dari 7 Terkumpul (${percent}%) • ${evalData.catatanAnalisis || ''}`;
-  if (progBar) progBar.style.width = `${percent}%`;
-  if (nilaiBadge) nilaiBadge.innerText = `Nilai TP 2.1: ${evalData.totalSkor}`;
-  if (penamaanBadge) {
-    penamaanBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 shadow-xs flex items-center gap-1.5 flex-wrap';
-    penamaanBadge.innerHTML = `
-      <span class="text-purple-700">🎨 <b>${evalData.paintCount || 0}/3 Paint (${evalData.paintScore || 0}p)</b></span>
-      <span class="text-slate-300">•</span>
-      <span class="text-indigo-700">🤖 <b>${evalData.aiCount || 0}/4 AI (${evalData.aiScore || 0}p)</b></span>
-      <span class="text-slate-300">•</span>
-      <span class="text-emerald-700">📝 <b>${evalData.validNameCount || 0}/7 Baku (${evalData.namaScore || 0}p)</b></span>
-    `;
-  }
-
-  if (btnEditNilai) {
-    btnEditNilai.onclick = () => {
-      tutupModalMonitoringDriveGuru();
-      bukaModalDetailSiswa(student.id);
-    };
-  }
-
-  // Render 7 Slots in Grid
-  const gridEl = document.getElementById('mon-drive-grid');
-  if (gridEl) {
-    gridEl.innerHTML = '';
-    DRIVE_7KEBIASAAN_CONFIG.forEach(cfg => {
-      const item = driveData[cfg.key];
-      const isFilled = item && (item.imageSrc || item.gambar || item.dataUrl);
-      const isPaintTarget = [1, 5, 7].includes(cfg.slotNumber);
-      const detail = (evalData.slotDetails && evalData.slotDetails[cfg.key]) ? evalData.slotDetails[cfg.key] : {};
-      const targetBadge = isPaintTarget 
-        ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-200">🎨 Wajib Paint (15p)</span>'
-        : '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">🤖 Wajib AI (10p)</span>';
-
-      const slotCard = document.createElement('div');
-      if (isFilled) {
-        const imgSrc = item.imageSrc || item.gambar || item.dataUrl;
-        const fileName = item.fileName || '-';
-        const check = periksaFormatNamaFile(fileName);
-        const sourceLabel = item.sumber || item.source || item.sourceBadge || 'Gambar Terunggah';
-        const currentType = detail.type || (isPaintTarget ? 'paint' : 'ai');
-        const nextType = (currentType === 'paint') ? 'ai' : 'paint';
-
-        const matchBadge = (detail.status === 'sesuai')
-          ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">✅ Sesuai (+${detail.score}p)</span>`
-          : `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">⚠️ Tidak Sesuai (+${detail.score}/${detail.maxScore}p)</span>`;
-
-        slotCard.className = `p-3 bg-white rounded-2xl border-2 ${detail.status === 'sesuai' ? 'border-emerald-300' : 'border-amber-300'} shadow-xs space-y-2 flex flex-col justify-between`;
-        slotCard.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1 gap-1 flex-wrap">
-              <span class="flex items-center gap-1.5 truncate">
-                <span>${cfg.emoji}</span>
-                <span class="truncate">${cfg.cleanTitle}</span>
-              </span>
-              <div class="flex items-center gap-1 shrink-0">
-                ${targetBadge}
-                ${matchBadge}
-              </div>
-            </div>
-
-            <!-- Thumbnail -->
-            <div class="h-28 bg-slate-900 rounded-xl overflow-hidden relative group cursor-pointer flex items-center justify-center p-1" onclick="bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')">
-              <img src="${imgSrc}" alt="${escapeXml(cfg.cleanTitle)}" class="max-h-full max-w-full object-contain rounded group-hover:scale-105 transition">
-              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
-                <i class="fa-solid fa-expand"></i> Perbesar
-              </div>
-            </div>
-
-            <!-- Info Sumber & Format Nama File -->
-            <div class="mt-2 space-y-1">
-              <div class="flex items-center justify-between text-[10px]">
-                <span class="text-slate-500 font-medium">Sumber:</span>
-                <span class="font-bold text-purple-700 bg-purple-50 px-1 rounded truncate max-w-[150px]">${escapeXml(sourceLabel)}</span>
-              </div>
-              <div class="text-[10px] text-slate-600 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
-                <div class="text-slate-400 font-medium text-[9px]">Nama File:</div>
-                <div class="font-bold truncate text-slate-800" title="${escapeXml(fileName)}">${escapeXml(fileName)}</div>
-                <div class="mt-1 flex items-center justify-between">
-                  ${check.valid ? '<span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">Format Baku ✅</span>' : '<span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">Belum Baku ⚠️</span>'}
-                  <span class="text-[9px] font-bold ${detail.status === 'sesuai' ? 'text-emerald-700' : 'text-amber-700'}">${detail.score}/${detail.maxScore} Poin</span>
-                </div>
-              </div>
-              
-              <!-- Tombol Koreksi Guru -->
-              <button type="button" onclick="guruUbahSumberSlot('${student.id || student.nis}', '${cfg.key}', '${nextType}')" class="w-full mt-1 py-1 px-2 text-[9px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs" title="Ubah status jenis sumber berkas ini">
-                <i class="fa-solid fa-arrows-rotate"></i> Koreksi: ${nextType === 'paint' ? '🎨 Ubah ke Paint' : '🤖 Ubah ke AI'}
-              </button>
-            </div>
-          </div>
-
-          <button type="button" onclick="bukaModalGambarMateriDariSrc('${imgSrc}', 'Slot ${cfg.slotNumber}: ${escapeXml(cfg.cleanTitle)} - ${escapeXml(student.nama)}')" class="w-full mt-2 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-            <i class="fa-solid fa-expand text-[10px]"></i> Lihat Ukuran Penuh
-          </button>
-        `;
-      } else {
-        slotCard.className = 'p-3 bg-slate-50/70 rounded-2xl border-2 border-dashed border-slate-300 space-y-2 flex flex-col justify-between text-center';
-        slotCard.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1 gap-1 flex-wrap">
-              <span class="flex items-center gap-1.5 truncate">
-                <span>${cfg.emoji}</span>
-                <span class="truncate">${cfg.cleanTitle}</span>
-              </span>
-              <div class="flex items-center gap-1 shrink-0">
-                ${targetBadge}
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-500 shrink-0">0/${isPaintTarget ? 15 : 10}p</span>
-              </div>
-            </div>
-
-            <div class="h-28 bg-white rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center p-3 text-slate-400">
-              <span class="text-2xl mb-1 opacity-50">${cfg.emoji}</span>
-              <span class="text-[11px] font-bold text-slate-500">Belum Ada Gambar</span>
-              <span class="text-[9px] text-slate-400 mt-1 line-clamp-2">${cfg.slogan}</span>
-            </div>
-          </div>
-
-          <span class="text-[10px] font-medium text-slate-400 italic">
-            Slot #${cfg.slotNumber} belum dikumpulkan (0 Poin)
-          </span>
-        `;
-      }
-      gridEl.appendChild(slotCard);
-    });
-  }
-
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
+// Ekspor Aman Fungsi Monitoring Drive Guru
+if (typeof bukaModalMonitoringDriveGuru === 'function') {
+  window.bukaModalMonitoringDriveGuru = bukaModalMonitoringDriveGuru;
 }
-window.bukaModalMonitoringDriveGuru = bukaModalMonitoringDriveGuru;
-
-function tutupModalMonitoringDriveGuru() {
-  playSound('click');
-  const modal = document.getElementById('modal-monitoring-drive-guru');
-  if (modal) {
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
-  }
+if (typeof tutupModalMonitoringDriveGuru === 'function') {
+  window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 }
-window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 
 // Koreksi Sumber Dokumen oleh Guru (Mengubah Klasifikasi Paint vs AI secara manual)
 function guruUbahSumberSlot(studentId, habitKey, newType) {
