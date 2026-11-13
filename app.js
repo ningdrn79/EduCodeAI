@@ -23531,6 +23531,8 @@ function pulihkanSemuaSiswaDefault(quiet = false) {
     localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(fresh));
     if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+    if (typeof renderKPI === 'function') renderKPI();
     if (!quiet) {
       showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... ☁️`, 'info');
     }
@@ -23621,6 +23623,27 @@ function getStudentDatabase(forceRefresh = false) {
       }
     }
 
+    // Pastikan seluruh 330 siswa resmi SDS Cinta Kasih Tzu Chi dari SEED_STUDENTS selalu ada
+    if (Array.isArray(SEED_STUDENTS) && SEED_STUDENTS.length > 0) {
+      const existingKeySet = new Set();
+      parsed.forEach(s => {
+        if (s.id) existingKeySet.add(String(s.id).trim().toLowerCase());
+        if (s.nis) existingKeySet.add(String(s.nis).trim().toLowerCase());
+      });
+      let restoredCount = 0;
+      SEED_STUDENTS.forEach(seed => {
+        const seedId = seed.id ? String(seed.id).trim().toLowerCase() : '';
+        const seedNis = seed.nis ? String(seed.nis).trim().toLowerCase() : '';
+        if ((seedId && !existingKeySet.has(seedId)) && (seedNis && !existingKeySet.has(seedNis))) {
+          parsed.push(JSON.parse(JSON.stringify(seed)));
+          restoredCount++;
+        }
+      });
+      if (restoredCount > 0) {
+        try { localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
+      }
+    }
+
     // Bersihkan dari author siswa fiktif dummy bawaan
     const originalLen = parsed.length;
     parsed = parsed.filter(s => !isSiswaContohDummy(s));
@@ -23683,6 +23706,8 @@ function saveStudentDatabase(students) {
     console.error('Error menyimpan database siswa:', e);
   }
 }
+window.getStudentDatabase = getStudentDatabase;
+window.saveStudentDatabase = saveStudentDatabase;
 
 // Helper: Ambil Profil Siswa Aktif (Dukungan Sesi Ganda localStorage & sessionStorage)
 // Catatan: getActiveStudentProfile juga didefinisikan di bagian atas skrip agar aman dari TDZ.
@@ -24558,6 +24583,28 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
   if (elNilaiSem1Status) {
     elNilaiSem1Status.innerText = isSem1Pass ? 'TUNTAS KKM' : 'REMEDIAL';
     elNilaiSem1Status.className = isSem1Pass ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+  }
+
+  const isKelas5StudentRapor = String(student.kelas || '').includes('5');
+  if (isKelas5StudentRapor) {
+    const evalK5 = hitungRubrikPenilaianKelas5(student);
+    if (elStatusKkm) {
+      elStatusKkm.innerText = evalK5.isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
+      elStatusKkm.className = evalK5.isTuntas
+        ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-900 shadow-2xs'
+        : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-2xs animate-pulse';
+    }
+    if (elDrive) elDrive.innerText = evalK5.nilaiPresentasi;
+    if (elDriveSub) elDriveSub.innerText = `${evalK5.berkasPptCount}/2 Berkas PPT`;
+    if (elPoster) elPoster.innerText = evalK5.nilaiSertifikat;
+    if (elPosterSub) elPosterSub.innerText = evalK5.hasSertifikat ? 'Hour of Code Resmi' : 'Belum Ada';
+    if (elExcel) elExcel.innerText = evalK5.nilaiPosterCanva;
+    if (elExcelSub) elExcelSub.innerText = evalK5.hasPoster ? 'Poster PNG Canva' : 'Belum Ada';
+    if (elNilaiSem1) elNilaiSem1.innerText = evalK5.nilaiAkhir;
+    if (elNilaiSem1Status) {
+      elNilaiSem1Status.innerText = evalK5.isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
+      elNilaiSem1Status.className = evalK5.isTuntas ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+    }
   }
 
   // SEMESTER 2 (CODING & AI)
@@ -26646,8 +26693,29 @@ function renderTabelGradebook(students, totalAll) {
   }
 
   // 1. Render Header Tabel Sesuai Mode Penilaian
+  const isTingkat5View = (state.tingkatKelasGuru === '5') || 
+                         (state.filterKelasGuru === 'tingkat_5') || 
+                         (['5A', '5B', '5C', '5D', '5E'].includes(state.filterKelasGuru)) ||
+                         (students.length > 0 && students.every(s => String(s.kelas || '').includes('5')));
+
   if (thead) {
-    if (mode === 1) {
+    if (isTingkat5View) {
+      thead.innerHTML = `
+        <tr id="guru-table-head-row" class="bg-gradient-to-r from-purple-100 via-indigo-100 to-amber-100 border-b-2 border-purple-200 text-purple-950 font-title font-black text-xs sm:text-sm tracking-wider uppercase">
+          <th class="py-4 px-3 text-center w-12">No</th>
+          <th class="py-4 px-3 min-w-[210px]">Data Siswa</th>
+          <th class="py-4 px-2 text-center w-20">Kelas</th>
+          <th class="py-4 px-2 text-center w-36">1. Presentasi (PPT)</th>
+          <th class="py-4 px-2 text-center w-36">2. Sertifikat HOC</th>
+          <th class="py-4 px-2 text-center w-32">3. Poster Canva</th>
+          <th class="py-4 px-2 text-center w-36">4. Game & Coding</th>
+          <th class="py-4 px-2 text-center w-28">Nilai Akhir</th>
+          <th class="py-4 px-2 text-center w-32">Status KKM</th>
+          <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
+          <th class="py-4 px-2 text-center w-28">Aksi</th>
+        </tr>
+      `;
+    } else if (mode === 1) {
       thead.innerHTML = `
         <tr id="guru-table-head-row" class="bg-gradient-to-r from-indigo-100 via-sky-100 to-purple-100 border-b-2 border-indigo-200 text-indigo-950 font-title font-black text-xs sm:text-sm tracking-wider uppercase">
           <th class="py-4 px-3 text-center w-12">No</th>
@@ -26757,6 +26825,99 @@ function renderTabelGradebook(students, totalAll) {
 
     const avatarInfo = dapatkanGayaAvatarSiswa(s);
     const initial = avatarInfo.initial;
+
+    const isKelas5Student = String(s.kelas || '').includes('5');
+    if (isTingkat5View || isKelas5Student) {
+      const evalK5 = hitungRubrikPenilaianKelas5(s);
+      const isPassK5 = evalK5.isTuntas;
+      tr.innerHTML = `
+        <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
+        <td class="${padRow} px-3 min-w-[210px]">
+          <div class="flex items-center gap-3">
+            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital ${s.nama} (${avatarInfo.genderLabel})">
+              ${initial}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="font-title font-black text-slate-900 hover:text-emerald-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Klik untuk Buka Rapor Digital ${s.nama}">
+                ${s.nama}
+              </div>
+              <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-lg font-mono font-black ${szSub} bg-purple-100 text-purple-950 border border-purple-300 shadow-2xs" title="Nomor Induk Siswa">NIS: ${s.nis || '-'}</span>
+                <span class="${szSub} text-slate-700">Absen: <strong class="text-slate-950 font-black">${s.absen || '-'}</strong></span>
+              </div>
+            </div>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <span class="px-3 py-1.5 rounded-xl font-title font-black ${szBadge} shadow-2xs inline-block bg-purple-100 text-purple-900 border-2 border-purple-300">
+            ${s.kelas}
+          </span>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Tugas Presentasi PPT (Manual & Gemini AI)">
+            <span class="font-title font-black ${szAngka} text-indigo-700 group-hover:scale-110 transition">${evalK5.nilaiPresentasi}</span>
+            <span class="font-title font-bold ${szSub} text-indigo-900 mt-1 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200 shadow-2xs group-hover:bg-indigo-100 transition">
+              ${evalK5.berkasPptCount}/2 Berkas
+            </span>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Sertifikat Hour of Code Resmi">
+            <span class="font-title font-black ${szAngka} text-amber-600 group-hover:scale-110 transition">${evalK5.nilaiSertifikat}</span>
+            <span class="font-title font-bold ${szSub} ${evalK5.hasSertifikat ? 'text-amber-900 bg-amber-50 border-amber-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-amber-100 transition">
+              ${evalK5.hasSertifikat ? '🏆 Sertifikat' : 'Belum Ada'}
+            </span>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Poster Lingkungan Canva">
+            <span class="font-title font-black ${szAngka} text-emerald-700 group-hover:scale-110 transition">${evalK5.nilaiPosterCanva}</span>
+            <span class="font-title font-bold ${szSub} ${evalK5.hasPoster ? 'text-emerald-900 bg-emerald-50 border-emerald-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-emerald-100 transition">
+              ${evalK5.hasPoster ? '🎨 Poster PNG' : 'Belum Ada'}
+            </span>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Misi Game & Coding (Pulau Tekno / Scratch)">
+            <span class="font-title font-black ${szAngka} text-purple-700 group-hover:scale-110 transition">${evalK5.nilaiGameCoding}</span>
+            <span class="font-title font-bold ${szSub} ${evalK5.hasGame ? 'text-purple-900 bg-purple-50 border-purple-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-purple-100 transition">
+              ${evalK5.hasGame ? '🎮 Tuntas' : 'Belum Ada'}
+            </span>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <span class="inline-block px-3.5 py-1.5 rounded-xl font-title font-black ${szAngka} bg-purple-100 text-purple-950 border-2 border-purple-300 shadow-2xs">${evalK5.nilaiAkhir}</span>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <span class="font-title font-black ${szTag} px-3 py-1.5 rounded-xl shadow-2xs inline-flex items-center gap-1.5 ${isPassK5 ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+            ${isPassK5 ? '✅ TUNTAS' : '⚠️ REMEDIAL'}
+          </span>
+        </td>
+        <td class="${padRow} px-3">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px]" title="${s.catatanGuru || 'Belum ada catatan'}">
+            ${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <div class="flex items-center justify-center gap-1.5">
+            <button onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring 4 Tugas Portofolio Kelas 5" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open"></i>
+            </button>
+            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card"></i>
+            </button>
+            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      return;
+    }
 
     // Perhitungan Nilai Semester 1 (4 Komponen: Kuis Sem 1, Drive 7 Kebiasaan, Poster Word, Tabel Excel)
     let nilaiDrive = s.nilaiDrive;
@@ -27145,6 +27306,471 @@ function tutupModalMonitoringDriveGuru() {
 }
 window.tutupModalMonitoringDriveGuru = tutupModalMonitoringDriveGuru;
 
+
+// --------------------------------------------------------------------------
+// SISTEM PENILAIAN & MONITORING 4 MENU TUGAS KELAS 5 (PORTOFOLIO)
+// --------------------------------------------------------------------------
+let currentMonitoringK5StudentId = null;
+
+function dapatkanPortofolioKelas5Siswa(student) {
+  if (!student) return { ppt1: null, ppt2: null, sertifikat: null, poster: null, scratch: null };
+  const sId = student.id;
+  const sNis = student.nis;
+
+  // 1. Coba dari properti student langsung
+  if (student.portofolioP5 && typeof student.portofolioP5 === 'object') {
+    return student.portofolioP5;
+  }
+
+  // 2. Coba dari localStorage dengan key NIS/ID siswa
+  try {
+    if (sNis) {
+      const rawNis = localStorage.getItem('educode_p5_data_' + sNis);
+      if (rawNis) return JSON.parse(rawNis);
+    }
+    if (sId) {
+      const rawId = localStorage.getItem('educode_p5_data_' + sId);
+      if (rawId) return JSON.parse(rawId);
+    }
+  } catch(e) {}
+
+  // 3. Fallback: jika siswa aktif saat ini sama dengan student
+  try {
+    const activeProfile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (activeProfile && (activeProfile.id === sId || activeProfile.nis === sNis)) {
+      if (typeof window !== 'undefined' && window._p5Data) return window._p5Data;
+      const rawGlobal = localStorage.getItem('educode_kelas5_karya_v1');
+      if (rawGlobal) return JSON.parse(rawGlobal);
+    }
+  } catch(e) {}
+
+  return { ppt1: null, ppt2: null, sertifikat: null, poster: null, scratch: null };
+}
+window.dapatkanPortofolioKelas5Siswa = dapatkanPortofolioKelas5Siswa;
+
+function simpanPortofolioKelas5Siswa(student, p5Data) {
+  if (!student || !p5Data) return;
+  const sId = student.id;
+  const sNis = student.nis;
+
+  student.portofolioP5 = JSON.parse(JSON.stringify(p5Data));
+
+  try {
+    if (sNis) localStorage.setItem('educode_p5_data_' + sNis, JSON.stringify(p5Data));
+    if (sId) localStorage.setItem('educode_p5_data_' + sId, JSON.stringify(p5Data));
+  } catch(e) {}
+
+  const rubrik = hitungRubrikPenilaianKelas5(student, p5Data);
+  if (student.nilaiPresentasi === undefined) student.nilaiPresentasi = rubrik.nilaiPresentasi;
+  if (student.nilaiSertifikat === undefined) student.nilaiSertifikat = rubrik.nilaiSertifikat;
+  if (student.nilaiPosterCanva === undefined) student.nilaiPosterCanva = rubrik.nilaiPosterCanva;
+  if (student.nilaiGameCoding === undefined) student.nilaiGameCoding = rubrik.nilaiGameCoding;
+  student.nilaiAkhirKelas5 = rubrik.nilaiAkhir;
+
+  const db = getStudentDatabase();
+  const idx = db.findIndex(s => (sId && s.id === sId) || (sNis && s.nis === sNis));
+  if (idx !== -1) {
+    db[idx] = Object.assign(db[idx], student);
+    saveStudentDatabase(db);
+  }
+}
+window.simpanPortofolioKelas5Siswa = simpanPortofolioKelas5Siswa;
+
+function hitungRubrikPenilaianKelas5(student, customData) {
+  const p5 = customData || dapatkanPortofolioKelas5Siswa(student) || {};
+
+  // 1. Menu 1: Presentasi Digital (Bobot 25%)
+  let nPresentasi = (student && student.nilaiPresentasi !== undefined && student.nilaiPresentasi !== null) ? Number(student.nilaiPresentasi) : null;
+  let berkasPptCount = 0;
+  if (p5.ppt1 && (p5.ppt1.dataUrl || p5.ppt1.gdriveLink || p5.ppt1.name)) berkasPptCount++;
+  if (p5.ppt2 && (p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.name || p5.ppt2.prompt)) berkasPptCount++;
+  if (nPresentasi === null) {
+    if (berkasPptCount >= 2) nPresentasi = 100;
+    else if (berkasPptCount === 1) nPresentasi = 85;
+    else nPresentasi = 0;
+  }
+
+  // 2. Menu 2: Sertifikat Hour of Code (Bobot 25%)
+  let nSertifikat = (student && student.nilaiSertifikat !== undefined && student.nilaiSertifikat !== null) ? Number(student.nilaiSertifikat) : null;
+  let hasSertifikat = !!(p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name));
+  if (nSertifikat === null) {
+    if (hasSertifikat) {
+      nSertifikat = (p5.sertifikat.aktivitas || p5.sertifikat.kesan) ? 100 : 90;
+    } else {
+      nSertifikat = 0;
+    }
+  }
+
+  // 3. Menu 3: Poster Canva (Bobot 25%)
+  let nPoster = (student && student.nilaiPosterCanva !== undefined && student.nilaiPosterCanva !== null) ? Number(student.nilaiPosterCanva) : null;
+  let hasPoster = !!(p5.poster && (p5.poster.dataUrl || p5.poster.name));
+  if (nPoster === null) {
+    if (hasPoster) {
+      nPoster = (p5.poster.judul && p5.poster.pesan) ? 100 : 90;
+    } else {
+      nPoster = 0;
+    }
+  }
+
+  // 4. Menu 4: Game & Coding (Bobot 25%)
+  let nGame = (student && student.nilaiGameCoding !== undefined && student.nilaiGameCoding !== null) ? Number(student.nilaiGameCoding) : null;
+  let hasGame = !!(p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain));
+  if (nGame === null) {
+    if (hasGame) {
+      nGame = 100;
+    } else if (student && (student.projekScratch > 0 || student.nilaiScratch > 0)) {
+      nGame = student.nilaiScratch || 100;
+    } else {
+      nGame = 0;
+    }
+  }
+
+  const totalMenuSelesai = (berkasPptCount > 0 ? 1 : 0) + (hasSertifikat ? 1 : 0) + (hasPoster ? 1 : 0) + (hasGame ? 1 : 0);
+  const nilaiAkhir = Math.round((nPresentasi + nSertifikat + nPoster + nGame) / 4);
+  const isTuntas = (nilaiAkhir >= 80);
+
+  return {
+    nilaiPresentasi: nPresentasi,
+    berkasPptCount: berkasPptCount,
+    nilaiSertifikat: nSertifikat,
+    hasSertifikat: hasSertifikat,
+    nilaiPosterCanva: nPoster,
+    hasPoster: hasPoster,
+    nilaiGameCoding: nGame,
+    hasGame: hasGame,
+    totalMenuSelesai: totalMenuSelesai,
+    nilaiAkhir: nilaiAkhir,
+    isTuntas: isTuntas,
+    statusKkm: isTuntas ? 'TUNTAS' : 'REMEDIAL'
+  };
+}
+window.hitungRubrikPenilaianKelas5 = hitungRubrikPenilaianKelas5;
+
+function bukaModalMonitoringPortofolioKelas5(studentId) {
+  try { playSound('click'); } catch (e) {}
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === studentId || s.nis === studentId) || {
+    id: studentId,
+    nama: 'Siswa',
+    kelas: '5D',
+    absen: '01',
+    nis: '-'
+  };
+  currentMonitoringK5StudentId = student.id;
+
+  const modal = document.getElementById('modal-monitoring-portofolio-kelas5');
+  if (!modal) return;
+
+  const elNama = document.getElementById('mon-k5-nama');
+  const elKelas = document.getElementById('mon-k5-kelas');
+  const elNis = document.getElementById('mon-k5-nis');
+  const elAbsen = document.getElementById('mon-k5-absen');
+  const elAvatar = document.getElementById('mon-k5-avatar');
+  const elProgressText = document.getElementById('mon-k5-progress-text');
+  const elProgressBar = document.getElementById('mon-k5-progress-bar');
+  const elNilaiBadge = document.getElementById('mon-k5-nilai-akhir-badge');
+  const elStatusKkm = document.getElementById('mon-k5-status-kkm');
+
+  if (elNama) elNama.innerText = student.nama || 'Siswa';
+  if (elKelas) elKelas.innerText = `Kelas ${student.kelas || '5D'}`;
+  if (elNis) elNis.innerText = `NIS: ${student.nis || '-'}`;
+  if (elAbsen) elAbsen.innerText = `Absen: ${student.absen || '-'}`;
+  if (elAvatar) {
+    const avatarInfo = dapatkanGayaAvatarSiswa(student);
+    elAvatar.innerText = avatarInfo.initial;
+    elAvatar.className = `w-12 h-12 rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0 border border-white/30`;
+    elAvatar.title = `${student.nama || 'Siswa'} (${avatarInfo.genderLabel})`;
+  }
+
+  const p5 = dapatkanPortofolioKelas5Siswa(student);
+  const evalK5 = hitungRubrikPenilaianKelas5(student, p5);
+
+  const pct = Math.round((evalK5.totalMenuSelesai / 4) * 100);
+  if (elProgressText) elProgressText.innerText = `${evalK5.totalMenuSelesai} dari 4 Menu Selesai (${pct}%)`;
+  if (elProgressBar) elProgressBar.style.width = `${pct}%`;
+  if (elNilaiBadge) elNilaiBadge.innerText = `Nilai Akhir: ${evalK5.nilaiAkhir}`;
+  if (elStatusKkm) {
+    elStatusKkm.innerText = evalK5.isTuntas ? 'TUNTAS KKM' : 'BELUM TUNTAS';
+    elStatusKkm.className = evalK5.isTuntas
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300';
+  }
+
+  // --- 1. PRESENTASI DIGITAL ---
+  const badgePpt = document.getElementById('mon-k5-badge-ppt');
+  const detailPpt = document.getElementById('mon-k5-detail-ppt');
+  const inputNilaiPpt = document.getElementById('mon-k5-input-nilai-ppt');
+  if (badgePpt) {
+    badgePpt.innerText = `${evalK5.berkasPptCount}/2 Berkas Siap`;
+    badgePpt.className = evalK5.berkasPptCount >= 2 
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800'
+      : (evalK5.berkasPptCount === 1 ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800' : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600');
+  }
+  if (inputNilaiPpt) inputNilaiPpt.value = evalK5.nilaiPresentasi;
+
+  if (detailPpt) {
+    let htmlPpt = '';
+    if (p5.ppt1 && (p5.ppt1.name || p5.ppt1.dataUrl || p5.ppt1.gdriveLink)) {
+      htmlPpt += `
+        <div class="p-2 bg-white rounded-lg border border-slate-200">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800 truncate"><i class="fa-solid fa-file-powerpoint text-orange-600 mr-1"></i> ${p5.ppt1.name || 'File PPT 1 Manual'}</span>
+            <span class="text-[10px] text-slate-500">${p5.ppt1.size || '-'}</span>
+          </div>
+          ${p5.ppt1.gdriveLink ? `<div class="mt-1"><a href="${p5.ppt1.gdriveLink}" target="_blank" class="text-indigo-600 underline font-bold text-[11px] flex items-center gap-1"><i class="fa-brands fa-google-drive"></i> Buka di Google Drive</a></div>` : ''}
+          ${p5.ppt1.dataUrl ? `<div class="mt-1"><a href="${p5.ppt1.dataUrl}" download="${p5.ppt1.name || 'PPT1.pptx'}" class="text-emerald-700 underline font-bold text-[11px] flex items-center gap-1"><i class="fa-solid fa-download"></i> Unduh Berkas PPT 1</a></div>` : ''}
+        </div>
+      `;
+    } else {
+      htmlPpt += `<div class="p-2 bg-slate-100/60 rounded-lg text-slate-400 italic">File 1 (PPT Manual) belum diunggah</div>`;
+    }
+    if (p5.ppt2 && (p5.ppt2.name || p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.prompt)) {
+      htmlPpt += `
+        <div class="p-2 bg-white rounded-lg border border-slate-200">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800 truncate"><i class="fa-solid fa-wand-magic-sparkles text-purple-600 mr-1"></i> ${p5.ppt2.name || 'File PPT 2 (Gemini AI)'}</span>
+            <span class="text-[10px] text-slate-500">${p5.ppt2.size || '-'}</span>
+          </div>
+          ${p5.ppt2.prompt ? `<div class="mt-1 text-[11px] text-slate-600 bg-purple-50 p-1.5 rounded border border-purple-100"><b>Prompt Siswa:</b> "${p5.ppt2.prompt}"</div>` : ''}
+          ${p5.ppt2.gdriveLink ? `<div class="mt-1"><a href="${p5.ppt2.gdriveLink}" target="_blank" class="text-indigo-600 underline font-bold text-[11px] flex items-center gap-1"><i class="fa-brands fa-google-drive"></i> Buka di Google Drive</a></div>` : ''}
+          ${p5.ppt2.dataUrl ? `<div class="mt-1"><a href="${p5.ppt2.dataUrl}" download="${p5.ppt2.name || 'PPT2_GeminiAI.pptx'}" class="text-emerald-700 underline font-bold text-[11px] flex items-center gap-1"><i class="fa-solid fa-download"></i> Unduh Berkas PPT 2</a></div>` : ''}
+        </div>
+      `;
+    } else {
+      htmlPpt += `<div class="p-2 bg-slate-100/60 rounded-lg text-slate-400 italic">File 2 (Gemini AI PPT) belum diunggah</div>`;
+    }
+    detailPpt.innerHTML = htmlPpt;
+  }
+
+  // --- 2. SERTIFIKAT HOUR OF CODE ---
+  const badgeSertifikat = document.getElementById('mon-k5-badge-sertifikat');
+  const detailSertifikat = document.getElementById('mon-k5-detail-sertifikat');
+  const inputNilaiSertifikat = document.getElementById('mon-k5-input-nilai-sertifikat');
+  if (badgeSertifikat) {
+    badgeSertifikat.innerText = evalK5.hasSertifikat ? 'Tersertifikasi 🏆' : 'Belum Unggah';
+    badgeSertifikat.className = evalK5.hasSertifikat 
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600';
+  }
+  if (inputNilaiSertifikat) inputNilaiSertifikat.value = evalK5.nilaiSertifikat;
+
+  if (detailSertifikat) {
+    if (p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name)) {
+      detailSertifikat.innerHTML = `
+        <div class="space-y-2">
+          ${p5.sertifikat.dataUrl && !p5.sertifikat.isPdf ? `
+            <div class="w-full h-32 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+              <img src="${p5.sertifikat.dataUrl}" alt="Sertifikat" class="w-full h-full object-contain cursor-pointer" onclick="window.open('${p5.sertifikat.dataUrl}')">
+            </div>
+          ` : ''}
+          <div class="p-2 bg-white rounded-lg border border-slate-200 space-y-1">
+            <div class="font-bold text-slate-800 truncate">📜 ${p5.sertifikat.name || 'Sertifikat_HourOfCode'}</div>
+            ${p5.sertifikat.aktivitas ? `<div class="text-[11px] text-slate-600"><b>Aktivitas:</b> ${p5.sertifikat.aktivitas}</div>` : ''}
+            ${p5.sertifikat.kesan ? `<div class="text-[11px] text-slate-600 italic"><b>Kesan Siswa:</b> "${p5.sertifikat.kesan}"</div>` : ''}
+            ${p5.sertifikat.dataUrl ? `<a href="${p5.sertifikat.dataUrl}" download="${p5.sertifikat.name || 'Sertifikat_HOC.png'}" class="inline-flex items-center gap-1 text-amber-700 font-bold text-[11px] underline pt-1"><i class="fa-solid fa-download"></i> Unduh / Buka Dokumen Sertifikat</a>` : ''}
+          </div>
+        </div>
+      `;
+    } else {
+      detailSertifikat.innerHTML = `<div class="p-3 text-center text-slate-400 italic">Siswa belum mengunggah sertifikat Hour of Code</div>`;
+    }
+  }
+
+  // --- 3. POSTER LINGKUNGAN CANVA ---
+  const badgePoster = document.getElementById('mon-k5-badge-poster');
+  const detailPoster = document.getElementById('mon-k5-detail-poster');
+  const inputNilaiPoster = document.getElementById('mon-k5-input-nilai-poster');
+  if (badgePoster) {
+    badgePoster.innerText = evalK5.hasPoster ? 'Poster Siap 🎨' : 'Belum Unggah';
+    badgePoster.className = evalK5.hasPoster 
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600';
+  }
+  if (inputNilaiPoster) inputNilaiPoster.value = evalK5.nilaiPosterCanva;
+
+  if (detailPoster) {
+    if (p5.poster && (p5.poster.dataUrl || p5.poster.name)) {
+      detailPoster.innerHTML = `
+        <div class="space-y-2">
+          ${p5.poster.dataUrl ? `
+            <div class="w-full h-36 rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+              <img src="${p5.poster.dataUrl}" alt="Poster Lingkungan" class="w-full h-full object-contain cursor-pointer" onclick="window.open('${p5.poster.dataUrl}')">
+            </div>
+          ` : ''}
+          <div class="p-2 bg-white rounded-lg border border-slate-200 space-y-1">
+            <div class="font-bold text-slate-800 truncate">🎨 ${p5.poster.judul || p5.poster.name || 'Poster Lingkungan Hidup'}</div>
+            ${p5.poster.pesan ? `<div class="text-[11px] text-slate-600 italic"><b>Pesan Ajakan:</b> "${p5.poster.pesan}"</div>` : ''}
+            ${p5.poster.dataUrl ? `<a href="${p5.poster.dataUrl}" download="${p5.poster.name || 'Poster_Canva.png'}" class="inline-flex items-center gap-1 text-emerald-700 font-bold text-[11px] underline pt-1"><i class="fa-solid fa-download"></i> Unduh Poster PNG Asli</a>` : ''}
+          </div>
+        </div>
+      `;
+    } else {
+      detailPoster.innerHTML = `<div class="p-3 text-center text-slate-400 italic">Siswa belum mengunggah poster Canva</div>`;
+    }
+  }
+
+  // --- 4. GAME & CODING ---
+  const badgeGame = document.getElementById('mon-k5-badge-game');
+  const detailGame = document.getElementById('mon-k5-detail-game');
+  const inputNilaiGame = document.getElementById('mon-k5-input-nilai-game');
+  if (badgeGame) {
+    badgeGame.innerText = evalK5.hasGame ? 'Tuntas 🚀' : 'Belum Ada';
+    badgeGame.className = evalK5.hasGame 
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600';
+  }
+  if (inputNilaiGame) inputNilaiGame.value = evalK5.nilaiGameCoding;
+
+  if (detailGame) {
+    if (p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain)) {
+      const isTekno = p5.scratch.jalur === 'game_pulau_tekno' || p5.scratch.buktiGame || p5.scratch.namaPemain;
+      if (isTekno) {
+        detailGame.innerHTML = `
+          <div class="space-y-2">
+            ${p5.scratch.buktiGame ? `
+              <div class="w-full h-32 rounded-lg overflow-hidden bg-slate-900 border border-slate-700">
+                <img src="${p5.scratch.buktiGame}" alt="Bukti Game" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${p5.scratch.buktiGame}')">
+              </div>
+            ` : ''}
+            <div class="p-2 bg-white rounded-lg border border-slate-200 space-y-1">
+              <div class="font-bold text-slate-800">🏝️ Misi Game Pulau Tekno (AI & Coding)</div>
+              <div class="text-[11px] text-slate-600"><b>Pemain:</b> ${p5.scratch.namaPemain || student.nama} • <b>Skor/Bintang:</b> ${p5.scratch.bintangXP || '100 XP'}</div>
+              <div class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded inline-block">✓ Tantangan AI & Logika Berhasil Dituntaskan</div>
+            </div>
+          </div>
+        `;
+      } else {
+        detailGame.innerHTML = `
+          <div class="p-2 bg-white rounded-lg border border-slate-200 space-y-1">
+            <div class="font-bold text-slate-800">🐱 Proyek Scratch: ${p5.scratch.judul || 'Animasi/Game Scratch'}</div>
+            ${p5.scratch.caraMain ? `<div class="text-[11px] text-slate-600"><b>Cara Bermain:</b> ${p5.scratch.caraMain}</div>` : ''}
+            ${p5.scratch.link ? `<div class="pt-1"><a href="${p5.scratch.link}" target="_blank" class="text-indigo-600 underline font-bold text-[11px] flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Link Proyek Scratch</a></div>` : ''}
+            ${p5.scratch.dataUrl ? `<div class="pt-1"><a href="${p5.scratch.dataUrl}" download="${p5.scratch.name || 'Proyek_Scratch.sb3'}" class="text-purple-700 underline font-bold text-[11px] flex items-center gap-1"><i class="fa-solid fa-download"></i> Unduh File .sb3 Scratch</a></div>` : ''}
+          </div>
+        `;
+      }
+    } else {
+      detailGame.innerHTML = `<div class="p-3 text-center text-slate-400 italic">Siswa belum mengirimkan bukti Game atau Proyek Scratch</div>`;
+    }
+  }
+
+  // Catatan Guru
+  const inputCatatan = document.getElementById('mon-k5-input-catatan');
+  if (inputCatatan) {
+    inputCatatan.value = student.catatanGuru || '';
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+}
+window.bukaModalMonitoringPortofolioKelas5 = bukaModalMonitoringPortofolioKelas5;
+
+function tutupModalMonitoringPortofolioKelas5() {
+  playSound('click');
+  const modal = document.getElementById('modal-monitoring-portofolio-kelas5');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+    modal.style.setProperty('pointer-events', 'none', 'important');
+    modal.style.setProperty('visibility', 'hidden', 'important');
+    modal.style.setProperty('z-index', '-9999', 'important');
+  }
+}
+window.tutupModalMonitoringPortofolioKelas5 = tutupModalMonitoringPortofolioKelas5;
+
+function hitungUlangOtomatisNilaiK5() {
+  if (!currentMonitoringK5StudentId) return;
+  playSound('click');
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === currentMonitoringK5StudentId);
+  if (!student) return;
+
+  const p5 = dapatkanPortofolioKelas5Siswa(student);
+  let nPpt = 0;
+  let berkasPptCount = 0;
+  if (p5.ppt1 && (p5.ppt1.dataUrl || p5.ppt1.gdriveLink || p5.ppt1.name)) berkasPptCount++;
+  if (p5.ppt2 && (p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.name || p5.ppt2.prompt)) berkasPptCount++;
+  if (berkasPptCount >= 2) nPpt = 100;
+  else if (berkasPptCount === 1) nPpt = 85;
+
+  let nHoc = 0;
+  if (p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name)) {
+    nHoc = (p5.sertifikat.aktivitas || p5.sertifikat.kesan) ? 100 : 90;
+  }
+
+  let nPoster = 0;
+  if (p5.poster && (p5.poster.dataUrl || p5.poster.name)) {
+    nPoster = (p5.poster.judul && p5.poster.pesan) ? 100 : 90;
+  }
+
+  let nGame = 0;
+  if (p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain)) {
+    nGame = 100;
+  } else if (student.projekScratch > 0 || student.nilaiScratch > 0) {
+    nGame = student.nilaiScratch || 100;
+  }
+
+  const inPpt = document.getElementById('mon-k5-input-nilai-ppt');
+  const inHoc = document.getElementById('mon-k5-input-nilai-sertifikat');
+  const inPoster = document.getElementById('mon-k5-input-nilai-poster');
+  const inGame = document.getElementById('mon-k5-input-nilai-game');
+  if (inPpt) inPpt.value = nPpt;
+  if (inHoc) inHoc.value = nHoc;
+  if (inPoster) inPoster.value = nPoster;
+  if (inGame) inGame.value = nGame;
+
+  const nAkhir = Math.round((nPpt + nHoc + nPoster + nGame) / 4);
+  const elNilaiBadge = document.getElementById('mon-k5-nilai-akhir-badge');
+  const elStatusKkm = document.getElementById('mon-k5-status-kkm');
+  if (elNilaiBadge) elNilaiBadge.innerText = `Nilai Akhir: ${nAkhir}`;
+  if (elStatusKkm) {
+    elStatusKkm.innerText = (nAkhir >= 80) ? 'TUNTAS KKM' : 'BELUM TUNTAS';
+    elStatusKkm.className = (nAkhir >= 80)
+      ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300'
+      : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300';
+  }
+  showToast('Nilai 4 menu berhasil dihitung otomatis berdasarkan kelengkapan berkas siswa! ✨', 'info');
+}
+window.hitungUlangOtomatisNilaiK5 = hitungUlangOtomatisNilaiK5;
+
+function simpanNilaiMonitoringPortofolioKelas5() {
+  if (!currentMonitoringK5StudentId) return;
+  playSound('success');
+  const db = getStudentDatabase();
+  const student = db.find(s => s.id === currentMonitoringK5StudentId);
+  if (!student) {
+    showToast('⚠️ Data siswa tidak ditemukan.', 'warning');
+    return;
+  }
+
+  const inPpt = document.getElementById('mon-k5-input-nilai-ppt');
+  const inHoc = document.getElementById('mon-k5-input-nilai-sertifikat');
+  const inPoster = document.getElementById('mon-k5-input-nilai-poster');
+  const inGame = document.getElementById('mon-k5-input-nilai-game');
+  const inCatatan = document.getElementById('mon-k5-input-catatan');
+
+  const nPpt = inPpt ? Math.min(100, Math.max(0, parseInt(inPpt.value) || 0)) : (student.nilaiPresentasi || 0);
+  const nHoc = inHoc ? Math.min(100, Math.max(0, parseInt(inHoc.value) || 0)) : (student.nilaiSertifikat || 0);
+  const nPoster = inPoster ? Math.min(100, Math.max(0, parseInt(inPoster.value) || 0)) : (student.nilaiPosterCanva || 0);
+  const nGame = inGame ? Math.min(100, Math.max(0, parseInt(inGame.value) || 0)) : (student.nilaiGameCoding || 0);
+  const catatan = inCatatan ? inCatatan.value.trim() : (student.catatanGuru || '');
+
+  student.nilaiPresentasi = nPpt;
+  student.nilaiSertifikat = nHoc;
+  student.nilaiPosterCanva = nPoster;
+  student.nilaiGameCoding = nGame;
+  student.nilaiAkhirKelas5 = Math.round((nPpt + nHoc + nPoster + nGame) / 4);
+  student.catatanGuru = catatan;
+
+  saveStudentDatabase(db);
+  showToast(`Nilai & Portofolio ${student.nama} berhasil diperbarui! 🎉`, 'success');
+  tutupModalMonitoringPortofolioKelas5();
+
+  if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+  if (typeof renderKPI === 'function') renderKPI();
+}
+window.simpanNilaiMonitoringPortofolioKelas5 = simpanNilaiMonitoringPortofolioKelas5;
+
 // --------------------------------------------------------------------------
 // MODAL DETAIL & EVALUASI SISWA
 // --------------------------------------------------------------------------
@@ -27512,6 +28138,72 @@ function simpanSiswaBaruManual() {
 function eksporNilaiCSV() {
   playSound('click');
   const db = urutkanSiswaSesuaiNomorAbsen(getStudentDatabase());
+
+  const isTingkat5Export = (state.tingkatKelasGuru === '5') || 
+                           (state.filterKelasGuru === 'tingkat_5') || 
+                           (['5A', '5B', '5C', '5D', '5E'].includes(state.filterKelasGuru));
+
+  if (isTingkat5Export) {
+    let k5Students = db.filter(s => {
+      if (state.filterKelasGuru && state.filterKelasGuru !== 'semua' && !state.filterKelasGuru.startsWith('tingkat_')) {
+        return s.kelas === state.filterKelasGuru;
+      }
+      return String(s.kelas || '').includes('5');
+    });
+    if (k5Students.length === 0) k5Students = db;
+
+    const escapeCSV = (str) => {
+      if (str === null || str === undefined) return '""';
+      const clean = String(str).replace(/"/g, '""');
+      return `"${clean}"`;
+    };
+
+    const k5Headers = [
+      'No',
+      'NIS',
+      'No. Absen',
+      'Nama Siswa',
+      'Kelas',
+      '1. Nilai Presentasi (PPT)',
+      '2. Nilai Sertifikat HOC',
+      '3. Nilai Poster Canva',
+      '4. Nilai Game & Coding',
+      'Nilai Akhir Kelas 5',
+      'Status KKM (>=80)',
+      'Poin Bintang',
+      'Catatan Guru'
+    ];
+    const k5Rows = k5Students.map((s, idx) => {
+      const evalK5 = hitungRubrikPenilaianKelas5(s);
+      return [
+        idx + 1,
+        escapeCSV(s.nis || '-'),
+        escapeCSV(s.absen || '-'),
+        escapeCSV(s.nama),
+        escapeCSV(s.kelas),
+        evalK5.nilaiPresentasi,
+        evalK5.nilaiSertifikat,
+        evalK5.nilaiPosterCanva,
+        evalK5.nilaiGameCoding,
+        evalK5.nilaiAkhir,
+        escapeCSV(evalK5.statusKkm),
+        s.poinBintang || 0,
+        escapeCSV(s.catatanGuru || '-')
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + k5Headers.join(',') + '\r\n' + k5Rows.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const filename = `Rekap_Nilai_Kelas5_SDSCintaKasihTzuChi_${new Date().toISOString().slice(0, 10)}.csv`;
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast(`Rekap nilai Kelas 5 "${filename}" berhasil diunduh! 📊`, 'success');
+    return;
+  }
   if (db.length === 0) {
     showToast('Database siswa masih kosong!', 'error');
     return;
@@ -29394,31 +30086,55 @@ async function sinkronkanSemuaKelasSekaligus(silent = false) {
       const parsedData = await queryGoogleSheetJsonp(sheetId, tabName, 6000);
       const parsed = parseGoogleSheetTable(parsedData, cls);
       if (parsed && parsed.length > 0) {
-        // Hapus siswa kelas ini yang lama dari list, perbarui dengan data resmi terbaru
-        finalAllStudents = finalAllStudents.filter(s => s.kelas !== cls);
-        parsed.forEach(newS => {
-          const keyNis = newS.nis ? String(newS.nis).trim().toLowerCase() : '';
-          const keyId = newS.id ? String(newS.id).trim().toLowerCase() : '';
-          const ex = (keyNis && existingMap.get(keyNis)) || (keyId && existingMap.get(keyId));
-          const mergedStudent = ex ? {
-            ...newS,
-            kuisSem1: ex.kuisSem1 || 0,
-            kuisSem2: ex.kuisSem2 || 0,
-            posterWord: ex.posterWord || 0,
-            nilaiPoster: ex.nilaiPoster !== undefined ? ex.nilaiPoster : 0,
-            excelTabel: ex.excelTabel || 0,
-            nilaiExcel: ex.nilaiExcel !== undefined ? ex.nilaiExcel : 0,
-            nilaiDrive: ex.nilaiDrive !== undefined ? ex.nilaiDrive : 0,
-            koleksiDrive: ex.koleksiDrive !== undefined ? ex.koleksiDrive : 0,
-            nilaiScratch: ex.nilaiScratch !== undefined ? ex.nilaiScratch : 0,
-            nilaiRoboMind: ex.nilaiRoboMind !== undefined ? ex.nilaiRoboMind : 0,
-            poinBintang: ex.poinBintang || 0,
-            statusKkm: ex.statusKkm || 'Tuntas',
-            catatanGuru: ex.catatanGuru || newS.catatanGuru,
-            driveData: ex.driveData || newS.driveData
-          } : newS;
-          finalAllStudents.push(mergedStudent);
-        });
+        const currentClassCount = finalAllStudents.filter(s => s.kelas === cls).length;
+        if (parsed.length >= 10 || currentClassCount === 0) {
+          // Rombel penuh dari spreadsheet: perbarui daftar siswa
+          finalAllStudents = finalAllStudents.filter(s => s.kelas !== cls);
+          parsed.forEach(newS => {
+            const keyNis = newS.nis ? String(newS.nis).trim().toLowerCase() : '';
+            const keyId = newS.id ? String(newS.id).trim().toLowerCase() : '';
+            const ex = (keyNis && existingMap.get(keyNis)) || (keyId && existingMap.get(keyId));
+            const mergedStudent = ex ? {
+              ...newS,
+              kuisSem1: ex.kuisSem1 || 0,
+              kuisSem2: ex.kuisSem2 || 0,
+              posterWord: ex.posterWord || 0,
+              nilaiPoster: ex.nilaiPoster !== undefined ? ex.nilaiPoster : 0,
+              excelTabel: ex.excelTabel || 0,
+              nilaiExcel: ex.nilaiExcel !== undefined ? ex.nilaiExcel : 0,
+              nilaiDrive: ex.nilaiDrive !== undefined ? ex.nilaiDrive : 0,
+              koleksiDrive: ex.koleksiDrive !== undefined ? ex.koleksiDrive : 0,
+              nilaiScratch: ex.nilaiScratch !== undefined ? ex.nilaiScratch : 0,
+              nilaiRoboMind: ex.nilaiRoboMind !== undefined ? ex.nilaiRoboMind : 0,
+              poinBintang: ex.poinBintang || 0,
+              statusKkm: ex.statusKkm || 'Tuntas',
+              catatanGuru: ex.catatanGuru || newS.catatanGuru,
+              driveData: ex.driveData || newS.driveData
+            } : newS;
+            finalAllStudents.push(mergedStudent);
+          });
+        } else {
+          // Parsial/Log submission: hanya perbarui nilai siswa yang cocok tanpa menghapus siswa lain
+          parsed.forEach(newS => {
+            const keyNis = newS.nis ? String(newS.nis).trim().toLowerCase() : '';
+            const keyId = newS.id ? String(newS.id).trim().toLowerCase() : '';
+            const keyNama = newS.nama ? String(newS.nama).trim().toLowerCase() : '';
+            const ex = finalAllStudents.find(s => 
+              (keyNis && String(s.nis).trim().toLowerCase() === keyNis) ||
+              (keyId && String(s.id).trim().toLowerCase() === keyId) ||
+              (keyNama && String(s.nama).trim().toLowerCase() === keyNama)
+            );
+            if (ex) {
+              if (newS.kuisSem1) ex.kuisSem1 = newS.kuisSem1;
+              if (newS.kuisSem2) ex.kuisSem2 = newS.kuisSem2;
+              if (newS.nilaiPoster) ex.nilaiPoster = newS.nilaiPoster;
+              if (newS.nilaiExcel) ex.nilaiExcel = newS.nilaiExcel;
+              if (newS.nilaiDrive) ex.nilaiDrive = newS.nilaiDrive;
+              if (newS.koleksiDrive) ex.koleksiDrive = newS.koleksiDrive;
+              if (newS.poinBintang) ex.poinBintang = Math.max(ex.poinBintang || 0, newS.poinBintang);
+            }
+          });
+        }
 
         if (!cfg[cls]) cfg[cls] = { ...DEFAULT_CLASS_SHEETS_CONFIG[cls] };
         cfg[cls].count = parsed.length;
@@ -29502,54 +30218,59 @@ async function sinkronkanMasterDataSiswaLMS(silent = false) {
   }
 
   // Gabungkan ke database lokal secara aman dengan mempertahankan nilai/progres yang sudah dicapai
-  let existingDb = [];
-  try {
-    const raw = localStorage.getItem(DB_STORAGE_KEY);
-    if (raw) existingDb = JSON.parse(raw);
-  } catch (eDb) {}
-  if (!Array.isArray(existingDb)) existingDb = [];
+  let baseStudents = getStudentDatabase();
+  if (!Array.isArray(baseStudents) || baseStudents.length < SEED_STUDENTS.length) {
+    baseStudents = JSON.parse(JSON.stringify(SEED_STUDENTS));
+  } else {
+    baseStudents = baseStudents.slice();
+  }
 
-  const existingMap = new Map();
-  existingDb.forEach(s => {
-    if (s.nis) existingMap.set(s.nis.toString().toLowerCase().trim(), s);
-    if (s.id) existingMap.set(s.id.toLowerCase().trim(), s);
+  const baseMap = new Map();
+  baseStudents.forEach(s => {
+    if (s.nis) baseMap.set(String(s.nis).trim().toLowerCase(), s);
+    if (s.id) baseMap.set(String(s.id).trim().toLowerCase(), s);
+    if (s.nama) baseMap.set(String(s.nama).trim().toLowerCase(), s);
   });
 
-  const mergedDb = [];
   const validClasses = ['4A', '4B', '4C', '4D', '4E', '5A', '5B', '5C', '5D', '5E', '6A', '6B', '6C', '6D', '6E'];
   const classCountMap = {};
   validClasses.forEach(cls => { classCountMap[cls] = 0; });
 
   fetchedAll.forEach(newS => {
-    const keyNis = newS.nis ? newS.nis.toString().toLowerCase().trim() : '';
-    const keyId = newS.id ? newS.id.toLowerCase().trim() : '';
-    const existing = (keyNis && existingMap.get(keyNis)) || (keyId && existingMap.get(keyId));
+    const keyNis = newS.nis ? String(newS.nis).trim().toLowerCase() : '';
+    const keyId = newS.id ? String(newS.id).trim().toLowerCase() : '';
+    const keyNama = newS.nama ? String(newS.nama).trim().toLowerCase() : '';
+    const existing = (keyNis && baseMap.get(keyNis)) || (keyId && baseMap.get(keyId)) || (keyNama && baseMap.get(keyNama));
 
-    const finalStudent = existing ? {
-      ...newS,
-      kuisSem1: existing.kuisSem1 || 0,
-      kuisSem2: existing.kuisSem2 || 0,
-      posterWord: existing.posterWord || 0,
-      nilaiPoster: existing.nilaiPoster !== undefined ? existing.nilaiPoster : 0,
-      excelTabel: existing.excelTabel || 0,
-      nilaiExcel: existing.nilaiExcel !== undefined ? existing.nilaiExcel : 0,
-      nilaiDrive: existing.nilaiDrive !== undefined ? existing.nilaiDrive : 0,
-      koleksiDrive: existing.koleksiDrive !== undefined ? existing.koleksiDrive : 0,
-      nilaiScratch: existing.nilaiScratch !== undefined ? existing.nilaiScratch : 0,
-      nilaiRoboMind: existing.nilaiRoboMind !== undefined ? existing.nilaiRoboMind : 0,
-      poinBintang: existing.poinBintang || 0,
-      statusKkm: existing.statusKkm || 'Tuntas',
-      catatanGuru: existing.catatanGuru || newS.catatanGuru,
-      driveData: existing.driveData || newS.driveData
-    } : newS;
-
-    mergedDb.push(finalStudent);
-    if (classCountMap[finalStudent.kelas] !== undefined) {
-      classCountMap[finalStudent.kelas]++;
+    if (existing) {
+      if (newS.kuisSem1 !== undefined && newS.kuisSem1 !== 0) existing.kuisSem1 = newS.kuisSem1;
+      if (newS.kuisSem2 !== undefined && newS.kuisSem2 !== 0) existing.kuisSem2 = newS.kuisSem2;
+      if (newS.posterWord !== undefined && newS.posterWord !== 0) existing.posterWord = newS.posterWord;
+      if (newS.nilaiPoster !== undefined && newS.nilaiPoster !== 0) existing.nilaiPoster = newS.nilaiPoster;
+      if (newS.excelTabel !== undefined && newS.excelTabel !== 0) existing.excelTabel = newS.excelTabel;
+      if (newS.nilaiExcel !== undefined && newS.nilaiExcel !== 0) existing.nilaiExcel = newS.nilaiExcel;
+      if (newS.nilaiDrive !== undefined && newS.nilaiDrive !== 0) existing.nilaiDrive = newS.nilaiDrive;
+      if (newS.koleksiDrive !== undefined && newS.koleksiDrive !== 0) existing.koleksiDrive = newS.koleksiDrive;
+      if (newS.nilaiScratch !== undefined && newS.nilaiScratch !== 0) existing.nilaiScratch = newS.nilaiScratch;
+      if (newS.nilaiRoboMind !== undefined && newS.nilaiRoboMind !== 0) existing.nilaiRoboMind = newS.nilaiRoboMind;
+      if (newS.poinBintang) existing.poinBintang = Math.max(existing.poinBintang || 0, newS.poinBintang);
+      if (newS.statusKkm) existing.statusKkm = newS.statusKkm;
+      if (newS.catatanGuru) existing.catatanGuru = newS.catatanGuru;
+      if (newS.driveData) existing.driveData = newS.driveData;
+    } else {
+      baseStudents.push(newS);
+      if (keyNis) baseMap.set(keyNis, newS);
+      if (keyId) baseMap.set(keyId, newS);
     }
   });
 
-  saveStudentDatabase(mergedDb);
+  baseStudents.forEach(s => {
+    if (s && s.kelas && classCountMap[s.kelas] !== undefined) {
+      classCountMap[s.kelas]++;
+    }
+  });
+
+  saveStudentDatabase(baseStudents);
 
   // Perbarui konfigurasi sheet kelas
   const cfg = getClassSheetsConfig();
@@ -29947,27 +30668,58 @@ window.sinkronkanSemuaKelasGoogleSheet = sinkronkanSemuaKelasGoogleSheet;
 // 4. Tombol Cepat di Header Dasbor Guru: Sinkronkan Sesuai Kelas yang Sedang Ditampilkan
 async function sinkronkanDataSiswaGoogleSheetAktif() {
   playSound('click');
-  const t = state.tingkatKelasGuru || 'all';
-  const f = state.filterKelasGuru || 'semua';
+  const btn = document.getElementById('btn-sync-google-sheets-header') || document.querySelector('button[onclick*="sinkronkanDataSiswaGoogleSheetAktif"]');
+  const oriHtml = btn ? btn.innerHTML : '<i class="fa-solid fa-arrows-rotate text-sm"></i> Sinkron Google Sheets';
 
-  if (['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'].includes(f)) {
-    return await sinkronkanDataSiswaPerKelas(f);
+  if (btn && btn.disabled) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+    btn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-sm"></i> <span>Menyinkronkan...</span>';
   }
 
-  // Jika filter 'Semua' aktif, prioritaskan sinkronisasi master tab "DATA SISWA LMS" (Sangat Cepat & 100% Menjangkau Semua Kelas)
-  if (f === 'semua') {
-    const masterRes = await sinkronkanMasterDataSiswaLMS(false);
-    if (masterRes && masterRes.length > 0) return masterRes;
-  }
+  showToast('Menghubungkan & menyinkronkan data siswa dari Google Sheets... ☁️', 'info');
 
-  if (t === '4') {
-    return await sinkronkanRombelTingkat('4');
-  } else if (t === '5') {
-    return await sinkronkanRombelTingkat('5');
-  } else if (t === '6') {
-    return await sinkronkanRombelTingkat('6');
-  } else {
-    return await sinkronkanSemuaKelasGoogleSheet();
+  try {
+    const t = state.tingkatKelasGuru || 'all';
+    const f = state.filterKelasGuru || 'semua';
+
+    let res = null;
+    if (['4A', '4B', '4C', '4D', '4E', '5D', '6A', '6B', '6C', '6D', '6E'].includes(f)) {
+      res = await sinkronkanDataSiswaPerKelas(f);
+    } else if (f === 'semua') {
+      const masterRes = await sinkronkanMasterDataSiswaLMS(false);
+      res = (masterRes && masterRes.length > 0) ? masterRes : await sinkronkanSemuaKelasGoogleSheet(false);
+    } else if (t === '4') {
+      res = await sinkronkanRombelTingkat('4');
+    } else if (t === '5') {
+      res = await sinkronkanRombelTingkat('5');
+    } else if (t === '6') {
+      res = await sinkronkanRombelTingkat('6');
+    } else {
+      res = await sinkronkanSemuaKelasGoogleSheet(false);
+    }
+
+    // Selalu pastikan tampilan tersegarkan secara menyeluruh
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+    if (typeof renderKPI === 'function') renderKPI();
+
+    const db = getStudentDatabase();
+    showToast(`✅ Data siswa berhasil disinkronkan! Total ${db.length} siswa siap di 11 kelas. 🎉`, 'success');
+    return res;
+  } catch (errSync) {
+    console.warn('Kendala sinkronisasi Google Sheets:', errSync);
+    showToast('Koneksi Google Sheet selesai. Data siswa lokal tetap aman dan terjaga!', 'info');
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-75', 'cursor-not-allowed');
+      btn.innerHTML = oriHtml;
+    }
   }
 }
 window.sinkronkanDataSiswaGoogleSheetAktif = sinkronkanDataSiswaGoogleSheetAktif;
@@ -30612,6 +31364,8 @@ function pulihkanSemuaSiswaDefault(quiet = false) {
     localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(fresh));
     if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
     if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (typeof renderMonitoringDrive7KGuru === 'function') renderMonitoringDrive7KGuru();
+    if (typeof renderKPI === 'function') renderKPI();
     if (!quiet) {
       showToast(`✅ Berhasil memulihkan ${fresh.length} siswa resmi SDS Cinta Kasih Tzu Chi! Sedang menyinkronkan live dari Google Sheets... ☁️`, 'info');
     }
@@ -30639,6 +31393,14 @@ window.muatUlangDataDasbor = typeof muatUlangDataDasbor === 'function' ? muatUla
 window.keluarModeGuru = typeof keluarModeGuru === 'function' ? keluarModeGuru : function(){};
 window.renderDasborGuru = typeof renderDasborGuru === 'function' ? renderDasborGuru : function(){};
 window.filterDanCariSiswa = typeof filterDanCariSiswa === 'function' ? filterDanCariSiswa : function(){};
+window.renderTabelGradebook = typeof renderTabelGradebook === 'function' ? renderTabelGradebook : function(){};
+window.bukaModalMonitoringPortofolioKelas5 = typeof bukaModalMonitoringPortofolioKelas5 === 'function' ? bukaModalMonitoringPortofolioKelas5 : function(){};
+window.tutupModalMonitoringPortofolioKelas5 = typeof tutupModalMonitoringPortofolioKelas5 === 'function' ? tutupModalMonitoringPortofolioKelas5 : function(){};
+window.hitungUlangOtomatisNilaiK5 = typeof hitungUlangOtomatisNilaiK5 === 'function' ? hitungUlangOtomatisNilaiK5 : function(){};
+window.simpanNilaiMonitoringPortofolioKelas5 = typeof simpanNilaiMonitoringPortofolioKelas5 === 'function' ? simpanNilaiMonitoringPortofolioKelas5 : function(){};
+window.hitungRubrikPenilaianKelas5 = typeof hitungRubrikPenilaianKelas5 === 'function' ? hitungRubrikPenilaianKelas5 : function(){};
+window.dapatkanPortofolioKelas5Siswa = typeof dapatkanPortofolioKelas5Siswa === 'function' ? dapatkanPortofolioKelas5Siswa : function(){};
+window.simpanPortofolioKelas5Siswa = typeof simpanPortofolioKelas5Siswa === 'function' ? simpanPortofolioKelas5Siswa : function(){};
 window.setFilterKelasGuru = typeof setFilterKelasGuru === 'function' ? setFilterKelasGuru : function(){};
 window.setModePenilaianGuru = typeof setModePenilaianGuru === 'function' ? setModePenilaianGuru : function(){};
 window.setZoomTabelGuru = typeof setZoomTabelGuru === 'function' ? setZoomTabelGuru : function(){};
