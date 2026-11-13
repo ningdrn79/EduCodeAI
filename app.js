@@ -26856,7 +26856,7 @@ function renderTabelGradebook(students, totalAll) {
           </span>
         </td>
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Tugas Presentasi PPT (Manual & Gemini AI)">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}', 'ppt')" title="Fokus Periksa Tugas 1: Presentasi PPT (Manual & Gemini AI)">
             <span class="font-title font-black ${szAngka} text-indigo-700 group-hover:scale-110 transition">${evalK5.nilaiPresentasi}</span>
             <span class="font-title font-bold ${szSub} text-indigo-900 mt-1 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200 shadow-2xs group-hover:bg-indigo-100 transition">
               ${evalK5.berkasPptCount}/2 Berkas
@@ -26864,7 +26864,7 @@ function renderTabelGradebook(students, totalAll) {
           </div>
         </td>
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Sertifikat Hour of Code Resmi">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}', 'sertifikat')" title="Fokus Periksa Tugas 2: Sertifikat Hour of Code Resmi">
             <span class="font-title font-black ${szAngka} text-amber-600 group-hover:scale-110 transition">${evalK5.nilaiSertifikat}</span>
             <span class="font-title font-bold ${szSub} ${evalK5.hasSertifikat ? 'text-amber-900 bg-amber-50 border-amber-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-amber-100 transition">
               ${evalK5.hasSertifikat ? '🏆 Sertifikat' : 'Belum Ada'}
@@ -26872,7 +26872,7 @@ function renderTabelGradebook(students, totalAll) {
           </div>
         </td>
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Poster Lingkungan Canva">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}', 'poster')" title="Fokus Periksa Tugas 3: Poster Lingkungan Canva">
             <span class="font-title font-black ${szAngka} text-emerald-700 group-hover:scale-110 transition">${evalK5.nilaiPosterCanva}</span>
             <span class="font-title font-bold ${szSub} ${evalK5.hasPoster ? 'text-emerald-900 bg-emerald-50 border-emerald-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-emerald-100 transition">
               ${evalK5.hasPoster ? '🎨 Poster PNG' : 'Belum Ada'}
@@ -26880,7 +26880,7 @@ function renderTabelGradebook(students, totalAll) {
           </div>
         </td>
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id}')" title="Monitoring Misi Game & Coding (Pulau Tekno / Scratch)">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}', 'game')" title="Fokus Periksa Tugas 4: Misi Game & Coding (Pulau Tekno / Scratch)">
             <span class="font-title font-black ${szAngka} text-purple-700 group-hover:scale-110 transition">${evalK5.nilaiGameCoding}</span>
             <span class="font-title font-bold ${szSub} ${evalK5.hasGame ? 'text-purple-900 bg-purple-50 border-purple-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-purple-100 transition">
               ${evalK5.hasGame ? '🎮 Tuntas' : 'Belum Ada'}
@@ -27600,7 +27600,7 @@ function hitungRubrikPenilaianKelas5(student, customData) {
 }
 window.hitungRubrikPenilaianKelas5 = hitungRubrikPenilaianKelas5;
 
-function bukaModalMonitoringPortofolioKelas5(studentId) {
+function bukaModalMonitoringPortofolioKelas5(studentId, focusTask = null) {
   try { playSound('click'); } catch (e) {}
   const db = getStudentDatabase();
   const safeId = (studentId || '').toString().trim();
@@ -27838,6 +27838,42 @@ function bukaModalMonitoringPortofolioKelas5(studentId) {
   modal.style.setProperty('pointer-events', 'auto', 'important');
   modal.style.setProperty('z-index', '999999', 'important');
   modal.style.setProperty('opacity', '1', 'important');
+
+  // Efek Sorot Cerdas (Focus Highlight): Jika guru mengklik kolom tugas spesifik di tabel
+  try {
+    const allCards = [
+      { key: 'ppt', id: 'mon-k5-card-ppt', ring: ['ring-4', 'ring-indigo-500', 'shadow-xl', 'bg-indigo-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-ppt' },
+      { key: 'sertifikat', id: 'mon-k5-card-sertifikat', ring: ['ring-4', 'ring-amber-500', 'shadow-xl', 'bg-amber-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-sertifikat' },
+      { key: 'poster', id: 'mon-k5-card-poster', ring: ['ring-4', 'ring-emerald-500', 'shadow-xl', 'bg-emerald-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-poster' },
+      { key: 'game', id: 'mon-k5-card-game', ring: ['ring-4', 'ring-purple-500', 'shadow-xl', 'bg-purple-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-game' }
+    ];
+
+    allCards.forEach(c => {
+      const el = document.getElementById(c.id);
+      if (el) {
+        el.classList.remove('ring-4', 'ring-indigo-500', 'ring-amber-500', 'ring-emerald-500', 'ring-purple-500', 'shadow-xl', 'bg-indigo-50/30', 'bg-amber-50/30', 'bg-emerald-50/30', 'bg-purple-50/30', 'scale-[1.01]');
+      }
+    });
+
+    if (focusTask && typeof focusTask === 'string') {
+      const target = allCards.find(c => c.key === focusTask);
+      if (target) {
+        const el = document.getElementById(target.id);
+        if (el) {
+          target.ring.forEach(cls => el.classList.add(cls));
+          setTimeout(() => {
+            try {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              const inp = document.getElementById(target.inputId);
+              if (inp) inp.focus();
+            } catch (err) {}
+          }, 150);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Gagal memicu efek sorot fokus tugas K5:', err);
+  }
 }
 window.bukaModalMonitoringPortofolioKelas5 = bukaModalMonitoringPortofolioKelas5;
 
