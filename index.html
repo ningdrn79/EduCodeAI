@@ -10257,10 +10257,14 @@
               <span id="word-account-name" class="font-medium">ning darningsih</span>
             </div>
 
-  <!-- Tombol Nilai Otomatis AI (0-100) Berbasis Rubrik -->
-            <button onclick="evaluasiDanNilaiOtomatisPosterWord()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold px-3 py-1 rounded-lg border border-amber-300/60 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap" title="Sistem AI menilai poster Word secara otomatis (0-100) berdasarkan 4 aspek rubrik">
+            <!-- Tombol Kirim ke Hasil Poster Siswa & Nilai Otomatis Guru -->
+            <button onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-emerald-300/80 flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & kirim nilai otomatis ke Akun Guru">
+              <i class="fa-solid fa-cloud-arrow-up text-xs text-amber-200"></i>
+              <span>Kirim Poster ke Guru 🚀</span>
+            </button>
+            <button onclick="evaluasiDanNilaiOtomatisPosterWord()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-300/60 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap" title="Sistem AI menilai poster Word secara otomatis (0-100) berdasarkan 4 aspek rubrik">
               <i class="fa-solid fa-robot text-xs text-amber-200"></i>
-              <span>Nilai Otomatis AI</span>
+              <span>Nilai AI</span>
             </button>
 
             <!-- Tombol Layar Penuh Seperti di Ms. Excel -->
@@ -10328,8 +10332,11 @@
             <i class="fa-solid fa-crop-simple text-[10px]"></i> Picture Format
           </button>
 
-          <!-- Tombol Share di Pojok Kanan Atas -->
+          <!-- Tombol Simpan ke Hasil Poster & Share di Pojok Kanan Atas -->
           <div class="ml-auto flex items-center gap-2 pr-1">
+            <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & kirim nilai ke Akun Guru">
+              <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i> Simpan ke Hasil Poster
+            </button>
             <button onclick="simpanPosterWord()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition">
               <i class="fa-solid fa-share-nodes"></i> Share
             </button>
@@ -11259,6 +11266,17 @@
 
   <!-- KANVAS LEMBAR KERJA MICROSOFT WORD (8 Kolom) - Persis Tampilan Dokumen Word Asli -->
           <div class="lg:col-span-8 bg-[#e8e8e8] flex flex-col items-center justify-start relative select-none min-h-[640px] overflow-hidden border-t border-slate-300">
+            
+            <!-- Banner Sinkronisasi Otomatis ke Hasil Poster & Buku Nilai Guru -->
+            <div class="w-full bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 text-slate-800 px-3.5 py-1.5 text-xs font-bold border-b border-emerald-200 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px] font-black shrink-0">✓</span>
+                <span class="text-[11px] text-slate-700">Lab MS Word terhubung otomatis ke <b>Hasil Poster Siswa</b> &amp; <b>Buku Nilai Guru (TP 2.1)</b>.</span>
+              </div>
+              <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i> <span>Kirim Nilai ke Guru 🚀</span>
+              </button>
+            </div>
             
             <!-- BAR PENGGARIS HORIZONTAL & TAB STOP CORNER -->
             <div class="w-full bg-[#f3f2f1] border-b border-[#dad8d6] flex items-center shadow-2xs">
@@ -16126,8 +16144,59 @@
               <i class="fa-solid fa-arrow-left"></i> Kembali ke Soal
             </button>
           </div>
+        </div>
 
-  </div>
+        <!-- Checklist 5 Tugas Pembelajaran KKA Semester 1 (Tampil jika kuis selesai tapi tugas lain belum lengkap) -->
+        <div id="certificate-locked-checklist" class="hidden max-w-3xl mx-auto pt-6 text-center space-y-6 animate-fadeIn">
+          <div class="p-6 sm:p-8 bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 rounded-3xl shadow-2xl text-white border-2 border-indigo-500/40 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 text-white/5 text-9xl pointer-events-none">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            
+            <div class="relative z-10 space-y-4">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-bold">
+                <i class="fa-solid fa-lock text-amber-400"></i> Syarat Piagam Penghargaan KKA Semester 1
+              </div>
+              
+              <h3 class="font-title text-2xl sm:text-3xl font-black text-white leading-tight">
+                Nilai Kuis Berhasil Dicatat: <span id="checklist-kuis-score" class="text-amber-400 font-mono">100</span>! 🏆
+              </h3>
+              
+              <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+                Hebat! Nilai kuismu telah <b class="text-emerald-400">tersimpan resmi di Kolom KUIS SEM 1 Guru &amp; Rapor Siswa</b>. Untuk membuka &amp; mencetak <b class="text-amber-300">Piagam Penghargaan Resmi Kelulusan KKA Semester 1</b>, yuk tuntaskan seluruh 5 tugas pembelajaran di bawah ini:
+              </p>
+
+              <!-- Progress Bar Kelulusan -->
+              <div class="max-w-md mx-auto bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700 space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold">
+                  <span class="text-slate-300">Progres 5 Tugas KKA Sem 1:</span>
+                  <span id="checklist-progress-text" class="text-amber-400 font-mono">0 / 5 Tugas Selesai (0%)</span>
+                </div>
+                <div class="w-full h-3.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                  <div id="checklist-progress-bar" class="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Container 5 Kartu Tugas Interaktif -->
+              <div id="checklist-tasks-container" class="grid grid-cols-1 gap-3 text-left pt-2">
+                <!-- Diisi otomatis oleh JavaScript renderChecklist5TugasKka() -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Aksi Bawah -->
+          <div class="flex flex-wrap justify-center gap-3">
+            <button type="button" onclick="evaluasiDanTampilkanPiagamKuisSiswa()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer transform hover:scale-105 active:scale-95 ring-2 ring-emerald-300">
+              <i class="fa-solid fa-arrows-rotate"></i> <span>Periksa Ulang Kelengkapan Tugas 🔄</span>
+            </button>
+            <button type="button" onclick="restartQuiz()" class="bg-amber-500 hover:bg-amber-600 text-white font-title text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-rotate-right"></i> Coba Kuis Lagi
+            </button>
+            <button type="button" onclick="kembaliKeSoalKuis()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl border border-slate-300 transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-arrow-left"></i> Kembali ke Soal Kuis
+            </button>
+          </div>
+        </div>
 
   </div>
 
@@ -18608,6 +18677,8 @@
               <option value="semua">Semua Status KKM</option>
               <option value="tuntas">✅ Tuntas KKM (≥ 80)</option>
               <option value="remedial">⚠️ Perlu Remedial (&lt; 80)</option>
+              <option value="aktif">🌟 Sedang/Sudah Mengerjakan</option>
+              <option value="belum">⏳ Belum Mengerjakan (0 Poin)</option>
             </select>
 
             <!-- Search Bar Input -->
@@ -23523,7 +23594,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261116_quiz_grade_fix_v160"></script>
+  <script charset="UTF-8" src="app.js?v=20261116_piagam_5tasks_checklist_v163"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
