@@ -28063,10 +28063,10 @@ function renderTabelGradebook(students, totalAll) {
           <th class="py-4 px-3 text-center w-12">No</th>
           <th class="py-4 px-3 min-w-[210px]">Data Siswa</th>
           <th class="py-4 px-2 text-center w-20">Kelas</th>
-          <th class="py-4 px-2 text-center w-36">1. Scratch 4 Pilar</th>
-          <th class="py-4 px-2 text-center w-36">2. Scratch Algoritma</th>
+          <th class="py-4 px-2 text-center w-36">1. Detektif Sampah</th>
+          <th class="py-4 px-2 text-center w-36">2. Pelestarian Lingkungan</th>
           <th class="py-4 px-2 text-center w-36">3. Antar Teman</th>
-          <th class="py-4 px-2 text-center w-36">4. Kuis6</th>
+          <th class="py-4 px-2 text-center w-36">4. Kuis Komputasi</th>
           <th class="py-4 px-2 text-center w-28">Nilai Rapor</th>
           <th class="py-4 px-2 text-center w-32">Sertifikat</th>
           <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
@@ -28295,6 +28295,8 @@ function renderTabelGradebook(students, totalAll) {
           </div>
         </td>
       `;
+      tbody.appendChild(tr);
+      return;
     } else if (isTingkat5View || isKelas5Student) {
       const evalK5 = hitungRubrikPenilaianKelas5(s);
       const isPassK5 = evalK5.isTuntas;
