@@ -28290,8 +28290,11 @@ function renderTabelGradebook(students, totalAll) {
             <button type="button" onclick="bukaModalSertifikatKelas6('${s.id || s.nis || s.nama}')" title="Piagam Sertifikat Kelulusan Kelas 6" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-award"></i>
             </button>
-            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail Siswa" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+            <button type="button" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Beri Nilai & Catatan Guru Kelas 6" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
         </td>
@@ -29478,6 +29481,22 @@ function bukaModalDetailSiswa(studentId) {
   const db = getStudentDatabase();
   const student = db.find(s => s.id === studentId);
   if (!student) return;
+
+  const kls = String(student.kelas || '').toUpperCase();
+  const isK6 = kls.includes('6') || kls.includes('VI') || state.tingkatKelasGuru === '6';
+  if (isK6) {
+    if (typeof bukaModalMonitoringTugasKelas6 === 'function') {
+      bukaModalMonitoringTugasKelas6(student.id || student.nis || student.nama);
+      return;
+    }
+  }
+  const isK5 = kls.includes('5') || kls.includes('V') || state.tingkatKelasGuru === '5';
+  if (isK5) {
+    if (typeof bukaModalMonitoringPortofolioKelas5 === 'function') {
+      bukaModalMonitoringPortofolioKelas5(student.id || student.nis || student.nama);
+      return;
+    }
+  }
 
   state.selectedStudentId = studentId;
 
@@ -36260,6 +36279,24 @@ function simpanNilaiMonitoringKelas6() {
     db[idx].statusKkm = _currentMonitoredK6Student.statusKkm;
     saveStudentDatabase(db);
   }
+
+  // Sinkronkan ke Cloud Firebase Portofolio K6 jika tersedia
+  try {
+    const k6Data = (typeof muatPortofolioKelas6Siswa === 'function') ? muatPortofolioKelas6Siswa(_currentMonitoredK6Student) : null;
+    if (k6Data) {
+      k6Data.nilaiScratch4Pilar = nPilar;
+      k6Data.nilaiScratchAlgoritma = nAlgo;
+      k6Data.nilaiAntarTeman = nAntar;
+      k6Data.nilaiKuis6 = nKuis;
+      k6Data.catatanGuru = catatan;
+      k6Data.nilaiAkhir = nilaiAkhir;
+      if (typeof simpanPortofolioKelas6Siswa === 'function') {
+        simpanPortofolioKelas6Siswa(_currentMonitoredK6Student, k6Data);
+      } else if (typeof simpanPortofolioK6KeCloud === 'function') {
+        simpanPortofolioK6KeCloud(_currentMonitoredK6Student, k6Data);
+      }
+    }
+  } catch(eCloud) {}
 
   // Update table gradebook
   if (typeof renderDasborGuru === 'function') {
