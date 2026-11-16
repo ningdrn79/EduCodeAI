@@ -10226,6 +10226,9 @@
             </div>
 
   <div class="flex items-center gap-1 text-slate-200">
+              <button onclick="resetWordKanvasKosong(true)" title="New / Blank Document (Kertas Kosong)" class="hover:bg-white/20 p-1 rounded transition text-xs">
+                <i class="fa-regular fa-file"></i>
+              </button>
               <button onclick="simpanDokumenCepatWord()" title="Save (Ctrl+S)" class="hover:bg-white/20 p-1 rounded transition text-xs">
                 <i class="fa-solid fa-floppy-disk"></i>
               </button>
@@ -10256,6 +10259,12 @@
               <span id="word-account-avatar" class="w-5 h-5 rounded-full bg-blue-700 text-white font-bold text-[10px] flex items-center justify-center">ND</span>
               <span id="word-account-name" class="font-medium">ning darningsih</span>
             </div>
+
+            <!-- Tombol Kertas Kosong (Mulai dari Awal) -->
+            <button onclick="resetWordKanvasKosong(true)" class="bg-blue-900/80 hover:bg-blue-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-400/40 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap cursor-pointer" title="Kosongkan lembar kerja untuk membuat poster secara mandiri dari awal">
+              <i class="fa-regular fa-file text-xs text-blue-200"></i>
+              <span>Kertas Kosong</span>
+            </button>
 
             <!-- Tombol Kirim ke Hasil Poster Siswa & Nilai Otomatis Guru -->
             <button onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-emerald-300/80 flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & kirim nilai otomatis ke Akun Guru">
@@ -11038,15 +11047,21 @@
           <!-- SIDEBAR KIRI (4 Kolom): Bank Teks & Gambar Lingkungan Hidup -->
           <div class="lg:col-span-4 bg-slate-100 p-4 border-r border-slate-300 overflow-y-auto max-h-[720px] space-y-4">
             
-            <!-- Quick Preset Template -->
-            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
-              <span class="text-[11px] font-bold uppercase text-slate-500 block mb-1">Inspirasi Cepat Template Poster:</span>
-              <select onchange="loadPresetPosterLingkungan(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-amber-400 outline-none">
-                <option value="">-- Pilih Template Poster --</option>
-                <option value="indonesia_hebat" selected>🌟 Template 1: Tujuh Kebiasaan Anak Indonesia Hebat</option>
-                <option value="asta_cita">🇮🇩 Template 2: Mewujudkan Asta Cita Karakter Bangsa</option>
-                <option value="sehat_bugar">🌅 Template 3: Bangun Pagi, Olahraga & Makan Bergizi</option>
-                <option value="cerdas_sosial">📖 Template 4: Gemar Belajar & Rukun Bermasyarakat</option>
+            <!-- Quick Preset Template (Opsional untuk Inspirasi) -->
+            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase text-slate-500 block">Inspirasi Template (Opsional):</span>
+                <button type="button" onclick="resetWordKanvasKosong(true)" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-lg font-bold transition flex items-center gap-1 cursor-pointer" title="Kosongkan lembar kerja untuk mulai dari awal secara mandiri">
+                  <i class="fa-solid fa-rotate-left"></i> Kertas Kosong
+                </button>
+              </div>
+              <select id="select-word-preset" onchange="if(this.value){ loadPresetPosterLingkungan(this.value); } else { resetWordKanvasKosong(false); }" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-blue-400 outline-none">
+                <option value="" selected>📄 Mulai Kertas Kosong (Mandiri)</option>
+                <option value="indonesia_hebat">🌟 Contoh 1: Tujuh Kebiasaan Anak Indonesia Hebat</option>
+                <option value="asta_cita">🇮🇩 Contoh 2: Mewujudkan Asta Cita Karakter Bangsa</option>
+                <option value="sehat_bugar">🌅 Contoh 3: Bangun Pagi, Olahraga & Makan Bergizi</option>
+                <option value="cerdas_sosial">📖 Contoh 4: Gemar Belajar & Rukun Bermasyarakat</option>
+                <option value="bumi">🌱 Contoh 5: Jaga Bumi Kita Berseri</option>
               </select>
             </div>
 
@@ -23594,7 +23609,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261116_ai_modal_zindex_fix_v164"></script>
+  <script charset="UTF-8" src="app.js?v=20261116_kuis_score_checklist_strict_v166"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

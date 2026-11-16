@@ -2080,6 +2080,7 @@ function switchTab(tabId) {
         if (k4QuizBox) k4QuizBox.classList.remove('hidden');
         // Reset & render kisi-kisi kuis minggu ini untuk Kelas 4
         if (typeof pilihSubTabKuis === 'function') pilihSubTabKuis('pg');
+        if (typeof sinkronkanSkorKuisHeader === 'function') sinkronkanSkorKuisHeader();
       }
     } catch(eKuis6) {
       console.error('Error in switchTab kuis:', eKuis6);
@@ -2201,10 +2202,12 @@ function switchTab(tabId) {
     setTimeout(initExcelSpreadsheet, 50);
   }
 
-  // Pastikan Lab MS Word memiliki poster awal jika lembar kerja masih kosong
+  // Buka Lab MS Word: muat draft tersimpan siswa (atau biarkan lembar kerja kosong jika belum ada draft)
   if (tabId === 'msword') {
-    if (wordElements.length === 0) {
-      setTimeout(() => loadPresetPosterLingkungan('indonesia_hebat'), 50);
+    if (typeof muatWordDraftSiswa === 'function') {
+      setTimeout(muatWordDraftSiswa, 50);
+    } else {
+      setTimeout(renderWordElements, 50);
     }
   }
 
@@ -11579,7 +11582,7 @@ function nextQuestion() {
 
     // 2. Evaluasi kelayakan Piagam Penghargaan KKA Semester 1 (5 Tugas Wajib)
     if (typeof evaluasiDanTampilkanPiagamKuisSiswa === 'function') {
-      evaluasiDanTampilkanPiagamKuisSiswa(state.quizScore);
+      evaluasiDanTampilkanPiagamKuisSiswa(state.quizScore, true);
     } else {
       const quizBox = document.getElementById('quiz-box');
       const certBox = document.getElementById('certificate-box');
@@ -11638,28 +11641,25 @@ function periksaKelengkapan5TugasKkaSem1(studentProfile) {
   const evalDrive = (typeof hitungNilaiDrive7Kebiasaan === 'function') ? hitungNilaiDrive7Kebiasaan(driveData) : { filledCount: 0, totalSkor: 0 };
   const driveCount = evalDrive.filledCount || student.koleksiDrive || 0;
   const driveScore = evalDrive.totalSkor || student.nilaiDrive || 0;
-  const isDriveDone = (driveCount > 0 || driveScore > 0);
+  const isDriveDone = (driveCount > 0 && driveScore > 0);
 
   // 2. Modul Belajar (Tugas 2: TP 2.1 - TP 2.4)
   const isModulDone = Boolean(
-    (student.tpSelesai && Array.isArray(student.tpSelesai) && student.tpSelesai.some(tp => tp.includes('TP 1') || tp.includes('TP 2'))) ||
-    localStorage.getItem('educode_modul_visited') === 'true' ||
-    (sNis && localStorage.getItem(`educode_modul_selesai_${sNis}`) === 'true') ||
-    (student.poinBintang && Number(student.poinBintang) >= 20) ||
-    (typeof state !== 'undefined' && state.userPoints >= 20)
+    (student.tpSelesai && Array.isArray(student.tpSelesai) && student.tpSelesai.some(tp => tp.includes('TP 2.2') || tp.includes('TP 2.3') || tp.includes('TP 2.4'))) ||
+    (sNis && localStorage.getItem(`educode_modul_selesai_${sNis}`) === 'true')
   );
 
   // 3. Poster Kreator Cilik (Tugas 3: Lab MS Word)
   const posterData = (typeof dapatkanStatusDanNilaiPosterSiswa === 'function') ? dapatkanStatusDanNilaiPosterSiswa(student) : { posterWord: student.posterWord || 0, nilaiPoster: student.nilaiPoster || 0 };
   const posterCount = posterData.posterWord || student.posterWord || 0;
   const posterScore = posterData.nilaiPoster || student.nilaiPoster || 0;
-  const isPosterDone = (posterCount > 0 || posterScore > 0);
+  const isPosterDone = (posterCount > 0 && posterScore > 0);
 
   // 4. Latihan Tabungan & Rumus (Tugas 4: Lab MS Excel)
   const exData = (typeof dapatkanStatusDanNilaiExcelSiswa === 'function') ? dapatkanStatusDanNilaiExcelSiswa(student) : { excelTabel: student.excelTabel || 0, nilaiExcel: student.nilaiExcel || 0 };
   const excelCount = exData.excelTabel || student.excelTabel || 0;
   const excelScore = exData.nilaiExcel || student.nilaiExcel || 0;
-  const isExcelDone = (excelCount > 0 || excelScore > 0);
+  const isExcelDone = (excelCount > 0 && excelScore > 0);
 
   // 5. Kuis Evaluasi Semester 1 (Tugas 5)
   const kuisScore = (student.kuisSem1 && Number(student.kuisSem1) > 0)
@@ -11837,17 +11837,76 @@ function navigasiKeTugasKka(targetTab) {
 }
 window.navigasiKeTugasKka = navigasiKeTugasKka;
 
-function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore) {
-  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-  const check = periksaKelengkapan5TugasKkaSem1(profile);
-  const finalScore = (explicitScore !== undefined && explicitScore !== null && Number(explicitScore) > 0)
-    ? Number(explicitScore)
-    : (check.kuisScore || state.quizScore || 100);
+// Sinkronkan Skor Kuis Siswa Aktif ke Badge "Skor Kamu: X / 100" & Tombol Sertifikat
+function sinkronkanSkorKuisHeader() {
+  try {
+    const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+    const sNis = profile && profile.nis ? String(profile.nis).trim() : '';
+    const student = (profile && db.find(s => (sNis && s.nis && String(s.nis).trim() === sNis) || (s.id && profile.id && s.id === profile.id))) || profile || {};
 
-  // Nilai kuis SELALU tercatat dan masuk ke database & Kolom KUIS SEM 1 guru
-  if (typeof catatHasilKuisSiswa === 'function') {
-    catatHasilKuisSiswa(1, finalScore);
+    let currentScore = 0;
+    if (state.currentSemester === 2) {
+      currentScore = (student && student.kuisSem2 && Number(student.kuisSem2) > 0) ? Number(student.kuisSem2) : (state.quizScore || 0);
+    } else {
+      currentScore = (student && student.kuisSem1 && Number(student.kuisSem1) > 0) ? Number(student.kuisSem1) : (state.quizScore || 0);
+    }
+
+    // Perbarui badge Skor Kamu di header kuis
+    const scoreEl = document.getElementById('quiz-score');
+    if (scoreEl) {
+      scoreEl.innerText = currentScore;
+    }
+
+    // Tombol Lihat Piagam Sertifikat di Top Header Kuis
+    const btnLihatSertifikatTop = document.getElementById('btn-lihat-sertifikat-top');
+    if (btnLihatSertifikatTop) {
+      if (currentScore > 0) {
+        btnLihatSertifikatTop.classList.remove('hidden');
+      } else {
+        btnLihatSertifikatTop.classList.add('hidden');
+      }
+    }
+
+    const btnTextSertifikatModul = document.getElementById('btn-text-sertifikat-modul');
+    if (btnTextSertifikatModul) {
+      if (currentScore > 0) {
+        btnTextSertifikatModul.innerText = 'Lihat Status Kelulusan KKA & Piagam 🏆';
+      } else {
+        btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat 🏆';
+      }
+    }
+  } catch (e) {
+    console.warn('Error in sinkronkanSkorKuisHeader:', e);
   }
+}
+window.sinkronkanSkorKuisHeader = sinkronkanSkorKuisHeader;
+
+function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore, isFinishingQuiz = false) {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+  const sNis = profile && profile.nis ? String(profile.nis).trim() : '';
+  const student = (profile && db.find(s => (sNis && s.nis && String(s.nis).trim() === sNis) || (s.id && profile.id && s.id === profile.id))) || profile || {};
+
+  let finalScore = 0;
+  if (explicitScore !== undefined && explicitScore !== null && !isNaN(Number(explicitScore)) && Number(explicitScore) > 0) {
+    finalScore = Number(explicitScore);
+  } else if (student && student.kuisSem1 && Number(student.kuisSem1) > 0) {
+    finalScore = Number(student.kuisSem1);
+  } else if (typeof state !== 'undefined' && state.quizScore && state.quizScore > 0) {
+    finalScore = Number(state.quizScore);
+  }
+
+  // Update badge "Skor Kamu: X / 100" di header kuis
+  const scoreEl = document.getElementById('quiz-score');
+  if (scoreEl) scoreEl.innerText = finalScore;
+
+  // Catat kuis ke database HANYA jika siswa baru saja menyelesaikan kuis secara nyata
+  if (isFinishingQuiz && finalScore > 0 && typeof catatHasilKuisSiswa === 'function') {
+    catatHasilKuisSiswa(state.currentSemester || 1, finalScore);
+  }
+
+  const check = periksaKelengkapan5TugasKkaSem1(profile);
 
   const quizBox = document.getElementById('quiz-box');
   const certBox = document.getElementById('certificate-box');
@@ -11855,88 +11914,98 @@ function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore) {
 
   if (quizBox) quizBox.classList.add('hidden');
 
-  if (check.isAllDone) {
-    // SEMUA 5 TUGAS TUNTAS -> TAMPILKAN PIAGAM PENGHARGAAN RESMI!
-    if (checklistBox) checklistBox.classList.add('hidden');
+  if (!check.isAllDone) {
+    // WAJIB KUNCI PIAGAM DAN TAMPILKAN CHECKLIST 5 TUGAS!
     if (certBox) {
-      certBox.classList.remove('hidden');
-      
-      const certScore = document.getElementById('cert-score');
-      if (certScore) certScore.innerText = finalScore;
-
-      const certStudentName = document.getElementById('cert-student-name');
-      if (certStudentName) {
-        if (profile && profile.nama) {
-          certStudentName.value = `${profile.nama} (${profile.kelas || 'Kelas 4'})`;
-        }
-      }
-
-      const certTitle = document.getElementById('cert-title');
-      const certSub = document.getElementById('cert-sub');
-      if (certTitle) {
-        certTitle.innerText = 'PIAGAM PENGHARGAAN KREATOR KONTEN DIGITAL & LITERASI KKA SEMESTER 1';
-      }
-      if (certSub) {
-        certSub.innerHTML = `
-          Telah berhasil menuntaskan seluruh <b>5 Tugas Wajib Pembelajaran KKA Semester 1</b><br>
-          <i>(Drive 7 Kebiasaan • Modul Belajar • Poster Word • Latihan Excel • Kuis Evaluasi)</i><br>
-          dengan predikat capaian belajar:
-        `;
-      }
-
-      // Render atau update lencana 5 tugas tuntas di dalam piagam
-      let badgesContainer = document.getElementById('cert-5tasks-badges');
-      if (!badgesContainer) {
-        badgesContainer = document.createElement('div');
-        badgesContainer.id = 'cert-5tasks-badges';
-        badgesContainer.className = 'grid grid-cols-2 sm:grid-cols-5 gap-2 my-3 pt-2 border-t border-amber-200 text-slate-800';
-        const certSubEl = document.getElementById('cert-sub');
-        if (certSubEl && certSubEl.parentNode) {
-          certSubEl.parentNode.insertBefore(badgesContainer, certSubEl.nextSibling);
-        }
-      }
-      if (badgesContainer) {
-        badgesContainer.innerHTML = `
-          <div class="p-2 rounded-xl bg-purple-50 border border-purple-200 text-center">
-            <div class="text-xs">📁</div>
-            <div class="text-[9px] font-black text-purple-900">Drive 7 Kebiasaan</div>
-            <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (${check.tasks[0].badge})</div>
-          </div>
-          <div class="p-2 rounded-xl bg-blue-50 border border-blue-200 text-center">
-            <div class="text-xs">📘</div>
-            <div class="text-[9px] font-black text-blue-900">Modul Belajar</div>
-            <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (TP 2.1-2.4)</div>
-          </div>
-          <div class="p-2 rounded-xl bg-indigo-50 border border-indigo-200 text-center">
-            <div class="text-xs">🎨</div>
-            <div class="text-[9px] font-black text-indigo-900">Poster Word</div>
-            <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (${check.tasks[2].badge})</div>
-          </div>
-          <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-            <div class="text-xs">📊</div>
-            <div class="text-[9px] font-black text-emerald-900">Latihan Excel</div>
-            <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (${check.tasks[3].badge})</div>
-          </div>
-          <div class="p-2 rounded-xl bg-amber-50 border border-amber-200 text-center col-span-2 sm:col-span-1">
-            <div class="text-xs">🏆</div>
-            <div class="text-[9px] font-black text-amber-900">Kuis Evaluasi</div>
-            <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (Skor: ${finalScore})</div>
-          </div>
-        `;
-      }
+      certBox.classList.add('hidden');
+      certBox.style.setProperty('display', 'none', 'important');
     }
-    playSound('fanfare');
-    showToast(`🎉 SELAMAT! Seluruh 5 Tugas KKA Semester 1 Lengkap! Piagam Penghargaan Terbuka! 🏆`, 'success');
-  } else {
-    // MASIH ADA TUGAS BELUM LENGKAP -> TAMPILKAN CHECKLIST PENYELESAIAN TUGAS
-    if (certBox) certBox.classList.add('hidden');
     if (checklistBox) {
       checklistBox.classList.remove('hidden');
+      checklistBox.style.removeProperty('display');
+      checklistBox.style.setProperty('display', 'block', 'important');
       renderChecklist5TugasKka(check, finalScore);
     }
     playSound('pop');
-    showToast(`⚠️ Nilai Kuis (${finalScore}) tercatat di Rapor! Namun masih ada tugas KKA yang belum selesai.`, 'warning');
+    showToast(`⚠️ Piagam Terkunci! Masih ada ${5 - check.completedCount} tugas KKA Semester 1 yang belum selesai.`, 'warning');
+    return;
   }
+
+  // SEMUA 5 TUGAS TUNTAS (100% LENGKAP) -> TAMPILKAN PIAGAM PENGHARGAAN RESMI!
+  if (checklistBox) {
+    checklistBox.classList.add('hidden');
+    checklistBox.style.setProperty('display', 'none', 'important');
+  }
+  if (certBox) {
+    certBox.classList.remove('hidden');
+    certBox.style.removeProperty('display');
+    
+    const certScore = document.getElementById('cert-score');
+    if (certScore) certScore.innerText = finalScore;
+
+    const certStudentName = document.getElementById('cert-student-name');
+    if (certStudentName) {
+      if (profile && profile.nama) {
+        certStudentName.value = `${profile.nama} (${profile.kelas || 'Kelas 4'})`;
+      }
+    }
+
+    const certTitle = document.getElementById('cert-title');
+    const certSub = document.getElementById('cert-sub');
+    if (certTitle) {
+      certTitle.innerText = 'PIAGAM PENGHARGAAN KREATOR KONTEN DIGITAL & LITERASI KKA SEMESTER 1';
+    }
+    if (certSub) {
+      certSub.innerHTML = `
+        Telah berhasil menuntaskan seluruh <b>5 Tugas Wajib Pembelajaran KKA Semester 1</b><br>
+        <i>(Drive 7 Kebiasaan • Modul Belajar • Poster Word • Latihan Excel • Kuis Evaluasi)</i><br>
+        dengan predikat capaian belajar:
+      `;
+    }
+
+    // Render atau update lencana 5 tugas tuntas di dalam piagam
+    let badgesContainer = document.getElementById('cert-5tasks-badges');
+    if (!badgesContainer) {
+      badgesContainer = document.createElement('div');
+      badgesContainer.id = 'cert-5tasks-badges';
+      badgesContainer.className = 'grid grid-cols-2 sm:grid-cols-5 gap-2 my-3 pt-2 border-t border-amber-200 text-slate-800';
+      const certSubEl = document.getElementById('cert-sub');
+      if (certSubEl && certSubEl.parentNode) {
+        certSubEl.parentNode.insertBefore(badgesContainer, certSubEl.nextSibling);
+      }
+    }
+    if (badgesContainer) {
+      badgesContainer.innerHTML = `
+        <div class="p-2 rounded-xl bg-purple-50 border border-purple-200 text-center">
+          <div class="text-xs">📁</div>
+          <div class="text-[9px] font-black text-purple-900">Drive 7 Kebiasaan</div>
+          <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (${check.tasks[0].badge})</div>
+        </div>
+        <div class="p-2 rounded-xl bg-blue-50 border border-blue-200 text-center">
+          <div class="text-xs">📘</div>
+          <div class="text-[9px] font-black text-blue-900">Modul Belajar</div>
+          <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas</div>
+        </div>
+        <div class="p-2 rounded-xl bg-indigo-50 border border-indigo-200 text-center">
+          <div class="text-xs">🎨</div>
+          <div class="text-[9px] font-black text-indigo-900">Poster Word</div>
+          <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (${check.tasks[2].badge})</div>
+        </div>
+        <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+          <div class="text-xs">📊</div>
+          <div class="text-[9px] font-black text-emerald-900">Latihan Excel</div>
+          <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (${check.tasks[3].badge})</div>
+        </div>
+        <div class="p-2 rounded-xl bg-amber-50 border border-amber-200 text-center col-span-2 sm:col-span-1">
+          <div class="text-xs">🏆</div>
+          <div class="text-[9px] font-black text-amber-900">Kuis Evaluasi</div>
+          <div class="text-[8px] font-bold text-emerald-700">✅ Tuntas (Skor: ${finalScore})</div>
+        </div>
+      `;
+    }
+  }
+  playSound('fanfare');
+  showToast(`🎉 SELAMAT! Seluruh 5 Tugas KKA Semester 1 Lengkap! Piagam Penghargaan Terbuka! 🏆`, 'success');
 }
 window.evaluasiDanTampilkanPiagamKuisSiswa = evaluasiDanTampilkanPiagamKuisSiswa;
 
@@ -11948,14 +12017,15 @@ function tampilkanSertifikatTersimpanSiswa() {
     return;
   }
   const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
-  const student = db.find(s => (profile.nis && s.nis === profile.nis) || s.id === profile.id || (s.nama.toLowerCase() === profile.nama.toLowerCase() && s.kelas === profile.kelas));
+  const sNis = profile.nis ? String(profile.nis).trim() : '';
+  const student = (profile && db.find(s => (sNis && s.nis && String(s.nis).trim() === sNis) || (s.id && profile.id && s.id === profile.id))) || profile || {};
   
   const score = (state.currentSemester === 2) 
-    ? ((student && student.kuisSem2) ? student.kuisSem2 : (state.quizScore || 100))
-    : ((student && student.kuisSem1) ? student.kuisSem1 : (state.quizScore || 100));
+    ? ((student && student.kuisSem2) ? Number(student.kuisSem2) : (state.quizScore || 0))
+    : ((student && student.kuisSem1) ? Number(student.kuisSem1) : (state.quizScore || 0));
 
   switchTab('kuis');
-  evaluasiDanTampilkanPiagamKuisSiswa(score);
+  evaluasiDanTampilkanPiagamKuisSiswa(score, false);
 }
 window.tampilkanSertifikatTersimpanSiswa = tampilkanSertifikatTersimpanSiswa;
 
@@ -14077,14 +14147,7 @@ function loadPresetPosterLingkungan(preset) {
 
   activeWordElementId = null;
   renderWordElements();
-  showToast(`Template "${preset.toUpperCase()}" berhasil dipasang di Word!`, 'success');
-
-  // Otomatis sinkronkan hasil ke Hasil Poster Siswa & Buku Nilai Guru di latar belakang
-  setTimeout(() => {
-    if (typeof kirimHasilWordKePosterDanGuru === 'function') {
-      kirimHasilWordKePosterDanGuru(false);
-    }
-  }, 400);
+  showToast(`Inspirasi template "${preset.toUpperCase()}" siap di lembar kerja! Silakan edit & kembangkan sebelum dinilai.`, 'info');
 }
 
 // Evaluasi Berpikir Komputasional (Kombinasi Logis & Dekomposisi)
@@ -19367,8 +19430,8 @@ document.addEventListener('DOMContentLoaded', () => {
   try { loadQuizQuestion(); } catch (e) { console.warn('loadQuizQuestion init:', e); }
   try { updateStudioPoster(); } catch (e) { console.warn('updateStudioPoster init:', e); }
   try { 
-    if (wordElements.length === 0) {
-      loadPresetPosterLingkungan('indonesia_hebat');
+    if (typeof muatWordDraftSiswa === 'function') {
+      muatWordDraftSiswa();
     } else {
       renderWordElements(); 
     }
@@ -26025,19 +26088,66 @@ function muatWordDraftSiswa() {
     }
   } catch (e) {}
 
-  // Jika siswa belum punya draft tersimpan, mulai lembar poster baru yang bersih
-  loadPresetPosterLingkungan('indonesia_hebat');
+  // Jika siswa belum punya draft tersimpan, mulai lembar poster baru dalam keadaan KOSONG (kertas putih polos mandiri)
+  wordElements = [];
+  wordPageBgColor = '#ffffff';
+  wordPageBorderStyle = 'solid';
+  setWordPageBg('#ffffff');
+  setWordPageBorder('solid');
+  activeWordElementId = null;
+
   const profile = getActiveStudentProfile();
-  if (profile) {
-    const formatBaku = `${profile.kelas}_${(profile.nama || 'Siswa').split(' ')[0]}_Poster 7 Kebiasaan`;
-    currentWordDocTitle = formatBaku;
-    const docNameInput = document.getElementById('word-doc-name-input');
-    if (docNameInput) docNameInput.value = formatBaku;
-    const titleDisplay = document.getElementById('word-doc-title-display');
-    if (titleDisplay) titleDisplay.innerText = `${formatBaku}.docx - Word`;
-  }
+  const formatBaku = profile ? `${profile.kelas || '4A'}_${(profile.nama || 'Siswa').split(' ')[0]}_Poster 7 Kebiasaan` : 'Poster_7_Kebiasaan';
+  currentWordDocTitle = formatBaku;
+  const docNameInput = document.getElementById('word-doc-name-input');
+  if (docNameInput) docNameInput.value = formatBaku;
+  const titleDisplay = document.getElementById('word-doc-title-display');
+  if (titleDisplay) titleDisplay.innerText = `${formatBaku}.docx - Word`;
+
+  const presetSelect = document.getElementById('select-word-preset');
+  if (presetSelect) presetSelect.value = '';
+
+  renderWordElements();
 }
 window.muatWordDraftSiswa = muatWordDraftSiswa;
+
+// Fungsi untuk mengosongkan lembar kerja Lab MS Word (Reset ke Kertas Kosong)
+function resetWordKanvasKosong(konfirmasi = false) {
+  if (konfirmasi && wordElements && wordElements.length > 0) {
+    if (!confirm('Apakah kamu yakin ingin mengosongkan lembar kerja Word dan mulai dari awal?')) {
+      return;
+    }
+  }
+  playSound('click');
+  wordElements = [];
+  wordPageBgColor = '#ffffff';
+  wordPageBorderStyle = 'solid';
+  setWordPageBg('#ffffff');
+  setWordPageBorder('solid');
+  activeWordElementId = null;
+
+  const profile = getActiveStudentProfile();
+  const formatBaku = profile ? `${profile.kelas || '4A'}_${(profile.nama || 'Siswa').split(' ')[0]}_Poster 7 Kebiasaan` : 'Poster_7_Kebiasaan';
+  currentWordDocTitle = formatBaku;
+  const docNameInput = document.getElementById('word-doc-name-input');
+  if (docNameInput) docNameInput.value = formatBaku;
+  const titleDisplay = document.getElementById('word-doc-title-display');
+  if (titleDisplay) titleDisplay.innerText = `${formatBaku}.docx - Word`;
+
+  const presetSelect = document.getElementById('select-word-preset');
+  if (presetSelect) presetSelect.value = '';
+
+  try {
+    const key = getActiveStudentStorageKey('educode_word_active_draft');
+    localStorage.removeItem(key);
+  } catch (e) {}
+
+  renderWordElements();
+  if (typeof showToast === 'function') {
+    showToast('📄 Lembar kerja Word dikosongkan. Silakan berkreasi secara mandiri!', 'info');
+  }
+}
+window.resetWordKanvasKosong = resetWordKanvasKosong;
 
 function simpanExcelDraftSiswa() {
   try {
@@ -26387,26 +26497,10 @@ function muatProfilSiswa() {
     }
   } catch (eCloud) {}
 
-  // Perbarui tombol sertifikat di Kuis & Banner Modul
+  // Perbarui tombol sertifikat di Kuis & Banner Modul serta skor kuis di header
   try {
-    const btnLihatSertifikatTop = document.getElementById('btn-lihat-sertifikat-top');
-    const btnTextSertifikatModul = document.getElementById('btn-text-sertifikat-modul');
-    const hasFinishedKuis = student && ((state.currentSemester === 2 ? student.kuisSem2 : student.kuisSem1) > 0);
-
-    if (btnLihatSertifikatTop) {
-      if (hasFinishedKuis) {
-        btnLihatSertifikatTop.classList.remove('hidden');
-      } else {
-        btnLihatSertifikatTop.classList.add('hidden');
-      }
-    }
-
-    if (btnTextSertifikatModul) {
-      if (hasFinishedKuis) {
-        btnTextSertifikatModul.innerText = 'Lihat Sertifikat Digital Saya 🏆';
-      } else {
-        btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat 🏆';
-      }
+    if (typeof sinkronkanSkorKuisHeader === 'function') {
+      sinkronkanSkorKuisHeader();
     }
   } catch (eKuisCert) {}
 }
@@ -26546,6 +26640,11 @@ function catatHasilKuisSiswa(semNumber, score) {
       localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(profile));
     } catch (eProf) {}
 
+    // Sinkronkan ke header kuis
+    if (typeof sinkronkanSkorKuisHeader === 'function') {
+      sinkronkanSkorKuisHeader();
+    }
+
     // Simpan riwayat kuis mandiri ke LocalStorage multi-kunci agar tidak pernah hilang
     try {
       const recordObj = {
@@ -26611,10 +26710,22 @@ window.catatHasilKuisSiswa = catatHasilKuisSiswa;
 
 // 1. Rubrik Penilaian Otomatis Poster Word (0-100)
 function hitungRubrikOtomatisPosterWord(elements = [], title = '', bgColor = '#ffffff', borderStyle = 'solid') {
-  const currentEls = Array.isArray(elements) && elements.length > 0 ? elements : (typeof wordElements !== 'undefined' ? wordElements : []);
+  const currentEls = Array.isArray(elements) ? elements : (typeof wordElements !== 'undefined' ? wordElements : []);
   const curTitle = title || (typeof currentWordDocTitle !== 'undefined' ? currentWordDocTitle : 'Poster Digital');
   const curBg = bgColor || (typeof wordPageBgColor !== 'undefined' ? wordPageBgColor : '#ffffff');
   const curBorder = borderStyle || (typeof wordPageBorderStyle !== 'undefined' ? wordPageBorderStyle : 'solid');
+
+  // Jika lembar kerja masih kosong sama sekali (belum ada elemen)
+  if (!currentEls || currentEls.length === 0) {
+    return {
+      totalSkor: 0,
+      aspek1: 0,
+      aspek2: 0,
+      aspek3: 0,
+      aspek4: 0,
+      grade: 'Lembar Kerja Masih Kosong (0/100)'
+    };
+  }
 
   // Aspek 1: Kelengkapan Elemen Konten (Maks 25 Poin)
   let aspek1 = 0;
@@ -26625,45 +26736,59 @@ function hitungRubrikOtomatisPosterWord(elements = [], title = '', bgColor = '#f
   if (hasJudul) aspek1 += 10;
   if (hasSlogan) aspek1 += 8;
   if (hasGambar) aspek1 += 7;
-  if (aspek1 === 0 && currentEls.length > 0) aspek1 = 15;
 
-  // Aspek 2: Kesesuaian Tema Budi Pekerti (Maks 25 Poin)
-  let aspek2 = 12;
+  // Aspek 2: Kesesuaian Tema Budi Pekerti & 7 Kebiasaan (Maks 25 Poin)
+  let aspek2 = 0;
   const combinedText = (curTitle + ' ' + currentEls.filter(e => e.type === 'teks').map(e => e.text || '').join(' ')).toLowerCase();
-  const keywords = ['hemat', 'energi', 'listrik', 'air', 'bumi', 'lestari', 'tzu chi', 'cinta', 'kasih', 'lingkungan', 'daur ulang', 'karakter', 'kebiasaan', 'hebat', 'hijau', 'pohon', 'sampah', 'disiplin', 'sayang', 'belajar', 'bersih'];
+  const keywords = ['tujuh', 'kebiasaan', 'anak', 'indonesia', 'hebat', 'asta', 'cita', 'bangun', 'pagi', 'olahraga', 'makan', 'sehat', 'gemar', 'baca', 'belajar', 'bermasyarakat', 'tidur', 'cepat', 'beribadah', 'tzu chi', 'cinta', 'kasih', 'budi', 'pekerti', 'hemat', 'energi', 'bumi', 'lestari', 'disiplin', 'lingkungan'];
   let matchCount = 0;
   keywords.forEach(kw => {
     if (combinedText.includes(kw)) matchCount++;
   });
-  if (matchCount >= 3) aspek2 = 25;
-  else if (matchCount === 2) aspek2 = 22;
-  else if (matchCount === 1) aspek2 = 18;
-  else aspek2 = 14;
+  if (matchCount >= 4) aspek2 = 25;
+  else if (matchCount >= 2) aspek2 = 20;
+  else if (matchCount === 1) aspek2 = 12;
+  else aspek2 = 5;
 
-  // Aspek 3: Kerapian Tata Letak & Variasi (Maks 25 Poin)
-  let aspek3 = 15;
-  if (currentEls.length >= 2) {
+  // Aspek 3: Kerapian Tata Letak & Variasi Spasial (Maks 25 Poin)
+  let aspek3 = 0;
+  if (currentEls.length >= 4) {
     const yPos = currentEls.map(e => e.y || 0);
     const spreadY = Math.max(...yPos) - Math.min(...yPos);
     if (spreadY > 200) aspek3 = 25;
-    else if (spreadY > 100) aspek3 = 21;
-    else aspek3 = 17;
+    else if (spreadY > 100) aspek3 = 20;
+    else aspek3 = 15;
+  } else if (currentEls.length === 3) {
+    aspek3 = 18;
+  } else if (currentEls.length === 2) {
+    aspek3 = 12;
+  } else if (currentEls.length === 1) {
+    aspek3 = 5;
   }
 
-  // Aspek 4: Harmonisasi Warna & Bingkai (Maks 25 Poin)
-  let aspek4 = 15;
-  if (curBorder && curBorder !== 'none') aspek4 += 5;
-  if (curBg && curBg !== '#ffffff') aspek4 += 5;
-  if (currentEls.length >= 4) aspek4 = Math.min(25, aspek4 + 3);
+  // Aspek 4: Harmonisasi Warna & Bingkai Halaman (Maks 25 Poin)
+  let aspek4 = 0;
+  if (curBorder && curBorder !== 'none') aspek4 += 8;
+  if (curBg && curBg !== '#ffffff') aspek4 += 7;
+  if (currentEls.length >= 4) aspek4 += 10;
+  else if (currentEls.length >= 2) aspek4 += 5;
 
-  const totalSkor = Math.min(100, Math.max(50, aspek1 + aspek2 + aspek3 + aspek4));
+  let totalSkor = Math.min(100, aspek1 + aspek2 + aspek3 + aspek4);
+
+  // Jika elemen masih sangat sedikit, batasi skor agar adil & proporsional
+  if (currentEls.length === 1) {
+    totalSkor = Math.min(30, totalSkor);
+  } else if (currentEls.length === 2) {
+    totalSkor = Math.min(50, totalSkor);
+  }
+
   return {
     totalSkor,
     aspek1,
     aspek2,
     aspek3,
     aspek4,
-    grade: totalSkor >= 90 ? 'Sangat Baik (A)' : totalSkor >= 75 ? 'Baik (B)' : 'Cukup (C)'
+    grade: totalSkor >= 90 ? 'Sangat Baik (A)' : totalSkor >= 80 ? 'Baik (B)' : totalSkor >= 65 ? 'Cukup (C)' : 'Perlu Dilengkapi (Remedial)'
   };
 }
 
@@ -27034,10 +27159,12 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
     const inputEl = document.getElementById('word-doc-name-input');
     const title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : (currentWordDocTitle || 'Poster 7 Kebiasaan Anak Indonesia Hebat');
 
-    // Jika belum ada elemen di lembar kerja, berikan preset otomatis agar tidak kosong
+    // Jika belum ada elemen di lembar kerja, beritahu siswa dan jangan simpan poster kosong
     if (!wordElements || wordElements.length === 0) {
-      wordElements = getPosterPresetElements('indonesia_hebat');
-      renderWordElements();
+      if (tampilkanNotif && typeof showToast === 'function') {
+        showToast('⚠️ Lembar kerja Word masih kosong! Sisipkan elemen dari Bank Bahan di sebelah kiri terlebih dahulu.', 'warning');
+      }
+      return;
     }
 
     // Render preview gambar poster PNG berkualitas tinggi
@@ -27216,6 +27343,23 @@ window.kirimHasilWordKePosterDanGuru = kirimHasilWordKePosterDanGuru;
 
 async function evaluasiDanNilaiOtomatisPosterWord() {
   playSound('click');
+  if (!wordElements || wordElements.length === 0) {
+    if (typeof showToast === 'function') {
+      showToast('⚠️ Lembar kerja Word masih kosong! Buat postermu dengan menaruh teks atau gambar dari Bank Bahan.', 'warning');
+    }
+    const evaluasiKosong = {
+      totalSkor: 0,
+      aspek1: 0,
+      aspek2: 0,
+      aspek3: 0,
+      aspek4: 0,
+      grade: 'Lembar Kerja Masih Kosong (0/100)'
+    };
+    if (typeof tampilkanHasilPenilaianOtomatis === 'function') {
+      tampilkanHasilPenilaianOtomatis('poster', evaluasiKosong, 'Lembar Kerja Word (Kosong)');
+    }
+    return;
+  }
   await kirimHasilWordKePosterDanGuru(true);
 }
 window.evaluasiDanNilaiOtomatisPosterWord = evaluasiDanNilaiOtomatisPosterWord;
@@ -29834,9 +29978,8 @@ function dapatkanPostersSiswa(student) {
 
   // 4. Jika siswa memiliki nilai poster atau penanda selesai tapi belum ada preview gambar, buat item poster representatif
   if (list.length === 0) {
-    const isDone = (student.posterWord && student.posterWord > 0) || 
-                   (student.nilaiPoster && student.nilaiPoster > 0) || 
-                   (student.nis && String(student.nis).trim() === '3245');
+    const isDone = (student.posterWord && Number(student.posterWord) > 0) && 
+                   (student.nilaiPoster && Number(student.nilaiPoster) > 0);
     if (isDone) {
       list.push({
         id: 'poster_' + (student.nis || student.id || 'auto'),
@@ -29911,11 +30054,6 @@ function dapatkanStatusDanNilaiPosterSiswa(student) {
     }
   } catch(e) {}
 
-  // 4. Auto-recovery siswa Feynman Jenson (NIS 3245)
-  if ((student.nis && String(student.nis).trim() === '3245') || (student.nama && student.nama.toUpperCase().includes('FEYNMAN'))) {
-    posterWord = Math.max(posterWord, 1);
-    nilaiPoster = Math.max(nilaiPoster, 95);
-  }
 
   if (posterWord > 0 && nilaiPoster === 0) {
     nilaiPoster = 90;
@@ -30012,14 +30150,7 @@ function dapatkanStatusDanNilaiExcelSiswa(student) {
     } catch (e) {}
   }
 
-  if (!hasDoneExcel) {
-    const isFeynman = (student.nis && String(student.nis).trim() === '3245') || 
-                      (student.id && String(student.id).includes('3245')) || 
-                      (student.nama && student.nama.toUpperCase().includes('FEYNMAN'));
-    if (isFeynman) {
-      hasDoneExcel = true;
-    }
-  }
+
 
   if (hasDoneExcel) {
     nilaiExcel = Math.max(nilaiExcel, 100);
