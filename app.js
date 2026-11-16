@@ -11965,7 +11965,7 @@ function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore, isFinishingQuiz = fa
     const certTitle = document.getElementById('cert-title');
     const certSub = document.getElementById('cert-sub');
     if (certTitle) {
-      certTitle.innerText = 'PIAGAM PENGHARGAAN KREATOR KONTEN DIGITAL & LITERASI KKA SEMESTER 1';
+      certTitle.innerText = 'SERTIFIKAT KELULUSAN KKA (KODING & KECERDASAN ARTIFISIAL)';
     }
     if (certSub) {
       certSub.innerHTML = `
@@ -12017,7 +12017,7 @@ function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore, isFinishingQuiz = fa
     }
   }
   playSound('fanfare');
-  showToast(`🎉 SELAMAT! Seluruh 5 Tugas KKA Semester 1 Lengkap! Piagam Penghargaan Terbuka! 🏆`, 'success');
+  showToast(`🎉 SELAMAT! Seluruh 5 Tugas KKA Semester 1 Lengkap! Sertifikat Kelulusan KKA Terbuka! 🏆`, 'success');
 }
 window.evaluasiDanTampilkanPiagamKuisSiswa = evaluasiDanTampilkanPiagamKuisSiswa;
 
