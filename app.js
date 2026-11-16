@@ -2121,6 +2121,9 @@ function switchTab(tabId) {
   if (tabId !== 'demo' && typeof isRoboFullscreenActive !== 'undefined' && isRoboFullscreenActive) {
     toggleRoboFullscreen(false);
   }
+  if (tabId !== 'kuis' && typeof isQuizFullscreenActive !== 'undefined' && isQuizFullscreenActive) {
+    toggleQuizFullscreen(false);
+  }
 
   // Pastikan tombol Lab MS Excel disembunyikan jika di Semester 2
   updateNavSemesterVisibility();
@@ -18965,6 +18968,7 @@ document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) {
     if (isRoboFullscreenActive) toggleRoboFullscreen(false);
     if (isExcelFullscreenActive) toggleExcelFullscreen(false);
+    if (typeof isQuizFullscreenActive !== 'undefined' && isQuizFullscreenActive) toggleQuizFullscreen(false);
   }
 });
 
@@ -18972,6 +18976,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (isRoboFullscreenActive) toggleRoboFullscreen(false);
     if (isExcelFullscreenActive) toggleExcelFullscreen(false);
+    if (typeof isQuizFullscreenActive !== 'undefined' && isQuizFullscreenActive) toggleQuizFullscreen(false);
   }
 });
 
@@ -35258,4 +35263,91 @@ function simpanJawabanUraianSiswa() {
   showToast('Seluruh jawaban uraian berhasil disimpan di akunmu! 💾✨', 'success');
 }
 window.simpanJawabanUraianSiswa = simpanJawabanUraianSiswa;
+
+/**
+ * ==========================================================
+ * FITUR LAYAR PENUH (FULLSCREEN) SEJATI UNTUK MENU KUIS SISWA
+ * Dual-Mode: Native HTML5 Fullscreen API + Viewport Desktop Isolation
+ * ==========================================================
+ */
+let isQuizFullscreenActive = false;
+window.isQuizFullscreenActive = isQuizFullscreenActive;
+
+function toggleQuizFullscreen(forceState = null) {
+  const tabKuis = document.getElementById('tab-kuis');
+  if (!tabKuis) return;
+
+  const nextState = (forceState !== null) ? forceState : !isQuizFullscreenActive;
+  isQuizFullscreenActive = nextState;
+  window.isQuizFullscreenActive = nextState;
+  if (typeof playSound === 'function') playSound('click');
+
+  const btnTop = document.getElementById('btn-quiz-fullscreen-top');
+  const labelTop = document.getElementById('label-quiz-fullscreen-top');
+  const iconTop = document.getElementById('icon-quiz-fullscreen-top');
+  const btnMain = document.getElementById('btn-quiz-fullscreen');
+  const labelMain = document.getElementById('label-quiz-fullscreen');
+  const iconMain = document.getElementById('icon-quiz-fullscreen');
+  const floatingBtn = document.getElementById('quiz-floating-exit-btn');
+
+  if (isQuizFullscreenActive) {
+    tabKuis.classList.add('quiz-fullscreen-mode');
+    document.body.classList.add('quiz-fs-active');
+
+    // Coba Browser Native Fullscreen (F11 sejati) jika didukung
+    if (!document.fullscreenElement) {
+      if (tabKuis.requestFullscreen) {
+        tabKuis.requestFullscreen().catch(() => {});
+      } else if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
+
+    if (labelTop) labelTop.innerText = 'Keluar Layar Penuh (Esc)';
+    if (iconTop) iconTop.className = 'fa-solid fa-compress text-amber-500';
+    if (btnTop) {
+      btnTop.classList.remove('text-indigo-700', 'bg-white', 'border-indigo-200');
+      btnTop.classList.add('text-amber-800', 'bg-amber-100', 'border-amber-300');
+    }
+
+    if (labelMain) labelMain.innerText = 'Keluar Penuh (Esc)';
+    if (iconMain) iconMain.className = 'fa-solid fa-compress text-amber-300';
+    if (btnMain) {
+      btnMain.classList.remove('from-indigo-600', 'to-purple-600');
+      btnMain.classList.add('from-amber-600', 'to-rose-600');
+    }
+
+    if (floatingBtn) floatingBtn.classList.remove('hidden');
+
+    if (typeof showToast === 'function') {
+      showToast('Mode Layar Penuh Kuis aktif! 🖥️✨ Mengerjakan jadi lebih fokus dan nyaman. Tekan Esc untuk keluar.', 'success');
+    }
+  } else {
+    tabKuis.classList.remove('quiz-fullscreen-mode');
+    document.body.classList.remove('quiz-fs-active');
+
+    // Keluar dari browser native fullscreen jika aktif
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+
+    if (labelTop) labelTop.innerText = 'Layar Penuh (Fullscreen) ⛶';
+    if (iconTop) iconTop.className = 'fa-solid fa-expand text-indigo-600';
+    if (btnTop) {
+      btnTop.classList.remove('text-amber-800', 'bg-amber-100', 'border-amber-300');
+      btnTop.classList.add('text-indigo-700', 'bg-white', 'border-indigo-200');
+    }
+
+    if (labelMain) labelMain.innerText = 'Layar Penuh ⛶';
+    if (iconMain) iconMain.className = 'fa-solid fa-expand text-amber-300';
+    if (btnMain) {
+      btnMain.classList.remove('from-amber-600', 'to-rose-600');
+      btnMain.classList.add('from-indigo-600', 'to-purple-600');
+    }
+
+    if (floatingBtn) floatingBtn.classList.add('hidden');
+  }
+}
+window.toggleQuizFullscreen = toggleQuizFullscreen;
+
 

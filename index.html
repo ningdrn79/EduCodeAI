@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261112_perf_boost_v140">
+  <link rel="stylesheet" href="styles.css?v=20261116_quiz_fullscreen_v156">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -15784,8 +15784,20 @@
     <!-- ======================================================== -->
     <section id="tab-kuis" class="hidden space-y-6 animate-fadeIn">
       <div class="flex items-center justify-between">
-        <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 bg-white hover:bg-blue-50 px-4 py-2 rounded-full border border-slate-200 shadow-xs transition">
+        <button onclick="switchTab('beranda')" class="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 bg-white hover:bg-blue-50 px-4 py-2 rounded-full border border-slate-200 shadow-xs transition cursor-pointer">
           <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda LMS
+        </button>
+        <button type="button" onclick="toggleQuizFullscreen()" id="btn-quiz-fullscreen-top" class="inline-flex items-center gap-2 text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white hover:bg-indigo-50 px-4 py-2 rounded-full border border-indigo-200 shadow-xs transition cursor-pointer" title="Layar Penuh (F11 / ESC)">
+          <i id="icon-quiz-fullscreen-top" class="fa-solid fa-expand text-indigo-600"></i>
+          <span id="label-quiz-fullscreen-top">Layar Penuh (Fullscreen) ⛶</span>
+        </button>
+      </div>
+
+      <!-- Floating Exit Fullscreen Button untuk Kuis (Versi Praktis saat Layar Penuh) -->
+      <div id="quiz-floating-exit-btn" class="hidden fixed bottom-6 right-6 z-[99999999] shadow-2xl">
+        <button type="button" onclick="toggleQuizFullscreen(false)" class="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white px-5 py-2.5 rounded-full font-title font-extrabold text-xs sm:text-sm shadow-2xl flex items-center gap-2 border-2 border-white ring-4 ring-red-500/30 hover:scale-105 active:scale-95 transition transform cursor-pointer">
+          <i class="fa-solid fa-compress text-amber-300"></i>
+          <span>Keluar Layar Penuh (Esc) 🗗</span>
         </button>
       </div>
 
@@ -15854,6 +15866,10 @@
   <div class="flex items-center gap-2.5 flex-wrap">
             <button id="btn-lihat-sertifikat-top" type="button" onclick="tampilkanSertifikatTersimpanSiswa()" class="hidden px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-title font-bold rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
               <i class="fa-solid fa-award text-amber-900"></i> <span>Lihat Piagam Sertifikat</span>
+            </button>
+            <button type="button" onclick="toggleQuizFullscreen()" id="btn-quiz-fullscreen" class="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-title font-bold rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer" title="Mode Layar Penuh Kuis (F11 / ESC)">
+              <i id="icon-quiz-fullscreen" class="fa-solid fa-expand text-amber-300"></i>
+              <span id="label-quiz-fullscreen">Layar Penuh ⛶</span>
             </button>
             <div class="flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 text-slate-950 px-4 py-2 rounded-2xl font-black text-xs sm:text-sm shadow-md border-2 border-amber-200">
               <i class="fa-solid fa-star text-amber-800 text-base animate-pulse"></i>
@@ -23438,7 +23454,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261116_k4_excel_quiz_v155"></script>
+  <script charset="UTF-8" src="app.js?v=20261116_quiz_fullscreen_v156"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
