@@ -2077,7 +2077,19 @@ function switchTab(tabId) {
           k6Container.classList.add('hidden');
           k6Container.style.setProperty('display', 'none', 'important');
         }
-        if (k4QuizBox) k4QuizBox.classList.remove('hidden');
+        if (k4CertBox) {
+          k4CertBox.classList.add('hidden');
+          k4CertBox.style.setProperty('display', 'none', 'important');
+        }
+        const k4Checklist = document.getElementById('certificate-locked-checklist');
+        if (k4Checklist) {
+          k4Checklist.classList.add('hidden');
+          k4Checklist.style.setProperty('display', 'none', 'important');
+        }
+        if (k4QuizBox) {
+          k4QuizBox.classList.remove('hidden');
+          k4QuizBox.style.removeProperty('display');
+        }
         // Reset & render kisi-kisi kuis minggu ini untuk Kelas 4
         if (typeof pilihSubTabKuis === 'function') pilihSubTabKuis('pg');
         if (typeof sinkronkanSkorKuisHeader === 'function') sinkronkanSkorKuisHeader();
@@ -11636,36 +11648,36 @@ function periksaKelengkapan5TugasKkaSem1(studentProfile) {
     (sNama && s.nama && s.nama.trim().toLowerCase() === sNama)
   ) || profile || {};
 
-  // 1. Drive 7 Kebiasaan (Tugas 1)
+  // 1. Drive 7 Kebiasaan (Tugas 1): Wajib lengkap seluruh 7 Gambar (7/7) dan tuntas dinilai
   const driveData = (typeof dapatkanDriveSiswa === 'function') ? dapatkanDriveSiswa(student) : ((typeof muatDrive7Kebiasaan === 'function') ? muatDrive7Kebiasaan(student) : {});
   const evalDrive = (typeof hitungNilaiDrive7Kebiasaan === 'function') ? hitungNilaiDrive7Kebiasaan(driveData) : { filledCount: 0, totalSkor: 0 };
   const driveCount = evalDrive.filledCount || student.koleksiDrive || 0;
   const driveScore = evalDrive.totalSkor || student.nilaiDrive || 0;
-  const isDriveDone = (driveCount > 0 && driveScore > 0);
+  const isDriveDone = (driveCount >= 7 && driveScore >= 70);
 
-  // 2. Modul Belajar (Tugas 2: TP 2.1 - TP 2.4)
+  // 2. Modul Belajar (Tugas 2: TP 2.1 - TP 2.4): Wajib tuntas membaca/mempelajari materi modul
   const isModulDone = Boolean(
     (student.tpSelesai && Array.isArray(student.tpSelesai) && student.tpSelesai.some(tp => tp.includes('TP 2.2') || tp.includes('TP 2.3') || tp.includes('TP 2.4'))) ||
     (sNis && localStorage.getItem(`educode_modul_selesai_${sNis}`) === 'true')
   );
 
-  // 3. Poster Kreator Cilik (Tugas 3: Lab MS Word)
+  // 3. Poster Kreator Cilik (Tugas 3: Lab MS Word): Wajib merancang poster mandiri & bernilai tuntas
   const posterData = (typeof dapatkanStatusDanNilaiPosterSiswa === 'function') ? dapatkanStatusDanNilaiPosterSiswa(student) : { posterWord: student.posterWord || 0, nilaiPoster: student.nilaiPoster || 0 };
   const posterCount = posterData.posterWord || student.posterWord || 0;
   const posterScore = posterData.nilaiPoster || student.nilaiPoster || 0;
-  const isPosterDone = (posterCount > 0 && posterScore > 0);
+  const isPosterDone = (posterCount >= 1 && posterScore >= 70);
 
-  // 4. Latihan Tabungan & Rumus (Tugas 4: Lab MS Excel)
+  // 4. Latihan Tabungan & Rumus (Tugas 4: Lab MS Excel): Wajib menyelesaikan spreadsheet keuangan
   const exData = (typeof dapatkanStatusDanNilaiExcelSiswa === 'function') ? dapatkanStatusDanNilaiExcelSiswa(student) : { excelTabel: student.excelTabel || 0, nilaiExcel: student.nilaiExcel || 0 };
   const excelCount = exData.excelTabel || student.excelTabel || 0;
   const excelScore = exData.nilaiExcel || student.nilaiExcel || 0;
-  const isExcelDone = (excelCount > 0 && excelScore > 0);
+  const isExcelDone = (excelCount >= 1 && excelScore >= 70);
 
-  // 5. Kuis Evaluasi Semester 1 (Tugas 5)
+  // 5. Kuis Evaluasi Semester 1 (Tugas 5): Wajib menyelesaikan kuis dengan skor tuntas
   const kuisScore = (student.kuisSem1 && Number(student.kuisSem1) > 0)
     ? Number(student.kuisSem1)
     : ((typeof state !== 'undefined' && state.quizScore > 0) ? state.quizScore : (typeof dapatkanStatusDanNilaiKuisSiswa === 'function' ? dapatkanStatusDanNilaiKuisSiswa(student, 1) : 0));
-  const isKuisDone = (kuisScore > 0);
+  const isKuisDone = (kuisScore >= 70);
 
   const tasks = [
     {
@@ -11673,10 +11685,10 @@ function periksaKelengkapan5TugasKkaSem1(studentProfile) {
       no: 1,
       title: 'Drive 7 Kebiasaan Anak Indonesia Hebat',
       done: isDriveDone,
-      detail: isDriveDone ? `Terkumpul ${driveCount}/7 Gambar Kebiasaan (Nilai: ${driveScore})` : 'Belum mengunggah karya gambar ke Drive 7 Kebiasaan',
+      detail: isDriveDone ? `Lengkap 7/7 Gambar Kebiasaan (Nilai: ${driveScore})` : (driveCount > 0 ? `Baru terkumpul ${driveCount}/7 Gambar (Kurang ${7 - driveCount} gambar kebiasaan lagi)` : 'Belum mengunggah karya gambar ke Drive 7 Kebiasaan'),
       icon: 'fa-folder-open',
       color: 'purple',
-      badge: isDriveDone ? `${driveCount}/7 Gambar` : 'Belum Ada',
+      badge: isDriveDone ? `Lengkap 7/7 Gambar` : (driveCount > 0 ? `${driveCount}/7 Gambar (Belum Lengkap)` : 'Belum Ada'),
       actionText: 'Buka Drive 7 Kebiasaan 🚀',
       actionTab: 'praktik'
     },
