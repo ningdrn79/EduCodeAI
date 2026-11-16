@@ -11965,7 +11965,7 @@ function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore, isFinishingQuiz = fa
     const certTitle = document.getElementById('cert-title');
     const certSub = document.getElementById('cert-sub');
     if (certTitle) {
-      certTitle.innerText = 'SERTIFIKAT KELULUSAN KKA (KODING & KECERDASAN ARTIFISIAL)';
+      certTitle.innerHTML = 'SERTIFIKAT KELULUSAN<br><span class="text-xl sm:text-2xl text-amber-900 block mt-1">KKA (KODING &amp; KECERDASAN ARTIFISIAL)</span>';
     }
     if (certSub) {
       certSub.innerHTML = `
