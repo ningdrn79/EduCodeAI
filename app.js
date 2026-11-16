@@ -2038,6 +2038,11 @@ function switchTab(tabId) {
     const b = document.getElementById('nav-p6-kuis');
     if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
     
+    // Reset & render kisi-kisi kuis minggu ini untuk Kelas 4
+    if (!isK6Kuis) {
+      if (typeof pilihSubTabKuis === 'function') pilihSubTabKuis('pg');
+    }
+
     // Khusus Siswa Kelas 6: Tampilkan Webview Kuis6 (kuis6.netlify.app)
     try {
       const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
@@ -9545,70 +9550,276 @@ function jalankanSimulasiDiseminasi() {
 
 // 1. Bank Soal Standar Kurikulum Semester 1 (TP 2.1 - TP 2.4, MS Word & Excel)
 const DEFAULT_BANK_SOAL_SEM1 = [
+  // --- KELOMPOK 1: TP 1.1 ANTARMUKA DASAR EXCEL & IDENTIFIKASI DATA (SOAL 1 - 5) ---
   {
-    id: 'soal_sem1_1',
-    tp: 'TP 2.1 (Konten Tunggal Sederhana)',
-    question: 'Manakah di bawah ini yang merupakan contoh satu konten digital teks sederhana?',
+    id: 'kisi_sem1_1',
+    tp: 'TP 1.1 • Antarmuka Spreadsheet',
+    question: '1. Kotak perpotongan antara Kolom vertikal dan Baris horizontal di Microsoft Excel, contohnya "B2", dinamakan...',
     options: [
-      'Sebuah slogan: "Matikan Keran Air Setelah Digunakan!"',
-      'Video film kartun berdurasi 2 jam tanpa tulisan',
-      'Kumpulan 10 foto tanpa teks dan tanpa keterangan',
-      'Kertas gambar yang digambar manual dengan krayon'
+      'Cell (Sel)',
+      'Ribbon Menu',
+      'Worksheet Halaman',
+      'Quick Access Toolbar'
     ],
     correct: 0,
-    explanation: 'Slogan singkat yang dibuat di gawai adalah contoh konten teks digital tunggal yang memiliki pesan jelas!'
+    explanation: 'Pertemuan antara kolom huruf (seperti B) dan baris angka (seperti 2) disebut Sel (Cell).'
   },
   {
-    id: 'soal_sem1_2',
-    tp: 'TP 2.2 (Menyusun Secara Terpisah)',
-    question: 'Mengapa dalam Berpikir Komputasional (BK) kita perlu memisahkan elemen judul, teks isi, dan gambar sebelum digabungkan?',
+    id: 'kisi_sem1_2',
+    tp: 'TP 1.1 • Antarmuka Spreadsheet',
+    question: '2. Huruf abjad vertikal (A, B, C, ...) pada bagian atas lembar spreadsheet Excel menunjukkan...',
     options: [
-      'Agar proses pembuatan menjadi sangat lama dan sulit',
-      'Agar jika ada kesalahan ketik judul, kita tidak perlu mengulang membuat seluruh gambar dari awal',
-      'Supaya warnanya hilang semua',
-      'Supaya tidak bisa dibaca oleh guru'
-    ],
-    correct: 1,
-    explanation: 'Dekomposisi memecah bagian menjadi terpisah sehingga mudah diedit, ditata ulang, dan dirawat tanpa merusak bagian lain.'
-  },
-  {
-    id: 'soal_sem1_3',
-    tp: 'TP 2.3 (Kombinasi Logis)',
-    question: 'Jika kamu membuat poster bertema "Lomba Membaca Buku di Perpustakaan", gambar apakah yang paling logis dan cocok dipasangkan?',
-    options: [
-      'Gambar semangkuk bakso kuah pedas',
-      'Gambar seorang anak tersenyum sedang membuka buku',
-      'Gambar mobil truk derek',
-      'Gambar gunung berapi meletus'
-    ],
-    correct: 1,
-    explanation: 'Kombinasi logis mengharuskan gambar berhubungan langsung dengan isi pesan teks agar audiens tidak bingung.'
-  },
-  {
-    id: 'soal_sem1_4',
-    tp: 'TP 2.4 (Diseminasi & Etika Digital)',
-    question: 'Sebelum menyebarkan karya poster digital ke internet, hal penting apa yang TIDAK BOLEH dicantumkan demi keamanan privasi anak?',
-    options: [
-      'Nama lengkap, alamat rumah asli, dan nomor telepon pribadi',
-      'Pesan motivasi belajar',
-      'Gambar ikon kartun yang lucu',
-      'Warna latar belakang poster yang cerah'
+      'Kolom (Column)',
+      'Baris (Row)',
+      'Nomor Halaman',
+      'Ukuran Font Huruf'
     ],
     correct: 0,
-    explanation: 'Data privasi sensitif seperti alamat rumah dan nomor kontak tidak boleh disebarkan secara sembarangan di internet demi keamanan!'
+    explanation: 'Kolom di Excel ditandai dengan huruf abjad tegak ke bawah dari A sampai Z dan seterusnya.'
   },
   {
-    id: 'soal_sem1_5',
-    tp: 'Berpikir Komputasional (Abstraksi)',
-    question: 'Kemampuan memilih informasi yang penting saja dan membuang detail yang tidak berguna saat membuat poster disebut...',
+    id: 'kisi_sem1_3',
+    tp: 'TP 1.1 • Antarmuka Spreadsheet',
+    question: '3. Deretan angka mendatar (1, 2, 3, ...) pada sisi paling kiri lembar Excel menunjukkan...',
     options: [
-      'Algoritma',
-      'Abstraksi',
-      'Dekomposisi',
-      'Pengenalan Pola'
+      'Baris (Row)',
+      'Kolom (Column)',
+      'Format Mata Uang',
+      'Banyaknya Grafik'
     ],
-    correct: 1,
-    explanation: 'Abstraksi adalah pilar Berpikir Komputasional untuk memfokuskan pikiran pada pesan inti dan mengabaikan hal yang tidak relevan.'
+    correct: 0,
+    explanation: 'Baris di Excel ditandai dengan angka horizontal mendatar dari atas ke bawah.'
+  },
+  {
+    id: 'kisi_sem1_4',
+    tp: 'TP 1.1 • Antarmuka Spreadsheet',
+    question: '4. Setiap lembar kerja tempat kita memasukkan tabel dan angka di dalam file buku kerja (Workbook) Excel dinamakan...',
+    options: [
+      'Worksheet (Sheet)',
+      'Slide Presentasi',
+      'WordArt Hiasan',
+      'Folder Komputer'
+    ],
+    correct: 0,
+    explanation: 'Setiap lembar kerja dokumen di Excel dinamakan Worksheet atau Sheet (misal: Sheet1, Sheet2).'
+  },
+  {
+    id: 'kisi_sem1_5',
+    tp: 'TP 1.1 • Pengolahan Masalah Sehari-hari',
+    question: '5. Jika kamu ingin mencatat uang saku harian, pengeluaran jajan, dan menghitung sisa tabungan mingguan secara rapi dan otomatis, aplikasi yang paling tepat digunakan adalah...',
+    options: [
+      'Microsoft Excel (Spreadsheet)',
+      'Pemutar Musik (Media Player)',
+      'Aplikasi Game Online',
+      'Notepad Tanpa Tabel'
+    ],
+    correct: 0,
+    explanation: 'Spreadsheet seperti Microsoft Excel dirancang khusus untuk mengolah data keuangan dan tabel angka otomatis.'
+  },
+
+  // --- KELOMPOK 2: TP 1.2 INPUT, FORMAT & MERAPIKAN TABEL EXCEL (SOAL 6 - 10) ---
+  {
+    id: 'kisi_sem1_6',
+    tp: 'TP 1.2 • Aturan Rumus Excel',
+    question: '6. Setiap kali kita ingin menuliskan rumus atau operasi hitung matematika di Excel, karakter pertama yang wajib diketik adalah...',
+    options: [
+      'Tanda sama dengan (=)',
+      'Tanda tambah (+)',
+      'Tanda tanya (?)',
+      'Tanda seru (!)'
+    ],
+    correct: 0,
+    explanation: 'Tanda sama dengan (=) adalah kunci utama agar Excel mengenali bahwa teks yang dimasukkan adalah rumus perhitungan.'
+  },
+  {
+    id: 'kisi_sem1_7',
+    tp: 'TP 1.2 • Merapikan Format Sel',
+    question: '7. Ikon tombol di Excel yang berfungsi menggabungkan beberapa sel menjadi satu sel yang lebar dan meletakkan teks tepat di tengah adalah...',
+    options: [
+      'Merge & Center',
+      'Wrap Text',
+      'Conditional Formatting',
+      'Sort & Filter'
+    ],
+    correct: 0,
+    explanation: 'Merge & Center digunakan untuk menyatukan sel dan mengatur posisinya tepat di tengah tabel (biasanya untuk judul tabel).'
+  },
+  {
+    id: 'kisi_sem1_8',
+    tp: 'TP 1.2 • Border Tabel',
+    question: '8. Untuk memberikan garis tepi kotak-kotak tabel yang tegas dan rapi agar terlihat saat dicetak (print), fitur yang digunakan adalah...',
+    options: [
+      'Border (All Borders)',
+      'Fill Color (Warna Sel)',
+      'Font Size (Ukuran Teks)',
+      'Orientation (Kemiringan Teks)'
+    ],
+    correct: 0,
+    explanation: 'Garis bantu abu-abu Excel tidak akan tercetak di kertas kecuali jika kita memberi garis Border tabel (All Borders).'
+  },
+  {
+    id: 'kisi_sem1_9',
+    tp: 'TP 1.2 • Format Angka Mata Uang',
+    question: '9. Format sel yang digunakan untuk menampilkan lambang mata uang "Rp" secara otomatis di depan angka uang saku adalah...',
+    options: [
+      'Currency / Rupiah (Rp)',
+      'Percentage (%)',
+      'Short Date (Tanggal)',
+      'Fraction (Pecahan)'
+    ],
+    correct: 0,
+    explanation: 'Format Currency / Rupiah menambahkan simbol Rp dan pemisah ribuan secara otomatis tanpa merusak perhitungan rumus.'
+  },
+  {
+    id: 'kisi_sem1_10',
+    tp: 'TP 1.2 • Merapikan Teks Panjang',
+    question: '10. Fitur yang membuat teks yang sangat panjang di dalam satu sel melipat ke bawah secara otomatis tanpa memperlebar kolom adalah...',
+    options: [
+      'Wrap Text',
+      'Merge Cells',
+      'Insert Picture',
+      'Zoom In'
+    ],
+    correct: 0,
+    explanation: 'Wrap Text membungkus teks panjang menjadi beberapa baris bersusun ke bawah di dalam satu sel yang sama.'
+  },
+
+  // --- KELOMPOK 3: TP 1.3 RUMUS ANALISIS DATA (SUM, AVERAGE, MAX, MIN, OPERASI SELISIH) (SOAL 11 - 15) ---
+  {
+    id: 'kisi_sem1_11',
+    tp: 'TP 1.3 • Fungsi Penjumlahan =SUM',
+    question: '11. Rumus Excel yang paling tepat untuk menjumlahkan seluruh sisa tabungan dari sel F2 sampai sel F6 adalah...',
+    options: [
+      '=SUM(F2:F6)',
+      '=AVERAGE(F2:F6)',
+      '=MAX(F2:F6)',
+      '=COUNT(F2:F6)'
+    ],
+    correct: 0,
+    explanation: 'Fungsi =SUM(F2:F6) menjumlahkan seluruh nilai angka dari sel F2 sampai sel F6 secara cepat dan akurat.'
+  },
+  {
+    id: 'kisi_sem1_12',
+    tp: 'TP 1.3 • Rumus Pengurangan / Selisih',
+    question: '12. Jika uang saku hari Senin di sel D2 bernilai Rp 15.000 dan uang jajan di sel E2 bernilai Rp 5.000, rumus untuk menghitung sisa tabungan hari Senin di sel F2 adalah...',
+    options: [
+      '=D2-E2',
+      '=D2+E2',
+      '=D2*E2',
+      '=D2/E2'
+    ],
+    correct: 0,
+    explanation: 'Sisa tabungan diperoleh dari uang saku dikurangi uang jajan, yaitu rumus =D2-E2 (hasilnya Rp 10.000).'
+  },
+  {
+    id: 'kisi_sem1_13',
+    tp: 'TP 1.3 • Fungsi Rata-Rata =AVERAGE',
+    question: '13. Fungsi Excel yang digunakan untuk menghitung nilai rata-rata uang jajan harian siswa selama satu minggu adalah...',
+    options: [
+      '=AVERAGE',
+      '=SUM',
+      '=MIN',
+      '=MAX'
+    ],
+    correct: 0,
+    explanation: '=AVERAGE menghitung nilai tengah atau rata-rata dari sekumpulan data angka yang dipilih.'
+  },
+  {
+    id: 'kisi_sem1_14',
+    tp: 'TP 1.3 • Nilai Tertinggi =MAX',
+    question: '14. Untuk mencari pengeluaran uang jajan yang paling besar (tertinggi) selama 5 hari sekolah, rumus fungsi yang digunakan adalah...',
+    options: [
+      '=MAX(...)',
+      '=MIN(...)',
+      '=SUM(...)',
+      '=AVERAGE(...)'
+    ],
+    correct: 0,
+    explanation: 'Fungsi =MAX(...) digunakan untuk menemukan angka terbesar/tertinggi dari rentang sel data.'
+  },
+  {
+    id: 'kisi_sem1_15',
+    tp: 'TP 1.3 • Nilai Terendah =MIN',
+    question: '15. Untuk mengetahui sisa tabungan harian yang paling sedikit (terendah) dalam satu minggu, rumus fungsi yang digunakan adalah...',
+    options: [
+      '=MIN(...)',
+      '=MAX(...)',
+      '=COUNT(...)',
+      '=SUM(...)'
+    ],
+    correct: 0,
+    explanation: 'Fungsi =MIN(...) digunakan untuk menemukan angka terkecil/terendah dari rentang sel data.'
+  },
+
+  // --- KELOMPOK 4: TP 1.4 PENYAJIAN GRAFIK BATANG (SOAL 16) ---
+  {
+    id: 'kisi_sem1_16',
+    tp: 'TP 1.4 • Visualisasi Grafik Batang',
+    question: '16. Keuntungan utama mengubah data tabel sisa tabungan siswa menjadi bentuk Diagram Batang (Bar Chart) di Excel adalah...',
+    options: [
+      'Memudahkan mata melihat perbandingan naik turunnya tabungan secara visual dan seketika',
+      'Menghapus baris tabel yang angkanya kecil secara otomatis',
+      'Membuat ukuran file dokumen komputer menjadi sangat besar',
+      'Mengubah angka uang menjadi huruf kata-kata'
+    ],
+    correct: 0,
+    explanation: 'Diagram Batang memberikan representasi visual yang jelas sehingga tinggi rendahnya tabungan langsung terbaca oleh mata.'
+  },
+
+  // --- KELOMPOK 5: TP 2.1 & TP 2.2 KONTEN DIGITAL TEKS, GAMBAR & DEKOMPOSISI DI MS WORD (SOAL 17 - 18) ---
+  {
+    id: 'kisi_sem1_17',
+    tp: 'TP 2.2 • Dekomposisi Poster Word',
+    question: '17. Dalam pilar Berpikir Komputasional, memecah rancangan poster menjadi bagian judul, gambar ilustrasi, dan teks ajakan secara terpisah sebelum digabung dinamakan...',
+    options: [
+      'Dekomposisi (Decomposition)',
+      'Pengenalan Pola (Pattern Recognition)',
+      'Abstraksi (Abstraction)',
+      'Algoritma (Algorithm)'
+    ],
+    correct: 0,
+    explanation: 'Dekomposisi adalah teknik memecah masalah/proyek besar menjadi bagian-bagian lebih kecil agar mudah dirancang dan diperbaiki.'
+  },
+  {
+    id: 'kisi_sem1_18',
+    tp: 'TP 2.1 • Desain Judul Menarik WordArt',
+    question: '18. Fitur di Microsoft Word yang digunakan untuk membuat tulisan judul poster dengan efek seni artistik, gradasi warna, dan bayangan adalah...',
+    options: [
+      'WordArt',
+      'Shapes Kotak',
+      'Page Number',
+      'Header & Footer'
+    ],
+    correct: 0,
+    explanation: 'WordArt adalah fitur pengolah kata untuk menciptakan teks dekoratif artistik yang menarik perhatian pembaca poster.'
+  },
+
+  // --- KELOMPOK 6: TP 2.3 & TP 2.4 KOMBINASI LOGIS & ETIKA BERINTERNET SEHAT (SOAL 19 - 20) ---
+  {
+    id: 'kisi_sem1_19',
+    tp: 'TP 2.3 • Kombinasi Logis Poster',
+    question: '19. Jika kamu membuat poster ajakan "Hemat Air Bersih di Sekolah", kombinasi teks slogan dan gambar yang paling logis dan tepat adalah...',
+    options: [
+      'Slogan "Tutup Keran Setelah Dipakai" dipadukan dengan gambar keran air tertutup rapat berteteskan air jernih',
+      'Slogan "Ayo Berhemat Air" dipadukan dengan gambar lapangan sepak bola',
+      'Slogan "Matikan Lampu Siang Hari" dipadukan dengan gambar keran air mengalir deras',
+      'Slogan "Jagalah Kebersihan" dipadukan dengan gambar semangkuk bakso kuah'
+    ],
+    correct: 0,
+    explanation: 'Kombinasi logis menuntut adanya keselarasan makna yang kuat antara teks pesan dan gambar visual yang disajikan.'
+  },
+  {
+    id: 'kisi_sem1_20',
+    tp: 'TP 2.4 • Etika Digital & Budaya Humanis',
+    question: '20. Sikap bijak dan beretika (Zun Zhong / Saling Menghargai) yang wajib kita terapkan saat menggunakan komputer dan internet adalah...',
+    options: [
+      'Menjaga kerahasiaan kata sandi pribadi dan mencantumkan sumber pembuat gambar/karya secara jujur',
+      'Menyebarkan alamat rumah dan nomor telepon pribadi kepada orang tak dikenal di internet',
+      'Mengakui hasil karya orang lain di internet sebagai buatan sendiri tanpa izin',
+      'Membuka dan menghapus file teman di komputer sekolah tanpa seizinnya'
+    ],
+    correct: 0,
+    explanation: 'Beretika di dunia digital meliputi menjaga keamanan privasi data diri sendiri serta menghormati hak cipta karya orang lain.'
   }
 ];
 
@@ -9923,10 +10134,24 @@ function checkQuizAccessForActiveStudent() {
     };
   }
 
-  const isCompleted = isStudentTaskCompleted(profile, sem);
+  // Cek apakah siswa sudah menyelesaikan latihan soal Tabungan di Lab Excel
+  let isTabunganExcelDone = false;
+  try {
+    isTabunganExcelDone = (localStorage.getItem('educode_excel_tabungan_done') === 'true');
+  } catch(e) {}
+
+  const isCompleted = isStudentTaskCompleted(profile, sem) || isTabunganExcelDone;
   if (isCompleted) {
     return { allowed: true, mode: 'prasyarat', studentName: profile.nama };
   }
+
+  return {
+    allowed: false,
+    mode: 'prasyarat',
+    isGuest: false,
+    needExcelTabungan: !isTabunganExcelDone,
+    studentName: profile.nama
+  };
 
   return {
     allowed: false,
@@ -10026,8 +10251,48 @@ function renderLayarKuisTerkunci(access) {
     return;
   }
 
-  // Siswa sudah login tapi belum menyelesaikan tugas
+  // Siswa sudah login tapi belum menyelesaikan latihan tabungan di Excel
   const studentName = profile ? profile.nama : 'Teman Pintar';
+  
+  if (access.needExcelTabungan) {
+    container.innerHTML = `
+      <div class="bg-gradient-to-br from-amber-50 via-white to-emerald-50 p-6 sm:p-8 rounded-3xl border-2 border-emerald-400 shadow-xl space-y-5 text-center animate-fadeIn">
+        <div class="relative w-20 h-20 mx-auto">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-amber-500 text-white flex items-center justify-center text-4xl shadow-lg animate-bounce">
+            🔒
+          </div>
+          <span class="absolute -bottom-1 -right-1 text-2xl">💰</span>
+        </div>
+
+        <div class="space-y-2 max-w-lg mx-auto">
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
+            Misi Syarat Terbuka Kuis Minggu Ini
+          </span>
+          <h3 class="font-title text-xl sm:text-2xl font-black text-slate-900">
+            Selesaikan Latihan Tabungan di Lab MS Excel Terlebih Dahulu
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+            Halo <b>${studentName}</b>! Untuk membuka <b>Kuis Kisi-kisi Persiapan Ujian</b> ini, kamu harus menyelesaikan misi latihan terlebih dahulu:
+            <br>
+            <span class="font-bold text-emerald-800 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200 inline-block mt-2">
+              👉 Menghitung "TOTAL TABUNGAN MINGGU INI" pada sel F7 (Hasil: Rp 48.000)
+            </span>
+          </p>
+        </div>
+
+        <!-- Tombol Langsung Menuju Lab Excel -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button type="button" onclick="switchTab('msexcel'); muatTemplateExcel('tabungan');" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-file-excel"></i> Buka Lab MS Excel (Tabungan &amp; Uang Saku) 🚀
+          </button>
+          <button type="button" onclick="switchTab('modul')" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs sm:text-sm border border-slate-300 transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-book-open"></i> Buka Modul Belajar
+          </button>
+        </div>
+      </div>
+    `;
+    return;
+  }
   const posterList = (typeof getStudentPosterList === 'function' && profile) 
     ? getStudentPosterList(profile.nis || profile.nama) 
     : [];
@@ -15070,7 +15335,7 @@ const EXCEL_TEMPLATES = {
       'A4': '3', 'B4': 'Bekal Hari Rabu', 'C4': 'Rabu', 'D4': '15000', 'E4': '5000', 'F4': '=D4-E4',
       'A5': '4', 'B5': 'Bekal Hari Kamis', 'C5': 'Kamis', 'D5': '15000', 'E5': '6000', 'F5': '=D5-E5',
       'A6': '5', 'B6': 'Bekal Hari Jumat', 'C6': 'Jumat', 'D6': '15000', 'E6': '4000', 'F6': '=D6-E6',
-      'A7': '', 'B7': 'TOTAL TABUNGAN MINGGU INI', 'C7': '5 Hari', 'D7': '=SUM(D2:D6)', 'E7': '=SUM(E2:E6)', 'F7': '=SUM(F2:F6)'
+      'A7': '', 'B7': 'TOTAL TABUNGAN MINGGU INI', 'C7': '5 Hari', 'D7': '=SUM(D2:D6)', 'E7': '=SUM(E2:E6)', 'F7': ''
     },
     formats: {
       'A1': { bold: true, align: 'center', bg: '#dbeafe' },
@@ -16609,6 +16874,15 @@ function terapkanFormulaExcel(pindahBawah = true) {
   if (String(val).startsWith('=')) {
     const hasil = evaluasiRumusExcel(val);
     showToast(`Rumus ${val} di sel ${coord} = ${hasil} ✨`, 'success');
+  }
+
+  // Jika sedang membuka template Tabungan dan mengedit sel F7, periksa misi penyelesaian tabungan
+  if (excelState.activeTemplate === 'tabungan') {
+    setTimeout(function() {
+      if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
+        cekJawabanTabunganDanBukaKuis(coord !== 'F7');
+      }
+    }, 100);
   }
 
   renderExcelGrid();
@@ -34652,4 +34926,336 @@ function cetakSertifikatKelas6() {
   window.print();
 }
 window.cetakSertifikatKelas6 = cetakSertifikatKelas6;
+
+
+
+// ==========================================================================
+// KELAS 4 SD: MISI LAB EXCEL TABUNGAN & KUIS KISI-KISI MINGGU INI
+// 1. Latihan Soal Tabungan (Sel F7 = Rp 48.000) -> Buka Menu Kuis
+// 2. Misi Kuis 20 Soal Pilihan Ganda & 5 Soal Uraian Modul Belajar
+// ==========================================================================
+
+const SOAL_URAIAN_KISI_KISI_SEM1 = [
+  {
+    no: 1,
+    judul: 'Misi Uraian 1: Analisis Kasus Tabungan & Pengeluaran Harian di Excel',
+    tp: 'TP 1.3 • Menganalisis Data Menggunakan Fungsi Dasar & Rumus Pengurangan',
+    pertanyaan: 'Setiap hari Senin sampai Jumat, Siti mendapatkan uang saku sebesar Rp 15.000 per hari (kolom D). Pengeluaran uang jajannya berturut-turut adalah: Senin Rp 5.000, Selasa Rp 7.000, Rabu Rp 5.000, Kamis Rp 6.000, dan Jumat Rp 4.000 (kolom E).\n\nJelaskan langkah-langkah dan tuliskan rumus Microsoft Excel yang digunakan Siti untuk:\n(a) Menghitung sisa tabungan harian di sel F2 sampai F6 (Uang Saku dikurangi Uang Jajan)!\n(b) Menghitung TOTAL TABUNGAN MINGGU INI pada sel F7! Berapa nilai hasil akhirnya?',
+    placeholder: 'Tuliskan rumus pengurangan tiap hari dan rumus penjumlahan total di sel F7...',
+    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) Rumus sisa tabungan harian:\n- Senin (sel F2): =D2-E2 (Hasil: Rp 10.000)\n- Selasa (sel F3): =D3-E3 (Hasil: Rp 8.000)\n- Rabu (sel F4): =D4-E4 (Hasil: Rp 10.000)\n- Kamis (sel F5): =D5-E5 (Hasil: Rp 9.000)\n- Jumat (sel F6): =D6-E6 (Hasil: Rp 11.000)\n(b) Rumus TOTAL TABUNGAN MINGGU INI di sel F7:\n=SUM(F2:F6) atau =D7-E7\nHasil total tabungan minggu ini adalah Rp 48.000.',
+    penjelasan: 'Pengurangan harian (=D2-E2) menghasilkan tabungan sisa per hari. Menjumlahkan seluruh kolom tabungan F2 sampai F6 menggunakan fungsi =SUM menghasilkan Rp 48.000.'
+  },
+  {
+    no: 2,
+    judul: 'Misi Uraian 2: Perbedaan Fungsi =SUM dan =AVERAGE di Kehidupan Sehari-hari',
+    tp: 'TP 1.3 • Mengolah & Menganalisis Data Angka Spreadsheet',
+    pertanyaan: 'Di Microsoft Excel, kita mengenal fungsi =SUM dan fungsi =AVERAGE.\n(a) Jelaskan perbedaan fungsi =SUM dan =AVERAGE saat mengolah data angka!\n(b) Berikan masing-masing 1 (satu) contoh nyata penerapannya dalam kehidupanmu di sekolah atau di rumah!',
+    placeholder: 'Jelaskan perbedaan =SUM dan =AVERAGE beserta contoh nyatanya...',
+    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbedaan:\n- Fungsi =SUM digunakan untuk menjumlahkan seluruh nilai angka dalam kumpulan sel data.\n- Fungsi =AVERAGE digunakan untuk menghitung nilai rata-rata dari kumpulan angka (total nilai dibagi jumlah data).\n(b) Contoh Nyata:\n- Contoh =SUM: Menghitung total seluruh uang kas kelas yang terkumpul dari 30 siswa, atau total berat sampah plastik daur ulang selama sebulan.\n- Contoh =AVERAGE: Menghitung rata-rata nilai ulangan harian mata pelajaran KKA satu kelas, atau menghitung rata-rata uang jajan siswa per hari.',
+    penjelasan: '=SUM menghasilkan nilai total akumulatif, sedangkan =AVERAGE menghasilkan nilai representasi rata-rata.'
+  },
+  {
+    no: 3,
+    judul: 'Misi Uraian 3: Penerapan Pilar Dekomposisi pada Pembuatan Poster Digital Word',
+    tp: 'TP 2.2 • Berpikir Komputasional: Menyusun Elemen Poster Terpisah',
+    pertanyaan: 'Saat kamu merancang poster digital bertema "7 Kebiasaan Anak Hebat" di Microsoft Word, kamu menerapkan pilar Berpikir Komputasional yaitu Dekomposisi.\n(a) Sebutkan 3 (tiga) elemen/komponen utama yang harus kamu siapkan secara terpisah!\n(b) Mengapa komponen-komponen tersebut sebaiknya dibuat terpisah terlebih dahulu sebelum digabungkan menjadi satu kesatuan poster?',
+    placeholder: 'Sebutkan 3 elemen poster dan jelaskan manfaat memisahkannya...',
+    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) 3 Elemen Utama:\n1. Judul Utama (Headline) yang menarik (menggunakan WordArt).\n2. Gambar Ilustrasi atau foto pendukung yang sesuai tema.\n3. Teks Isi / Slogan / Pesan ajakan ringkas yang mudah dipahami.\n(b) Alasan dipisahkan (Dekomposisi):\nAgar proses pembuatan lebih teratur dan mudah diperbaiki. Jika ada kesalahan ketik pada judul atau letak gambar ingin digeser, kita cukup mengedit bagian yang salah tanpa harus menghapus atau mengulang pembuatan poster dari awal.',
+    penjelasan: 'Dekomposisi memecah desain poster menjadi elemen independen sehingga mudah ditata, dirawat, dan diselaraskan.'
+  },
+  {
+    no: 4,
+    judul: 'Misi Uraian 4: Keunggulan Visualisasi Diagram Batang (Chart) Dibanding Tabel',
+    tp: 'TP 1.4 • Menyajikan Data Hasil Analisis dalam Bentuk Diagram Batang',
+    pertanyaan: 'Bandingkan penyajian data tabungan siswa menggunakan Tabel Angka dengan menggunakan Diagram Batang (Bar Chart).\nMengapa orang tua atau bapak/ibu guru lebih cepat memahami kondisi keuangan siswa ketika melihat Diagram Batang dibandingkan membaca baris angka tabel? Jelaskan alasan visualnya!',
+    placeholder: 'Jelaskan keunggulan visual diagram batang dibanding tabel angka...',
+    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\nKarena Diagram Batang mengubah angka-angka abstrak menjadi bentuk visual berupa tinggi atau panjang batang.\n1. Lebih Cepat Terbaca: Mata manusia dapat langsung membandingkan batang tertinggi (tabungan paling banyak, yaitu hari Jumat) dan batang terendah (tabungan paling sedikit, yaitu hari Selasa) dalam hitungan detik.\n2. Pola Terlihat Nyata: Naik turunnya tren tabungan terlihat jelas dari bentuk grafik batang tanpa perlu membaca angka rupiah satu per satu dan tanpa perlu menghitung manual di kepala.',
+    penjelasan: 'Otak manusia memproses informasi visual berupa ketinggian batang jauh lebih cepat daripada mencerna deretan angka teks.'
+  },
+  {
+    no: 5,
+    judul: 'Misi Uraian 5: Etika Digital & Nilai Humanis Tzu Chi (Zun Zhong) di Dunia Maya',
+    tp: 'TP 2.4 • Keamanan Berinternet, Perlindungan Data Pribadi & Hak Cipta',
+    pertanyaan: 'Internet memberikan banyak kemudahan untuk mencari gambar dan informasi tugas sekolah. Namun, kita harus berhati-hati dan menjunjung tinggi etika digital serta nilai budaya humanis Tzu Chi (Zun Zhong / Saling Menghargai).\nJelaskan 2 (dua) aturan etika yang wajib kamu patuhi terkait:\n(a) Perlindungan keamanan data pribadi dan kata sandi akunmu!\n(b) Penghargaan terhadap hak cipta karya atau gambar milik orang lain!',
+    placeholder: 'Tuliskan aturan perlindungan data pribadi dan cara menghargai karya orang lain...',
+    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) Perlindungan Data Pribadi:\n- Tidak pernah membagikan kata sandi (password), alamat rumah, nomor telepon, atau data rahasia keluarga kepada orang lain di internet.\n- Selalu logout/keluar dari akun komputer sekolah setelah selesai digunakan.\n(b) Menghargai Karya Orang Lain (Zun Zhong):\n- Tidak menjiplak atau mengaku-ngaku gambar/tulisan orang lain di internet sebagai karya buatan sendiri.\n- Selalu mencantumkan sumber pembuat gambar (kredit karya) secara jujur dan meminta izin jika diperlukan.',
+    penjelasan: 'Etika digital mengajarkan kita untuk bertanggung jawab, aman, dan menghargai hasil jerih payah orang lain di ruang siber.'
+  }
+];
+
+/**
+ * Cek apakah siswa sudah menghitung Total Tabungan Minggu Ini di sel F7 Excel
+ */
+function cekJawabanTabunganDanBukaKuis(silent = false) {
+  const valF7 = excelState.cells['F7'] || '';
+  const hasilF7 = evaluasiRumusExcel(valF7);
+
+  const previewEl = document.getElementById('val-sel-f7-preview');
+  if (previewEl) {
+    if (!valF7) {
+      previewEl.innerText = 'Kosong (Belum Diisi)';
+      previewEl.className = 'text-amber-400 font-bold';
+    } else {
+      previewEl.innerText = typeof formatExcelNumber === 'function' ? formatExcelNumber(hasilF7, 'rupiah') : hasilF7;
+      previewEl.className = (Number(hasilF7) === 48000) ? 'text-emerald-400 font-bold' : 'text-amber-300 font-bold';
+    }
+  }
+
+  const badgeEl = document.getElementById('badge-status-misi-tabungan');
+  const btnPeriksa = document.getElementById('btn-periksa-tabungan');
+
+  // Nilai total yang benar adalah 48000
+  // Rumus bisa =SUM(F2:F6) atau =D7-E7 atau nilai 48000
+  const isCorrect = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
+
+  if (isCorrect) {
+    // Simpan status tuntas
+    try {
+      localStorage.setItem('educode_excel_tabungan_done', 'true');
+      const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+      if (profile) {
+        const sId = profile.nis || profile.nama || 'anoname';
+        localStorage.setItem(`educode_task_done_${sId}_sem1`, 'true');
+        
+        // Simpan nilai excel di database
+        const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+        const record = db.find(s => (profile.nis && s.nis === profile.nis) || s.id === profile.id || (s.nama && profile.nama && s.nama.toLowerCase() === profile.nama.toLowerCase()));
+        if (record) {
+          record.excelTabel = 100;
+          record.statusKkm = 'Tuntas';
+          if (typeof saveStudentDatabase === 'function') saveStudentDatabase(db);
+        }
+      }
+    } catch(e) {}
+
+    if (badgeEl) {
+      badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold animate-pulse';
+      badgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> Tuntas! Kuis Terbuka 🔓';
+    }
+
+    if (btnPeriksa) {
+      btnPeriksa.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition flex items-center gap-1.5 cursor-pointer animate-bounce';
+      btnPeriksa.innerHTML = '<i class="fa-solid fa-arrow-right"></i> <span>Buka Menu Kuis Sekarang 📝</span>';
+      btnPeriksa.onclick = function() {
+        switchTab('kuis');
+      };
+    }
+
+    if (!silent) {
+      playSound('fanfare');
+      showToast('Luar biasa! Perhitungan Total Tabungan Minggu Ini Benar (Rp 48.000)! Menu Kuis Kini TERBUKA! 🔓🎉', 'success');
+    }
+    return true;
+  } else {
+    if (badgeEl) {
+      badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold';
+      badgeEl.innerText = '⏳ Belum Dihitung';
+    }
+    if (btnPeriksa) {
+      btnPeriksa.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95';
+      btnPeriksa.innerHTML = '<i class="fa-solid fa-calculator"></i> <span>Periksa &amp; Buka Kuis 🚀</span>';
+      btnPeriksa.onclick = function() {
+        cekJawabanTabunganDanBukaKuis(false);
+      };
+    }
+
+    if (!silent) {
+      playSound('click');
+      if (!valF7) {
+        showToast('Sel F7 masih kosong! Klik sel F7 lalu ketik rumus =SUM(F2:F6) atau =D7-E7 untuk menjumlahkan tabungan ya! 💡', 'warning');
+      } else {
+        showToast(`Nilai sel F7 saat ini adalah ${hasilF7}. Hasil yang benar adalah Rp 48.000 (Gunakan rumus =SUM(F2:F6) atau =D7-E7). Coba lagi ya!`, 'warning');
+      }
+    }
+    return false;
+  }
+}
+window.cekJawabanTabunganDanBukaKuis = cekJawabanTabunganDanBukaKuis;
+
+/**
+ * Petunjuk rumus tabungan
+ */
+function bantuanRumusTabungan() {
+  playSound('click');
+  pilihSelExcel('F7');
+  fokusFormulaBarExcel();
+  showToast('Petunjuk: Klik sel F7, lalu ketik =SUM(F2:F6) atau =D7-E7 lalu tekan Enter! Hasil yang benar adalah Rp 48.000 💡', 'info');
+}
+window.bantuanRumusTabungan = bantuanRumusTabungan;
+
+/**
+ * Navigasi Sub-Tab Kuis (Misi 1: 20 Soal PG vs Misi 2: 5 Soal Uraian)
+ */
+function pilihSubTabKuis(mode) {
+  playSound('click');
+  const btnPg = document.getElementById('btn-subkuis-pg');
+  const btnUraian = document.getElementById('btn-subkuis-uraian');
+  const quizBox = document.getElementById('quiz-box');
+  const certBox = document.getElementById('certificate-box');
+  const uraianContainer = document.getElementById('kuis-uraian-container');
+
+  if (mode === 'pg') {
+    if (btnPg) {
+      btnPg.className = 'px-4 py-2 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-md cursor-pointer';
+    }
+    if (btnUraian) {
+      btnUraian.className = 'px-4 py-2 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer';
+    }
+    if (uraianContainer) uraianContainer.classList.add('hidden');
+    
+    // Tampilkan quiz box atau cert box
+    if (state.quizScore !== undefined && state.currentQuizIndex >= getActiveQuizList().length) {
+      if (certBox) certBox.classList.remove('hidden');
+      if (quizBox) quizBox.classList.add('hidden');
+    } else {
+      if (quizBox) quizBox.classList.remove('hidden');
+      if (certBox) certBox.classList.add('hidden');
+    }
+  } else {
+    // Mode Uraian
+    if (btnUraian) {
+      btnUraian.className = 'px-4 py-2 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 bg-purple-600 text-white shadow-md cursor-pointer';
+    }
+    if (btnPg) {
+      btnPg.className = 'px-4 py-2 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer';
+    }
+    if (quizBox) quizBox.classList.add('hidden');
+    if (certBox) certBox.classList.add('hidden');
+    if (uraianContainer) {
+      uraianContainer.classList.remove('hidden');
+      renderDaftarSoalUraian();
+      muatJawabanUraianSiswa();
+    }
+  }
+}
+window.pilihSubTabKuis = pilihSubTabKuis;
+
+/**
+ * Render 5 Soal Uraian di HTML
+ */
+function renderDaftarSoalUraian() {
+  const wrapper = document.getElementById('daftar-soal-uraian-wrapper');
+  if (!wrapper) return;
+
+  wrapper.innerHTML = SOAL_URAIAN_KISI_KISI_SEM1.map(q => `
+    <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-slate-200 shadow-sm space-y-4 hover:border-purple-300 transition">
+      <div class="flex items-start justify-between gap-3 flex-wrap border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-title font-black text-sm">
+            ${q.no}
+          </span>
+          <div>
+            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 uppercase tracking-wider">
+              ${q.tp}
+            </span>
+            <h4 class="font-title font-bold text-sm sm:text-base text-slate-900 mt-0.5">
+              ${q.judul}
+            </h4>
+          </div>
+        </div>
+        <button type="button" onclick="toggleKunciUraian(${q.no})" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-title font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-key text-amber-600"></i> <span id="label-btn-kunci-${q.no}">Buka Kunci &amp; Rubrik 💡</span>
+        </button>
+      </div>
+
+      <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans whitespace-pre-line font-medium bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200">
+        ${q.pertanyaan}
+      </p>
+
+      <div class="space-y-1.5">
+        <label for="textarea-uraian-${q.no}" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+          <i class="fa-solid fa-pen-nib text-purple-600"></i> Jawaban Analisismu:
+        </label>
+        <textarea id="textarea-uraian-${q.no}" rows="4" placeholder="${q.placeholder}" oninput="simpanJawabanUraianOtomatis(${q.no})" class="w-full p-3.5 rounded-2xl border border-slate-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-xs sm:text-sm text-slate-800 transition outline-none font-sans leading-relaxed"></textarea>
+      </div>
+
+      <!-- Kotak Kunci Jawaban & Rubrik Guru (Hidden by default) -->
+      <div id="box-kunci-uraian-${q.no}" class="hidden p-4 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 text-xs space-y-2 animate-fadeIn">
+        <div class="font-title font-bold text-xs uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-award text-amber-600"></i> Kunci Jawaban &amp; Rubrik Penilaian Guru:
+        </div>
+        <div class="whitespace-pre-line font-sans leading-relaxed text-slate-800 bg-white/90 p-3 rounded-xl border border-amber-200">
+          ${q.kunci}
+        </div>
+        <p class="text-[11px] text-amber-800 italic">
+          💡 <strong>Penjelasan Konsep:</strong> ${q.penjelasan}
+        </p>
+      </div>
+    </div>
+  `).join('');
+}
+window.renderDaftarSoalUraian = renderDaftarSoalUraian;
+
+/**
+ * Toggle tampilkan kunci jawaban uraian
+ */
+function toggleKunciUraian(no) {
+  playSound('click');
+  const box = document.getElementById(`box-kunci-uraian-${no}`);
+  const lbl = document.getElementById(`label-btn-kunci-${no}`);
+  if (!box) return;
+
+  if (box.classList.contains('hidden')) {
+    box.classList.remove('hidden');
+    if (lbl) lbl.innerText = 'Tutup Kunci Jawaban ✖';
+  } else {
+    box.classList.add('hidden');
+    if (lbl) lbl.innerText = 'Buka Kunci & Rubrik 💡';
+  }
+}
+window.toggleKunciUraian = toggleKunciUraian;
+
+/**
+ * Muat jawaban uraian siswa dari localStorage
+ */
+function muatJawabanUraianSiswa() {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const sId = profile ? (profile.nis || profile.nama) : 'guest';
+  let savedAnswers = {};
+
+  try {
+    const raw = localStorage.getItem(`educode_jawaban_uraian_${sId}_sem1`);
+    if (raw) savedAnswers = JSON.parse(raw);
+  } catch(e) {}
+
+  SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
+    const ta = document.getElementById(`textarea-uraian-${q.no}`);
+    if (ta && savedAnswers[q.no]) {
+      ta.value = savedAnswers[q.no];
+    }
+  });
+}
+window.muatJawabanUraianSiswa = muatJawabanUraianSiswa;
+
+/**
+ * Simpan jawaban uraian siswa ke localStorage
+ */
+function simpanJawabanUraianOtomatis(no) {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const sId = profile ? (profile.nis || profile.nama) : 'guest';
+  let savedAnswers = {};
+
+  try {
+    const raw = localStorage.getItem(`educode_jawaban_uraian_${sId}_sem1`);
+    if (raw) savedAnswers = JSON.parse(raw);
+  } catch(e) {}
+
+  const ta = document.getElementById(`textarea-uraian-${no}`);
+  if (ta) {
+    savedAnswers[no] = ta.value;
+    try {
+      localStorage.setItem(`educode_jawaban_uraian_${sId}_sem1`, JSON.stringify(savedAnswers));
+    } catch(e) {}
+  }
+}
+window.simpanJawabanUraianOtomatis = simpanJawabanUraianOtomatis;
+
+function simpanJawabanUraianSiswa() {
+  playSound('fanfare');
+  SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
+    simpanJawabanUraianOtomatis(q.no);
+  });
+  showToast('Seluruh jawaban uraian berhasil disimpan di akunmu! 💾✨', 'success');
+}
+window.simpanJawabanUraianSiswa = simpanJawabanUraianSiswa;
 

@@ -11811,7 +11811,48 @@
 
   </div>
 
-  <!-- MAIN EXCEL APPLICATION WINDOW INTERFACE -->
+  <!-- MISI LATIHAN EXCEL: HITUNG TOTAL TABUNGAN MINGGU INI (SYARAT BUKA KUIS) -->
+      <div id="misi-excel-tabungan-box" class="bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/60 p-4 sm:p-5 rounded-3xl text-white shadow-xl space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-3 border-b border-emerald-800/80 pb-3">
+          <div class="flex items-center gap-3">
+            <span class="w-11 h-11 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center text-2xl font-bold shadow-md">
+              💰
+            </span>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold uppercase tracking-wider">
+                  Misi Praktik Kelas 4 • Syarat Buka Kuis
+                </span>
+                <span id="badge-status-misi-tabungan" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold">
+                  ⏳ Belum Dihitung
+                </span>
+              </div>
+              <h4 class="font-title font-bold text-base sm:text-lg text-white mt-0.5">
+                Latihan Menghitung Total Tabungan Minggu Ini (Sel F7)
+              </h4>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="bantuanRumusTabungan()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 font-title font-bold text-xs border border-yellow-500/40 transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-lightbulb"></i> <span>Petunjuk Rumus 💡</span>
+            </button>
+            <button type="button" onclick="cekJawabanTabunganDanBukaKuis(false)" id="btn-periksa-tabungan" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-calculator"></i> <span>Periksa &amp; Buka Kuis 🚀</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-slate-200">
+          <p class="leading-relaxed font-sans max-w-3xl">
+            👉 <strong>Petunjuk Tugas:</strong> Klik sel <strong>F7</strong> pada tabel buku kas di bawah, lalu ketik rumus penjumlahan sisa tabungan <strong><code>=SUM(F2:F6)</code></strong> atau selisih <strong><code>=D7-E7</code></strong> (atau ketik hasil perhitungannya). Setelah sel <strong>F7</strong> menghasilkan <strong>Rp 48.000</strong>, <strong>Menu Kuis</strong> akan langsung TERBUKA!
+          </p>
+          <div id="misi-tabungan-feedback" class="shrink-0 font-bold text-amber-300 font-mono text-xs bg-slate-950/70 px-3 py-1.5 rounded-xl border border-slate-700">
+            Nilai Sel F7 saat ini: <span id="val-sel-f7-preview" class="text-white">Kosong</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN EXCEL APPLICATION WINDOW INTERFACE -->
       <div id="excel-main-window" class="bg-white rounded-3xl border-2 border-emerald-600/30 shadow-2xl overflow-hidden transition-all duration-300">
         
         <!-- EXCEL TITLE BAR (OFFICE GREEN) -->
@@ -15846,7 +15887,37 @@
 
   </div>
 
-  <!-- Quiz Container -->
+  <!-- SUB-TAB MISI KUIS MINGGU INI: 20 PILIHAN GANDA & 5 URAIAN -->
+        <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 p-4 rounded-3xl border-2 border-indigo-400/40 text-white shadow-xl space-y-3">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-indigo-800/60 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-400/40 flex items-center justify-center text-xl font-bold">
+                🎯
+              </span>
+              <div>
+                <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[10px] font-bold uppercase tracking-wider">
+                  Misi Kisi-kisi Minggu Ini • Persiapan Kuis Sesungguhnya
+                </span>
+                <h3 class="font-title font-bold text-base sm:text-lg text-white mt-0.5">
+                  Uji Pemahaman Materi Modul Belajar (20 Pilihan Ganda + 5 Uraian)
+                </h3>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-950/80 p-1.5 rounded-2xl border border-indigo-500/30">
+              <button type="button" onclick="pilihSubTabKuis('pg')" id="btn-subkuis-pg" class="px-4 py-2 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-md cursor-pointer">
+                <i class="fa-solid fa-list-check"></i> <span>Misi 1: 20 Soal PG</span>
+              </button>
+              <button type="button" onclick="pilihSubTabKuis('uraian')" id="btn-subkuis-uraian" class="px-4 py-2 rounded-xl font-title font-bold text-xs transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer">
+                <i class="fa-solid fa-pen-to-square"></i> <span>Misi 2: 5 Soal Uraian</span>
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed font-sans">
+            Misi ini dirancang berdasarkan seluruh capaian pembelajaran (TP 1.1 - TP 1.4 Pengolahan Data Excel &amp; TP 2.1 - TP 2.4 Konten Digital Word/Internet Sehat) untuk mempersiapkanmu menghadapi kuis sesungguhnya!
+          </p>
+        </div>
+
+        <!-- Quiz Container -->
         <div id="quiz-box" class="max-w-2xl mx-auto space-y-5">
           <!-- Indikator Soal & Bar Kemajuan Gamified -->
           <div class="space-y-2">
@@ -15902,7 +15973,41 @@
           <!-- Di-render dinamis oleh renderLayarKuisTerkunci(access) di app.js -->
         </div>
 
-  <!-- Sertifikat Kelulusan (Tampil jika kuis selesai) -->
+  <!-- CONTAINER MISI 2: 5 SOAL URAIAN PEMAHAMAN MODUL BELAJAR -->
+        <div id="kuis-uraian-container" class="hidden max-w-3xl mx-auto space-y-6 animate-fadeIn">
+          <div class="bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/50 rounded-3xl p-5 sm:p-7 text-white shadow-xl space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/40 text-xs font-bold uppercase tracking-wider">
+                Misi Bagian 2 • Soal Uraian Pemahaman
+              </span>
+              <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold">
+                5 Soal Analisis Kasus
+              </span>
+            </div>
+            <h3 class="font-title font-black text-xl sm:text-2xl text-white">
+              5 Soal Uraian Pemahaman Materi Modul Belajar
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+              Tuliskan pemikiran dan analisis logismu pada setiap soal di bawah ini. Jawabanmu otomatis tersimpan. Kamu juga bisa membuka panduan/kunci jawaban guru untuk belajar mandiri!
+            </p>
+          </div>
+
+          <div id="daftar-soal-uraian-wrapper" class="space-y-5">
+            <!-- Soal-soal uraian akan dirender lewat JavaScript -->
+          </div>
+
+          <!-- Tombol Aksi Simpan & Kembali -->
+          <div class="p-5 bg-white rounded-3xl border-2 border-slate-200 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+            <button type="button" onclick="pilihSubTabKuis('pg')" class="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-arrow-left"></i> <span>Kembali ke 20 Soal Pilihan Ganda</span>
+            </button>
+            <button type="button" onclick="simpanJawabanUraianSiswa()" class="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-floppy-disk"></i> <span>Simpan Seluruh Jawaban Uraian 💾</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sertifikat Kelulusan (Tampil jika kuis selesai) -->
         <div id="certificate-box" class="hidden max-w-2xl mx-auto pt-6 text-center space-y-6">
           <div class="p-8 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 rounded-3xl shadow-xl text-slate-900 border-4 border-amber-300 relative overflow-hidden">
             <div class="absolute -top-10 -right-10 text-white/20 text-9xl pointer-events-none">
@@ -23333,7 +23438,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261116_k6_full_v154"></script>
+  <script charset="UTF-8" src="app.js?v=20261116_k4_excel_quiz_v155"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
