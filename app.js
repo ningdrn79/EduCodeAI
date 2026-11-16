@@ -1904,10 +1904,14 @@ function switchTab(tabId) {
     } catch (eProfilEarly) {}
   }
 
-  // Bersihkan style early teacher agar tidak menimpa display section
+  // Bersihkan style early teacher & student section overrides agar tidak menimpa display section
   try {
     const earlyGuruStyle = document.getElementById('style-early-teacher-session');
     if (earlyGuruStyle) earlyGuruStyle.remove();
+    const earlyStudentStyle = document.getElementById('style-early-student-session');
+    if (earlyStudentStyle) {
+      earlyStudentStyle.innerHTML = earlyStudentStyle.innerHTML.replace(/#tab-[a-zA-Z0-9_]+\s*\{[^}]*\}/g, '');
+    }
   } catch (e) {}
 
   // Sinkronkan navbar:
@@ -1918,7 +1922,7 @@ function switchTab(tabId) {
   // 5. Jika di beranda dan belum login, tampilkan navbar utama
   if (tabId === 'guru' || (state.isGuruLoggedIn && tabId === 'guru')) {
     setHeaderNavMode('guru');
-  } else if (tabId === 'petualangan6') {
+  } else if (tabId === 'petualangan6' || tabId === 'algoritma' || tabId === 'antarteman') {
     setHeaderNavMode('kelas6');
   } else if (tabId === 'petualangan5') {
     setHeaderNavMode('kelas5');
@@ -1951,7 +1955,7 @@ function switchTab(tabId) {
   }
 
   // Daftar semua tab (termasuk Tab Petualangan Kelas 5 SD & Kelas 6 SD)
-  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5', 'petualangan6'];
+  const tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5', 'petualangan6', 'algoritma', 'antarteman'];
   if (!tabs.includes(tabId)) {
     tabId = 'beranda';
   }
@@ -1990,6 +1994,79 @@ function switchTab(tabId) {
       }
     }
   });
+
+  // Update visual tab aktif khusus Navbar Siswa Kelas 6 SD
+  const navK6Ids = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis'];
+  navK6Ids.forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.remove('active-tab', 'text-white');
+    btn.classList.add('text-slate-300');
+  });
+
+  if (tabId === 'beranda') {
+    const b = document.getElementById('nav-p6-beranda');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') {
+      setTimeout(window.perbaruiStatusMisiKelas6Siswa, 30);
+    }
+  } else if (tabId === 'modul') {
+    const b = document.getElementById('nav-p6-modul');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+  } else if (tabId === 'petualangan6') {
+    const b = document.getElementById('nav-p6-4pilar');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    if (typeof window.muatStatusTugasScratchK6 === 'function') {
+      setTimeout(function() { window.muatStatusTugasScratchK6('4pilar'); }, 30);
+    }
+  } else if (tabId === 'algoritma') {
+    const b = document.getElementById('nav-p6-algoritma');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    if (typeof window.muatStatusTugasScratchK6 === 'function') {
+      setTimeout(function() { window.muatStatusTugasScratchK6('algoritma'); }, 30);
+    }
+  } else if (tabId === 'antarteman') {
+    const b = document.getElementById('nav-p6-antarteman');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    if (typeof window.muatStatusMisiK6 === 'function') {
+      setTimeout(function() { window.muatStatusMisiK6('antarteman'); }, 30);
+    }
+    if (typeof window.muatPenilaianAntarTemanK6 === 'function') {
+      setTimeout(window.muatPenilaianAntarTemanK6, 50);
+    }
+  } else if (tabId === 'kuis') {
+    const b = document.getElementById('nav-p6-kuis');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    
+    // Khusus Siswa Kelas 6: Tampilkan Webview Kuis6 (kuis6.netlify.app)
+    try {
+      const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+      const isK6Kuis = (activeStd && String(activeStd.kelas || '').includes('6')) || (state.tingkatKelasGuru === '6');
+      const k6Container = document.getElementById('kuis-kelas6-container');
+      const k4QuizBox = document.getElementById('quiz-box');
+      const k4LockedBox = document.getElementById('quiz-locked-box');
+      const k4CertBox = document.getElementById('certificate-box');
+      if (isK6Kuis) {
+        if (k6Container) {
+          k6Container.classList.remove('hidden');
+          k6Container.style.removeProperty('display');
+          k6Container.style.setProperty('display', 'block', 'important');
+        }
+        if (k4QuizBox) k4QuizBox.classList.add('hidden');
+        if (k4LockedBox) k4LockedBox.classList.add('hidden');
+        if (k4CertBox) k4CertBox.classList.add('hidden');
+        if (typeof window.muatStatusMisiK6 === 'function') {
+          setTimeout(function() { window.muatStatusMisiK6('kuis'); }, 30);
+        }
+      } else {
+        if (k6Container) {
+          k6Container.classList.add('hidden');
+          k6Container.style.setProperty('display', 'none', 'important');
+        }
+        if (k4QuizBox) k4QuizBox.classList.remove('hidden');
+      }
+    } catch(eKuis6) {}
+  }
 
   if (tabId === 'guru') {
     renderDasborGuru();
@@ -2804,11 +2881,35 @@ function bukaDrive7KebiasaanDariProta() {
 }
 window.bukaDrive7KebiasaanDariProta = bukaDrive7KebiasaanDariProta;
 
-// Fungsi gulir langsung ke tabel PROTA
-function gulirKeTabelProta() {
-  playSound('click');
+// Fungsi gulir langsung ke tabel PROTA Kelas 6
+function gulirKeProtaKelas6() {
+  try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
   if (state.currentTab !== 'modul') {
     switchTab('modul');
+  }
+  if (typeof pilihTingkatModul === 'function') {
+    pilihTingkatModul('kelas6');
+  }
+  setTimeout(() => {
+    const el = document.getElementById('tabel-prota-kelas6-kurikulum-merdeka');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 120);
+}
+window.gulirKeProtaKelas6 = gulirKeProtaKelas6;
+
+// Fungsi gulir langsung ke tabel PROTA
+function gulirKeTabelProta(tingkat) {
+  try { if (typeof playSound === 'function') playSound('click'); } catch (e) {}
+  if (tingkat === 'kelas6' || (state.activeStudent && String(state.activeStudent.kelas || '').includes('6'))) {
+    return gulirKeProtaKelas6();
+  }
+  if (state.currentTab !== 'modul') {
+    switchTab('modul');
+  }
+  if (typeof pilihTingkatModul === 'function') {
+    pilihTingkatModul('kelas4');
   }
   setTimeout(() => {
     const el = document.getElementById('tabel-prota-kurikulum-merdeka');
@@ -2817,6 +2918,7 @@ function gulirKeTabelProta() {
     }
   }, 100);
 }
+window.gulirKeTabelProta = gulirKeTabelProta;
 
 // Link Cepat Membuka Aplikasi Paint Terbaru Khusus TP 2.2 (Membuat Konten Gambar Terpisah)
 function bukaAplikasiPaintTerbaru() {
@@ -9625,6 +9727,10 @@ var quizQuestions = getBankSoal(1);
 var quizQuestionsSem2 = getBankSoal(2);
 
 function getActiveQuizList() {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (profile && String(profile.kelas || '').includes('6')) {
+    return getBankSoalKelas6();
+  }
   return getBankSoal(state.currentSemester || 1);
 }
 window.getActiveQuizList = getActiveQuizList;
@@ -9732,6 +9838,9 @@ window.renderKontrolAksesKuisGuru = renderKontrolAksesKuisGuru;
 
 function isStudentTaskCompleted(profile, sem = 1) {
   if (!profile) return false;
+  if (String(profile.kelas || '').includes('6')) {
+    return true; // Siswa Kelas 6 SD langsung memiliki akses kuis CT & Algoritma
+  }
   const semNum = Number(sem) === 2 ? 2 : 1;
   const sId = profile.nis || profile.nama || 'anoname';
 
@@ -26695,13 +26804,34 @@ function renderTabelGradebook(students, totalAll) {
   }
 
   // 1. Render Header Tabel Sesuai Mode Penilaian
+  const isTingkat6View = (state.tingkatKelasGuru === '6') || 
+                         (state.filterKelasGuru === 'tingkat_6') || 
+                         (['6A', '6B', '6C', '6D', '6E'].includes(state.filterKelasGuru)) ||
+                         (students.length > 0 && students.every(s => String(s.kelas || '').includes('6')));
+
   const isTingkat5View = (state.tingkatKelasGuru === '5') || 
                          (state.filterKelasGuru === 'tingkat_5') || 
                          (['5A', '5B', '5C', '5D', '5E'].includes(state.filterKelasGuru)) ||
                          (students.length > 0 && students.every(s => String(s.kelas || '').includes('5')));
 
   if (thead) {
-    if (isTingkat5View) {
+    if (isTingkat6View) {
+      thead.innerHTML = `
+        <tr id="guru-table-head-row" class="bg-gradient-to-r from-orange-100 via-amber-100 to-emerald-100 border-b-2 border-orange-200 text-orange-950 font-title font-black text-xs sm:text-sm tracking-wider uppercase">
+          <th class="py-4 px-3 text-center w-12">No</th>
+          <th class="py-4 px-3 min-w-[210px]">Data Siswa</th>
+          <th class="py-4 px-2 text-center w-20">Kelas</th>
+          <th class="py-4 px-2 text-center w-36">1. Scratch 4 Pilar</th>
+          <th class="py-4 px-2 text-center w-36">2. Scratch Algoritma</th>
+          <th class="py-4 px-2 text-center w-36">3. Antar Teman</th>
+          <th class="py-4 px-2 text-center w-36">4. Kuis6</th>
+          <th class="py-4 px-2 text-center w-28">Nilai Rapor</th>
+          <th class="py-4 px-2 text-center w-32">Sertifikat</th>
+          <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
+          <th class="py-4 px-2 text-center w-32">Aksi</th>
+        </tr>
+      `;
+    } else if (isTingkat5View) {
       thead.innerHTML = `
         <tr id="guru-table-head-row" class="bg-gradient-to-r from-purple-100 via-indigo-100 to-amber-100 border-b-2 border-purple-200 text-purple-950 font-title font-black text-xs sm:text-sm tracking-wider uppercase">
           <th class="py-4 px-3 text-center w-12">No</th>
@@ -26828,8 +26958,102 @@ function renderTabelGradebook(students, totalAll) {
     const avatarInfo = dapatkanGayaAvatarSiswa(s);
     const initial = avatarInfo.initial;
 
+    const isKelas6Student = String(s.kelas || '').includes('6');
     const isKelas5Student = String(s.kelas || '').includes('5');
-    if (isTingkat5View || isKelas5Student) {
+    if (isTingkat6View || isKelas6Student) {
+      const evalK6 = (typeof hitungRubrikPenilaianKelas6 === 'function') ? hitungRubrikPenilaianKelas6(s) : { nilaiScratch4Pilar: 0, nilaiScratchAlgoritma: 0, nilaiAntarTeman: 0, nilaiKuis6: 0, nilaiAkhir: 0, isTuntas: false, isSertifikatEligible: false, selesaiCount: 0 };
+      const isPassK6 = evalK6.isTuntas;
+      tr.innerHTML = `
+        <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
+        <td class="${padRow} px-3 min-w-[210px]">
+          <div class="flex items-center gap-3">
+            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Buka Monitoring 4 Tugas Kelas 6: ${s.nama}">
+              ${initial}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="font-title font-black text-slate-900 hover:text-orange-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Klik untuk Periksa 4 Tugas & Beri Nilai ${s.nama}">
+                ${s.nama}
+              </div>
+              <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span class="font-title font-black ${szTag} bg-orange-100 text-orange-900 px-2 py-0.5 rounded-md border border-orange-200">
+                  NIS: ${s.nis || '-'}
+                </span>
+                <span class="text-slate-500 ${szSub}">Absen: ${s.absen || '-'}</span>
+              </div>
+            </div>
+          </div>
+        </td>
+        <td class="${padRow} px-2 text-center">
+          <span class="inline-block px-2.5 py-1 rounded-xl font-title font-black ${szTag} bg-orange-100 text-orange-950 border border-orange-300 shadow-2xs">${s.kelas || '6A'}</span>
+        </td>
+        <!-- 1. Scratch 4 Pilar -->
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', '4pilar')" title="Periksa Tugas 1: Proyek Scratch 4 Pilar">
+            <span class="font-title font-black ${szAngka} text-sky-700 group-hover:scale-110 transition">${evalK6.nilaiScratch4Pilar}</span>
+            <span class="font-title font-bold ${szSub} ${evalK6.hasScratch4Pilar ? 'text-sky-900 bg-sky-50 border-sky-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-sky-100 transition">
+              ${evalK6.hasScratch4Pilar ? '🐱 Ada Proyek' : 'Belum Kumpul'}
+            </span>
+          </div>
+        </td>
+        <!-- 2. Scratch Algoritma -->
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'algoritma')" title="Periksa Tugas 2: Proyek Scratch Algoritma">
+            <span class="font-title font-black ${szAngka} text-orange-700 group-hover:scale-110 transition">${evalK6.nilaiScratchAlgoritma}</span>
+            <span class="font-title font-bold ${szSub} ${evalK6.hasScratchAlgoritma ? 'text-orange-900 bg-orange-50 border-orange-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-orange-100 transition">
+              ${evalK6.hasScratchAlgoritma ? '🚀 Ada Proyek' : 'Belum Kumpul'}
+            </span>
+          </div>
+        </td>
+        <!-- 3. Antar Teman (evalscore.netlify.app) -->
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'antarteman')" title="Periksa Tugas 3: Penilaian Antar Teman EvalScore">
+            <span class="font-title font-black ${szAngka} text-purple-700 group-hover:scale-110 transition">${evalK6.nilaiAntarTeman}</span>
+            <span class="font-title font-bold ${szSub} ${evalK6.hasAntarTeman ? 'text-purple-900 bg-purple-50 border-purple-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-purple-100 transition">
+              ${evalK6.hasAntarTeman ? '👥 Tuntas' : 'Belum'}
+            </span>
+          </div>
+        </td>
+        <!-- 4. Kuis (kuis6.netlify.app) -->
+        <td class="${padRow} px-2 text-center">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'kuis')" title="Periksa Tugas 4: Kuis Komputasi Kuis6">
+            <span class="font-title font-black ${szAngka} text-amber-600 group-hover:scale-110 transition">${evalK6.nilaiKuis6}</span>
+            <span class="font-title font-bold ${szSub} ${evalK6.hasKuis6 ? 'text-amber-900 bg-amber-50 border-amber-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-amber-100 transition">
+              ${evalK6.hasKuis6 ? '🏆 Tuntas' : 'Belum'}
+            </span>
+          </div>
+        </td>
+        <!-- Nilai Rapor -->
+        <td class="${padRow} px-2 text-center">
+          <span class="inline-block px-3.5 py-1.5 rounded-xl font-title font-black ${szAngka} bg-orange-100 text-orange-950 border-2 border-orange-300 shadow-2xs">${evalK6.nilaiAkhir}</span>
+        </td>
+        <!-- Status Sertifikat -->
+        <td class="${padRow} px-2 text-center">
+          <button type="button" onclick="bukaModalSertifikatKelas6('${s.id || s.nis || s.nama}')" title="${evalK6.isSertifikatEligible ? 'Lihat & Cetak Sertifikat Kelulusan Resmi Siswa' : 'Siswa belum menyelesaikan 4 tugas'}" class="font-title font-black ${szTag} px-3 py-1.5 rounded-xl shadow-2xs inline-flex items-center gap-1.5 cursor-pointer transition ${evalK6.isSertifikatEligible ? 'bg-emerald-600 hover:bg-emerald-700 text-white animate-pulse' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}">
+            ${evalK6.isSertifikatEligible ? '🎓 Cetak' : `⏳ (${evalK6.selesaiCount}/4)`}
+          </button>
+        </td>
+        <!-- Catatan Guru -->
+        <td class="${padRow} px-3">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px]" title="${s.catatanGuru || 'Belum ada catatan'}">
+            ${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}
+          </div>
+        </td>
+        <!-- Aksi -->
+        <td class="${padRow} px-2 text-center">
+          <div class="flex items-center justify-center gap-1.5">
+            <button type="button" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Monitoring & Beri Nilai 4 Tugas Kelas 6" class="${szAksi} rounded-xl bg-orange-50 hover:bg-orange-600 hover:text-white text-orange-700 border border-orange-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open pointer-events-none"></i>
+            </button>
+            <button type="button" onclick="bukaModalSertifikatKelas6('${s.id || s.nis || s.nama}')" title="Piagam Sertifikat Kelulusan Kelas 6" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-award"></i>
+            </button>
+            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail Siswa" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+          </div>
+        </td>
+      `;
+    } else if (isTingkat5View || isKelas5Student) {
       const evalK5 = hitungRubrikPenilaianKelas5(s);
       const isPassK5 = evalK5.isTuntas;
       tr.innerHTML = `
@@ -31479,7 +31703,14 @@ window.ujiKirimWebhookGuru = typeof ujiKirimWebhookGuru === 'function' ? ujiKiri
 window.bukaKuisAtauSertifikatSiswa = typeof bukaKuisAtauSertifikatSiswa === 'function' ? bukaKuisAtauSertifikatSiswa : function(){};
 window.bukaRoboMindLangsung = typeof bukaRoboMindLangsung === 'function' ? bukaRoboMindLangsung : function(){};
 window.bukaPetualanganZona = typeof bukaPetualanganZona === 'function' ? bukaPetualanganZona : function(z){ if(typeof switchTab==='function')switchTab('petualangan5'); };
-window.bukaPetualangan6Zona = typeof bukaPetualangan6Zona === 'function' ? bukaPetualangan6Zona : function(z){ if(typeof switchTab==='function')switchTab('petualangan6'); };
+window.bukaPetualangan6Zona = function(z) {
+  playSound('click');
+  if (z === 'zona-algoritma' || z === 'algoritma') {
+    if (typeof switchTab === 'function') switchTab('algoritma');
+  } else {
+    if (typeof switchTab === 'function') switchTab('petualangan6');
+  }
+};
 
 window.masukCepatKelas6 = function() {
   const testSiswa6 = {
@@ -33096,4 +33327,1329 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+
+// =========================================================================
+// FITUR KHUSUS KELAS 6 SD: BANK SOAL CT & PENILAIAN ANTAR TEMAN (PEER ASSESSMENT)
+// =========================================================================
+
+const DEFAULT_BANK_SOAL_K6 = [
+  {
+    question: "Pilar Berpikir Komputasional (CT) yang berarti memecah masalah besar yang rumit menjadi beberapa bagian kecil yang lebih mudah diselesaikan adalah...",
+    options: ["Dekomposisi", "Pengenalan Pola", "Abstraksi", "Algoritma"],
+    answer: 0,
+    explanation: "Dekomposisi adalah teknik memecah masalah atau sistem yang rumit menjadi bagian-bagian yang lebih kecil sehingga lebih mudah dipahami dan dikelola."
+  },
+  {
+    question: "Ketika kita mengamati keteraturan atau kesamaan ciri-ciri pada beberapa data untuk menemukan solusi, kita sedang menerapkan pilar...",
+    options: ["Abstraksi", "Pengenalan Pola", "Dekomposisi", "Pengulangan"],
+    answer: 1,
+    explanation: "Pengenalan Pola (Pattern Recognition) adalah proses menemukan keteraturan, kesamaan bentuk, atau sifat yang berulang untuk memprediksi solusi."
+  },
+  {
+    question: "Menyaring dan memilih hanya informasi yang penting serta mengabaikan rincian yang tidak relevan disebut...",
+    options: ["Algoritma", "Dekomposisi", "Abstraksi", "Debugging"],
+    answer: 2,
+    explanation: "Abstraksi berfokus pada informasi penting dan inti masalah, seraya menyisihkan rincian yang tidak diperlukan dalam penyelesaian masalah."
+  },
+  {
+    question: "Urutan langkah-langkah logis, bertahap, dan terstruktur yang dibuat untuk menyelesaikan suatu tugas disebut...",
+    options: ["Algoritma", "Pola", "Abstraksi", "Dekomposisi"],
+    answer: 0,
+    explanation: "Algoritma adalah serangkaian instruksi atau prosedur logis langkah demi langkah yang harus diikuti untuk mencapai hasil yang diinginkan."
+  },
+  {
+    question: "Dalam membuat diagram alir (Flowchart), simbol berbentuk belah ketupat (diamond) digunakan untuk menunjukkan...",
+    options: ["Awal atau akhir program", "Keputusan / Pilihan logika (Ya / Tidak)", "Proses perhitungan", "Arah aliran data"],
+    answer: 1,
+    explanation: "Simbol belah ketupat (Decision) digunakan untuk percabangan atau pengambilan keputusan logika berdasarkan kondisi tertentu."
+  },
+  {
+    question: "Di aplikasi Scratch, blok perintah yang digunakan agar Sprite mengulang suatu instruksi secara terus-menerus adalah...",
+    options: ["wait 1 secs", "forever", "stop all", "when green flag clicked"],
+    answer: 1,
+    explanation: "Blok 'forever' (selamanya) adalah perulangan tak berhingga (infinite loop) yang menjalankan perintah di dalamnya terus-menerus."
+  },
+  {
+    question: "Apa fungsi dari sebuah Variabel dalam program komputer?",
+    options: ["Menghapus seluruh file", "Tempat menyimpan data atau nilai yang bisa berubah", "Memutar suara latar", "Mengubah warna monitor"],
+    answer: 1,
+    explanation: "Variabel adalah wadah penyimpanan dalam memori komputer yang menampung data (seperti skor kuis, jumlah koin, atau sisa waktu) yang nilainya dapat berubah."
+  },
+  {
+    question: "Jika program Scratch kita tidak berjalan sesuai rencana karena ada kesalahan urutan blok logika, tindakan mencari dan memperbaiki kesalahan tersebut disebut...",
+    options: ["Debugging", "Compiling", "Formatting", "Downloading"],
+    answer: 0,
+    explanation: "Debugging adalah proses mendeteksi, melacak, dan memperbaiki bug atau kesalahan logika dalam kode program."
+  },
+  {
+    question: "Dalam budaya humanis Tzu Chi, saat berdiskusi menyelesaikan proyek komputasi bersama teman sekelas, sikap utama yang harus kita junjung tinggi adalah...",
+    options: ["Meremehkan pendapat teman lain", "Saling menghargai (Zun Zhong) dan bekerja sama dengan cinta kasih (Hu Ai)", "Bekerja sendiri tanpa mau berbagi tugas", "Memaksa teman mengikuti cara kita"],
+    answer: 1,
+    explanation: "Nilai luhur Tzu Chi mengajarkan Zun Zhong (saling menghargai) dan Hu Ai (cinta kasih) dalam gotong royong dan kerjasama tim."
+  },
+  {
+    question: "Kecerdasan Artifisial (Artificial Intelligence / AI) adalah teknologi komputer yang dirancang agar mampu...",
+    options: ["Menghasilkan panas ruangan", "Meniru kemampuan berpikir, mengenali pola, dan memecahkan masalah seperti manusia", "Menggantikan seluruh guru di sekolah", "Mematikan internet secara otomatis"],
+    answer: 1,
+    explanation: "AI adalah bidang ilmu komputer yang bertujuan membuat mesin atau program yang mampu belajar, menganalisis data, dan mengambil keputusan cerdas menyerupai kecerdasan manusia."
+  }
+];
+
+function getBankSoalKelas6() {
+  try {
+    const raw = localStorage.getItem('educode_bank_soal_k6');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_BANK_SOAL_K6));
+}
+window.getBankSoalKelas6 = getBankSoalKelas6;
+
+// State & Helper Penilaian Antar Teman Kelas 6 SD
+const KEY_ANTARTEMAN_K6 = 'educode_antarteman_k6_list';
+let _antartemanK6Skor = { aspek1: 4, aspek2: 4, aspek3: 4, aspek4: 4 };
+
+function setSkorAspekK6(aspekIndex, skor) {
+  _antartemanK6Skor['aspek' + aspekIndex] = Number(skor);
+  try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+
+  const ratings = [1, 2, 3, 4];
+  const colorMap = {
+    1: { bgActive: 'bg-emerald-600/30', borderActive: 'border-emerald-400', textActive: 'text-emerald-200' },
+    2: { bgActive: 'bg-sky-600/30', borderActive: 'border-sky-400', textActive: 'text-sky-200' },
+    3: { bgActive: 'bg-amber-600/30', borderActive: 'border-amber-400', textActive: 'text-amber-200' },
+    4: { bgActive: 'bg-purple-600/30', borderActive: 'border-purple-400', textActive: 'text-purple-200' }
+  };
+  const c = colorMap[aspekIndex] || colorMap[1];
+
+  ratings.forEach(r => {
+    const btn = document.getElementById(`btn-aspek${aspekIndex}-${r}`);
+    if (!btn) return;
+    if (r === skor) {
+      btn.className = `btn-aspek-k6 py-2 px-2.5 rounded-xl text-xs font-semibold border text-center transition cursor-pointer ${c.bgActive} ${c.borderActive} ${c.textActive} shadow-xs ring-2 ring-white/20`;
+    } else {
+      btn.className = 'btn-aspek-k6 py-2 px-2.5 rounded-xl text-xs font-semibold border text-center transition cursor-pointer bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700/60';
+    }
+  });
+
+  const labelNamaSkor = {
+    4: '4 (Sangat Baik)',
+    3: '3 (Baik)',
+    2: '2 (Cukup)',
+    1: '1 (Perlu Bimbingan)'
+  };
+  const lbl = document.getElementById(`label-skor-aspek-${aspekIndex}`);
+  if (lbl) {
+    lbl.innerText = `Skor: ${labelNamaSkor[skor] || skor}`;
+  }
+
+  hitungRekapNilaiAntarTemanK6();
+}
+window.setSkorAspekK6 = setSkorAspekK6;
+
+function hitungRekapNilaiAntarTemanK6() {
+  const p1 = _antartemanK6Skor.aspek1 || 4;
+  const p2 = _antartemanK6Skor.aspek2 || 4;
+  const p3 = _antartemanK6Skor.aspek3 || 4;
+  const p4 = _antartemanK6Skor.aspek4 || 4;
+  const total = p1 + p2 + p3 + p4;
+  const nilaiAkhir = Math.round((total / 16) * 100);
+
+  let predikat = 'Sangat Baik (A)';
+  let predikatColor = 'text-emerald-400';
+  if (nilaiAkhir < 70) {
+    predikat = 'Perlu Bimbingan (D)';
+    predikatColor = 'text-rose-400';
+  } else if (nilaiAkhir < 80) {
+    predikat = 'Cukup (C)';
+    predikatColor = 'text-amber-400';
+  } else if (nilaiAkhir < 90) {
+    predikat = 'Baik (B)';
+    predikatColor = 'text-sky-400';
+  }
+
+  const elNilai = document.getElementById('rekap-nilai-angka-k6');
+  const elPred = document.getElementById('rekap-predikat-k6');
+  const elTotal = document.getElementById('rekap-total-poin-k6');
+  const elP1 = document.getElementById('rekap-p1-k6');
+  const elP2 = document.getElementById('rekap-p2-k6');
+  const elP3 = document.getElementById('rekap-p3-k6');
+  const elP4 = document.getElementById('rekap-p4-k6');
+
+  if (elNilai) elNilai.innerText = String(nilaiAkhir);
+  if (elPred) {
+    elPred.className = predikatColor + ' font-bold';
+    elPred.innerText = predikat;
+  }
+  if (elTotal) elTotal.innerText = `${total} / 16 Poin`;
+  if (elP1) elP1.innerText = `${p1} / 4`;
+  if (elP2) elP2.innerText = `${p2} / 4`;
+  if (elP3) elP3.innerText = `${p3} / 4`;
+  if (elP4) elP4.innerText = `${p4} / 4`;
+}
+window.hitungRekapNilaiAntarTemanK6 = hitungRekapNilaiAntarTemanK6;
+
+function filterKelasPenilaianAntarTemanK6(kelasTarget) {
+  const selTarget = document.getElementById('select-teman-dinilai-k6');
+  if (!selTarget) return;
+
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const currentNis = activeStudent ? String(activeStudent.nis || '').trim() : '';
+  const currentName = activeStudent ? String(activeStudent.nama || '').trim().toLowerCase() : '';
+
+  const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+  const list = db.filter(s => {
+    if (!s || !s.kelas) return false;
+    if (String(s.kelas).toUpperCase() !== String(kelasTarget).toUpperCase()) return false;
+    if (currentNis && String(s.nis || '').trim() === currentNis) return false;
+    if (currentName && String(s.nama || '').trim().toLowerCase() === currentName) return false;
+    return true;
+  });
+
+  list.sort((a, b) => {
+    const absA = parseInt(a.absen || '0', 10);
+    const absB = parseInt(b.absen || '0', 10);
+    if (absA && absB) return absA - absB;
+    return String(a.nama || '').localeCompare(String(b.nama || ''));
+  });
+
+  selTarget.innerHTML = '<option value="">-- Pilih Nama Siswa Teman Sekelas --</option>' + 
+    list.map(s => {
+      const absenStr = s.absen ? `[Absen ${s.absen}] ` : '';
+      return `<option value="${s.nis || s.id}" data-nama="${s.nama}" data-kelas="${s.kelas}">${absenStr}${s.nama} (${s.kelas})</option>`;
+    }).join('');
+}
+window.filterKelasPenilaianAntarTemanK6 = filterKelasPenilaianAntarTemanK6;
+
+function pilihTemanDinilaiK6(val) {
+  try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+}
+window.pilihTemanDinilaiK6 = pilihTemanDinilaiK6;
+
+function muatPenilaianAntarTemanK6() {
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const stdName = activeStudent ? activeStudent.nama : 'Pelajar Kelas 6';
+  const stdKelas = (activeStudent && activeStudent.kelas) ? String(activeStudent.kelas).toUpperCase() : '6A';
+
+  const lblNama = document.getElementById('label-penilai-aktif-k6');
+  const lblKelas = document.getElementById('label-kelas-penilai-k6');
+  const selFilter = document.getElementById('select-filter-kelas-antarteman');
+
+  if (lblNama) lblNama.innerText = stdName;
+  if (lblKelas) lblKelas.innerText = stdKelas;
+  if (selFilter) selFilter.value = ['6A', '6B', '6C', '6D', '6E'].includes(stdKelas) ? stdKelas : '6A';
+
+  filterKelasPenilaianAntarTemanK6(selFilter ? selFilter.value : '6A');
+  hitungRekapNilaiAntarTemanK6();
+  muatRiwayatPenilaianAntarTemanK6();
+}
+window.muatPenilaianAntarTemanK6 = muatPenilaianAntarTemanK6;
+
+function kirimPenilaianAntarTemanK6() {
+  const selTarget = document.getElementById('select-teman-dinilai-k6');
+  if (!selTarget || !selTarget.value) {
+    try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+    if (typeof showToast === 'function') showToast('Silakan pilih nama sahabat/teman sekelas yang ingin dinilai terlebih dahulu! 🤝', 'warning');
+    return;
+  }
+
+  const selectedOption = selTarget.options[selTarget.selectedIndex];
+  const targetNama = selectedOption ? selectedOption.getAttribute('data-nama') || selectedOption.text : 'Teman Sekelas';
+  const targetKelas = selectedOption ? selectedOption.getAttribute('data-kelas') || '6A' : '6A';
+  const targetNis = selTarget.value;
+
+  const inCatatan = document.getElementById('input-catatan-antarteman-k6');
+  const catatan = inCatatan ? inCatatan.value.trim() : '';
+
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const penilaiNama = activeStudent ? activeStudent.nama : 'Pelajar Kelas 6';
+  const penilaiNis = activeStudent ? (activeStudent.nis || activeStudent.id || '6000') : '6000';
+  const penilaiKelas = activeStudent ? activeStudent.kelas : '6A';
+
+  const p1 = _antartemanK6Skor.aspek1 || 4;
+  const p2 = _antartemanK6Skor.aspek2 || 4;
+  const p3 = _antartemanK6Skor.aspek3 || 4;
+  const p4 = _antartemanK6Skor.aspek4 || 4;
+  const total = p1 + p2 + p3 + p4;
+  const nilaiAkhir = Math.round((total / 16) * 100);
+
+  let predikat = 'Sangat Baik (A)';
+  if (nilaiAkhir < 70) predikat = 'Perlu Bimbingan (D)';
+  else if (nilaiAkhir < 80) predikat = 'Cukup (C)';
+  else if (nilaiAkhir < 90) predikat = 'Baik (B)';
+
+  const entry = {
+    id: 'PAT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+    penilaiNama: penilaiNama,
+    penilaiNis: penilaiNis,
+    penilaiKelas: penilaiKelas,
+    targetNama: targetNama,
+    targetNis: targetNis,
+    targetKelas: targetKelas,
+    skorAspek: {
+      huAi: p1,
+      zunZhong: p2,
+      tanggungJawab: p3,
+      berpikirKritis: p4
+    },
+    totalSkor: total,
+    nilaiAkhir: nilaiAkhir,
+    predikat: predikat,
+    catatan: catatan || 'Sangat baik dalam bekerjasama dan saling menghargai!',
+    tanggal: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+  };
+
+  let list = [];
+  try {
+    const raw = localStorage.getItem(KEY_ANTARTEMAN_K6);
+    if (raw) list = JSON.parse(raw);
+    if (!Array.isArray(list)) list = [];
+  } catch(e) { list = []; }
+
+  const existingIdx = list.findIndex(item => String(item.penilaiNis) === String(penilaiNis) && String(item.targetNis) === String(targetNis));
+  if (existingIdx !== -1) {
+    list[existingIdx] = entry;
+  } else {
+    list.unshift(entry);
+  }
+
+  try {
+    localStorage.setItem(KEY_ANTARTEMAN_K6, JSON.stringify(list));
+  } catch(e) {}
+
+  try {
+    const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+    const targetStudent = db.find(s => (s.nis && String(s.nis).trim() === String(targetNis).trim()) || s.id === targetNis);
+    if (targetStudent) {
+      if (!Array.isArray(targetStudent.penilaianAntarTeman)) targetStudent.penilaianAntarTeman = [];
+      const exIdx = targetStudent.penilaianAntarTeman.findIndex(p => String(p.penilaiNis) === String(penilaiNis));
+      if (exIdx !== -1) {
+        targetStudent.penilaianAntarTeman[exIdx] = entry;
+      } else {
+        targetStudent.penilaianAntarTeman.push(entry);
+      }
+      const totalNilaiAT = targetStudent.penilaianAntarTeman.reduce((acc, curr) => acc + (curr.nilaiAkhir || 0), 0);
+      targetStudent.nilaiAntarTeman = Math.round(totalNilaiAT / targetStudent.penilaianAntarTeman.length);
+      localStorage.setItem('educode_student_db_v1', JSON.stringify(db));
+    }
+  } catch(eDb) {}
+
+  try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+  if (typeof showToast === 'function') {
+    showToast(`🎉 Penilaian untuk ${targetNama} berhasil dikirim! Nilai: ${nilaiAkhir} (${predikat}) ✨`, 'success');
+  }
+
+  if (inCatatan) inCatatan.value = '';
+  selTarget.value = '';
+  muatRiwayatPenilaianAntarTemanK6();
+}
+window.kirimPenilaianAntarTemanK6 = kirimPenilaianAntarTemanK6;
+
+function muatRiwayatPenilaianAntarTemanK6() {
+  const container = document.getElementById('container-riwayat-antarteman-k6');
+  if (!container) return;
+
+  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const currentNis = activeStudent ? (activeStudent.nis || activeStudent.id) : null;
+
+  let list = [];
+  try {
+    const raw = localStorage.getItem(KEY_ANTARTEMAN_K6);
+    if (raw) list = JSON.parse(raw);
+    if (!Array.isArray(list)) list = [];
+  } catch(e) { list = []; }
+
+  const userList = currentNis ? list.filter(item => String(item.penilaiNis) === String(currentNis)) : list;
+
+  const badgeTotal = document.getElementById('badge-total-riwayat-k6');
+  const labelJml = document.getElementById('label-jumlah-dinilai-k6');
+  if (badgeTotal) badgeTotal.innerText = `${userList.length} Dikirim`;
+  if (labelJml) labelJml.innerText = `${userList.length} Teman`;
+
+  if (userList.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-slate-500 text-xs italic bg-slate-950/40 rounded-2xl border border-slate-800/60 p-4 space-y-1">
+        <i class="fa-solid fa-users-viewfinder text-2xl text-purple-400/50 mb-1"></i>
+        <div>Belum ada teman yang dinilai.</div>
+        <div class="text-[11px] text-slate-400">Pilih teman di form sebelah kiri untuk memberikan apresiasi &amp; penilaian! 🌟</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = userList.map(item => `
+    <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-purple-500/20 hover:border-purple-400/40 transition space-y-2">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center font-bold text-xs">
+            ${(item.targetNama || 'T').charAt(0)}
+          </span>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-white leading-tight">${item.targetNama}</h4>
+            <span class="text-[10px] text-purple-300 font-semibold">${item.targetKelas} • NIS: ${item.targetNis || '-'}</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="px-2 py-0.5 rounded-md text-xs font-black bg-purple-600/30 text-purple-200 border border-purple-400/30">
+            ${item.nilaiAkhir}
+          </span>
+          <div class="text-[10px] text-slate-400 mt-0.5">${item.predikat}</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-1 text-[10px] text-center bg-slate-900/80 py-1.5 px-2 rounded-xl text-slate-300">
+        <div>Hu Ai: <strong class="text-emerald-300">${item.skorAspek?.huAi || 4}</strong></div>
+        <div>Zun Zhong: <strong class="text-sky-300">${item.skorAspek?.zunZhong || 4}</strong></div>
+        <div>Disiplin: <strong class="text-amber-300">${item.skorAspek?.tanggungJawab || 4}</strong></div>
+        <div>CT: <strong class="text-purple-300">${item.skorAspek?.berpikirKritis || 4}</strong></div>
+      </div>
+
+      ${item.catatan ? `
+        <div class="text-[11px] text-slate-300 italic bg-purple-950/30 p-2 rounded-lg border border-purple-500/10 flex items-start gap-1.5">
+          <i class="fa-solid fa-quote-left text-purple-400 text-[10px] shrink-0 mt-0.5"></i>
+          <span>${item.catatan}</span>
+        </div>
+      ` : ''}
+
+      <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-900">
+        <span><i class="fa-regular fa-clock"></i> ${item.tanggal || '-'}</span>
+        <button type="button" onclick="hapusRiwayatAntarTemanK6('${item.id}')" class="text-rose-400 hover:text-rose-300 transition cursor-pointer flex items-center gap-1" title="Hapus penilaian ini">
+          <i class="fa-solid fa-trash-can"></i> Hapus
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+window.muatRiwayatPenilaianAntarTemanK6 = muatRiwayatPenilaianAntarTemanK6;
+
+function hapusRiwayatAntarTemanK6(id) {
+  if (!confirm('Apakah kamu yakin ingin menghapus penilaian ini?')) return;
+  try {
+    const raw = localStorage.getItem(KEY_ANTARTEMAN_K6);
+    if (raw) {
+      let list = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        list = list.filter(item => item.id !== id);
+        localStorage.setItem(KEY_ANTARTEMAN_K6, JSON.stringify(list));
+      }
+    }
+    muatRiwayatPenilaianAntarTemanK6();
+    try { if (typeof showToast === 'function') showToast('Penilaian teman berhasil dihapus.', 'info'); } catch(e){}
+  } catch(e) {}
+}
+window.hapusRiwayatAntarTemanK6 = hapusRiwayatAntarTemanK6;
+
+function resetFormPenilaianAntarTemanK6() {
+  const selTarget = document.getElementById('select-teman-dinilai-k6');
+  const inCatatan = document.getElementById('input-catatan-antarteman-k6');
+  if (selTarget) selTarget.value = '';
+  if (inCatatan) inCatatan.value = '';
+  setSkorAspekK6(1, 4);
+  setSkorAspekK6(2, 4);
+  setSkorAspekK6(3, 4);
+  setSkorAspekK6(4, 4);
+  try { if (typeof showToast === 'function') showToast('Form penilaian berhasil dikosongkan.', 'info'); } catch(e){}
+}
+window.resetFormPenilaianAntarTemanK6 = resetFormPenilaianAntarTemanK6;
+
+
+// =========================================================================
+// HELPER VIEWER BUKU TEORI ALGORITMA KELAS 6 SD (5 HALAMAN)
+// =========================================================================
+window._algoPageActive = 1;
+window.pilihHalamanTeoriAlgo = function(hal) {
+  window._algoPageActive = hal;
+  try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+
+  const pages = [
+    { num: 1, img: 'algoritma_teori_hal_1.jpg', judul: 'Halaman 1: Apa itu Algoritma? & Cara Membuat Teh Manis', desc: 'Pengertian algoritma sebagai urutan langkah logis dan contoh nyata langkah membuat teh manis secara teratur (1. Rebus air, 2. Masukkan teh, 3. Tuang air panas, 4. Aduk & tambah gula).' },
+    { num: 2, img: 'algoritma_teori_hal_2.jpg', judul: 'Halaman 2: Logika Dasar & Algoritma Keseharian', desc: 'Mengenal logika dasar: mengambil keputusan (jika-maka), mengulang sesuatu, serta contoh merapikan tempat tidur dan menggosok gigi.' },
+    { num: 3, img: 'algoritma_teori_hal_3.jpg', judul: 'Halaman 3: Algoritma di Coding Scratch', desc: 'Algoritma dalam dunia pemrograman adalah susunan blok kode (misalnya pada Scratch: when flag clicked -> move 50 steps -> say Hello!).' },
+    { num: 4, img: 'algoritma_teori_hal_4.jpg', judul: 'Halaman 4: 3 Jenis Struktur Logika Coding', desc: 'Tiga pilar struktur logika koding kelas 6: 1. Urutan (Sequence), 2. Percabangan (If-Else), dan 3. Pengulangan (Loop).' },
+    { num: 5, img: 'algoritma_teori_hal_5.jpg', judul: 'Halaman 5: Petualangan Logika Calon Programmer', desc: 'Panduan visual petualangan robot, alur kondisi jika-maka (ambil payung vs main di taman), dan putaran loop berulang yang seru dan cerdas.' }
+  ];
+
+  const singleView = document.getElementById('algo-teori-single-view');
+  const allView = document.getElementById('algo-teori-all-view');
+  const imgEl = document.getElementById('img-algo-teori-active');
+  const titleEl = document.getElementById('judul-algo-teori-active');
+  const descEl = document.getElementById('desc-algo-teori-active');
+  const numEl = document.getElementById('label-algo-teori-hal');
+
+  for (let i = 1; i <= 5; i++) {
+    const t = document.getElementById('tab-btn-algo-' + i);
+    if (t) {
+      if (i === hal && hal !== 'all') {
+        t.className = 'px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-orange-500 text-white shadow-md transition cursor-pointer border border-orange-400';
+      } else {
+        t.className = 'px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700';
+      }
+    }
+  }
+
+  const tabAll = document.getElementById('tab-btn-algo-all');
+  if (tabAll) {
+    if (hal === 'all') {
+      tabAll.className = 'px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-orange-500 text-white shadow-md transition cursor-pointer border border-orange-400';
+      if (singleView) singleView.classList.add('hidden');
+      if (allView) allView.classList.remove('hidden');
+    } else {
+      tabAll.className = 'px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700';
+      if (singleView) singleView.classList.remove('hidden');
+      if (allView) allView.classList.add('hidden');
+    }
+  }
+
+  if (hal !== 'all') {
+    const cur = pages[hal - 1] || pages[0];
+    if (imgEl) {
+      imgEl.src = cur.img;
+      imgEl.alt = cur.judul;
+    }
+    if (titleEl) titleEl.innerText = cur.judul;
+    if (descEl) descEl.innerText = cur.desc;
+    if (numEl) numEl.innerText = 'Halaman ' + cur.num + ' dari 5';
+  }
+};
+
+window.gantiHalamanTeoriAlgo = function(arah) {
+  let cur = window._algoPageActive;
+  if (cur === 'all') cur = 1;
+  let next = cur + arah;
+  if (next < 1) next = 5;
+  if (next > 5) next = 1;
+  window.pilihHalamanTeoriAlgo(next);
+};
+
+
+// ==========================================================================
+// FITUR KHUSUS KELAS 6 SD (FASE C - COMPUTATIONAL THINKING & KODING SCRATCH)
+// 1. Scratch 4 Pilar | 2. Scratch Algoritma | 3. EvalScore | 4. Kuis6
+// Nilai Rapor & Piagam Sertifikat Resmi Kelulusan Komputasi
+// ==========================================================================
+
+const _p6CloudCache = new Map();
+let _currentMonitoredK6Student = null;
+
+/**
+ * Mengambil data 4 tugas portofolio Kelas 6 untuk siswa tertentu
+ */
+function dapatkanPortofolioKelas6Siswa(student) {
+  if (!student) {
+    return {
+      scratch4Pilar: { link: '', judul: '', catatan: '', tgl: '' },
+      scratchAlgoritma: { link: '', judul: '', catatan: '', tgl: '' },
+      antarTeman: { selesai: false, tgl: '' },
+      kuis6: { selesai: false, skor: 0, tgl: '' }
+    };
+  }
+
+  const sId = student.id;
+  const sNis = student.nis;
+
+  // 1. Cek dari Cloud Cache Realtime
+  if (sNis && _p6CloudCache.has(String(sNis))) {
+    return _p6CloudCache.get(String(sNis));
+  }
+  if (sId && _p6CloudCache.has(String(sId))) {
+    return _p6CloudCache.get(String(sId));
+  }
+
+  // 2. Coba dari properti student langsung
+  if (student.portofolioK6 && typeof student.portofolioK6 === 'object') {
+    return student.portofolioK6;
+  }
+
+  // 3. Coba dari localStorage dengan NIS / ID siswa
+  try {
+    if (sNis) {
+      const rawNis = localStorage.getItem('educode_p6_data_' + sNis);
+      if (rawNis) return JSON.parse(rawNis);
+    }
+    if (sId) {
+      const rawId = localStorage.getItem('educode_p6_data_' + sId);
+      if (rawId) return JSON.parse(rawId);
+    }
+  } catch(e) {}
+
+  // 4. Fallback: Siswa aktif saat ini
+  try {
+    const activeProfile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (activeProfile && (activeProfile.id === sId || activeProfile.nis === sNis)) {
+      const rawGlobal = localStorage.getItem('educode_kelas6_karya_v1');
+      if (rawGlobal) return JSON.parse(rawGlobal);
+    }
+  } catch(e) {}
+
+  return {
+    scratch4Pilar: { link: '', judul: '', catatan: '', tgl: '' },
+    scratchAlgoritma: { link: '', judul: '', catatan: '', tgl: '' },
+    antarTeman: { selesai: false, tgl: '' },
+    kuis6: { selesai: false, skor: 0, tgl: '' }
+  };
+}
+window.dapatkanPortofolioKelas6Siswa = dapatkanPortofolioKelas6Siswa;
+
+/**
+ * Menyimpan data 4 tugas portofolio Kelas 6 siswa
+ */
+function simpanPortofolioKelas6Siswa(student, data) {
+  if (!student) return;
+  const sId = student.id;
+  const sNis = student.nis;
+
+  if (sNis) _p6CloudCache.set(String(sNis), data);
+  if (sId) _p6CloudCache.set(String(sId), data);
+
+  student.portofolioK6 = data;
+
+  try {
+    if (sNis) localStorage.setItem('educode_p6_data_' + sNis, JSON.stringify(data));
+    if (sId) localStorage.setItem('educode_p6_data_' + sId, JSON.stringify(data));
+    localStorage.setItem('educode_kelas6_karya_v1', JSON.stringify(data));
+  } catch(e) {}
+
+  // Update di state student database jika ada
+  try {
+    const db = getStudentDatabase();
+    const idx = db.findIndex(s => (s.id && s.id === sId) || (s.nis && s.nis === sNis));
+    if (idx !== -1) {
+      db[idx].portofolioK6 = data;
+      saveStudentDatabase(db);
+    }
+  } catch(eDb) {}
+
+  // Trigger sinkronisasi cloud Firebase jika terhubung
+  try {
+    if (typeof window.simpanPortofolioK6KeCloud === 'function') {
+      window.simpanPortofolioK6KeCloud(student, data);
+    }
+  } catch(eCloud) {}
+}
+window.simpanPortofolioKelas6Siswa = simpanPortofolioKelas6Siswa;
+
+/**
+ * Menghitung Nilai Rapor & Rubrik 4 Tugas Kelas 6 SD
+ */
+function hitungRubrikPenilaianKelas6(student, customData) {
+  const k6 = customData || dapatkanPortofolioKelas6Siswa(student) || {};
+
+  // 1. Menu 1: Scratch 4 Pilar (Bobot 25%)
+  const pilar = k6.scratch4Pilar || {};
+  const hasScratch4Pilar = !!(pilar.link && pilar.link.trim().length > 7);
+  let nScratch4Pilar = (student && student.nilaiScratch4Pilar !== undefined && student.nilaiScratch4Pilar !== null && student.nilaiScratch4Pilar !== '') ? Number(student.nilaiScratch4Pilar) : null;
+  if (nScratch4Pilar === null) {
+    nScratch4Pilar = hasScratch4Pilar ? (pilar.catatan && pilar.catatan.trim().length > 5 ? 100 : 90) : 0;
+  }
+
+  // 2. Menu 2: Scratch Algoritma (Bobot 25%)
+  const algo = k6.scratchAlgoritma || {};
+  const hasScratchAlgoritma = !!(algo.link && algo.link.trim().length > 7);
+  let nScratchAlgoritma = (student && student.nilaiScratchAlgoritma !== undefined && student.nilaiScratchAlgoritma !== null && student.nilaiScratchAlgoritma !== '') ? Number(student.nilaiScratchAlgoritma) : null;
+  if (nScratchAlgoritma === null) {
+    nScratchAlgoritma = hasScratchAlgoritma ? (algo.catatan && algo.catatan.trim().length > 5 ? 100 : 90) : 0;
+  }
+
+  // 3. Menu 3: Penilaian Antar Teman (Bobot 25%)
+  const antar = k6.antarTeman || {};
+  const hasAntarTeman = !!(antar.selesai || (student && Number(student.nilaiAntarTeman) > 0));
+  let nAntarTeman = (student && student.nilaiAntarTeman !== undefined && student.nilaiAntarTeman !== null && student.nilaiAntarTeman !== '') ? Number(student.nilaiAntarTeman) : null;
+  if (nAntarTeman === null) {
+    nAntarTeman = hasAntarTeman ? 100 : 0;
+  }
+
+  // 4. Menu 4: Kuis6 Komputasi (Bobot 25%)
+  const kuis = k6.kuis6 || {};
+  const hasKuis6 = !!(kuis.selesai || Number(kuis.skor) > 0 || (student && Number(student.nilaiKuis6) > 0));
+  let nKuis6 = (student && student.nilaiKuis6 !== undefined && student.nilaiKuis6 !== null && student.nilaiKuis6 !== '') ? Number(student.nilaiKuis6) : null;
+  if (nKuis6 === null) {
+    nKuis6 = (kuis.skor && Number(kuis.skor) > 0) ? Number(kuis.skor) : (hasKuis6 ? 100 : 0);
+  }
+
+  let selesaiCount = 0;
+  if (hasScratch4Pilar) selesaiCount++;
+  if (hasScratchAlgoritma) selesaiCount++;
+  if (hasAntarTeman) selesaiCount++;
+  if (hasKuis6) selesaiCount++;
+
+  const persentase = Math.round((selesaiCount / 4) * 100);
+  const nilaiAkhir = Math.round((nScratch4Pilar + nScratchAlgoritma + nAntarTeman + nKuis6) / 4);
+  const isTuntas = (nilaiAkhir >= 80) && (selesaiCount === 4);
+  const isSertifikatEligible = (selesaiCount === 4);
+
+  return {
+    nilaiScratch4Pilar: nScratch4Pilar,
+    hasScratch4Pilar: hasScratch4Pilar,
+    pilarData: pilar,
+
+    nilaiScratchAlgoritma: nScratchAlgoritma,
+    hasScratchAlgoritma: hasScratchAlgoritma,
+    algoData: algo,
+
+    nilaiAntarTeman: nAntarTeman,
+    hasAntarTeman: hasAntarTeman,
+    antarData: antar,
+
+    nilaiKuis6: nKuis6,
+    hasKuis6: hasKuis6,
+    kuisData: kuis,
+
+    selesaiCount: selesaiCount,
+    persentase: persentase,
+    nilaiAkhir: nilaiAkhir,
+    isTuntas: isTuntas,
+    isSertifikatEligible: isSertifikatEligible
+  };
+}
+window.hitungRubrikPenilaianKelas6 = hitungRubrikPenilaianKelas6;
+
+/**
+ * Siswa mengirimkan Link Karya Scratch (4 Pilar atau Algoritma)
+ */
+function kirimTugasScratchK6(type) {
+  playSound('click');
+  const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (!student) {
+    showToast('Silakan masuk ke akun Siswa Kelas 6 terlebih dahulu!', 'warning');
+    if (typeof bukaModalProfilSiswa === 'function') bukaModalProfilSiswa();
+    return;
+  }
+
+  const is4Pilar = (type === '4pilar');
+  const inputLink = document.getElementById(is4Pilar ? 'input-k6-scratch-link-4pilar' : 'input-k6-scratch-link-algoritma');
+  const inputJudul = document.getElementById(is4Pilar ? 'input-k6-scratch-judul-4pilar' : 'input-k6-scratch-judul-algoritma');
+  const inputCatatan = document.getElementById(is4Pilar ? 'input-k6-scratch-catatan-4pilar' : 'input-k6-scratch-catatan-algoritma');
+
+  const link = inputLink ? inputLink.value.trim() : '';
+  const judul = inputJudul ? inputJudul.value.trim() : '';
+  const catatan = inputCatatan ? inputCatatan.value.trim() : '';
+
+  if (!link) {
+    showToast('Harap masukkan Link Proyek Scratch kamu (contoh: https://scratch.mit.edu/projects/...)', 'warning');
+    if (inputLink) inputLink.focus();
+    return;
+  }
+
+  if (!link.startsWith('http')) {
+    showToast('Link harus diawali dengan http:// atau https://', 'warning');
+    if (inputLink) inputLink.focus();
+    return;
+  }
+
+  const k6 = dapatkanPortofolioKelas6Siswa(student);
+  const now = new Date().toLocaleString('id-ID');
+
+  if (is4Pilar) {
+    k6.scratch4Pilar = {
+      link: link,
+      judul: judul || 'Proyek Scratch 4 Pilar CT',
+      catatan: catatan,
+      tgl: now
+    };
+  } else {
+    k6.scratchAlgoritma = {
+      link: link,
+      judul: judul || 'Proyek Scratch Algoritma',
+      catatan: catatan,
+      tgl: now
+    };
+  }
+
+  simpanPortofolioKelas6Siswa(student, k6);
+  muatStatusTugasScratchK6(type);
+  perbaruiStatusMisiKelas6Siswa();
+
+  playSound('fanfare');
+  showToast(is4Pilar ? 'Link Tugas Scratch 4 Pilar Berhasil Dikumpulkan! 🚀🐱' : 'Link Tugas Scratch Algoritma Berhasil Dikumpulkan! 🚀📜', 'success');
+}
+window.kirimTugasScratchK6 = kirimTugasScratchK6;
+
+/**
+ * Memuat status dan link tugas Scratch di form siswa
+ */
+function muatStatusTugasScratchK6(type) {
+  const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const is4Pilar = (type === '4pilar');
+
+  const inputLink = document.getElementById(is4Pilar ? 'input-k6-scratch-link-4pilar' : 'input-k6-scratch-link-algoritma');
+  const inputJudul = document.getElementById(is4Pilar ? 'input-k6-scratch-judul-4pilar' : 'input-k6-scratch-judul-algoritma');
+  const inputCatatan = document.getElementById(is4Pilar ? 'input-k6-scratch-catatan-4pilar' : 'input-k6-scratch-catatan-algoritma');
+
+  const badgeStatus = document.getElementById(is4Pilar ? 'badge-status-tugas-4pilar' : 'badge-status-tugas-algoritma');
+  const labelStatus = document.getElementById(is4Pilar ? 'label-status-4pilar' : 'label-status-algoritma');
+  const previewDiv = document.getElementById(is4Pilar ? 'preview-link-k6-4pilar' : 'preview-link-k6-algoritma');
+
+  if (!student) {
+    if (badgeStatus) {
+      badgeStatus.className = 'px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-xs font-bold flex items-center gap-1.5';
+    }
+    if (labelStatus) labelStatus.innerText = 'Masuk Akun Siswa';
+    return;
+  }
+
+  const k6 = dapatkanPortofolioKelas6Siswa(student);
+  const data = is4Pilar ? (k6.scratch4Pilar || {}) : (k6.scratchAlgoritma || {});
+
+  if (data.link && data.link.trim().length > 5) {
+    if (inputLink && !inputLink.value) inputLink.value = data.link;
+    if (inputJudul && !inputJudul.value) inputJudul.value = data.judul || '';
+    if (inputCatatan && !inputCatatan.value) inputCatatan.value = data.catatan || '';
+
+    if (badgeStatus) {
+      badgeStatus.className = 'px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-bold flex items-center gap-1.5';
+    }
+    if (labelStatus) labelStatus.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> Sudah Dikumpulkan ✅';
+
+    if (previewDiv) {
+      previewDiv.innerHTML = `
+        <span class="text-emerald-300 font-bold">Terkirim:</span>
+        <a href="${data.link}" target="_blank" rel="noopener noreferrer" class="text-yellow-300 underline font-mono ml-1 hover:text-yellow-200">
+          ${data.link} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      `;
+    }
+  } else {
+    if (badgeStatus) {
+      badgeStatus.className = 'px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold flex items-center gap-1.5';
+    }
+    if (labelStatus) labelStatus.innerHTML = '<i class="fa-solid fa-clock text-amber-400"></i> Belum Mengumpulkan';
+    if (previewDiv) {
+      previewDiv.innerText = '*Tugas ini wajib dikumpulkan untuk melengkapi Nilai Rapor & Sertifikat Kelulusan.';
+    }
+  }
+}
+window.muatStatusTugasScratchK6 = muatStatusTugasScratchK6;
+
+/**
+ * Siswa menandai Misi Selesai (Penilaian Antar Teman atau Kuis)
+ */
+function tandaiMisiK6Selesai(misi) {
+  playSound('click');
+  const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (!student) {
+    showToast('Silakan masuk ke akun Siswa Kelas 6 terlebih dahulu!', 'warning');
+    if (typeof bukaModalProfilSiswa === 'function') bukaModalProfilSiswa();
+    return;
+  }
+
+  const k6 = dapatkanPortofolioKelas6Siswa(student);
+  const now = new Date().toLocaleString('id-ID');
+
+  if (misi === 'antarteman') {
+    if (!k6.antarTeman) k6.antarTeman = {};
+    const sudah = !!k6.antarTeman.selesai;
+    k6.antarTeman.selesai = !sudah;
+    k6.antarTeman.tgl = now;
+    simpanPortofolioKelas6Siswa(student, k6);
+    muatStatusMisiK6('antarteman');
+    perbaruiStatusMisiKelas6Siswa();
+
+    if (k6.antarTeman.selesai) {
+      playSound('fanfare');
+      showToast('Penilaian Antar Teman (EvalScore) Ditandai Selesai! 🌟🤝', 'success');
+    } else {
+      showToast('Status Penilaian Antar Teman diatur ulang.', 'info');
+    }
+  } else if (misi === 'kuis') {
+    if (!k6.kuis6) k6.kuis6 = {};
+    const sudah = !!k6.kuis6.selesai;
+    k6.kuis6.selesai = !sudah;
+    if (k6.kuis6.selesai && (!k6.kuis6.skor || Number(k6.kuis6.skor) === 0)) {
+      k6.kuis6.skor = 100;
+    }
+    k6.kuis6.tgl = now;
+    simpanPortofolioKelas6Siswa(student, k6);
+    muatStatusMisiK6('kuis');
+    perbaruiStatusMisiKelas6Siswa();
+
+    if (k6.kuis6.selesai) {
+      playSound('fanfare');
+      showToast('Kuis Komputasi Kelas 6 Ditandai Selesai! 🏆🎯', 'success');
+    } else {
+      showToast('Status Kuis Komputasi diatur ulang.', 'info');
+    }
+  }
+}
+window.tandaiMisiK6Selesai = tandaiMisiK6Selesai;
+
+/**
+ * Sinkronisasi visual tombol status misi di tab EvalScore dan Kuis6
+ */
+function muatStatusMisiK6(misi) {
+  const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const k6 = dapatkanPortofolioKelas6Siswa(student);
+
+  if (misi === 'antarteman') {
+    const btn = document.getElementById('btn-status-selesai-evalscore');
+    const label = document.getElementById('label-btn-evalscore');
+    const isDone = !!(k6.antarTeman && k6.antarTeman.selesai);
+    if (btn) {
+      btn.className = isDone
+        ? 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs border border-emerald-400 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md'
+        : 'px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-emerald-300 font-title font-bold text-xs border border-emerald-500/40 transition flex items-center justify-center gap-1.5 cursor-pointer';
+    }
+    if (label) {
+      label.innerText = isDone ? 'Penilaian Selesai ✅ (Klik untuk Ubah)' : 'Tandai Penilaian Selesai ✅';
+    }
+  } else if (misi === 'kuis') {
+    const btn = document.getElementById('btn-status-selesai-kuis6');
+    const label = document.getElementById('label-btn-kuis6');
+    const isDone = !!(k6.kuis6 && k6.kuis6.selesai);
+    if (btn) {
+      btn.className = isDone
+        ? 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs border border-emerald-400 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md'
+        : 'px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-emerald-300 font-title font-bold text-xs border border-emerald-500/40 transition flex items-center justify-center gap-1.5 cursor-pointer';
+    }
+    if (label) {
+      label.innerText = isDone ? 'Kuis Selesai ✅ (Klik untuk Ubah)' : 'Tandai Kuis Selesai ✅';
+    }
+  }
+}
+window.muatStatusMisiK6 = muatStatusMisiK6;
+
+/**
+ * Memperbarui Tampilan Kotak Status Misi & Sertifikat di Beranda Siswa Kelas 6
+ */
+function perbaruiStatusMisiKelas6Siswa() {
+  const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const isK6 = student && String(student.kelas || '').includes('6');
+  const card = document.getElementById('beranda-k6-status-misi-card');
+  if (!card) return;
+
+  if (!isK6) {
+    card.classList.add('hidden');
+    return;
+  }
+
+  card.classList.remove('hidden');
+  const evalK6 = hitungRubrikPenilaianKelas6(student);
+
+  // Update Progress Bar & Label
+  const pBar = document.getElementById('beranda-k6-progress-bar');
+  const pText = document.getElementById('beranda-k6-persen-teks');
+  const statusSemua = document.getElementById('beranda-k6-label-status-semua');
+  const badgeSemua = document.getElementById('beranda-k6-badge-status-semua');
+
+  if (pBar) pBar.style.width = evalK6.persentase + '%';
+  if (pText) pText.innerText = evalK6.persentase + '%';
+
+  if (statusSemua) {
+    statusSemua.innerText = `${evalK6.selesaiCount} dari 4 Misi Selesai`;
+  }
+  if (badgeSemua) {
+    badgeSemua.className = (evalK6.selesaiCount === 4)
+      ? 'px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-bold flex items-center gap-1.5 animate-pulse'
+      : 'px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold flex items-center gap-1.5';
+  }
+
+  // Mini Badges
+  const b1 = document.getElementById('badge-mini-k6-4pilar');
+  if (b1) {
+    b1.className = evalK6.hasScratch4Pilar ? 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 font-bold border border-emerald-400/40' : 'text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300';
+    b1.innerText = evalK6.hasScratch4Pilar ? '✅ Selesai' : 'Belum';
+  }
+
+  const b2 = document.getElementById('badge-mini-k6-algo');
+  if (b2) {
+    b2.className = evalK6.hasScratchAlgoritma ? 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 font-bold border border-emerald-400/40' : 'text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300';
+    b2.innerText = evalK6.hasScratchAlgoritma ? '✅ Selesai' : 'Belum';
+  }
+
+  const b3 = document.getElementById('badge-mini-k6-antarteman');
+  if (b3) {
+    b3.className = evalK6.hasAntarTeman ? 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 font-bold border border-emerald-400/40' : 'text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300';
+    b3.innerText = evalK6.hasAntarTeman ? '✅ Selesai' : 'Belum';
+  }
+
+  const b4 = document.getElementById('badge-mini-k6-kuis');
+  if (b4) {
+    b4.className = evalK6.hasKuis6 ? 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 font-bold border border-emerald-400/40' : 'text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300';
+    b4.innerText = evalK6.hasKuis6 ? '✅ Selesai' : 'Belum';
+  }
+
+  // Nilai Rapor & Kelulusan
+  const nRapor = document.getElementById('beranda-k6-nilai-rapor');
+  if (nRapor) nRapor.innerText = evalK6.nilaiAkhir;
+
+  const sLulus = document.getElementById('beranda-k6-status-kelulusan');
+  if (sLulus) {
+    if (evalK6.isTuntas) {
+      sLulus.className = 'ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40';
+      sLulus.innerText = 'TUNTAS LULUS KKTP (80)';
+    } else if (evalK6.isSertifikatEligible) {
+      sLulus.className = 'ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-400/40';
+      sLulus.innerText = '4 MISI LENGKAP';
+    } else {
+      sLulus.className = 'ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700';
+      sLulus.innerText = `DALAM PROSES (${evalK6.selesaiCount}/4)`;
+    }
+  }
+
+  // Tombol Sertifikat
+  const btnSertif = document.getElementById('btn-beranda-k6-sertifikat');
+  const lblSertif = document.getElementById('label-beranda-k6-sertifikat');
+  if (btnSertif && lblSertif) {
+    if (evalK6.isSertifikatEligible) {
+      btnSertif.className = 'w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95 animate-pulse';
+      lblSertif.innerText = 'Lihat & Cetak Sertifikat Digital 🎓';
+    } else {
+      btnSertif.className = 'w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 font-title font-bold text-xs sm:text-sm border border-slate-700 transition flex items-center justify-center gap-2 cursor-not-allowed';
+      lblSertif.innerText = `Sertifikat Terkunci (${evalK6.selesaiCount}/4 Selesai) ⏳`;
+    }
+  }
+}
+window.perbaruiStatusMisiKelas6Siswa = perbaruiStatusMisiKelas6Siswa;
+
+/**
+ * Membuka Modal Monitoring Tugas Siswa Kelas 6 SD untuk Guru
+ */
+function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
+  playSound('click');
+  const db = getStudentDatabase();
+  const student = db.find(s => (s.id && s.id === studentIdentifier) || (s.nis && String(s.nis) === String(studentIdentifier)) || (s.nama && s.nama.toLowerCase() === String(studentIdentifier).toLowerCase())) || {
+    id: 'STD-K6',
+    nama: studentIdentifier,
+    kelas: '6A',
+    nis: studentIdentifier,
+    absen: '01'
+  };
+
+  _currentMonitoredK6Student = student;
+  const evalK6 = hitungRubrikPenilaianKelas6(student);
+
+  // Avatar & Profil Header
+  const avatarEl = document.getElementById('mon-k6-avatar');
+  if (avatarEl) {
+    avatarEl.innerText = (student.nama || 'S').charAt(0).toUpperCase();
+  }
+
+  const namaEl = document.getElementById('mon-k6-nama');
+  if (namaEl) namaEl.innerText = student.nama || '-';
+
+  const kelasEl = document.getElementById('mon-k6-kelas');
+  if (kelasEl) kelasEl.innerText = `Kelas ${student.kelas || '6A'}`;
+
+  const nisEl = document.getElementById('mon-k6-nis');
+  if (nisEl) nisEl.innerText = `NIS: ${student.nis || '-'}`;
+
+  const absenEl = document.getElementById('mon-k6-absen');
+  if (absenEl) absenEl.innerText = `Absen: ${student.absen || '-'}`;
+
+  const statusKkmEl = document.getElementById('mon-k6-status-kkm');
+  if (statusKkmEl) {
+    statusKkmEl.innerText = evalK6.isTuntas ? 'TUNTAS LULUS (KKTP 80)' : 'BELUM TUNTAS';
+    statusKkmEl.className = evalK6.isTuntas ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-300 text-slate-900 shadow-2xs' : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-300 text-slate-900 shadow-2xs';
+  }
+
+  // KPI Summary
+  const pText = document.getElementById('mon-k6-progress-text');
+  if (pText) pText.innerText = `${evalK6.selesaiCount} dari 4 Menu Selesai (${evalK6.persentase}%)`;
+
+  const pBar = document.getElementById('mon-k6-progress-bar');
+  if (pBar) pBar.style.width = evalK6.persentase + '%';
+
+  const nAkhirBadge = document.getElementById('mon-k6-nilai-akhir-badge');
+  if (nAkhirBadge) nAkhirBadge.innerText = `Nilai Akhir: ${evalK6.nilaiAkhir}`;
+
+  // CARD 1: Scratch 4 Pilar
+  const bPilar = document.getElementById('mon-k6-badge-scratch-4pilar');
+  if (bPilar) {
+    bPilar.className = evalK6.hasScratch4Pilar ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300' : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200';
+    bPilar.innerText = evalK6.hasScratch4Pilar ? 'Sudah Kumpul ✅' : 'Belum Kumpul';
+  }
+
+  const dPilar = document.getElementById('mon-k6-detail-scratch-4pilar');
+  if (dPilar) {
+    if (evalK6.hasScratch4Pilar) {
+      dPilar.innerHTML = `
+        <div class="font-bold text-slate-800 flex items-center justify-between">
+          <span>${evalK6.pilarData.judul || 'Proyek Scratch 4 Pilar'}</span>
+          <span class="text-[10px] text-slate-500">${evalK6.pilarData.tgl || ''}</span>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <a href="${evalK6.pilarData.link}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs transition">
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> <span>Buka di Scratch 🚀</span>
+          </a>
+          <span class="text-[11px] text-slate-500 truncate max-w-[200px] font-mono">${evalK6.pilarData.link}</span>
+        </div>
+        ${evalK6.pilarData.catatan ? `<div class="p-2 bg-white rounded-lg border border-sky-100 text-[11px] text-slate-700 mt-1.5"><span class="font-bold text-sky-900">Refleksi Siswa:</span> "${evalK6.pilarData.catatan}"</div>` : ''}
+      `;
+    } else {
+      dPilar.innerHTML = '<div class="text-slate-500 italic">Siswa belum mengumpulkan link tugas Scratch 4 Pilar</div>';
+    }
+  }
+
+  const inPilar = document.getElementById('mon-k6-input-nilai-scratch-4pilar');
+  if (inPilar) inPilar.value = evalK6.nilaiScratch4Pilar || (evalK6.hasScratch4Pilar ? 100 : 0);
+
+  // CARD 2: Scratch Algoritma
+  const bAlgo = document.getElementById('mon-k6-badge-scratch-algo');
+  if (bAlgo) {
+    bAlgo.className = evalK6.hasScratchAlgoritma ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300' : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200';
+    bAlgo.innerText = evalK6.hasScratchAlgoritma ? 'Sudah Kumpul ✅' : 'Belum Kumpul';
+  }
+
+  const dAlgo = document.getElementById('mon-k6-detail-scratch-algo');
+  if (dAlgo) {
+    if (evalK6.hasScratchAlgoritma) {
+      dAlgo.innerHTML = `
+        <div class="font-bold text-slate-800 flex items-center justify-between">
+          <span>${evalK6.algoData.judul || 'Proyek Scratch Algoritma'}</span>
+          <span class="text-[10px] text-slate-500">${evalK6.algoData.tgl || ''}</span>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <a href="${evalK6.algoData.link}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs transition">
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> <span>Buka di Scratch 🚀</span>
+          </a>
+          <span class="text-[11px] text-slate-500 truncate max-w-[200px] font-mono">${evalK6.algoData.link}</span>
+        </div>
+        ${evalK6.algoData.catatan ? `<div class="p-2 bg-white rounded-lg border border-orange-100 text-[11px] text-slate-700 mt-1.5"><span class="font-bold text-orange-900">Refleksi Siswa:</span> "${evalK6.algoData.catatan}"</div>` : ''}
+      `;
+    } else {
+      dAlgo.innerHTML = '<div class="text-slate-500 italic">Siswa belum mengumpulkan link tugas Scratch Algoritma</div>';
+    }
+  }
+
+  const inAlgo = document.getElementById('mon-k6-input-nilai-scratch-algo');
+  if (inAlgo) inAlgo.value = evalK6.nilaiScratchAlgoritma || (evalK6.hasScratchAlgoritma ? 100 : 0);
+
+  // CARD 3: Antar Teman (EvalScore)
+  const bAntar = document.getElementById('mon-k6-badge-antarteman');
+  if (bAntar) {
+    bAntar.className = evalK6.hasAntarTeman ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300' : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200';
+    bAntar.innerText = evalK6.hasAntarTeman ? 'Sudah Mengisi ✅' : 'Belum Mengisi';
+  }
+
+  const dAntar = document.getElementById('mon-k6-detail-antarteman');
+  if (dAntar) {
+    dAntar.innerHTML = evalK6.hasAntarTeman
+      ? '<div class="text-emerald-700 font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Siswa telah menyelesaikan evaluasi rekan di platform EvalScore</div>'
+      : '<div class="text-slate-500 italic">Siswa belum menyelesaikan evaluasi rekan di platform EvalScore</div>';
+  }
+
+  const inAntar = document.getElementById('mon-k6-input-nilai-antarteman');
+  if (inAntar) inAntar.value = evalK6.nilaiAntarTeman || (evalK6.hasAntarTeman ? 100 : 0);
+
+  // CARD 4: Kuis Komputasi (Kuis6)
+  const bKuis = document.getElementById('mon-k6-badge-kuis');
+  if (bKuis) {
+    bKuis.className = evalK6.hasKuis6 ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300' : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200';
+    bKuis.innerText = evalK6.hasKuis6 ? 'Sudah Selesai ✅' : 'Belum Mengerjakan';
+  }
+
+  const dKuis = document.getElementById('mon-k6-detail-kuis');
+  if (dKuis) {
+    dKuis.innerHTML = evalK6.hasKuis6
+      ? '<div class="text-emerald-700 font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Siswa telah menyelesaikan kuis di kuis6.netlify.app</div>'
+      : '<div class="text-slate-500 italic">Siswa belum menyelesaikan kuis di kuis6.netlify.app</div>';
+  }
+
+  const inKuis = document.getElementById('mon-k6-input-nilai-kuis');
+  if (inKuis) inKuis.value = evalK6.nilaiKuis6 || (evalK6.hasKuis6 ? 100 : 0);
+
+  // Catatan Guru
+  const catatanEl = document.getElementById('mon-k6-catatan');
+  if (catatanEl) catatanEl.value = student.catatanGuru || '';
+
+  // Buka Modal
+  const modal = document.getElementById('modal-monitoring-tugas-kelas6');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+  }
+}
+window.bukaModalMonitoringTugasKelas6 = bukaModalMonitoringTugasKelas6;
+
+/**
+ * Menutup Modal Monitoring Tugas Kelas 6
+ */
+function tutupModalMonitoringTugasKelas6() {
+  playSound('click');
+  const modal = document.getElementById('modal-monitoring-tugas-kelas6');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+  }
+}
+window.tutupModalMonitoringTugasKelas6 = tutupModalMonitoringTugasKelas6;
+
+/**
+ * Guru menghitung ulang otomatis nilai tugas Kelas 6 sesuai rubrik
+ */
+function hitungUlangOtomatisNilaiK6() {
+  playSound('click');
+  if (!_currentMonitoredK6Student) return;
+  const evalK6 = hitungRubrikPenilaianKelas6(_currentMonitoredK6Student);
+
+  const inPilar = document.getElementById('mon-k6-input-nilai-scratch-4pilar');
+  if (inPilar) inPilar.value = evalK6.hasScratch4Pilar ? 100 : 0;
+
+  const inAlgo = document.getElementById('mon-k6-input-nilai-scratch-algo');
+  if (inAlgo) inAlgo.value = evalK6.hasScratchAlgoritma ? 100 : 0;
+
+  const inAntar = document.getElementById('mon-k6-input-nilai-antarteman');
+  if (inAntar) inAntar.value = evalK6.hasAntarTeman ? 100 : 0;
+
+  const inKuis = document.getElementById('mon-k6-input-nilai-kuis');
+  if (inKuis) inKuis.value = evalK6.hasKuis6 ? 100 : 0;
+
+  const nAkhir = Math.round(((evalK6.hasScratch4Pilar ? 100 : 0) + (evalK6.hasScratchAlgoritma ? 100 : 0) + (evalK6.hasAntarTeman ? 100 : 0) + (evalK6.hasKuis6 ? 100 : 0)) / 4);
+  const nAkhirBadge = document.getElementById('mon-k6-nilai-akhir-badge');
+  if (nAkhirBadge) nAkhirBadge.innerText = `Nilai Akhir: ${nAkhir}`;
+
+  showToast('Nilai 4 tugas dihitung otomatis berdasarkan kelengkapan berkas siswa!', 'info');
+}
+window.hitungUlangOtomatisNilaiK6 = hitungUlangOtomatisNilaiK6;
+
+/**
+ * Guru menyimpan nilai & catatan tugas Kelas 6
+ */
+function simpanNilaiMonitoringKelas6() {
+  playSound('click');
+  if (!_currentMonitoredK6Student) return;
+
+  const inPilar = document.getElementById('mon-k6-input-nilai-scratch-4pilar');
+  const inAlgo = document.getElementById('mon-k6-input-nilai-scratch-algo');
+  const inAntar = document.getElementById('mon-k6-input-nilai-antarteman');
+  const inKuis = document.getElementById('mon-k6-input-nilai-kuis');
+  const inCatatan = document.getElementById('mon-k6-catatan');
+
+  const nPilar = inPilar ? Math.min(100, Math.max(0, Number(inPilar.value) || 0)) : 0;
+  const nAlgo = inAlgo ? Math.min(100, Math.max(0, Number(inAlgo.value) || 0)) : 0;
+  const nAntar = inAntar ? Math.min(100, Math.max(0, Number(inAntar.value) || 0)) : 0;
+  const nKuis = inKuis ? Math.min(100, Math.max(0, Number(inKuis.value) || 0)) : 0;
+  const catatan = inCatatan ? inCatatan.value.trim() : '';
+
+  const nilaiAkhir = Math.round((nPilar + nAlgo + nAntar + nKuis) / 4);
+
+  // Update object
+  _currentMonitoredK6Student.nilaiScratch4Pilar = nPilar;
+  _currentMonitoredK6Student.nilaiScratchAlgoritma = nAlgo;
+  _currentMonitoredK6Student.nilaiAntarTeman = nAntar;
+  _currentMonitoredK6Student.nilaiKuis6 = nKuis;
+  _currentMonitoredK6Student.catatanGuru = catatan;
+  _currentMonitoredK6Student.nilaiAkhir = nilaiAkhir;
+  _currentMonitoredK6Student.statusKkm = (nilaiAkhir >= 80) ? 'Tuntas' : 'Remedial';
+
+  // Simpan ke database siswa
+  const db = getStudentDatabase();
+  const idx = db.findIndex(s => (s.id && s.id === _currentMonitoredK6Student.id) || (s.nis && String(s.nis) === String(_currentMonitoredK6Student.nis)));
+  if (idx !== -1) {
+    db[idx].nilaiScratch4Pilar = nPilar;
+    db[idx].nilaiScratchAlgoritma = nAlgo;
+    db[idx].nilaiAntarTeman = nAntar;
+    db[idx].nilaiKuis6 = nKuis;
+    db[idx].catatanGuru = catatan;
+    db[idx].nilaiAkhir = nilaiAkhir;
+    db[idx].statusKkm = _currentMonitoredK6Student.statusKkm;
+    saveStudentDatabase(db);
+  }
+
+  // Update table gradebook
+  if (typeof renderDasborGuru === 'function') {
+    renderDasborGuru();
+  }
+
+  tutupModalMonitoringTugasKelas6();
+  playSound('fanfare');
+  showToast(`Nilai & Catatan ${_currentMonitoredK6Student.nama} Berhasil Disimpan! Nilai Rapor: ${nilaiAkhir} 💾`, 'success');
+}
+window.simpanNilaiMonitoringKelas6 = simpanNilaiMonitoringKelas6;
+
+/**
+ * Membuka Modal Piagam Sertifikat Digital Kelas 6
+ */
+function bukaModalSertifikatKelas6(studentIdentifier) {
+  playSound('fanfare');
+  let student = null;
+  if (studentIdentifier) {
+    const db = getStudentDatabase();
+    student = db.find(s => (s.id && s.id === studentIdentifier) || (s.nis && String(s.nis) === String(studentIdentifier)) || (s.nama && s.nama.toLowerCase() === String(studentIdentifier).toLowerCase()));
+  }
+  if (!student) {
+    student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  }
+  if (!student) {
+    student = {
+      nama: 'Pelajar Prestasi Kelas 6',
+      kelas: '6A',
+      nis: '6000'
+    };
+  }
+
+  const evalK6 = hitungRubrikPenilaianKelas6(student);
+
+  const namaEl = document.getElementById('sertif-k6-nama');
+  if (namaEl) namaEl.innerText = student.nama || 'Pelajar Prestasi';
+
+  const detailEl = document.getElementById('sertif-k6-detail');
+  if (detailEl) detailEl.innerText = `Kelas ${student.kelas || '6A'} • NIS: ${student.nis || '-'} • SDS Cinta Kasih Tzu Chi`;
+
+  const nilaiEl = document.getElementById('sertif-k6-nilai');
+  if (nilaiEl) nilaiEl.innerText = evalK6.nilaiAkhir || 100;
+
+  const tglEl = document.getElementById('sertif-k6-tanggal');
+  if (tglEl) {
+    const d = new Date();
+    const bln = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][d.getMonth()];
+    tglEl.innerText = `Jakarta, ${d.getDate()} ${bln} ${d.getFullYear()}`;
+  }
+
+  const modal = document.getElementById('modal-sertifikat-kelas6');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+  }
+}
+window.bukaModalSertifikatKelas6 = bukaModalSertifikatKelas6;
+
+function bukaModalSertifikatKelas6DariMonitoring() {
+  if (_currentMonitoredK6Student) {
+    bukaModalSertifikatKelas6(_currentMonitoredK6Student.id || _currentMonitoredK6Student.nis || _currentMonitoredK6Student.nama);
+  }
+}
+window.bukaModalSertifikatKelas6DariMonitoring = bukaModalSertifikatKelas6DariMonitoring;
+
+function bukaModalSertifikatKelas6DariSiswa() {
+  const student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (!student) {
+    showToast('Silakan masuk ke akun siswa terlebih dahulu!', 'warning');
+    return;
+  }
+  const evalK6 = hitungRubrikPenilaianKelas6(student);
+  if (!evalK6.isSertifikatEligible) {
+    showToast(`Kamu telah menyelesaikan ${evalK6.selesaiCount} dari 4 menu tugas. Selesaikan semua untuk membuka Sertifikat! ⏳`, 'warning');
+    return;
+  }
+  bukaModalSertifikatKelas6(student.id || student.nis || student.nama);
+}
+window.bukaModalSertifikatKelas6DariSiswa = bukaModalSertifikatKelas6DariSiswa;
+
+/**
+ * Menutup Modal Sertifikat Kelas 6
+ */
+function tutupModalSertifikatKelas6() {
+  playSound('click');
+  const modal = document.getElementById('modal-sertifikat-kelas6');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.setProperty('display', 'none', 'important');
+  }
+}
+window.tutupModalSertifikatKelas6 = tutupModalSertifikatKelas6;
+
+/**
+ * Mencetak Piagam Sertifikat Kelas 6
+ */
+function cetakSertifikatKelas6() {
+  playSound('click');
+  window.print();
+}
+window.cetakSertifikatKelas6 = cetakSertifikatKelas6;
 

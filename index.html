@@ -107,6 +107,8 @@
     #modal-rubrik-penilaian:not(.hidden),
     #modal-monitoring-drive-guru:not(.hidden),
     #modal-monitoring-portofolio-kelas5:not(.hidden),
+    #modal-monitoring-tugas-kelas6:not(.hidden),
+    #modal-sertifikat-kelas6:not(.hidden),
     #modal-gambar-materi:not(.hidden),
     #modal-mesin-pencari-kartun:not(.hidden),
     #modal-bank-soal-guru:not(.hidden),
@@ -1628,39 +1630,34 @@
       <!-- ======================================================== -->
       <div id="navbar-tampilan-kelas6" class="hidden flex items-center justify-end">
         <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
-          <!-- 1. Tombol Kembali ke Beranda -->
-          <button type="button" onclick="switchTab('beranda')" id="nav-p6-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kembali ke Beranda LMS">
+          <!-- 1. Beranda -->
+          <button type="button" onclick="switchTab('beranda')" id="nav-p6-beranda" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="1. Beranda LMS">
             <i class="fa-solid fa-arrow-left text-[#38bdf8] icon-3d-glow"></i> <span>Beranda</span>
           </button>
 
-          <!-- Label Kelas 6 SD -->
-          <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 font-title font-black text-[11px] uppercase border border-emerald-400/40 shrink-0 hidden md:inline-flex items-center gap-1">
-            <i class="fa-solid fa-brain text-yellow-300"></i> Kelas 6 SD • CT
-          </span>
-
-          <!-- Tombol Modul Belajar (4 Pilar CT) -->
-          <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" id="nav-p6-modul" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Modul Belajar: 4 Pilar Computational Thinking">
+          <!-- 2. Modul Belajar -->
+          <button type="button" onclick="switchTab('modul'); if(typeof pilihTingkatModul==='function') pilihTingkatModul('kelas6');" id="nav-p6-modul" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="2. Modul Belajar: PROTA Semester Ganjil">
             <i class="fa-solid fa-book-open text-emerald-300 icon-3d-glow"></i> <span>Modul Belajar</span>
           </button>
 
-          <!-- Menu 1: Dekomposisi -->
-          <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" id="nav-p6-dekomposisi" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-white shrink-0 cursor-pointer" title="Pilar 1: Dekomposisi (Memecah Masalah)">
-            <i class="fa-solid fa-puzzle-piece text-sky-300 icon-3d-glow"></i> <span>1. Dekomposisi</span>
+          <!-- 3. 4 Pilar -->
+          <button type="button" onclick="switchTab('petualangan6')" id="nav-p6-4pilar" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="3. 4 Pilar Computational Thinking">
+            <i class="fa-solid fa-puzzle-piece text-sky-300 icon-3d-glow"></i> <span>3. 4 Pilar</span>
           </button>
 
-          <!-- Menu 2: Pengenalan Pola -->
-          <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" id="nav-p6-pola" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Pilar 2: Pengenalan Pola (Menemukan Kesamaan)">
-            <i class="fa-solid fa-shapes text-emerald-300 icon-3d-glow"></i> <span>2. Pola</span>
-          </button>
-
-          <!-- Menu 3: Abstraksi -->
-          <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" id="nav-p6-abstraksi" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Pilar 3: Abstraksi (Memilih Informasi Pokok)">
-            <i class="fa-solid fa-filter text-amber-300 icon-3d-glow"></i> <span>3. Abstraksi</span>
-          </button>
-
-          <!-- Menu 4: Algoritma -->
-          <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" id="nav-p6-algoritma" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Pilar 4: Algoritma (Urutan Langkah Logis)">
+          <!-- 4. Algoritma -->
+          <button type="button" onclick="switchTab('algoritma')" id="nav-p6-algoritma" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="4. Algoritma (Urutan Langkah Logis & Scratch)">
             <i class="fa-solid fa-paper-plane text-orange-300 icon-3d-glow"></i> <span>4. Algoritma</span>
+          </button>
+
+          <!-- 5. Penilaian Antar Teman -->
+          <button type="button" onclick="switchTab('antarteman')" id="nav-p6-antarteman" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="5. Penilaian Antar Teman (Peer Assessment)">
+            <i class="fa-solid fa-users text-purple-300 icon-3d-glow"></i> <span>5. Penilaian Antar Teman</span>
+          </button>
+
+          <!-- 6. Kuis -->
+          <button type="button" onclick="switchTab('kuis')" id="nav-p6-kuis" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="6. Kuis Interaktif Kelas 6 SD">
+            <i class="fa-solid fa-circle-question text-yellow-300 icon-3d-glow"></i> <span>6. Kuis</span>
           </button>
 
           <!-- Sound Orb -->
@@ -1674,7 +1671,7 @@
             <span id="user-points-kelas6">4 Pilar</span>
           </div>
 
-  <!-- Tombol Keluar Siswa Kelas 6 -->
+          <!-- Tombol Keluar Siswa Kelas 6 -->
           <button type="button" onclick="konfirmasiKeluarSiswa()" id="nav-p6-keluar" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-300 hover:text-white shrink-0 cursor-pointer" title="Keluar dari Akun Siswa">
             <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> <span class="hidden sm:inline">Keluar</span>
           </button>
@@ -2490,7 +2487,91 @@
 
   </div>
 
-  <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+  
+        <!-- STATUS 4 MISI & SERTIFIKAT KELULUSAN KELAS 6 SD -->
+        <div id="beranda-k6-status-misi-card" class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl border-2 border-amber-400/50 p-5 sm:p-7 shadow-2xl text-white space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-400/40 flex items-center justify-center text-2xl font-bold shadow-inner">
+                🎓
+              </span>
+              <div>
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-bold uppercase tracking-wider">
+                  Kelulusan Komputasi &amp; Pemrograman • Kelas 6 SD
+                </span>
+                <h3 class="font-title font-bold text-lg sm:text-xl text-white mt-0.5">
+                  Progres 4 Misi Pembelajaran &amp; Piagam Sertifikat Digital
+                </h3>
+              </div>
+            </div>
+            <div id="beranda-k6-badge-status-semua" class="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-clock"></i> <span id="beranda-k6-label-status-semua">0 dari 4 Misi Selesai</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs text-slate-300">
+              <span>Selesaikan seluruh 4 menu tugas untuk membuka Nilai Rapor &amp; Piagam Sertifikat Resmi!</span>
+              <span id="beranda-k6-persen-teks" class="font-bold text-amber-400">0%</span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden border border-slate-700">
+              <div id="beranda-k6-progress-bar" class="h-full bg-gradient-to-r from-orange-500 via-amber-400 to-emerald-400 transition-all duration-500" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- 4 Kotak Misi Ringkas -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+            <!-- Misi 1: Scratch 4 Pilar -->
+            <div onclick="switchTab('petualangan6')" class="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-sky-500/30 hover:border-sky-400 transition cursor-pointer group space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-sky-300 font-bold">1. 4 Pilar</span>
+                <span id="badge-mini-k6-4pilar" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Belum</span>
+              </div>
+              <div class="text-[11px] text-slate-300 group-hover:text-white transition">Karya Scratch CT</div>
+            </div>
+
+            <!-- Misi 2: Scratch Algoritma -->
+            <div onclick="switchTab('algoritma')" class="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-orange-500/30 hover:border-orange-400 transition cursor-pointer group space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-orange-300 font-bold">2. Algoritma</span>
+                <span id="badge-mini-k6-algo" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Belum</span>
+              </div>
+              <div class="text-[11px] text-slate-300 group-hover:text-white transition">Karya Scratch Koding</div>
+            </div>
+
+            <!-- Misi 3: Penilaian Antar Teman -->
+            <div onclick="switchTab('antarteman')" class="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-purple-500/30 hover:border-purple-400 transition cursor-pointer group space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-purple-300 font-bold">3. Antar Teman</span>
+                <span id="badge-mini-k6-antarteman" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Belum</span>
+              </div>
+              <div class="text-[11px] text-slate-300 group-hover:text-white transition">evalscore.netlify.app</div>
+            </div>
+
+            <!-- Misi 4: Kuis6 -->
+            <div onclick="switchTab('kuis')" class="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-amber-500/30 hover:border-amber-400 transition cursor-pointer group space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-amber-300 font-bold">4. Kuis6</span>
+                <span id="badge-mini-k6-kuis" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Belum</span>
+              </div>
+              <div class="text-[11px] text-slate-300 group-hover:text-white transition">kuis6.netlify.app</div>
+            </div>
+          </div>
+
+          <!-- Aksi Sertifikat & Rapor -->
+          <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800">
+            <div class="text-xs text-slate-300">
+              Nilai Rapor Akhir: <span id="beranda-k6-nilai-rapor" class="font-bold text-amber-400 text-sm">0</span>
+              <span id="beranda-k6-status-kelulusan" class="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">Dalam Proses</span>
+            </div>
+            <button type="button" onclick="bukaModalSertifikatKelas6DariSiswa()" id="btn-beranda-k6-sertifikat" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 font-title font-bold text-xs sm:text-sm border border-slate-700 transition flex items-center justify-center gap-2 cursor-not-allowed">
+              <i class="fa-solid fa-award"></i> <span id="label-beranda-k6-sertifikat">Sertifikat Belum Terbuka ⏳</span>
+            </button>
+          </div>
+        </div>
+
+<!-- Grid 4 Pilar Sesuai Gambar Infografis -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
           
           <!-- Pilar 1: Dekomposisi -->
@@ -4767,150 +4848,67 @@
       <!-- 1. Lipat dua kertas -> 2. Lipat sudut atas ke tengah ->  -->
       <!-- 3. Lipat sayap -> 4. Terbangkan!                         -->
       <!-- ======================================================== -->
-      <div id="p6-zona-algoritma" class="p6-zona-content hidden space-y-5">
-        <div class="bg-white rounded-3xl border border-orange-200 p-5 sm:p-7 shadow-xl text-slate-800">
-          
-          <!-- Banner Pilar 4 -->
-          <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">
-                ✈️
-              </div>
-
-  <div>
-                <span class="text-[11px] font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
-                  Pilar 4 • Computational Thinking
-                </span>
-                <h3 class="font-title font-bold text-xl sm:text-2xl text-slate-800 mt-0.5">4. ALGORITMA (URUTAN LANGKAH)</h3>
-                <p class="text-xs text-slate-500">Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.</p>
-              </div>
-
-  </div>
-
-  <div class="flex items-center gap-2">
-              <span class="px-3 py-1.5 rounded-xl bg-orange-50 text-orange-700 border border-orange-200 text-xs font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-list-ol text-orange-500"></i> &ldquo;Urutan Langkah Rahasia!&rdquo;
+      <!-- ======================================================== -->
+      <!-- KOTAK TUGAS WAJIB: LINK HASIL KARYA SCRATCH (4 PILAR CT)   -->
+      <!-- ======================================================== -->
+      <div id="p6-tugas-scratch-4pilar-box" class="bg-gradient-to-r from-sky-950 via-indigo-950 to-slate-900 rounded-3xl border-2 border-sky-400/50 p-5 sm:p-7 shadow-2xl text-white space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-3 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-3">
+            <span class="w-11 h-11 rounded-2xl bg-sky-500/20 text-sky-300 border border-sky-400/40 flex items-center justify-center text-2xl font-bold shadow-inner">
+              🐱
+            </span>
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 text-[10px] font-bold uppercase tracking-wider">
+                Tugas Wajib 1 • 4 Pilar Computational Thinking
               </span>
+              <h3 class="font-title font-bold text-lg sm:text-xl text-white mt-0.5">
+                Pengumpulan Link Hasil Karya Scratch (4 Pilar CT)
+              </h3>
             </div>
+          </div>
+          <div id="badge-status-tugas-4pilar" class="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-clock"></i> <span id="label-status-4pilar">Belum Mengumpulkan</span>
+          </div>
+        </div>
 
-  </div>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+          Kumpulkan link hasil karya proyek Scratch kamu yang menerapkan salah satu pilar <strong>Dekomposisi, Pengenalan Pola, atau Abstraksi</strong>. Pastikan proyek Scratch sudah berstatus <strong>Share (Publik)</strong> agar dapat dinilai oleh Guru Pengampu!
+        </p>
 
-  <!-- Infografis Konsep & Contoh Nyata Sesuai Gambar -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-            <div class="p-5 rounded-3xl bg-gradient-to-br from-orange-50 to-amber-50/50 border border-orange-200 space-y-3">
-              <div class="flex items-center gap-2 text-orange-800 font-title font-bold text-sm sm:text-base">
-                <i class="fa-solid fa-code text-orange-600"></i> Konsep Algoritma (Algorithm):
-              </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div class="space-y-1.5">
+            <label for="input-k6-scratch-link-4pilar" class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-link"></i> Link Proyek Scratch (https://scratch.mit.edu/projects/...):
+            </label>
+            <input type="url" id="input-k6-scratch-link-4pilar" placeholder="https://scratch.mit.edu/projects/123456789/" class="w-full bg-slate-900 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 font-mono">
+          </div>
 
-  <p class="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans">
-                <strong>Urutan langkah rahasia!</strong><br>
-                Algoritma adalah susunan urutan instruksi langkah demi langkah yang logis, teratur, dan jelas dari awal hingga akhir. Jika urutannya tertukar atau salah, hasilnya tidak akan tercapai atau komputer akan error!
-              </p>
-              <div class="p-3 bg-white rounded-2xl border border-orange-100 text-xs text-slate-600 space-y-1">
-                <div class="font-bold text-orange-900 flex items-center gap-1.5">
-                  <i class="fa-solid fa-robot text-orange-600"></i> Algoritma dalam Coding Komputer:
-                </div>
+          <div class="space-y-1.5">
+            <label for="input-k6-scratch-judul-4pilar" class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-heading"></i> Judul Karya Scratch:
+            </label>
+            <input type="text" id="input-k6-scratch-judul-4pilar" placeholder="Contoh: Petualangan Kucing Dekomposisi & Pola" class="w-full bg-slate-900 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/30">
+          </div>
+        </div>
 
-  <p>Semua aplikasi, game Scratch, dan robot cerdas berjalan karena ada baris-baris algoritma instruksi yang ditaati robot.</p>
-              </div>
+        <div class="space-y-1.5">
+          <label for="input-k6-scratch-catatan-4pilar" class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-nib"></i> Catatan Singkat Penerapan 4 Pilar dalam Proyekmu:
+          </label>
+          <textarea id="input-k6-scratch-catatan-4pilar" rows="2" placeholder="Jelaskan secara singkat bagaimana proyek Scratch ini memecahkan masalah dengan dekomposisi atau pengenalan pola..." class="w-full bg-slate-900 border border-slate-700 focus:border-sky-400 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/30"></textarea>
+        </div>
 
-  </div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div id="preview-link-k6-4pilar" class="text-xs text-slate-400 truncate max-w-md">
+            *Tugas ini wajib dikumpulkan untuk melengkapi Nilai Rapor &amp; Sertifikat Kelulusan.
+          </div>
+          <button type="button" onclick="window.kirimTugasScratchK6('4pilar')" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-title font-bold text-xs sm:text-sm shadow-lg shadow-sky-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-paper-plane text-yellow-300"></i> <span>Kirim Link Tugas Scratch 4 Pilar 🚀</span>
+          </button>
+        </div>
+      </div>
 
-  <div class="p-5 rounded-3xl bg-gradient-to-br from-yellow-50 to-orange-50/50 border border-yellow-200 space-y-3">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 text-orange-800 font-title font-bold text-sm sm:text-base">
-                  <i class="fa-solid fa-paper-plane text-orange-600"></i> Contoh Nyata Sesuai Gambar:
-                </div>
-
-  <span class="text-[11px] font-bold text-orange-700 bg-white px-2.5 py-0.5 rounded-full border border-orange-200">
-                  Origami Pesawat Kertas ✈️
-                </span>
-              </div>
-
-  <p class="text-xs text-slate-700 font-medium">
-                Contoh: <strong>Membuat Origami Pesawat</strong> membutuhkan urutan algoritma yang tepat agar bisa terbang:
-              </p>
-              <div class="space-y-1.5 text-xs">
-                <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
-                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
-                  <span><strong>Lipat dua kertas</strong> secara simetris</span>
-                </div>
-
-  <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
-                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
-                  <span><strong>Lipat sudut atas ke tengah</strong> membentuk segitiga</span>
-                </div>
-
-  <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
-                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
-                  <span><strong>Lipat sayap</strong> kiri dan kanan ke bawah</span>
-                </div>
-
-  <div class="flex items-center gap-2 p-2 rounded-xl bg-white border border-orange-100 text-slate-700 shadow-2xs">
-                  <span class="w-5 h-5 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center shrink-0">4</span>
-                  <span><strong>Terbangkan!</strong> Pesawat kertas meluncur di udara! ✈️</span>
-                </div>
-
-  </div>
-
-  </div>
-
-  </div>
-
-  <!-- GAME PUZZLE URUTAN ALGORITMA ORIGAMI INTERAKTIF -->
-          <div class="p-5 rounded-3xl bg-slate-900 text-white border-2 border-orange-400/50 shadow-inner space-y-4">
-            <div class="flex items-center justify-between flex-wrap gap-2">
-              <div class="flex items-center gap-2 font-title font-bold text-sm sm:text-base text-yellow-300">
-                <i class="fa-solid fa-puzzle-piece"></i> <span>Game Interaktif: Susun Urutan Algoritma Origami Pesawat!</span>
-              </div>
-
-  <button type="button" onclick="window.acakUrutanOrigami()" class="text-xs text-sky-400 hover:underline">Acak Kartu Langkah</button>
-            </div>
-
-  <p class="text-xs text-slate-300">Urutkan 4 kartu langkah di bawah dari langkah 1 sampai langkah 4 dengan menekan tombol nomor yang sesuai:</p>
-
-            <!-- 4 Kartu Langkah yang Diurutkan Siswa -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="wadah-kartu-origami">
-              <!-- JS mengisi kartu origami interaktif -->
-            </div>
-
-  <!-- Area Uji Terbang Pesawat -->
-            <div class="relative p-5 rounded-2xl bg-slate-950 border border-orange-500/30 text-center overflow-hidden h-28 flex flex-col items-center justify-center">
-              <div id="animasi-pesawat-kertas" class="text-4xl transition-all duration-1000 transform translate-x-0">
-                ✈️
-              </div>
-
-  <div class="mt-2 text-xs font-bold text-slate-300" id="status-terbang-pesawat">
-                Susun 4 kartu langkah di atas dengan urutan 1 &gt; 2 &gt; 3 &gt; 4 untuk menerbangkan pesawat!
-              </div>
-
-  </div>
-
-  <!-- Lembar Tantangan Algoritma Siswa Mandiri -->
-            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-xs">
-              <label class="block font-bold text-orange-300">
-                <i class="fa-solid fa-pen-nib"></i> Tuliskan Algoritma (3-4 Langkah) Menyalakan Komputer Sekolah Tzu Chi:
-              </label>
-              <textarea id="input-k6-algoritma-refleksi" rows="2" placeholder="Contoh: 1. Tekan tombol power CPU -> 2. Nyalakan monitor -> 3. Tunggu Windows memuat -> 4. Masuk ke aplikasi EduCodeAI!" class="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-600 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
-            </div>
-
-  <!-- Tombol Simpan -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-              <span class="text-xs text-slate-400" id="status-simpan-algoritma">
-                Status: Susun algoritma dan simpan progres ke Cloud.
-              </span>
-              <button type="button" onclick="window.simpanMisiKomputasiKelas6('algoritma')" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan Misi 4 (Algoritma) 🚀 (+25 Poin)</span>
-              </button>
-            </div>
-
-  </div>
-
-  </div>
-
-  </div>
-
-  <!-- POJOK BUDAYA HUMANIS TZU CHI KELAS 6 SD -->
+      <!-- POJOK BUDAYA HUMANIS TZU CHI KELAS 6 SD -->
       <div class="bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 rounded-3xl p-6 border-2 border-emerald-500/40 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-4">
           <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-3xl shrink-0">
@@ -4934,6 +4932,374 @@
       </div>
 
   </section>
+    <!-- ======================================================== -->
+    <!-- 4. TAB ALGORITMA (STANDALONE TANPA MATERI 4 PILAR)         -->
+    <!-- Menampilkan Teori Algoritma 5 Halaman & Tugas Scratch      -->
+    <!-- ======================================================== -->
+    <section id="tab-algoritma" class="hidden space-y-6 animate-fadeIn select-none">
+      
+      <!-- HERO HEADER MENU ALGORITMA (FOKUS 100% PADA ALGORITMA & STRUKTUR KODING) -->
+      <div class="bg-gradient-to-r from-orange-950 via-amber-950 to-slate-900 rounded-3xl border-2 border-orange-500/50 p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-gradient-to-tr from-orange-500/20 via-amber-500/20 to-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-3 max-w-3xl">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/40 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-paper-plane text-orange-400"></i> Menu 4 • Algoritma &amp; Pemrograman
+              </span>
+              <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-code"></i> Koding &amp; Kecerdasan Artifisial (KKA)
+              </span>
+              <span class="px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-graduation-cap"></i> Kelas 6 SD
+              </span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-title font-black text-white leading-tight">
+              Algoritma &amp; Struktur Logika Koding <span class="text-orange-400 block sm:inline">(Kelas 6 SD)</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+              <span class="text-yellow-300 font-bold">&ldquo;Urutan Langkah Rahasia Ahli Komputer!&rdquo;</span> Algoritma adalah urutan instruksi langkah demi langkah yang logis, teratur, dan jelas dari awal hingga akhir. Pelajari modul teori resmi dan kumpulkan tugas proyek Scratch kamu di bawah ini!
+            </p>
+          </div>
+
+          <!-- Tombol Cepat Aksi Header -->
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full sm:w-auto shrink-0">
+            <a href="Algoritma-teori.pdf" download="Algoritma_Teori_Kelas6_SD.pdf" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-orange-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95" title="Unduh File PDF Algoritma-teori">
+              <i class="fa-solid fa-file-pdf text-yellow-300 text-base"></i> <span>Unduh Berkas PDF (5 Hal)</span>
+            </a>
+            <button type="button" onclick="suarakanTeksRobo('Algoritma adalah urutan langkah-langkah logis untuk menyelesaikan masalah atau tugas! Dalam coding, ada tiga struktur logika utama: Urutan atau Sequence, Percabangan atau If-Else, dan Pengulangan atau Loop!');" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-yellow-300 font-title font-bold text-xs border border-yellow-500/30 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-volume-high text-yellow-400"></i> <span>Dengarkan Suara Robo 🎧</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KOTAK TUGAS WAJIB: LINK HASIL KARYA SCRATCH (ALGORITMA) -->
+      <div id="p6-tugas-scratch-algoritma-box" class="bg-gradient-to-r from-orange-950 via-amber-950 to-slate-900 rounded-3xl border-2 border-orange-400/50 p-5 sm:p-7 shadow-2xl text-white space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-3 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-3">
+            <span class="w-11 h-11 rounded-2xl bg-orange-500/20 text-orange-300 border border-orange-400/40 flex items-center justify-center text-2xl font-bold shadow-inner">
+              🚀
+            </span>
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 text-[10px] font-bold uppercase tracking-wider">
+                Tugas Wajib 2 • Algoritma &amp; Pemrograman Scratch
+              </span>
+              <h3 class="font-title font-bold text-lg sm:text-xl text-white mt-0.5">
+                Pengumpulan Link Hasil Karya Scratch (Algoritma)
+              </h3>
+            </div>
+          </div>
+          <div id="badge-status-tugas-algoritma" class="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-xs font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-clock"></i> <span id="label-status-algoritma">Belum Mengumpulkan</span>
+          </div>
+        </div>
+
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+          Kumpulkan link hasil karya proyek Scratch kamu yang menerapkan logika algoritma (Urutan / <em>Sequence</em>, Percabangan / <em>If-Else</em>, atau Pengulangan / <em>Loop</em>). Pastikan proyek Scratch sudah berstatus <strong>Share (Publik)</strong>!
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div class="space-y-1.5">
+            <label for="input-k6-scratch-link-algoritma" class="text-xs font-bold text-orange-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-link"></i> Link Proyek Scratch (https://scratch.mit.edu/projects/...):
+            </label>
+            <input type="url" id="input-k6-scratch-link-algoritma" placeholder="https://scratch.mit.edu/projects/123456789/" class="w-full bg-slate-900 border border-slate-700 focus:border-orange-400 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30 font-mono">
+          </div>
+
+          <div class="space-y-1.5">
+            <label for="input-k6-scratch-judul-algoritma" class="text-xs font-bold text-orange-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-heading"></i> Judul Karya Scratch:
+            </label>
+            <input type="text" id="input-k6-scratch-judul-algoritma" placeholder="Contoh: Game Algoritma Labirin Cerdas" class="w-full bg-slate-900 border border-slate-700 focus:border-orange-400 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30">
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="input-k6-scratch-catatan-algoritma" class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-nib"></i> Catatan Singkat Logika Algoritma yang Digunakan:
+          </label>
+          <textarea id="input-k6-scratch-catatan-algoritma" rows="2" placeholder="Jelaskan urutan logika, percabangan, atau perulangan yang kamu buat di Scratch..." class="w-full bg-slate-900 border border-slate-700 focus:border-orange-400 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500/30"></textarea>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div id="preview-link-k6-algoritma" class="text-xs text-slate-400 truncate max-w-md">
+            *Tugas ini wajib dikumpulkan untuk melengkapi Nilai Rapor &amp; Sertifikat Kelulusan.
+          </div>
+          <button type="button" onclick="window.kirimTugasScratchK6('algoritma')" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-title font-bold text-xs sm:text-sm shadow-lg shadow-orange-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-paper-plane text-yellow-300"></i> <span>Kirim Link Tugas Scratch Algoritma 🚀</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MODUL RESMI: BERKAS ALGORITMA-TEORI (5 HALAMAN INTERAKTIF) -->
+      <div class="bg-slate-900/90 rounded-3xl border-2 border-orange-500/40 p-5 sm:p-7 shadow-2xl space-y-6">
+        
+        <!-- Bar Kontrol Navigasi Halaman Dokumen -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-sm">
+                <i class="fa-solid fa-book-open"></i>
+              </span>
+              <h3 class="font-title font-bold text-lg sm:text-xl text-white">
+                Buku Modul: Algoritma &amp; Teori Logika Komputasi
+              </h3>
+            </div>
+            <p class="text-xs text-orange-300/80 mt-0.5">Bahan Belajar Asyik Koding &amp; AI • Sumber: Berkas Algoritma-teori.pdf</p>
+          </div>
+
+          <!-- Tab Pemilih Halaman 1-5 & Semua Halaman -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button type="button" onclick="window.pilihHalamanTeoriAlgo(1)" id="tab-btn-algo-1" class="px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-orange-500 text-white shadow-md transition cursor-pointer border border-orange-400">
+              1. Pengertian
+            </button>
+            <button type="button" onclick="window.pilihHalamanTeoriAlgo(2)" id="tab-btn-algo-2" class="px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700">
+              2. Logika Dasar
+            </button>
+            <button type="button" onclick="window.pilihHalamanTeoriAlgo(3)" id="tab-btn-algo-3" class="px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700">
+              3. Coding Scratch
+            </button>
+            <button type="button" onclick="window.pilihHalamanTeoriAlgo(4)" id="tab-btn-algo-4" class="px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700">
+              4. 3 Struktur Logika
+            </button>
+            <button type="button" onclick="window.pilihHalamanTeoriAlgo(5)" id="tab-btn-algo-5" class="px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700">
+              5. Petualangan Robot
+            </button>
+            <button type="button" onclick="window.pilihHalamanTeoriAlgo('all')" id="tab-btn-algo-all" class="px-3 py-1.5 rounded-xl font-title font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer border border-slate-700">
+              <i class="fa-solid fa-table-cells"></i> Semua Hal
+            </button>
+          </div>
+        </div>
+
+        <!-- TAMPILAN SINGLE VIEW (CAROUSEL / VIEWER PER HALAMAN) -->
+        <div id="algo-teori-single-view" class="space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2 bg-slate-950/70 p-3 rounded-2xl border border-slate-800 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 font-bold border border-orange-400/40" id="label-algo-teori-hal">
+                Halaman 1 dari 5
+              </span>
+              <span class="font-bold text-white hidden sm:inline" id="judul-algo-teori-active">
+                Halaman 1: Apa itu Algoritma? &amp; Cara Membuat Teh Manis
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.gantiHalamanTeoriAlgo(-1)" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-chevron-left text-[10px]"></i> Sebelumnya
+              </button>
+              <button type="button" onclick="window.gantiHalamanTeoriAlgo(1)" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition flex items-center gap-1 cursor-pointer">
+                Berikutnya <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </button>
+              <button type="button" onclick="bukaModalGambarMateri(document.getElementById('img-algo-teori-active').src, document.getElementById('judul-algo-teori-active').innerText)" class="px-3 py-1 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-bold transition flex items-center gap-1 cursor-pointer shadow-xs" title="Perbesar Layar Penuh">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> Perbesar 🔍
+              </button>
+            </div>
+          </div>
+
+          <div class="relative group rounded-2xl overflow-hidden border-2 border-orange-400/30 bg-black/60 flex justify-center cursor-zoom-in shadow-inner p-2" onclick="bukaModalGambarMateri(document.getElementById('img-algo-teori-active').src, document.getElementById('judul-algo-teori-active').innerText)" title="Klik untuk memperbesar gambar ukuran penuh">
+            <img id="img-algo-teori-active" src="algoritma_teori_hal_1.jpg" alt="Halaman 1: Apa itu Algoritma?" class="max-h-[640px] w-auto max-w-full object-contain rounded-xl transition-transform duration-300 group-hover:scale-[1.01]" loading="eager">
+            <div class="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+              <span class="bg-black/80 text-white text-xs font-bold px-4 py-2 rounded-full backdrop-blur-xs flex items-center gap-2 shadow-2xl border border-orange-400/50">
+                <i class="fa-solid fa-magnifying-glass-plus text-orange-400"></i> Klik untuk Melihat Ukuran Penuh (Zoom) 🔍
+              </span>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 flex items-start gap-2.5">
+            <span class="text-lg text-orange-400 shrink-0">💡</span>
+            <p id="desc-algo-teori-active" class="leading-relaxed">
+              Pengertian algoritma sebagai urutan langkah logis dan contoh nyata langkah membuat teh manis secara teratur (1. Rebus air, 2. Masukkan teh, 3. Tuang air panas, 4. Aduk dan tambahkan gula).
+            </p>
+          </div>
+        </div>
+
+        <!-- TAMPILAN ALL VIEW (GRID SEMUA 5 HALAMAN) -->
+        <div id="algo-teori-all-view" class="hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 group cursor-pointer" onclick="bukaModalGambarMateri('algoritma_teori_hal_1.jpg', 'Halaman 1: Apa itu Algoritma? & Cara Membuat Teh Manis')">
+              <div class="flex justify-between items-center text-xs font-bold text-orange-300">
+                <span>Halaman 1</span>
+                <span class="text-[10px] text-slate-400">Teh Manis ☕</span>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-800 bg-black/40 flex justify-center">
+                <img src="algoritma_teori_hal_1.jpg" alt="Hal 1" class="h-56 object-contain group-hover:scale-105 transition-transform" loading="lazy">
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Pengertian &amp; Langkah Membuat Teh Manis</p>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 group cursor-pointer" onclick="bukaModalGambarMateri('algoritma_teori_hal_2.jpg', 'Halaman 2: Logika Dasar & Keseharian')">
+              <div class="flex justify-between items-center text-xs font-bold text-orange-300">
+                <span>Halaman 2</span>
+                <span class="text-[10px] text-slate-400">Keseharian 🛏️</span>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-800 bg-black/40 flex justify-center">
+                <img src="algoritma_teori_hal_2.jpg" alt="Hal 2" class="h-56 object-contain group-hover:scale-105 transition-transform" loading="lazy">
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Logika Dasar, Merapikan Kasur &amp; Sikat Gigi</p>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 group cursor-pointer" onclick="bukaModalGambarMateri('algoritma_teori_hal_3.jpg', 'Halaman 3: Algoritma di Coding Scratch')">
+              <div class="flex justify-between items-center text-xs font-bold text-orange-300">
+                <span>Halaman 3</span>
+                <span class="text-[10px] text-slate-400">Scratch 🐱</span>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-800 bg-black/40 flex justify-center">
+                <img src="algoritma_teori_hal_3.jpg" alt="Hal 3" class="h-56 object-contain group-hover:scale-105 transition-transform" loading="lazy">
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Blok Kode Algoritma pada Scratch</p>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 group cursor-pointer" onclick="bukaModalGambarMateri('algoritma_teori_hal_4.jpg', 'Halaman 4: 3 Jenis Struktur Logika Coding')">
+              <div class="flex justify-between items-center text-xs font-bold text-orange-300">
+                <span>Halaman 4</span>
+                <span class="text-[10px] text-slate-400">3 Struktur ⚙️</span>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-800 bg-black/40 flex justify-center">
+                <img src="algoritma_teori_hal_4.jpg" alt="Hal 4" class="h-56 object-contain group-hover:scale-105 transition-transform" loading="lazy">
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Urutan (Sequence), Percabangan, Pengulangan</p>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 group cursor-pointer" onclick="bukaModalGambarMateri('algoritma_teori_hal_5.jpg', 'Halaman 5: Petualangan Robot Calon Programmer')">
+              <div class="flex justify-between items-center text-xs font-bold text-orange-300">
+                <span>Halaman 5</span>
+                <span class="text-[10px] text-slate-400">Petualangan 🤖</span>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-800 bg-black/40 flex justify-center">
+                <img src="algoritma_teori_hal_5.jpg" alt="Hal 5" class="h-56 object-contain group-hover:scale-105 transition-transform" loading="lazy">
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Panduan Petualangan Logika Robot</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 KARTU INTISARI STRUKTUR LOGIKA KODING -->
+        <div class="pt-4 border-t border-slate-800 space-y-4">
+          <h4 class="font-title font-bold text-base text-white flex items-center gap-2">
+            <i class="fa-solid fa-shapes text-orange-400"></i>
+            <span>3 Struktur Logika Utama dalam Coding (Sesuai Buku Teori)</span>
+          </h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-2xl bg-sky-950/40 border border-sky-400/40 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold uppercase">Struktur 1</span>
+                <span class="text-xl">🐱</span>
+              </div>
+              <h5 class="font-title font-bold text-sky-300 text-sm">1. Urutan (Sequence)</h5>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Langkah-langkah yang harus dilakukan <strong>satu per satu dari atas ke bawah</strong>. Jangan lompat-lompat ya!
+              </p>
+              <div class="bg-slate-900/80 p-2.5 rounded-xl border border-sky-500/20 text-[11px] text-slate-300 space-y-1">
+                <div class="text-sky-400 font-bold">Contoh: Bikin Teh Manis 🍵</div>
+                <div>1. Ambil gelas &rarr; 2. Taruh air &rarr; 3. Masukkan teh &rarr; 4. Tambah gula &rarr; 5. Selesai!</div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/40 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase">Struktur 2</span>
+                <span class="text-xl">🌧️☀️</span>
+              </div>
+              <h5 class="font-title font-bold text-amber-300 text-sm">2. Percabangan (If-Else)</h5>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Komputer membuat keputusan berdasarkan kondisi. <strong>Jika BENAR lakukan A, jika SALAH lakukan B!</strong>
+              </p>
+              <div class="bg-slate-900/80 p-2.5 rounded-xl border border-amber-500/20 text-[11px] text-slate-300 space-y-1">
+                <div class="text-amber-400 font-bold">Contoh: Cuaca Hujan? ☔</div>
+                <div>&bull; Benar (Hujan): <strong>Ambil Payung!</strong></div>
+                <div>&bull; Salah (Cerah): <strong>Main di Taman!</strong></div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-400/40 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase">Struktur 3</span>
+                <span class="text-xl">🐶🔁</span>
+              </div>
+              <h5 class="font-title font-bold text-emerald-300 text-sm">3. Pengulangan (Loop)</h5>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Lakukan instruksi berulang kali sampai kondisi terpenuhi. <strong>Biar nggak capek nulis kode berulang!</strong>
+              </p>
+              <div class="bg-slate-900/80 p-2.5 rounded-xl border border-emerald-500/20 text-[11px] text-slate-300 space-y-1">
+                <div class="text-emerald-400 font-bold">Contoh: Perulangan Tepuk 👏</div>
+                <div>Ulangi: <strong>Tepuk tangan 3 kali!</strong> (1, 2, 3 selesai).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ======================================================== -->
+    <!-- 5. TAB PENILAIAN ANTAR TEMAN (PEER ASSESSMENT) KELAS 6 SD  -->
+    <!-- Menilai Karakter Hu Ai, Zun Zhong, Tanggung Jawab & CT   -->
+    <!-- ======================================================== -->
+    <section id="tab-antarteman" class="hidden space-y-6 animate-fadeIn select-none">
+      
+      <!-- HERO HEADER EVALSCORE -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-purple-950 to-indigo-950 border-2 border-purple-400/40 p-6 sm:p-8 text-white shadow-2xl">
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-3 max-w-3xl">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/40 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-users"></i> Menu 5 • Penilaian Antar Teman
+              </span>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-heart"></i> Budaya Humanis Tzu Chi • Hu Ai &amp; Zun Zhong
+              </span>
+              <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-globe"></i> evalscore.netlify.app
+              </span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-title font-black tracking-tight text-white leading-tight">
+              Penilaian Antar Teman <span class="text-purple-400 block sm:inline">(EvalScore)</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+              <span class="text-yellow-300 font-bold">&ldquo;Saling Menghargai (Zun Zhong) &amp; Bekerjasama Penuh Cinta Kasih (Hu Ai)&rdquo;</span>. 
+              Gunakan formulir penilaian teman online di bawah ini (atau buka di tab baru) untuk saling mengapresiasi kerjasama tim dan budi pekerti luhur!
+            </p>
+          </div>
+
+          <!-- Tombol Aksi Header -->
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full sm:w-auto shrink-0">
+            <a href="https://evalscore.netlify.app" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-purple-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95" title="Buka website EvalScore di Tab Baru">
+              <i class="fa-solid fa-arrow-up-right-from-square text-yellow-300"></i> <span>Buka di Tab Baru 🚀</span>
+            </a>
+            <button type="button" onclick="window.tandaiMisiK6Selesai('antarteman')" id="btn-status-selesai-evalscore" class="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-emerald-300 font-title font-bold text-xs border border-emerald-500/40 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="label-btn-evalscore">Tandai Penilaian Selesai ✅</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEBVIEW IFRAME EVALSCORE -->
+      <div class="rounded-3xl overflow-hidden border-2 border-purple-500/40 bg-slate-950 shadow-2xl relative min-h-[760px]">
+        <div class="p-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span class="font-mono text-purple-300 ml-2">https://evalscore.netlify.app</span>
+          </div>
+          <a href="https://evalscore.netlify.app" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 flex items-center gap-1 text-xs">
+            <span>Buka Layar Penuh</span> <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+          </a>
+        </div>
+        <iframe src="https://evalscore.netlify.app" class="w-full h-[720px] border-none bg-slate-900" allow="fullscreen; clipboard-write; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      </div>
+
+    </section>
+
 
     <!-- INLINE SCRIPT INTERAKTIF KHUSUS 4 MENU KELAS 6 SD (PERSISTENSI, SIMULASI & CLOUD) -->
     <script>
@@ -5162,18 +5528,29 @@
           var zonas = ['zona-dekomposisi', 'zona-pola', 'zona-abstraksi', 'zona-algoritma'];
           zonas.forEach(function(z) {
             var el = document.getElementById('p6-' + z);
-            var nav = document.getElementById('nav-p6-' + z.replace('zona-', ''));
             var dock = document.getElementById('btn-dock-p6-' + z.replace('zona-', ''));
 
             if (z === zonaId) {
               if (el) { el.classList.remove('hidden'); el.style.setProperty('display', 'block', 'important'); }
-              if (nav) { nav.classList.add('active-tab', 'text-white'); nav.classList.remove('text-slate-300'); }
               if (dock) { dock.classList.add('border-2', 'border-sky-400'); dock.classList.remove('border-emerald-500/40', 'border-amber-500/40', 'border-orange-500/40'); }
             } else {
               if (el) { el.classList.add('hidden'); el.style.setProperty('display', 'none', 'important'); }
-              if (nav) { nav.classList.remove('active-tab', 'text-white'); nav.classList.add('text-slate-300'); }
             }
           });
+
+          // Highlight navbar Kelas 6
+          var btn4Pilar = document.getElementById('nav-p6-4pilar');
+          var btnAlgo = document.getElementById('nav-p6-algoritma');
+          var allK6Navs = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis'];
+          allK6Navs.forEach(function(nid) {
+            var b = document.getElementById(nid);
+            if (b) { b.classList.remove('active-tab', 'text-white'); b.classList.add('text-slate-300'); }
+          });
+          if (zonaId === 'zona-algoritma') {
+            if (btnAlgo) { btnAlgo.classList.add('active-tab', 'text-white'); btnAlgo.classList.remove('text-slate-300'); }
+          } else {
+            if (btn4Pilar) { btn4Pilar.classList.add('active-tab', 'text-white'); btn4Pilar.classList.remove('text-slate-300'); }
+          }
           try { window.scrollTo({ top: 120, behavior: 'smooth' }); } catch(e){}
         };
 
@@ -9162,7 +9539,34 @@
       <!-- Tampil saat memilih tab Kelas 6 atau saat siswa Kelas 6 aktif  -->
       <!-- ======================================================== -->
       <div id="modul-kelas6-container" class="hidden space-y-8 animate-fadeIn">
-        
+
+        <!-- ======================================================== -->
+        <!-- PROGRAM TAHUNAN (PROTA) KELAS 6 SD - SEMESTER GANJIL     -->
+        <!-- TAMPILAN GAMBAR DOKUMEN RESMI TERBARU                    -->
+        <!-- ======================================================== -->
+        <div id="tabel-prota-kelas6-kurikulum-merdeka" class="bg-white rounded-3xl p-5 sm:p-7 border-2 border-slate-300 shadow-xl space-y-4 animate-fadeIn">
+          
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-3 py-1.5 rounded-full border border-emerald-300">
+              <i class="fa-solid fa-file-signature text-emerald-600"></i> Program Tahunan (PROTA) • Kelas 6 SD (Semester Ganjil)
+            </span>
+            <span class="text-xs text-slate-500 font-semibold">
+              Kurikulum Merdeka • SDS Cinta Kasih Tzu Chi
+            </span>
+          </div>
+
+          <!-- Tampilan Gambar PROTA 6 Semester Ganjil Terbaru (Tanpa Download & Tanpa Zoom Penuh) -->
+          <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50/50 shadow-sm flex justify-center p-2 sm:p-4">
+            <img 
+              src="prota6.png?v=20261116_k6_5features_v154" 
+              alt="Program Tahunan (PROTA) Kelas 6 SD Semester Ganjil - Kurikulum Merdeka SDS Cinta Kasih Tzu Chi" 
+              class="w-full max-h-[750px] object-contain rounded-xl shadow-xs" 
+              loading="eager"
+            />
+          </div>
+
+        </div>
+
         <!-- DOKUMEN MODUL RESMI KELAS 6 SD -->
         <div class="bg-white rounded-3xl p-5 sm:p-7 border-2 border-emerald-300 shadow-xl space-y-6">
           
@@ -15344,7 +15748,55 @@
         </button>
       </div>
 
-  <div class="bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl border-2 border-indigo-100 shadow-2xl space-y-6 text-slate-800">
+  
+      <!-- TAMPILAN KHUSUS KELAS 6 SD: WEBSITE KUIS (kuis6.netlify.app) -->
+      <div id="kuis-kelas6-container" class="space-y-5 hidden">
+        <div class="p-6 rounded-3xl bg-gradient-to-r from-amber-950 via-yellow-950 to-slate-900 border-2 border-amber-500/50 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-bold uppercase tracking-wider">
+                Menu 6 • Kuis Komputasi Kelas 6 SD
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 text-xs font-bold">
+                kuis6.netlify.app
+              </span>
+            </div>
+            <h2 class="font-title font-black text-2xl sm:text-3xl text-white">
+              Kuis Evaluasi Komputasi &amp; Algoritma
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-200">
+              Uji pemahaman materi Computational Thinking dan Algoritma kamu melalui platform kuis online resmi!
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0 w-full sm:w-auto">
+            <a href="https://kuis6.netlify.app" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-amber-500/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Buka Kuis6 di Tab Baru 🚀</span>
+            </a>
+            <button type="button" onclick="window.tandaiMisiK6Selesai('kuis')" id="btn-status-selesai-kuis6" class="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-emerald-300 font-title font-bold text-xs border border-emerald-500/40 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="label-btn-kuis6">Tandai Kuis Selesai ✅</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- WEBVIEW IFRAME KUIS6 -->
+        <div class="rounded-3xl overflow-hidden border-2 border-amber-500/40 bg-slate-950 shadow-2xl relative min-h-[760px]">
+          <div class="p-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span class="font-mono text-amber-300 ml-2">https://kuis6.netlify.app</span>
+            </div>
+            <a href="https://kuis6.netlify.app" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 text-xs">
+              <span>Buka Layar Penuh</span> <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+          <iframe src="https://kuis6.netlify.app" class="w-full h-[720px] border-none bg-slate-900" allow="fullscreen; clipboard-write; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </div>
+      </div>
+
+<div class="bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl border-2 border-indigo-100 shadow-2xl space-y-6 text-slate-800">
         <!-- Header Kuis Lucu & Berwarna -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
@@ -20962,7 +21414,487 @@
           </button>
         </div>
       </div>
+    
+
+  <!-- ======================================================== -->
+  <!-- MODAL MONITORING PORTOFOLIO KELAS 6 (GURU DASBOR)         -->
+  <!-- Memantau 4 Misi: Scratch 4 Pilar, Scratch Algoritma,      -->
+  <!-- EvalScore, & Kuis6 serta Penerbitan Rapor & Sertifikat    -->
+  <!-- ======================================================== -->
+  <div id="modal-monitoring-portofolio-kelas6" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalMonitoringPortofolioKelas6()">
+    <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-emerald-200 flex flex-col max-h-[92vh] overflow-hidden">
+      
+      <!-- Header Modal -->
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-emerald-800 via-teal-800 to-indigo-800 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="mon-k6-avatar" class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0">
+            👤
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white uppercase tracking-wider">Monitoring Guru • Kelas 6 SD</span>
+              <span id="mon-k6-status-kkm" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-300 text-slate-900">BELUM TUNTAS</span>
+            </div>
+            <h3 id="mon-k6-nama" class="font-title font-black text-lg sm:text-xl truncate">Nama Siswa</h3>
+            <div class="flex items-center gap-2 text-xs text-emerald-100 flex-wrap">
+              <span id="mon-k6-kelas">Kelas 6A</span> &bull; 
+              <span id="mon-k6-nis">NIS: -</span> &bull; 
+              <span id="mon-k6-absen">Absen: -</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="tutupModalMonitoringPortofolioKelas6()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Body Modal -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-5 bg-slate-50/50 flex-1">
+        
+        <!-- Progress Bar Misi -->
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="w-full sm:w-auto">
+            <div class="text-xs font-bold text-slate-500 uppercase">Ketercapaian 4 Tugas Siswa:</div>
+            <div class="text-sm font-black text-slate-800 mt-0.5" id="mon-k6-progress-text">0 dari 4 Tugas Selesai (0%)</div>
+            <div class="w-full sm:w-64 h-2 bg-slate-100 rounded-full mt-2 overflow-hidden border border-slate-200">
+              <div id="mon-k6-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+            <div class="text-right">
+              <div class="text-[10px] font-bold text-slate-400 uppercase">Nilai Rapor Akhir:</div>
+              <div class="text-2xl font-black text-indigo-700" id="mon-k6-nilai-akhir-badge">0</div>
+            </div>
+            <button type="button" onclick="hitungUlangNilaiOtomatisK6()" class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-title font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+              <i class="fa-solid fa-calculator"></i> Hitung Rubrik
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Kotak Tugas Kelas 6 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- Tugas 1: Scratch 4 Pilar -->
+          <div class="p-4 rounded-2xl bg-white border-2 border-sky-100 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-xl bg-sky-100 text-sky-700 font-bold text-xs flex items-center justify-center">1</span>
+                <span class="font-title font-bold text-xs sm:text-sm text-slate-800">Karya Scratch 4 Pilar CT</span>
+              </div>
+              <span id="mon-k6-status-4pilar" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Belum Ada</span>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <div id="mon-k6-link-4pilar-wrap" class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 truncate">
+                <span class="text-slate-400 italic">Siswa belum mengumpulkan link Scratch 4 Pilar</span>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-1">
+                <span class="text-slate-500 font-semibold text-[11px]">Nilai Scratch 4 Pilar (0-100):</span>
+                <input type="number" id="mon-k6-input-nilai-4pilar" min="0" max="100" class="w-20 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-sky-400" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tugas 2: Scratch Algoritma -->
+          <div class="p-4 rounded-2xl bg-white border-2 border-orange-100 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-xl bg-orange-100 text-orange-700 font-bold text-xs flex items-center justify-center">2</span>
+                <span class="font-title font-bold text-xs sm:text-sm text-slate-800">Karya Scratch Algoritma</span>
+              </div>
+              <span id="mon-k6-status-algoritma" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Belum Ada</span>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <div id="mon-k6-link-algoritma-wrap" class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 truncate">
+                <span class="text-slate-400 italic">Siswa belum mengumpulkan link Scratch Algoritma</span>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-1">
+                <span class="text-slate-500 font-semibold text-[11px]">Nilai Scratch Algoritma (0-100):</span>
+                <input type="number" id="mon-k6-input-nilai-algoritma" min="0" max="100" class="w-20 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-orange-400" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tugas 3: EvalScore -->
+          <div class="p-4 rounded-2xl bg-white border-2 border-purple-100 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-xl bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">3</span>
+                <span class="font-title font-bold text-xs sm:text-sm text-slate-800">EvalScore (Penilaian Teman)</span>
+              </div>
+              <span id="mon-k6-status-evalscore" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Belum Selesai</span>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 flex items-center justify-between">
+                <span>Platform: <strong class="text-purple-700">evalscore.netlify.app</strong></span>
+                <a href="https://evalscore.netlify.app" target="_blank" class="text-purple-600 hover:underline font-bold text-[11px]">Buka Platform ↗</a>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-1">
+                <span class="text-slate-500 font-semibold text-[11px]">Nilai Karakter / Kerjasama (0-100):</span>
+                <input type="number" id="mon-k6-input-nilai-evalscore" min="0" max="100" class="w-20 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-purple-400" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Tugas 4: Kuis6 -->
+          <div class="p-4 rounded-2xl bg-white border-2 border-amber-100 shadow-xs space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-xl bg-amber-100 text-amber-700 font-bold text-xs flex items-center justify-center">4</span>
+                <span class="font-title font-bold text-xs sm:text-sm text-slate-800">Kuis Komputasi (kuis6)</span>
+              </div>
+              <span id="mon-k6-status-kuis6" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Belum Selesai</span>
+            </div>
+
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 flex items-center justify-between">
+                <span>Platform: <strong class="text-amber-700">kuis6.netlify.app</strong></span>
+                <a href="https://kuis6.netlify.app" target="_blank" class="text-amber-600 hover:underline font-bold text-[11px]">Buka Platform ↗</a>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-1">
+                <span class="text-slate-500 font-semibold text-[11px]">Nilai Kuis Siswa (0-100):</span>
+                <input type="number" id="mon-k6-input-nilai-kuis6" min="0" max="100" class="w-20 px-2 py-1 bg-white border border-slate-300 rounded-lg text-center font-bold text-xs focus:ring-2 focus:ring-amber-400" value="0">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Catatan Guru Pengampu -->
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-1.5">
+          <label for="mon-k6-catatan-guru" class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-comment-dots text-emerald-600"></i> Catatan Pembinaan &amp; Apresiasi Guru:
+          </label>
+          <textarea id="mon-k6-catatan-guru" rows="2" placeholder="Tuliskan catatan perkembangan dan pesan pembinaan untuk siswa..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"></textarea>
+        </div>
+
+      </div>
+
+      <!-- Footer Modal: Aksi Simpan & Cetak Rapor/Sertifikat -->
+      <div class="p-4 sm:p-5 bg-slate-100 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onclick="bukaRaporDigitalDariGuru(currentMonitoringK6StudentId)" class="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-indigo-700 border border-indigo-200 font-title font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
+            <i class="fa-solid fa-file-invoice text-indigo-600"></i> <span>Rapor Digital</span>
+          </button>
+          <button type="button" onclick="bukaSertifikatSiswaDariGuru(currentMonitoringK6StudentId)" class="px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-title font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
+            <i class="fa-solid fa-award text-amber-600"></i> <span>Piagam Sertifikat</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="tutupModalMonitoringPortofolioKelas6()" class="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-slate-600 font-title font-bold text-xs transition cursor-pointer border border-slate-300">
+            Tutup
+          </button>
+          <button type="button" onclick="simpanNilaiMonitoringKelas6()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-floppy-disk"></i> <span>Simpan Nilai &amp; Catatan 💾</span>
+          </button>
+        </div>
+      </div>
+
     </div>
+  </div></div>
+  <!-- ======================================================== -->
+  <!-- MODAL MONITORING & PENILAIAN 4 TUGAS SISWA KELAS 6 SD    -->
+  <!-- 1. Scratch 4 Pilar | 2. Scratch Algoritma | 3. EvalScore | 4. Kuis6 -->
+  <!-- ======================================================== -->
+  <div id="modal-monitoring-tugas-kelas6" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalMonitoringTugasKelas6()">
+    <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-orange-200 flex flex-col max-h-[92vh] overflow-hidden">
+      <!-- Header Modal Monitoring Kelas 6 -->
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-orange-800 via-amber-800 to-emerald-800 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="mon-k6-avatar" class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-title font-black text-xl text-white shadow-inner shrink-0">
+            🤖
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white uppercase tracking-wider">Monitoring Guru • Kelas 6</span>
+              <span id="mon-k6-status-kkm" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-300 text-slate-900">BELUM TUNTAS</span>
+            </div>
+            <h4 id="mon-k6-nama" class="font-title font-black text-base sm:text-lg leading-tight truncate">Nama Siswa</h4>
+            <div class="flex items-center gap-2 text-xs text-orange-100 mt-0.5 flex-wrap">
+              <span id="mon-k6-kelas" class="font-bold">Kelas 6A</span>
+              <span>•</span>
+              <span id="mon-k6-nis">NIS: -</span>
+              <span>•</span>
+              <span id="mon-k6-absen">Absen: -</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="tutupModalMonitoringTugasKelas6()" class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-sm transition cursor-pointer" title="Tutup Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- KPI Summary 4 Menu Tugas -->
+      <div class="p-4 bg-orange-50/70 border-b border-orange-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+        <div class="w-full sm:w-1/2 space-y-1.5">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-list-check text-orange-600"></i> Ketercapaian 4 Menu Tugas:</span>
+            <span id="mon-k6-progress-text" class="text-orange-700 font-bold">0 dari 4 Menu Selesai (0%)</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-slate-200 overflow-hidden shadow-inner">
+            <div id="mon-k6-progress-bar" class="h-full bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-500 transition-all duration-500" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="mon-k6-nilai-akhir-badge" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black bg-orange-600 text-white shadow-2xs">
+            Nilai Akhir: 0
+          </span>
+          <button type="button" onclick="hitungUlangOtomatisNilaiK6()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-orange-700 border border-orange-200 hover:bg-orange-50 transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
+            <i class="fa-solid fa-wand-magic-sparkles text-orange-600"></i> Hitung Rubrik Otomatis
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 Cards Grid for the 4 Tasks -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 bg-slate-50">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- CARD 1: KARYA SCRATCH 4 PILAR -->
+          <div class="bg-white rounded-2xl p-4 border border-sky-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-sm">
+                  1
+                </div>
+                <div>
+                  <h5 class="font-title font-bold text-slate-800 text-sm">Karya Scratch: 4 Pilar CT</h5>
+                  <p class="text-[11px] text-slate-500">Dekomposisi, Pola, atau Abstraksi</p>
+                </div>
+              </div>
+              <span id="mon-k6-badge-scratch-4pilar" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                Belum Kumpul
+              </span>
+            </div>
+
+            <!-- Detail Tugas Scratch 4 Pilar -->
+            <div id="mon-k6-detail-scratch-4pilar" class="p-3 bg-sky-50/60 rounded-xl border border-sky-100 text-xs space-y-1.5">
+              <div class="text-slate-500 italic">Siswa belum mengumpulkan link tugas Scratch 4 Pilar</div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-100">
+              <label for="mon-k6-input-nilai-scratch-4pilar" class="text-xs font-bold text-slate-700">Nilai Scratch 4 Pilar (0-100):</label>
+              <input type="number" id="mon-k6-input-nilai-scratch-4pilar" min="0" max="100" placeholder="0" class="w-20 px-3 py-1.5 rounded-xl border border-sky-300 text-center font-bold text-sm text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+          </div>
+
+          <!-- CARD 2: KARYA SCRATCH ALGORITMA -->
+          <div class="bg-white rounded-2xl p-4 border border-orange-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm">
+                  2
+                </div>
+                <div>
+                  <h5 class="font-title font-bold text-slate-800 text-sm">Karya Scratch: Algoritma</h5>
+                  <p class="text-[11px] text-slate-500">Urutan, Percabangan, Pengulangan</p>
+                </div>
+              </div>
+              <span id="mon-k6-badge-scratch-algo" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                Belum Kumpul
+              </span>
+            </div>
+
+            <!-- Detail Tugas Scratch Algoritma -->
+            <div id="mon-k6-detail-scratch-algo" class="p-3 bg-orange-50/60 rounded-xl border border-orange-100 text-xs space-y-1.5">
+              <div class="text-slate-500 italic">Siswa belum mengumpulkan link tugas Scratch Algoritma</div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-100">
+              <label for="mon-k6-input-nilai-scratch-algo" class="text-xs font-bold text-slate-700">Nilai Scratch Algoritma (0-100):</label>
+              <input type="number" id="mon-k6-input-nilai-scratch-algo" min="0" max="100" placeholder="0" class="w-20 px-3 py-1.5 rounded-xl border border-orange-300 text-center font-bold text-sm text-orange-900 focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+          </div>
+
+          <!-- CARD 3: PENILAIAN ANTAR TEMAN (EVALSCORE) -->
+          <div class="bg-white rounded-2xl p-4 border border-purple-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">
+                  3
+                </div>
+                <div>
+                  <h5 class="font-title font-bold text-slate-800 text-sm">Penilaian Antar Teman</h5>
+                  <p class="text-[11px] text-slate-500">evalscore.netlify.app • Hu Ai &amp; Zun Zhong</p>
+                </div>
+              </div>
+              <span id="mon-k6-badge-antarteman" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                Belum Mengisi
+              </span>
+            </div>
+
+            <!-- Detail Antar Teman -->
+            <div id="mon-k6-detail-antarteman" class="p-3 bg-purple-50/60 rounded-xl border border-purple-100 text-xs space-y-1.5">
+              <div class="text-slate-500 italic">Siswa belum menyelesaikan evaluasi rekan di platform EvalScore</div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-100">
+              <label for="mon-k6-input-nilai-antarteman" class="text-xs font-bold text-slate-700">Nilai Antar Teman (0-100):</label>
+              <input type="number" id="mon-k6-input-nilai-antarteman" min="0" max="100" placeholder="0" class="w-20 px-3 py-1.5 rounded-xl border border-purple-300 text-center font-bold text-sm text-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+          </div>
+
+          <!-- CARD 4: KUIS KOMPUTASI (KUIS6) -->
+          <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+                  4
+                </div>
+                <div>
+                  <h5 class="font-title font-bold text-slate-800 text-sm">Kuis Komputasi &amp; Algoritma</h5>
+                  <p class="text-[11px] text-slate-500">kuis6.netlify.app • Evaluasi Online</p>
+                </div>
+              </div>
+              <span id="mon-k6-badge-kuis" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                Belum Mengerjakan
+              </span>
+            </div>
+
+            <!-- Detail Kuis6 -->
+            <div id="mon-k6-detail-kuis" class="p-3 bg-amber-50/60 rounded-xl border border-amber-100 text-xs space-y-1.5">
+              <div class="text-slate-500 italic">Siswa belum menyelesaikan kuis di kuis6.netlify.app</div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-1 border-t border-slate-100">
+              <label for="mon-k6-input-nilai-kuis" class="text-xs font-bold text-slate-700">Nilai Kuis (0-100):</label>
+              <input type="number" id="mon-k6-input-nilai-kuis" min="0" max="100" placeholder="0" class="w-20 px-3 py-1.5 rounded-xl border border-amber-300 text-center font-bold text-sm text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Catatan Guru & Umpan Balik -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2">
+          <label for="mon-k6-catatan" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <i class="fa-solid fa-comment-dots text-orange-600"></i> Catatan &amp; Umpan Balik Guru (Ditampilkan di Rapor Siswa):
+          </label>
+          <textarea id="mon-k6-catatan" rows="2" placeholder="Tuliskan apresiasi, saran, atau catatan motivasi untuk ananda..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/30"></textarea>
+        </div>
+      </div>
+
+      <!-- Footer Modal Monitoring -->
+      <div class="p-4 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+        <div class="text-xs text-slate-500">
+          <i class="fa-solid fa-circle-check text-emerald-500"></i> Nilai rapor otomatis menghitung rata-rata dari 4 menu tugas Kelas 6 SD.
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+          <button type="button" onclick="bukaModalSertifikatKelas6DariMonitoring()" id="btn-mon-k6-sertifikat" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-title font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-award"></i> <span>Cetak Sertifikat 🎓</span>
+          </button>
+          <button type="button" onclick="tutupModalMonitoringTugasKelas6()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title font-bold text-xs transition cursor-pointer">
+            Tutup
+          </button>
+          <button type="button" onclick="simpanNilaiMonitoringKelas6()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-title font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95">
+            <i class="fa-solid fa-floppy-disk"></i> <span>Simpan Nilai &amp; Catatan 💾</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL PIAGAM SERTIFIKAT KELULUSAN KELAS 6 SD RESMI       -->
+  <!-- ======================================================== -->
+  <div id="modal-sertifikat-kelas6" class="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 hidden animate-fadeIn" onclick="if(event.target===this) tutupModalSertifikatKelas6()">
+    <div class="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border-4 border-amber-300 flex flex-col max-h-[94vh] overflow-hidden">
+      <!-- Sertifikat Bar Kontrol Cetak -->
+      <div class="p-3.5 bg-slate-900 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+          <span class="text-xs font-bold text-amber-300 font-title tracking-wider uppercase">Piagam Kelulusan Resmi • Computational Thinking &amp; Scratch</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="cetakSertifikatKelas6()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-title font-black text-xs shadow transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-print"></i> <span>Cetak / Simpan PDF 🖨️</span>
+          </button>
+          <button type="button" onclick="tutupModalSertifikatKelas6()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Area Piagam Sertifikat Digital Siap Cetak -->
+      <div id="area-sertifikat-kelas6-print" class="p-6 sm:p-10 overflow-y-auto bg-gradient-to-br from-amber-50 via-white to-orange-50 text-slate-900 relative">
+        <!-- Bingkai Klasik Ornamen Piagam -->
+        <div class="border-4 border-double border-amber-500/80 rounded-2xl p-6 sm:p-8 text-center space-y-4 relative overflow-hidden bg-white/90 shadow-sm">
+          <!-- Logo & Header Sekolah -->
+          <div class="flex items-center justify-center gap-3">
+            <span class="text-3xl sm:text-4xl">🏛️</span>
+            <div>
+              <h3 class="font-title font-black text-sm sm:text-base text-slate-800 tracking-wider uppercase">
+                SDS CINTA KASIH TZU CHI • JAKARTA
+              </h3>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                Kurikulum Merdeka • Fase C (Kelas 6 SD) • Koding &amp; AI (KKA)
+              </p>
+            </div>
+            <span class="text-3xl sm:text-4xl">🎓</span>
+          </div>
+
+          <div class="w-24 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto"></div>
+
+          <!-- Judul Piagam -->
+          <div class="space-y-1">
+            <span class="text-[11px] font-extrabold uppercase tracking-widest text-amber-700 block">PIAGAM PENGHARGAAN RESMI</span>
+            <h2 class="font-title text-2xl sm:text-3xl font-black text-slate-900 tracking-wide">
+              AHLI PEMIKIRAN KOMPUTASIONAL &amp; KODING CILIK
+            </h2>
+            <p class="text-xs text-slate-500">Diberikan secara terhormat kepada:</p>
+          </div>
+
+          <!-- Nama Siswa -->
+          <div class="py-2">
+            <h1 id="sertif-k6-nama" class="font-title font-black text-2xl sm:text-3xl md:text-4xl text-indigo-900 tracking-tight underline decoration-amber-400 decoration-2">
+              Pelajar Uji Coba 6A
+            </h1>
+            <div id="sertif-k6-detail" class="text-xs sm:text-sm font-bold text-slate-600 mt-1">
+              Kelas 6A • NIS: 6000 • SDS Cinta Kasih Tzu Chi
+            </div>
+          </div>
+
+          <!-- Keterangan Pencapaian 4 Menu -->
+          <p class="text-xs sm:text-sm text-slate-700 max-w-xl mx-auto leading-relaxed">
+            Atas dedikasi, integritas, dan keberhasilan menyelesaikan seluruh <strong>4 Menu Pembelajaran Wajib Kelas 6 SD</strong>:
+            <br>
+            <span class="text-[11px] text-slate-600 font-semibold block mt-1">
+              1. Scratch 4 Pilar Computational Thinking &bull; 2. Scratch Pemrograman Algoritma &bull; 3. Penilaian Antar Teman (EvalScore) &bull; 4. Kuis Komputasi Online (Kuis6)
+            </span>
+          </p>
+
+          <!-- Predikat Nilai Rapor -->
+          <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-title font-black text-sm sm:text-base shadow-md">
+            <span>🌟 SANGAT KOMPETEN</span>
+            <span>&bull;</span>
+            <span>NILAI RAPOR: <span id="sertif-k6-nilai">100</span></span>
+          </div>
+
+          <!-- Tanggal & Tanda Tangan -->
+          <div class="pt-6 grid grid-cols-2 gap-4 text-xs text-slate-600 border-t border-slate-200">
+            <div>
+              <p id="sertif-k6-tanggal" class="text-slate-500 text-[11px]">Jakarta, 2026</p>
+              <p class="font-bold text-slate-800 mt-0.5">Guru Koding &amp; AI (KKA)</p>
+              <div class="my-3 font-title font-bold text-indigo-800 text-sm italic">
+                (Darningsih, S.T.)
+              </div>
+              <p class="text-[10px] text-slate-400">Guru Pengampu</p>
+            </div>
+            <div>
+              <p class="text-slate-500 text-[11px]">Mengetahui,</p>
+              <p class="font-bold text-slate-800 mt-0.5">Kepala Sekolah</p>
+              <div class="my-3 font-title font-bold text-emerald-800 text-sm italic">
+                (SDS Cinta Kasih Tzu Chi)
+              </div>
+              <p class="text-[10px] text-slate-400">Terverifikasi Digital LMS</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div>
 
   <!-- ======================================================== -->
@@ -22401,7 +23333,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261113_focus_highlight_v149"></script>
+  <script charset="UTF-8" src="app.js?v=20261116_k6_full_v154"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
