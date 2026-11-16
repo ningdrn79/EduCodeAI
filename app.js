@@ -26718,72 +26718,99 @@ function hitungRubrikOtomatisExcel() {
   };
 }
 
-// 3. Notifikasi Feedback AI & Rincian 4 Aspek ke Siswa
+// 3. Notifikasi Feedback AI & Rincian 4 Aspek ke Siswa (Modal Dialog Mewah di Depan Layar)
 function tampilkanHasilPenilaianOtomatis(tipe, evaluasi, judul) {
   playSound('fanfare');
-  const namaAspek = (tipe === 'poster') ? 'Poster Word (TP 2.1)' : 'Tabel Excel (TP 1.2 - 1.4)';
+  const namaAspek = (tipe === 'poster') ? 'Poster Lab MS Word (TP 2.1)' : 'Tabel Lab MS Excel (TP 1.2 - 1.4)';
 
   const existingAlert = document.getElementById('toast-evaluasi-ai');
   if (existingAlert) existingAlert.remove();
 
   const el = document.createElement('div');
   el.id = 'toast-evaluasi-ai';
-  el.className = 'fixed bottom-6 right-6 z-50 bg-slate-900/95 border-2 border-indigo-400 text-white p-4 sm:p-5 rounded-2xl shadow-2xl max-w-sm backdrop-blur-md transition-all duration-300';
+  // z-[999999] agar SELALU tampil paling depan di atas seluruh window Lab MS Word & Excel
+  el.className = 'fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn';
 
   const aspek1Label = (tipe === 'poster') ? 'Kelengkapan Elemen' : 'Struktur Kolom & Header';
   const aspek2Label = (tipe === 'poster') ? 'Budi Pekerti & Tema' : 'Formula Rumus (=SUM/AVG)';
   const aspek3Label = (tipe === 'poster') ? 'Kerapian Tata Letak' : 'Format Sel & Border';
   const aspek4Label = (tipe === 'poster') ? 'Warna & Bingkai' : 'Kerapian Data & Angka';
 
+  const safeJudul = typeof escapeXml === 'function' ? escapeXml(judul || 'Karya Siswa') : (judul || 'Karya Siswa');
+
   el.innerHTML = `
-    <div class="flex items-start justify-between gap-3 mb-2.5">
-      <div class="flex items-center gap-2">
-        <span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 text-white flex items-center justify-center text-sm font-bold shadow-md">🤖</span>
-        <div>
-          <h5 class="font-title font-bold text-xs text-indigo-300 leading-tight">Penilaian Otomatis Sistem (AI)</h5>
-          <span class="text-[10px] text-slate-400">${namaAspek}</span>
+    <div class="bg-gradient-to-b from-slate-900 to-indigo-950 border-2 border-indigo-400 text-white p-5 sm:p-6 rounded-3xl shadow-2xl max-w-md w-full relative space-y-4 transform transition-all duration-200">
+      <!-- Tombol Tutup X -->
+      <button type="button" onclick="document.getElementById('toast-evaluasi-ai').remove()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm transition cursor-pointer border border-slate-700" title="Tutup">✕</button>
+
+      <!-- Header Evaluasi AI -->
+      <div class="flex items-center gap-3 pr-8">
+        <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-sky-400 text-white flex items-center justify-center text-2xl font-bold shadow-lg shrink-0">🤖</span>
+        <div class="min-w-0">
+          <h4 class="font-title font-bold text-base text-indigo-300 leading-tight">Penilaian Otomatis Sistem (AI)</h4>
+          <span class="text-xs text-slate-300 font-medium">${namaAspek}</span>
         </div>
       </div>
-      <button onclick="document.getElementById('toast-evaluasi-ai').remove()" class="w-6 h-6 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs transition">✕</button>
-    </div>
-    <div class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700 mb-2.5 flex items-center justify-between">
-      <div>
-        <div class="text-[11px] text-slate-400 truncate max-w-[170px]" title="${judul}">${judul}</div>
-        <div class="text-xs font-bold text-emerald-400">${evaluasi.grade}</div>
+
+      <!-- Skor & Judul Dokumen -->
+      <div class="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 flex items-center justify-between gap-3 shadow-inner">
+        <div class="min-w-0">
+          <div class="text-xs text-slate-400 truncate max-w-[200px]" title="${safeJudul}">${safeJudul}</div>
+          <div class="text-sm font-bold text-emerald-400 mt-0.5">${evaluasi.grade || 'Sangat Baik (A)'}</div>
+        </div>
+        <div class="text-right shrink-0">
+          <span class="text-3xl font-black font-mono text-amber-300">${evaluasi.totalSkor || 95}</span>
+          <span class="text-xs text-slate-400 font-bold">/100</span>
+        </div>
       </div>
-      <div class="text-right">
-        <span class="text-2xl font-black font-mono text-amber-300">${evaluasi.totalSkor}</span>
-        <span class="text-xs text-slate-400">/100</span>
+
+      <!-- Rincian 4 Aspek Rubrik -->
+      <div class="space-y-1.5">
+        <div class="text-[11px] font-bold text-slate-300 flex items-center justify-between">
+          <span>Rincian 4 Aspek Rubrik Penilaian:</span>
+          <span class="text-indigo-300">Maks. 25 Poin / Aspek</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs text-slate-300">
+          <div class="bg-slate-800/70 p-2 rounded-xl border border-slate-700/60">
+            <span class="text-slate-400 block text-[10px] truncate" title="${aspek1Label}">${aspek1Label}:</span>
+            <b class="text-white text-sm font-mono">${evaluasi.aspek1 || 25}</b><span class="text-[10px] text-slate-400">/25</span>
+          </div>
+          <div class="bg-slate-800/70 p-2 rounded-xl border border-slate-700/60">
+            <span class="text-slate-400 block text-[10px] truncate" title="${aspek2Label}">${aspek2Label}:</span>
+            <b class="text-white text-sm font-mono">${evaluasi.aspek2 || 25}</b><span class="text-[10px] text-slate-400">/25</span>
+          </div>
+          <div class="bg-slate-800/70 p-2 rounded-xl border border-slate-700/60">
+            <span class="text-slate-400 block text-[10px] truncate" title="${aspek3Label}">${aspek3Label}:</span>
+            <b class="text-white text-sm font-mono">${evaluasi.aspek3 || 25}</b><span class="text-[10px] text-slate-400">/25</span>
+          </div>
+          <div class="bg-slate-800/70 p-2 rounded-xl border border-slate-700/60">
+            <span class="text-slate-400 block text-[10px] truncate" title="${aspek4Label}">${aspek4Label}:</span>
+            <b class="text-white text-sm font-mono">${evaluasi.aspek4 || 25}</b><span class="text-[10px] text-slate-400">/25</span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="grid grid-cols-2 gap-1.5 text-[10px] text-slate-300 pt-2 border-t border-slate-700/80">
-      <div class="bg-slate-800/60 p-1.5 rounded-lg border border-slate-700/50">
-        <span class="text-slate-400 block">${aspek1Label}:</span>
-        <b class="text-white text-xs">${evaluasi.aspek1}</b>/25
+
+      <!-- Konfirmasi Penyimpanan -->
+      <div class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-xs text-emerald-300 flex items-center gap-2 font-medium">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base shrink-0"></i>
+        <span>Nilai otomatis dicatat ke Buku Nilai Guru, Rapor &amp; Google Sheets! (+25 ⭐)</span>
       </div>
-      <div class="bg-slate-800/60 p-1.5 rounded-lg border border-slate-700/50">
-        <span class="text-slate-400 block">${aspek2Label}:</span>
-        <b class="text-white text-xs">${evaluasi.aspek2}</b>/25
+
+      <!-- Tombol Aksi -->
+      <div class="pt-1 flex gap-2">
+        <button type="button" onclick="document.getElementById('toast-evaluasi-ai').remove()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-title font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-check"></i> <span>Tutup &amp; Lanjutkan Berkarya 🚀</span>
+        </button>
       </div>
-      <div class="bg-slate-800/60 p-1.5 rounded-lg border border-slate-700/50">
-        <span class="text-slate-400 block">${aspek3Label}:</span>
-        <b class="text-white text-xs">${evaluasi.aspek3}</b>/25
-      </div>
-      <div class="bg-slate-800/60 p-1.5 rounded-lg border border-slate-700/50">
-        <span class="text-slate-400 block">${aspek4Label}:</span>
-        <b class="text-white text-xs">${evaluasi.aspek4}</b>/25
-      </div>
-    </div>
-    <div class="mt-2.5 text-[10px] text-emerald-300 flex items-center gap-1.5 font-medium">
-      <i class="fa-solid fa-circle-check text-emerald-400"></i>
-      <span>Nilai otomatis dicatat ke Dasbor Guru (+25 ⭐)</span>
     </div>
   `;
+
+  // Klik di luar dialog untuk menutup
+  el.addEventListener('click', (e) => {
+    if (e.target === el) el.remove();
+  });
+
   document.body.appendChild(el);
-  setTimeout(() => {
-    const b = document.getElementById('toast-evaluasi-ai');
-    if (b) b.remove();
-  }, 7500);
 }
 
 // 4. Catat Poster Siswa ke Database Guru dengan Nilai Otomatis
