@@ -81,11 +81,11 @@
     #modal-konfirmasi-hapus-semua-poster.hidden,
     #modal-panduan-typing.hidden,
     #modal-robo-victory.hidden,
-    #modal-semester-2.hidden {
+    #modal-semester-2.hidden,
+    #btn-welcome-rapor {
       display: none !important;
       visibility: hidden !important;
       pointer-events: none !important;
-      z-index: -9999 !important;
       opacity: 0 !important;
     }
     [id^="modal-"]:not(.hidden) {
@@ -400,7 +400,7 @@
                 #tab-petualangan6 { display: block !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: none !important; }
                 #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
                   display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
@@ -418,7 +418,7 @@
                 #tab-petualangan5 { display: block !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: none !important; }
                 #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 #m-navbar-utama, #m-navbar-sem1, #m-navbar-guru, div[id^="m-navbar-"], .m-navbar-strip {
                   display: none !important; height: 0 !important; visibility: hidden !important; border: none !important; padding: 0 !important; margin: 0 !important;
@@ -434,7 +434,7 @@
                 #tab-petualangan6 { display: none !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: none !important; }
                 #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
                 #hero-guest-btn { display: none !important; }
@@ -610,7 +610,7 @@
                   }
                   if (btnLogin) { btnLogin.classList.add('hidden'); btnLogin.style.setProperty('display', 'none', 'important'); }
                   if (btnLogout) { btnLogout.classList.remove('hidden'); btnLogout.style.setProperty('display', 'inline-flex', 'important'); }
-                  if (btnRapor) { btnRapor.classList.remove('hidden'); btnRapor.style.setProperty('display', 'inline-flex', 'important'); }
+                  if (btnRapor) { btnRapor.classList.add('hidden'); btnRapor.style.setProperty('display', 'none', 'important'); }
                   if (btnGanti) { btnGanti.classList.remove('hidden'); btnGanti.style.setProperty('display', 'inline-flex', 'important'); }
                 }
               }
@@ -1139,7 +1139,7 @@
                 #navbar-tampilan-kelas6 * { pointer-events: auto !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: none !important; }
                 #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 #hero-guest-btn { display: none !important; }
                 #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
@@ -1154,7 +1154,7 @@
                 #navbar-tampilan-kelas5 * { pointer-events: auto !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: none !important; }
                 #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 #hero-guest-btn { display: none !important; }
                 #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
@@ -1169,7 +1169,7 @@
                 #navbar-tampilan-sem1 * { pointer-events: auto !important; }
                 #btn-welcome-login { display: none !important; }
                 #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-                #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+                #btn-welcome-rapor { display: none !important; }
                 #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
                 #hero-guest-btn { display: none !important; }
                 #hero-sem-buttons { display: flex !important; pointer-events: auto !important; }
@@ -1870,9 +1870,8 @@
             <span id="label-toggle-sem">Semester 1</span>
             <i class="fa-solid fa-arrows-rotate text-[10px] text-blue-400"></i>
           </button>
-          <button id="btn-welcome-rapor" onclick="bukaModalProfilSiswa()" class="hidden px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
-            <i class="fa-solid fa-id-card"></i> <span>Rapor & Kartu Pelajar</span>
-          </button>
+          <!-- Tombol Rapor & Kartu Pelajar (Dinonaktifkan di semua akun siswa) -->
+          <button id="btn-welcome-rapor" style="display: none !important;" class="hidden"></button>
           <button id="btn-welcome-ganti" onclick="bukaPilihSiswaCepat()" class="hidden px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-title text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="Ganti Siswa / Masuk Akun Lain">
             <i class="fa-solid fa-arrow-right-arrow-left text-xs"></i> <span>Ganti</span>
           </button>
@@ -1939,9 +1938,8 @@
               btnLogout.style.setProperty('display', 'inline-flex', 'important'); 
             }
             if (btnRapor) { 
-              btnRapor.classList.remove('hidden'); 
-              btnRapor.style.removeProperty('display');
-              btnRapor.style.setProperty('display', 'inline-flex', 'important'); 
+              btnRapor.classList.add('hidden'); 
+              btnRapor.style.setProperty('display', 'none', 'important'); 
             }
             if (btnGanti) { 
               btnGanti.classList.remove('hidden'); 
@@ -21548,7 +21546,7 @@
         </div>
 
         <!-- Catatan Guru Box -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2">
+        <div id="mon-k5-card-catatan" class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2 transition-all duration-300">
           <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <i class="fa-solid fa-comment-dots text-indigo-600"></i> Catatan &amp; Umpan Balik Guru untuk Siswa:
           </label>
@@ -23309,7 +23307,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261117_k6_modal_fix_v176"></script>
+  <script charset="UTF-8" src="app.js?v=20261117_hide_rapor_siswa_v178"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

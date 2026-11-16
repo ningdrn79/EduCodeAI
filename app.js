@@ -307,7 +307,7 @@ function injectOrUpdateStudentStyle(profile) {
       #navbar-tampilan-kelas6 * { pointer-events: auto !important; }
       #btn-welcome-login { display: none !important; }
       #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-      #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+      #btn-welcome-rapor { display: none !important; }
       #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
       #btn-toggle-sem-siswa { display: none !important; }
       #hero-guest-btn { display: none !important; }
@@ -326,7 +326,7 @@ function injectOrUpdateStudentStyle(profile) {
       #navbar-tampilan-kelas5 * { pointer-events: auto !important; }
       #btn-welcome-login { display: none !important; }
       #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-      #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+      #btn-welcome-rapor { display: none !important; }
       #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
       #btn-toggle-sem-siswa { display: none !important; }
       #hero-guest-btn { display: none !important; }
@@ -345,7 +345,7 @@ function injectOrUpdateStudentStyle(profile) {
       #navbar-tampilan-sem1 * { pointer-events: auto !important; }
       #btn-welcome-login { display: none !important; }
       #btn-welcome-logout { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
-      #btn-welcome-rapor { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
+      #btn-welcome-rapor { display: none !important; }
       #btn-welcome-ganti { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }
       ${isSem2Open ? '#btn-toggle-sem-siswa { display: inline-flex !important; pointer-events: auto !important; cursor: pointer !important; }' : '#btn-toggle-sem-siswa { display: none !important; }'}
       #hero-guest-btn { display: none !important; }
@@ -25517,7 +25517,12 @@ window.isiDataRaporDigital = isiDataRaporDigital;
 function bukaRaporDigitalDariGuru(studentId) {
   playSound('click');
   const db = getStudentDatabase();
-  const student = db.find(s => s.id === studentId || s.nis === studentId);
+  const safeId = String(studentId || '').trim().toLowerCase();
+  const student = db.find(s => 
+    (s.id && String(s.id).toLowerCase() === safeId) || 
+    (s.nis && String(s.nis).toLowerCase() === safeId) ||
+    (s.nama && s.nama.toLowerCase() === safeId)
+  );
   if (!student) {
     showToast('⚠️ Data siswa tidak ditemukan di database.', 'warning');
     return;
@@ -26530,9 +26535,9 @@ function muatProfilSiswa() {
       btnLogin.style.setProperty('display', 'none', 'important'); 
     }
     if (btnRapor) { 
-      btnRapor.classList.remove('hidden'); 
+      btnRapor.classList.add('hidden'); 
       btnRapor.style.removeProperty('display');
-      btnRapor.style.setProperty('display', 'inline-flex', 'important'); 
+      btnRapor.style.setProperty('display', 'none', 'important'); 
     }
     if (btnGanti) { 
       btnGanti.classList.remove('hidden'); 
@@ -28276,9 +28281,10 @@ function renderTabelGradebook(students, totalAll) {
           </button>
         </td>
         <!-- Catatan Guru -->
-        <td class="${padRow} px-3">
-          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px]" title="${s.catatanGuru || 'Belum ada catatan'}">
-            ${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}
+        <td class="${padRow} px-3 cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'catatan')" title="Klik untuk mengedit Catatan Guru ${s.nama}">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px] group-hover:text-orange-700 transition flex items-center justify-between gap-1.5" title="${s.catatanGuru || 'Belum ada catatan'}">
+            <span class="truncate">${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">Belum ada catatan</span>'}</span>
+            <i class="fa-solid fa-pen-to-square text-[11px] text-orange-500 opacity-60 group-hover:opacity-100 transition shrink-0 pointer-events-none"></i>
           </div>
         </td>
         <!-- Aksi -->
@@ -28367,9 +28373,10 @@ function renderTabelGradebook(students, totalAll) {
             ${isPassK5 ? '✅ TUNTAS' : '⚠️ REMEDIAL'}
           </span>
         </td>
-        <td class="${padRow} px-3">
-          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px]" title="${s.catatanGuru || 'Belum ada catatan'}">
-            ${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}
+        <td class="${padRow} px-3 cursor-pointer group" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}', 'catatan')" title="Klik untuk mengedit Catatan Guru ${s.nama}">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px] group-hover:text-purple-700 transition flex items-center justify-between gap-1.5" title="${s.catatanGuru || 'Belum ada catatan'}">
+            <span class="truncate">${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">Belum ada catatan</span>'}</span>
+            <i class="fa-solid fa-pen-to-square text-[11px] text-purple-500 opacity-60 group-hover:opacity-100 transition shrink-0 pointer-events-none"></i>
           </div>
         </td>
         <td class="${padRow} px-2 text-center">
@@ -28377,14 +28384,14 @@ function renderTabelGradebook(students, totalAll) {
             <button type="button" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}')" title="Monitoring 4 Tugas Portofolio Kelas 5" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
-            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-id-card"></i>
+            <button type="button" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card pointer-events-none"></i>
             </button>
-            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <button type="button" onclick="bukaModalMonitoringPortofolioKelas5('${s.id || s.nis || s.nama}', 'catatan')" title="Beri Nilai & Catatan Guru Kelas 5" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square pointer-events-none"></i>
             </button>
-            <button onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-trash-can"></i>
+            <button type="button" onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can pointer-events-none"></i>
             </button>
           </div>
         </td>
@@ -29330,13 +29337,14 @@ function bukaModalMonitoringPortofolioKelas5(studentId, focusTask = null) {
       { key: 'ppt', id: 'mon-k5-card-ppt', ring: ['ring-4', 'ring-indigo-500', 'shadow-xl', 'bg-indigo-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-ppt' },
       { key: 'sertifikat', id: 'mon-k5-card-sertifikat', ring: ['ring-4', 'ring-amber-500', 'shadow-xl', 'bg-amber-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-sertifikat' },
       { key: 'poster', id: 'mon-k5-card-poster', ring: ['ring-4', 'ring-emerald-500', 'shadow-xl', 'bg-emerald-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-poster' },
-      { key: 'game', id: 'mon-k5-card-game', ring: ['ring-4', 'ring-purple-500', 'shadow-xl', 'bg-purple-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-game' }
+      { key: 'game', id: 'mon-k5-card-game', ring: ['ring-4', 'ring-purple-500', 'shadow-xl', 'bg-purple-50/30', 'scale-[1.01]'], inputId: 'mon-k5-input-nilai-game' },
+      { key: 'catatan', id: 'mon-k5-card-catatan', ring: ['ring-4', 'ring-purple-500', 'shadow-xl', 'bg-purple-50/50', 'scale-[1.01]'], inputId: 'mon-k5-input-catatan' }
     ];
 
     allCards.forEach(c => {
       const el = document.getElementById(c.id);
       if (el) {
-        el.classList.remove('ring-4', 'ring-indigo-500', 'ring-amber-500', 'ring-emerald-500', 'ring-purple-500', 'shadow-xl', 'bg-indigo-50/30', 'bg-amber-50/30', 'bg-emerald-50/30', 'bg-purple-50/30', 'scale-[1.01]');
+        el.classList.remove('ring-4', 'ring-indigo-500', 'ring-amber-500', 'ring-emerald-500', 'ring-purple-500', 'shadow-xl', 'bg-indigo-50/30', 'bg-amber-50/30', 'bg-emerald-50/30', 'bg-purple-50/30', 'bg-purple-50/50', 'scale-[1.01]');
       }
     });
 
@@ -29384,7 +29392,12 @@ function hitungUlangOtomatisNilaiK5() {
   if (!currentMonitoringK5StudentId) return;
   playSound('click');
   const db = getStudentDatabase();
-  const student = db.find(s => s.id === currentMonitoringK5StudentId);
+  const safeId = String(currentMonitoringK5StudentId).trim().toLowerCase();
+  const student = db.find(s => 
+    (s.id && String(s.id).toLowerCase() === safeId) || 
+    (s.nis && String(s.nis).toLowerCase() === safeId) ||
+    (s.nama && s.nama.toLowerCase() === safeId)
+  );
   if (!student) return;
 
   const p5 = dapatkanPortofolioKelas5Siswa(student);
@@ -29439,7 +29452,12 @@ function simpanNilaiMonitoringPortofolioKelas5() {
   if (!currentMonitoringK5StudentId) return;
   playSound('success');
   const db = getStudentDatabase();
-  const student = db.find(s => s.id === currentMonitoringK5StudentId);
+  const safeId = String(currentMonitoringK5StudentId).trim().toLowerCase();
+  const student = db.find(s => 
+    (s.id && String(s.id).toLowerCase() === safeId) || 
+    (s.nis && String(s.nis).toLowerCase() === safeId) ||
+    (s.nama && s.nama.toLowerCase() === safeId)
+  );
   if (!student) {
     showToast('⚠️ Data siswa tidak ditemukan.', 'warning');
     return;
@@ -36191,6 +36209,18 @@ function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
     modal.classList.remove('hidden');
     modal.style.removeProperty('display');
     modal.style.setProperty('display', 'flex', 'important');
+  }
+
+  if (targetMisi === 'catatan') {
+    setTimeout(() => {
+      try {
+        const c = document.getElementById('mon-k6-catatan');
+        if (c) {
+          c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          c.focus();
+        }
+      } catch (e) {}
+    }, 150);
   }
 }
 window.bukaModalMonitoringTugasKelas6 = bukaModalMonitoringTugasKelas6;
