@@ -27887,6 +27887,7 @@ function filterDanCariSiswa() {
 
   
   if (typeof mulaiRealtimeMonitoringKelas5Guru === 'function') mulaiRealtimeMonitoringKelas5Guru();
+  if (typeof mulaiRealtimeMonitoringKelas6Guru === 'function') mulaiRealtimeMonitoringKelas6Guru();
 const filtered = db.filter(s => {
     if (!s) return false;
     // Filter Kelas / Tingkat (Disesuaikan dengan pengampu resmi Ibu Darningsih, S.T.)
@@ -35552,6 +35553,95 @@ function simpanPortofolioKelas6Siswa(student, data) {
   } catch(eCloud) {}
 }
 window.simpanPortofolioKelas6Siswa = simpanPortofolioKelas6Siswa;
+
+function simpanPortofolioK6KeCloud(student, data) {
+  if (!student || !data) return;
+  const sNis = student.nis || student.id;
+  if (!sNis) return;
+
+  let db = (typeof firebaseFirestoreInstance !== 'undefined' && firebaseFirestoreInstance) 
+           ? firebaseFirestoreInstance 
+           : (typeof getInlineFirestore === 'function' ? getInlineFirestore() : null);
+  if (!db && typeof firebase !== 'undefined' && firebase.firestore) {
+    try { db = firebase.firestore(); } catch(e){}
+  }
+  if (!db) return;
+
+  try {
+    const payload = {
+      studentNis: String(sNis).trim(),
+      studentNama: student.nama || '',
+      studentKelas: student.kelas || '6A',
+      portofolioK6: data,
+      updatedAt: new Date().toISOString()
+    };
+    db.collection('karya_komputasi_kelas6').doc(String(sNis).trim()).set(payload, { merge: true })
+      .catch(e => console.warn('Gagal sync portofolio K6 ke Firestore:', e));
+  } catch(e) {
+    console.warn('Error simpanPortofolioK6KeCloud:', e);
+  }
+}
+window.simpanPortofolioK6KeCloud = simpanPortofolioK6KeCloud;
+
+let _guruKelas6RealtimeUnsubscribe = null;
+function mulaiRealtimeMonitoringKelas6Guru() {
+  let db = (typeof firebaseFirestoreInstance !== 'undefined' && firebaseFirestoreInstance) 
+           ? firebaseFirestoreInstance 
+           : (typeof getInlineFirestore === 'function' ? getInlineFirestore() : null);
+  if (!db && typeof firebase !== 'undefined' && firebase.firestore) {
+    try { db = firebase.firestore(); } catch(e){}
+  }
+  if (!db || _guruKelas6RealtimeUnsubscribe) return;
+
+  try {
+    _guruKelas6RealtimeUnsubscribe = db.collection('karya_komputasi_kelas6').onSnapshot((snapshot) => {
+      if (!snapshot) return;
+      const currentDb = getStudentDatabase();
+      let hasChange = false;
+
+      snapshot.docChanges().forEach((change) => {
+        const docData = change.doc.data();
+        if (!docData || !docData.portofolioK6) return;
+        const targetNis = String(docData.studentNis || change.doc.id).trim();
+        const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+
+        if (sIdx >= 0) {
+          const student = currentDb[sIdx];
+          student.portofolioK6 = docData.portofolioK6;
+          _p6CloudCache.set(targetNis, docData.portofolioK6);
+          if (student.id) _p6CloudCache.set(student.id, docData.portofolioK6);
+
+          const rubrik = hitungRubrikPenilaianKelas6(student, docData.portofolioK6);
+          student.nilaiScratch4Pilar = rubrik.nilaiScratch4Pilar;
+          student.nilaiScratchAlgoritma = rubrik.nilaiScratchAlgoritma;
+          student.nilaiAntarTeman = rubrik.nilaiAntarTeman;
+          student.nilaiKuis6 = rubrik.nilaiKuis6;
+          student.nilaiAkhir = rubrik.nilaiAkhir;
+          student.terakhirAktif = 'Baru saja';
+          hasChange = true;
+
+          if (change.type === 'added' || change.type === 'modified') {
+            if (typeof showToast === 'function') {
+              showToast(`🚀 [Tugas Kelas 6 Masuk] ${student.nama} (${student.kelas}) baru saja mengumpulkan tugas ke Cloud! ☁️`, 'success');
+            }
+            try { playSound('fanfare'); } catch(e){}
+          }
+        }
+      });
+
+      if (hasChange) {
+        saveStudentDatabase(currentDb);
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      }
+    }, (err) => {
+      console.warn('Realtime listener Kelas 6 error:', err);
+      _guruKelas6RealtimeUnsubscribe = null;
+    });
+  } catch(e) {
+    console.warn('Gagal pasang realtime listener Kelas 6:', e);
+  }
+}
+window.mulaiRealtimeMonitoringKelas6Guru = mulaiRealtimeMonitoringKelas6Guru;
 
 /**
  * Menghitung Nilai Rapor & Rubrik 4 Tugas Kelas 6 SD
