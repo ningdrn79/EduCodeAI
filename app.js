@@ -1890,6 +1890,15 @@ function switchTab(tabId) {
   playSound('click');
   window.speechSynthesis && window.speechSynthesis.cancel();
 
+  // Simpan draft Lab MS Word sebelum berpindah tab agar editan siswa tidak pernah hilang
+  if (state.currentTab === 'msword' || (typeof wordElements !== 'undefined' && wordElements && wordElements.length > 0)) {
+    try {
+      if (typeof simpanWordDraftSiswa === 'function') {
+        simpanWordDraftSiswa();
+      }
+    } catch (eWordSave) {}
+  }
+
   // Jika guru sedang login dan memanggil beranda, otomatis arahkan ke Dasbor Guru
   if (tabId === 'beranda' && (state.isGuruLoggedIn || (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()))) {
     tabId = 'guru';
@@ -2049,7 +2058,7 @@ function switchTab(tabId) {
     const b = document.getElementById('nav-p6-kuis');
     if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
 
-    // Khusus Siswa Kelas 6: Tampilkan Webview Kuis6 (kuis6.netlify.app)
+    // Kuis Interaktif EduCode AI (Kelas 4, 5, dan Kelas 6 terintegrasi lokal)
     try {
       const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
       const isK6Kuis = (activeStd && (String(activeStd.kelas || '').includes('6') || String(activeStd.kelas || '').toUpperCase().includes('VI'))) || 
@@ -2059,40 +2068,38 @@ function switchTab(tabId) {
       const k4QuizBox = document.getElementById('quiz-box');
       const k4LockedBox = document.getElementById('quiz-locked-box');
       const k4CertBox = document.getElementById('certificate-box');
+      const k4Checklist = document.getElementById('certificate-locked-checklist');
+
+      if (k6Container) {
+        k6Container.classList.add('hidden');
+        k6Container.style.setProperty('display', 'none', 'important');
+      }
+      if (k4CertBox) {
+        k4CertBox.classList.add('hidden');
+        k4CertBox.style.setProperty('display', 'none', 'important');
+      }
+      if (k4Checklist) {
+        k4Checklist.classList.add('hidden');
+        k4Checklist.style.setProperty('display', 'none', 'important');
+      }
+      if (k4QuizBox) {
+        k4QuizBox.classList.remove('hidden');
+        k4QuizBox.style.removeProperty('display');
+      }
+
       if (isK6Kuis) {
         setHeaderNavMode('kelas6');
-        if (k6Container) {
-          k6Container.classList.remove('hidden');
-          k6Container.style.removeProperty('display');
-          k6Container.style.setProperty('display', 'block', 'important');
-        }
-        if (k4QuizBox) k4QuizBox.classList.add('hidden');
-        if (k4LockedBox) k4LockedBox.classList.add('hidden');
-        if (k4CertBox) k4CertBox.classList.add('hidden');
         if (typeof window.muatStatusMisiK6 === 'function') {
           setTimeout(function() { window.muatStatusMisiK6('kuis'); }, 30);
         }
-      } else {
-        if (k6Container) {
-          k6Container.classList.add('hidden');
-          k6Container.style.setProperty('display', 'none', 'important');
-        }
-        if (k4CertBox) {
-          k4CertBox.classList.add('hidden');
-          k4CertBox.style.setProperty('display', 'none', 'important');
-        }
-        const k4Checklist = document.getElementById('certificate-locked-checklist');
-        if (k4Checklist) {
-          k4Checklist.classList.add('hidden');
-          k4Checklist.style.setProperty('display', 'none', 'important');
-        }
-        if (k4QuizBox) {
-          k4QuizBox.classList.remove('hidden');
-          k4QuizBox.style.removeProperty('display');
-        }
-        // Reset & render kisi-kisi kuis minggu ini untuk Kelas 4
-        if (typeof pilihSubTabKuis === 'function') pilihSubTabKuis('pg');
-        if (typeof sinkronkanSkorKuisHeader === 'function') sinkronkanSkorKuisHeader();
+      }
+
+      // Muat soal sesuai bank soal aktif (Kelas 6 memuat DEFAULT_BANK_SOAL_K6)
+      if (typeof loadQuizQuestion === 'function') {
+        loadQuizQuestion();
+      }
+      if (typeof sinkronkanSkorKuisHeader === 'function') {
+        sinkronkanSkorKuisHeader();
       }
     } catch(eKuis6) {
       console.error('Error in switchTab kuis:', eKuis6);
@@ -10165,10 +10172,16 @@ function checkQuizAccessForActiveStudent() {
     };
   }
 
+  // Khusus Siswa Kelas 6: Langsung izinkan akses ke kuis internal komputasi & Scratch
+  const isKelas6 = profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI'));
+  if (isKelas6) {
+    return { allowed: true, mode: mode, studentName: profile.nama };
+  }
+
   // Cek apakah siswa sudah menyelesaikan latihan soal Tabungan di Lab Excel
   let isTabunganExcelDone = false;
   try {
-    isTabunganExcelDone = (localStorage.getItem('educode_excel_tabungan_done') === 'true');
+    isTabunganExcelDone = profile.nis ? (localStorage.getItem(`educode_excel_tabungan_done_${profile.nis}`) === 'true') : false;
   } catch(e) {}
 
   const isCompleted = isStudentTaskCompleted(profile, sem) || isTabunganExcelDone;
@@ -10436,7 +10449,11 @@ function loadQuizQuestion() {
 
   const subtitleEl = document.getElementById('quiz-header-subtitle');
   if (subtitleEl) {
-    if (state.currentSemester === 2) {
+    const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    const isK6Std = (activeStd && (String(activeStd.kelas || '').includes('6') || String(activeStd.kelas || '').toUpperCase().includes('VI'))) || (state.headerNavMode === 'kelas6');
+    if (isK6Std) {
+      subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis Computational Thinking & Algoritma Scratch untuk Siswa Kelas 6 SD!`;
+    } else if (state.currentSemester === 2) {
       subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis materi Semester 2 (Coding Scratch & RoboMind AI) untuk mendapatkan Sertifikat Digital!`;
     } else {
       subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis materi Semester 1 (Konten Digital & MS Word) untuk mendapatkan Sertifikat Digital!`;
@@ -11858,7 +11875,13 @@ function sinkronkanSkorKuisHeader() {
     const student = (profile && db.find(s => (sNis && s.nis && String(s.nis).trim() === sNis) || (s.id && profile.id && s.id === profile.id))) || profile || {};
 
     let currentScore = 0;
-    if (state.currentSemester === 2) {
+    const isK6Std = (student && (String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI'))) ||
+                    (profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI')));
+    if (isK6Std) {
+      currentScore = (student && student.nilaiKuis6 && Number(student.nilaiKuis6) > 0) 
+        ? Number(student.nilaiKuis6) 
+        : ((student && student.kuisSem1 && Number(student.kuisSem1) > 0) ? Number(student.kuisSem1) : (state.quizScore || 0));
+    } else if (state.currentSemester === 2) {
       currentScore = (student && student.kuisSem2 && Number(student.kuisSem2) > 0) ? Number(student.kuisSem2) : (state.quizScore || 0);
     } else {
       currentScore = (student && student.kuisSem1 && Number(student.kuisSem1) > 0) ? Number(student.kuisSem1) : (state.quizScore || 0);
@@ -11916,6 +11939,16 @@ function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore, isFinishingQuiz = fa
   // Catat kuis ke database HANYA jika siswa baru saja menyelesaikan kuis secara nyata
   if (isFinishingQuiz && finalScore > 0 && typeof catatHasilKuisSiswa === 'function') {
     catatHasilKuisSiswa(state.currentSemester || 1, finalScore);
+  }
+
+  // Khusus Siswa Kelas 6: Alihkan ke sertifikat kelulusan portofolio Kelas 6 (4 Menu Tugas)
+  const isKelas6 = (profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI'))) ||
+                   (student && (String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI')));
+  if (isKelas6) {
+    if (typeof bukaModalSertifikatKelas6DariSiswa === 'function') {
+      bukaModalSertifikatKelas6DariSiswa();
+    }
+    return;
   }
 
   const check = periksaKelengkapan5TugasKkaSem1(profile);
@@ -12670,6 +12703,7 @@ function terapkanDokumenWord(doc) {
   const titleDisplay = document.getElementById('word-doc-title-display');
   if (titleDisplay) titleDisplay.innerText = `${title}.docx - Microsoft Word`;
 
+  simpanWordDraftSiswa();
   renderWordElements();
 }
 
@@ -12975,6 +13009,7 @@ function setWordPageBg(color) {
   wordPageBgColor = color;
   const paper = document.getElementById('word-paper');
   if (paper) paper.style.backgroundColor = color;
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch(e) {}
   showToast('Warna kertas Word diubah! 📄');
 }
 
@@ -12990,6 +13025,7 @@ function setWordPageBorder(style) {
   } else if (style === 'dashed') {
     borderEl.className = 'absolute inset-4 pointer-events-none transition-all duration-200 border-4 border-dashed border-emerald-500 rounded-xl';
   }
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch(e) {}
 }
 
 // Sisipkan Teks / Judul WordArt ke Word
@@ -13239,6 +13275,15 @@ function renderWordElements() {
     emptyHint.style.display = (wordElements.length === 0) ? 'flex' : 'none';
   }
 
+  // Auto-save draft aktif setiap kali elemen dirender agar perubahan selalu tersimpan
+  if (wordElements && wordElements.length > 0) {
+    try {
+      if (typeof simpanWordDraftSiswa === 'function') {
+        simpanWordDraftSiswa();
+      }
+    } catch (eAutoDraft) {}
+  }
+
   wordElements.forEach(item => {
     const el = document.createElement('div');
     el.id = item.id;
@@ -13307,11 +13352,12 @@ function renderWordElements() {
       }
 
       const textAlign = item.textAlign || 'left';
+      const cleanText = String(item.text || '').replace(/•/g, '•');
 
       el.innerHTML = `
         <div class="px-2.5 py-1 rounded-lg ${isBanner ? 'bg-emerald-600 font-black shadow-md border-2 border-white' : ''}" style="background-color: ${isBanner ? '#059669' : highlight}; text-align: ${textAlign};">
           <span class="block select-none tracking-wide" style="font-family: ${fontFamily}; font-size: ${effectiveSizePx}px; font-weight: ${isBold ? '800' : '400'}; font-style: ${isItalic ? 'italic' : 'normal'}; text-decoration: ${textDecoration}; color: ${color}; vertical-align: ${vertAlign}; text-shadow: ${textShadow}; ${strokeStyle} text-align: ${textAlign};" ondblclick="editWordTextElement('${item.id}')">
-            ${escapeXml(item.text)}
+            ${escapeXml(cleanText)}
           </span>
         </div>
         <!-- Handle Putar (Rotate) Khas MS Word -->
@@ -13471,6 +13517,7 @@ function endDragWord() {
   document.removeEventListener('mouseup', endDragWord);
   document.removeEventListener('touchmove', onDragWordMove);
   document.removeEventListener('touchend', endDragWord);
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
 }
 
 // ==========================================
@@ -13673,6 +13720,7 @@ function endRotateWord() {
     document.removeEventListener('mouseup', endRotateWord);
     document.removeEventListener('touchmove', onRotateWordMove);
     document.removeEventListener('touchend', endRotateWord);
+    try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
     showToast(`Gambar diputar ke ${wordElements.find(el => el.id === activeWordElementId)?.rotation || 0}° 🔄`);
   }
 }
@@ -14114,7 +14162,7 @@ function loadPresetPosterLingkungan(preset) {
       { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Bangun Pagi • 2. Beribadah • 3. Berolahraga • 4. Makan Bergizi', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 20, y: 330, zIndex: 3 },
       { id: 'w6', type: 'teks', subtype: 'slogan', text: '5. Gemar Belajar • 6. Bermasyarakat • 7. Tidur Cepat', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 60, y: 380, zIndex: 3 },
       { id: 'w7', type: 'teks', subtype: 'slogan', text: 'Dari Pembiasaan Menjadi Kebiasaan, Terbentuk Kepribadian & Peradaban!', color: '#b45309', fontSizePx: 12, isItalic: true, x: 15, y: 460, zIndex: 3 },
-      { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Pelajar Pancasila - Siswa Kelas 4 SD Hebat', color: '#475569', fontSizePx: 12, x: 100, y: 560, zIndex: 4 }
+      { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Pelajar Pancasila • Siswa Kelas 4 SD Hebat', color: '#475569', fontSizePx: 12, x: 100, y: 520, zIndex: 4 }
     ];
   } else if (preset === 'asta_cita') {
     setWordPageBg('#eff6ff');
@@ -14158,6 +14206,7 @@ function loadPresetPosterLingkungan(preset) {
   }
 
   activeWordElementId = null;
+  simpanWordDraftSiswa();
   renderWordElements();
   showToast(`Inspirasi template "${preset.toUpperCase()}" siap di lembar kerja! Silakan edit & kembangkan sebelum dinilai.`, 'info');
 }
@@ -14252,18 +14301,19 @@ async function generatePosterDataUrl(customDocData = null) {
           eCtx.translate(-(rx + 60), -(ry + 15));
         }
 
+        const cleanText = String(item.text || '').replace(/•/g, '•');
         if (isBanner) {
           eCtx.fillStyle = '#059669';
           eCtx.fillRect(rx - 10, ry - 22, width * 0.8, 44);
           eCtx.fillStyle = '#ffffff';
           eCtx.font = 'bold 22px Fredoka, sans-serif';
           eCtx.textAlign = 'left';
-          eCtx.fillText(item.text || '', rx + 10, ry + 6);
+          eCtx.fillText(cleanText, rx + 10, ry + 6);
         } else {
           eCtx.fillStyle = item.color || '#000000';
           eCtx.font = isJudul ? '900 28px Fredoka, sans-serif' : 'bold 18px Nunito, sans-serif';
           eCtx.textAlign = 'left';
-          eCtx.fillText(item.text || '', rx, ry + 24);
+          eCtx.fillText(cleanText, rx, ry + 24);
         }
       } else if (item.type === 'gambar') {
         const imgData = WORD_IMAGES[item.key] || {};
@@ -14366,7 +14416,7 @@ function getPosterPresetElements(key = 'lingkungan') {
       { id: 'w5', type: 'teks', subtype: 'slogan', text: '1. Bangun Pagi • 2. Beribadah • 3. Berolahraga • 4. Makan Bergizi', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 20, y: 330, zIndex: 3 },
       { id: 'w6', type: 'teks', subtype: 'slogan', text: '5. Gemar Belajar • 6. Bermasyarakat • 7. Tidur Cepat', color: '#1e3a8a', fontSizePx: 14, isBold: true, x: 60, y: 380, zIndex: 3 },
       { id: 'w7', type: 'teks', subtype: 'slogan', text: 'Dari Pembiasaan Menjadi Kebiasaan, Terbentuk Kepribadian & Peradaban!', color: '#b45309', fontSizePx: 12, isItalic: true, x: 15, y: 460, zIndex: 3 },
-      { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Siswa Kelas 4 SD • SDS Cinta Kasih Tzu Chi', color: '#475569', fontSizePx: 12, x: 100, y: 560, zIndex: 4 }
+      { id: 'w8', type: 'teks', subtype: 'pembuat', text: 'Karya Pelajar Pancasila • Siswa Kelas 4 SD Hebat', color: '#475569', fontSizePx: 12, x: 100, y: 520, zIndex: 4 }
     ];
   }
   return [
@@ -14583,11 +14633,12 @@ function renderGaleriPosterWord() {
         const color = item.color || (isBanner ? '#ffffff' : '#0f172a');
         const textDec = isUnderline ? 'underline' : 'none';
 
+        const cleanText = String(item.text || '').replace(/•/g, '•');
         if (isBanner) {
           return `
             <div style="position: absolute; left: ${leftPct}%; top: ${topPct}%; ${rotStyle} z-index: ${item.zIndex || 1};" class="pointer-events-none select-none">
               <div class="px-2 py-0.5 rounded bg-emerald-600 text-white font-black shadow-xs whitespace-nowrap" style="font-family: ${fontFamily}; font-size: ${fontSizeCqw}cqw;">
-                ${escapeXml(item.text)}
+                ${escapeXml(cleanText)}
               </div>
             </div>
           `;
@@ -14596,7 +14647,7 @@ function renderGaleriPosterWord() {
         return `
           <div style="position: absolute; left: ${leftPct}%; top: ${topPct}%; ${rotStyle} z-index: ${item.zIndex || 1}; max-width: 95%;" class="pointer-events-none select-none">
             <span style="font-family: ${fontFamily}; font-size: ${fontSizeCqw}cqw; font-weight: ${isBold ? '800' : '500'}; font-style: ${isItalic ? 'italic' : 'normal'}; text-decoration: ${textDec}; color: ${color};" class="block leading-tight drop-shadow-2xs">
-              ${escapeXml(item.text)}
+              ${escapeXml(cleanText)}
             </span>
           </div>
         `;
@@ -25689,18 +25740,44 @@ async function loginDenganNis() {
 
     // Auto-recovery jika siswa sudah mengerjakan latihan Excel di perangkat ini
     try {
-      const isTabunganDone = (localStorage.getItem('educode_excel_tabungan_done') === 'true');
-      const isTaskDone = (localStorage.getItem(`educode_task_done_${student.nis}_sem1`) === 'true') || (localStorage.getItem(`educode_excel_tabungan_done_${student.nis}`) === 'true');
-      if (isTabunganDone || isTaskDone) {
-        profile.nilaiExcel = 100;
-        profile.excelTabel = 1;
-        const db = getStudentDatabase();
-        const stdInDb = db.find(s => String(s.nis).trim() === String(student.nis).trim() || s.id === student.id);
-        if (stdInDb) {
-          stdInDb.nilaiExcel = 100;
-          stdInDb.excelTabel = Math.max(stdInDb.excelTabel || 0, 1);
-          stdInDb.statusKkm = 'Tuntas';
-          saveStudentDatabase(db);
+      const isTaskDone = (student.nis && localStorage.getItem(`educode_excel_tabungan_done_${student.nis}`) === 'true') || 
+                         (student.nis && localStorage.getItem(`educode_task_done_${student.nis}_sem1`) === 'true');
+      if (isTaskDone) {
+        // Verifikasi apakah siswa benar-benar menyelesaikan sel F7 pada draft aktif
+        const activeCellsKey = student.nis ? `educode_excel_active_cells_${student.nis}` : null;
+        let isF7Answered = true;
+        if (activeCellsKey) {
+          try {
+            const savedCells = localStorage.getItem(activeCellsKey);
+            if (savedCells && savedCells.includes('"cells"')) {
+              const parsed = JSON.parse(savedCells);
+              if (parsed && parsed.cells && (parsed.activeTemplate === 'tabungan' || !parsed.activeTemplate)) {
+                const f7Val = String(parsed.cells['F7'] || '').trim().replace(/\s+/g, '').toUpperCase();
+                if (!f7Val || (f7Val !== '48000' && f7Val !== '=SUM(F2:F6)' && f7Val !== '=D7-E7')) {
+                  isF7Answered = false;
+                }
+              }
+            }
+          } catch (eF7) {}
+        }
+        if (isF7Answered) {
+          profile.nilaiExcel = 100;
+          profile.excelTabel = 1;
+          const db = getStudentDatabase();
+          const stdInDb = db.find(s => String(s.nis).trim() === String(student.nis).trim() || s.id === student.id);
+          if (stdInDb) {
+            stdInDb.nilaiExcel = 100;
+            stdInDb.excelTabel = Math.max(stdInDb.excelTabel || 0, 1);
+            stdInDb.statusKkm = 'Tuntas';
+            saveStudentDatabase(db);
+          }
+        } else {
+          profile.nilaiExcel = 0;
+          profile.excelTabel = 0;
+          if (student.nis) {
+            localStorage.removeItem(`educode_excel_tabungan_done_${student.nis}`);
+            localStorage.removeItem(`educode_task_done_${student.nis}_sem1`);
+          }
         }
       }
     } catch(eRec) {}
@@ -26080,6 +26157,16 @@ function simpanWordDraftSiswa() {
 window.simpanWordDraftSiswa = simpanWordDraftSiswa;
 
 function muatWordDraftSiswa() {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+
+  // 1. Jika di memori sudah ada elemen dan milik sesi saat ini: PERTAHANKAN!
+  if (wordElements && wordElements.length > 0) {
+    simpanWordDraftSiswa();
+    renderWordElements();
+    return;
+  }
+
+  // 2. Cek draft aktif siswa di localStorage
   try {
     const key = getActiveStudentStorageKey('educode_word_active_draft');
     const raw = localStorage.getItem(key);
@@ -26090,6 +26177,8 @@ function muatWordDraftSiswa() {
         currentWordDocTitle = draft.title || 'Poster_7_Kebiasaan';
         wordPageBgColor = draft.pageBgColor || '#ffffff';
         wordPageBorderStyle = draft.pageBorderStyle || 'solid';
+        setWordPageBg(wordPageBgColor);
+        setWordPageBorder(wordPageBorderStyle);
         const docNameInput = document.getElementById('word-doc-name-input');
         if (docNameInput) docNameInput.value = currentWordDocTitle;
         const titleDisplay = document.getElementById('word-doc-title-display');
@@ -26100,7 +26189,35 @@ function muatWordDraftSiswa() {
     }
   } catch (e) {}
 
-  // Jika siswa belum punya draft tersimpan, mulai lembar poster baru dalam keadaan KOSONG (kertas putih polos mandiri)
+  // 3. Jika draft kosong tapi siswa SUDAH punya poster tersimpan di Hasil Poster (Galeri):
+  // Muat poster terakhir siswa secara otomatis agar lembar kerja tidak hilang!
+  try {
+    const galleryKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
+    const galRaw = localStorage.getItem(galleryKey);
+    if (galRaw) {
+      const posters = JSON.parse(galRaw);
+      if (Array.isArray(posters) && posters.length > 0) {
+        const latest = posters[0];
+        if (latest && latest.docData && Array.isArray(latest.docData.elements) && latest.docData.elements.length > 0) {
+          wordElements = JSON.parse(JSON.stringify(latest.docData.elements));
+          currentWordDocTitle = latest.title || latest.docData.title || 'Poster_7_Kebiasaan';
+          wordPageBgColor = latest.docData.pageBgColor || '#ffffff';
+          wordPageBorderStyle = latest.docData.pageBorderStyle || 'solid';
+          setWordPageBg(wordPageBgColor);
+          setWordPageBorder(wordPageBorderStyle);
+          const docNameInput = document.getElementById('word-doc-name-input');
+          if (docNameInput) docNameInput.value = currentWordDocTitle;
+          const titleDisplay = document.getElementById('word-doc-title-display');
+          if (titleDisplay) titleDisplay.innerText = `${currentWordDocTitle}.docx - Word`;
+          simpanWordDraftSiswa();
+          renderWordElements();
+          return;
+        }
+      }
+    }
+  } catch (eGal) {}
+
+  // 4. Hanya jika siswa benar-benar baru dan belum pernah membuat apapun: mulai kanvas kosong mandiri
   wordElements = [];
   wordPageBgColor = '#ffffff';
   wordPageBorderStyle = 'solid';
@@ -26108,7 +26225,6 @@ function muatWordDraftSiswa() {
   setWordPageBorder('solid');
   activeWordElementId = null;
 
-  const profile = getActiveStudentProfile();
   const formatBaku = profile ? `${profile.kelas || '4A'}_${(profile.nama || 'Siswa').split(' ')[0]}_Poster 7 Kebiasaan` : 'Poster_7_Kebiasaan';
   currentWordDocTitle = formatBaku;
   const docNameInput = document.getElementById('word-doc-name-input');
@@ -26638,6 +26754,26 @@ function catatHasilKuisSiswa(semNumber, score) {
       profile.kuisSem2 = student.kuisSem2;
     }
 
+    // Khusus Siswa Kelas 6: Catat nilai ke nilaiKuis6 dan sinkronkan portofolio Misi 4
+    const isKelas6 = (student && (String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI'))) ||
+                     (profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI')));
+    if (isKelas6) {
+      student.nilaiKuis6 = Math.max(Number(student.nilaiKuis6) || 0, finalScore);
+      profile.nilaiKuis6 = student.nilaiKuis6;
+      try {
+        if (typeof dapatkanPortofolioKelas6Siswa === 'function' && typeof simpanPortofolioKelas6Siswa === 'function') {
+          const k6 = dapatkanPortofolioKelas6Siswa(student);
+          if (!k6.kuis6) k6.kuis6 = {};
+          k6.kuis6.selesai = true;
+          k6.kuis6.skor = Math.max(Number(k6.kuis6.skor) || 0, finalScore);
+          k6.kuis6.tgl = new Date().toLocaleString('id-ID');
+          simpanPortofolioKelas6Siswa(student, k6);
+        }
+        if (typeof perbaruiStatusMisiKelas6Siswa === 'function') perbaruiStatusMisiKelas6Siswa();
+        if (typeof muatStatusMisiK6 === 'function') muatStatusMisiK6('kuis');
+      } catch (eK6Port) {}
+    }
+
     const k1 = Number(student.kuisSem1) || 0;
     const k2 = Number(student.kuisSem2) || 0;
     const count = (k1 > 0 ? 1 : 0) + (k2 > 0 ? 1 : 0) || 1;
@@ -26810,6 +26946,23 @@ function hitungRubrikOtomatisExcel() {
   const cells = (typeof excelState !== 'undefined' && excelState.cells) ? excelState.cells : {};
   const rowCount = (typeof excelState !== 'undefined' && excelState.rowCount) ? excelState.rowCount : 7;
   const formats = (typeof excelState !== 'undefined' && excelState.formats) || tpl.formats || {};
+
+  // Khusus template tabungan: jika sel F7 masih kosong atau belum dihitung, jangan beri nilai tuntas!
+  if (typeof excelState !== 'undefined' && excelState.activeTemplate === 'tabungan') {
+    const valF7 = cells['F7'] || '';
+    const hasilF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(valF7) : '';
+    const isF7Valid = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
+    if (!isF7Valid) {
+      return {
+        totalSkor: 0,
+        aspek1: 0,
+        aspek2: 0,
+        aspek3: 0,
+        aspek4: 0,
+        grade: 'Sel F7 Belum Dihitung (0/100)'
+      };
+    }
+  }
 
   // Aspek 1: Struktur Kolom & Header Tabel (Maks 25 Poin)
   let aspek1 = 16;
@@ -27245,6 +27398,11 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
         localStorage.setItem(`educode_poster_done_${sNis}`, 'true');
         localStorage.setItem(`educode_task_done_${sNis}_sem1`, 'true');
       }
+
+      // Pastikan draft aktif Lab MS Word selalu tersinkronkan agar saat kembali tidak hilang
+      if (typeof simpanWordDraftSiswa === 'function') {
+        simpanWordDraftSiswa();
+      }
     } catch (eSave) {}
 
     // Perbarui ke database siswa guru
@@ -27382,7 +27540,11 @@ function simpanDanNilaiExcel() {
   if (typeof excelState !== 'undefined' && excelState.activeTemplate === 'tabungan') {
     if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
       const isDone = cekJawabanTabunganDanBukaKuis(false);
-      if (isDone) return;
+      if (!isDone) {
+        // Hentikan proses! Jangan beri nilai atau catat latihan jika sel F7 belum benar!
+        return;
+      }
+      return;
     }
   }
   const tpl = (typeof excelState !== 'undefined' && EXCEL_TEMPLATES && EXCEL_TEMPLATES[excelState.activeTemplate]) || {};
@@ -28066,21 +28228,21 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-2 text-center">
           <span class="inline-block px-2.5 py-1 rounded-xl font-title font-black ${szTag} bg-orange-100 text-orange-950 border border-orange-300 shadow-2xs">${s.kelas || '6A'}</span>
         </td>
-        <!-- 1. Scratch 4 Pilar -->
+        <!-- 1. Game Detektif Sampah (4 Pilar) -->
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', '4pilar')" title="Periksa Tugas 1: Proyek Scratch 4 Pilar">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', '4pilar')" title="Periksa Tugas 1: Game Detektif Sampah (4 Pilar CT)">
             <span class="font-title font-black ${szAngka} text-sky-700 group-hover:scale-110 transition">${evalK6.nilaiScratch4Pilar}</span>
             <span class="font-title font-bold ${szSub} ${evalK6.hasScratch4Pilar ? 'text-sky-900 bg-sky-50 border-sky-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-sky-100 transition">
-              ${evalK6.hasScratch4Pilar ? '🐱 Ada Proyek' : 'Belum Kumpul'}
+              ${evalK6.hasScratch4Pilar ? '🎮 Ada Game' : 'Belum Kumpul'}
             </span>
           </div>
         </td>
-        <!-- 2. Scratch Algoritma -->
+        <!-- 2. Kerja Kelompok Pelestarian Lingkungan (Algoritma) -->
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'algoritma')" title="Periksa Tugas 2: Proyek Scratch Algoritma">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'algoritma')" title="Periksa Tugas 2: Kerja Kelompok Pelestarian Lingkungan (Algoritma)">
             <span class="font-title font-black ${szAngka} text-orange-700 group-hover:scale-110 transition">${evalK6.nilaiScratchAlgoritma}</span>
             <span class="font-title font-bold ${szSub} ${evalK6.hasScratchAlgoritma ? 'text-orange-900 bg-orange-50 border-orange-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-orange-100 transition">
-              ${evalK6.hasScratchAlgoritma ? '🚀 Ada Proyek' : 'Belum Kumpul'}
+              ${evalK6.hasScratchAlgoritma ? '🌿 Ada Proyek' : 'Belum Kumpul'}
             </span>
           </div>
         </td>
@@ -28093,9 +28255,9 @@ function renderTabelGradebook(students, totalAll) {
             </span>
           </div>
         </td>
-        <!-- 4. Kuis (kuis6.netlify.app) -->
+        <!-- 4. Kuis Komputasi & AI (EduCode AI) -->
         <td class="${padRow} px-2 text-center">
-          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'kuis')" title="Periksa Tugas 4: Kuis Komputasi Kuis6">
+          <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'kuis')" title="Periksa Tugas 4: Kuis Komputasi EduCode AI">
             <span class="font-title font-black ${szAngka} text-amber-600 group-hover:scale-110 transition">${evalK6.nilaiKuis6}</span>
             <span class="font-title font-bold ${szSub} ${evalK6.hasKuis6 ? 'text-amber-900 bg-amber-50 border-amber-200' : 'text-slate-500 bg-slate-100 border-slate-200'} mt-1 px-2 py-0.5 rounded-lg border shadow-2xs group-hover:bg-amber-100 transition">
               ${evalK6.hasKuis6 ? '🏆 Tuntas' : 'Belum'}
@@ -30098,10 +30260,17 @@ function dapatkanDriveSiswa(student) {
 window.dapatkanDriveSiswa = dapatkanDriveSiswa;
 
 /**
- * Helper: Ambil Status & Nilai Praktik Excel Siswa (Dengan Auto-Recovery Penuh)
+ * Helper: Ambil Status & Nilai Praktik Excel Siswa (Dengan Validasi Ketat & Auto-Recovery Penuh)
  */
 function dapatkanStatusDanNilaiExcelSiswa(student) {
   if (!student) return { nilaiExcel: 0, excelTabel: 0 };
+
+  // Bersihkan key kontaminasi global lama
+  try {
+    if (localStorage.getItem('educode_excel_tabungan_done') !== null) {
+      localStorage.removeItem('educode_excel_tabungan_done');
+    }
+  } catch (e) {}
 
   let nilaiExcel = (student.nilaiExcel !== undefined && student.nilaiExcel !== null && Number(student.nilaiExcel) > 0) ? Number(student.nilaiExcel) : 0;
   let excelTabel = (student.excelTabel !== undefined && student.excelTabel !== null && Number(student.excelTabel) > 0) ? Number(student.excelTabel) : 0;
@@ -30120,16 +30289,64 @@ function dapatkanStatusDanNilaiExcelSiswa(student) {
     (activeStudent.nama && student.nama && activeStudent.nama.toLowerCase().trim() === student.nama.toLowerCase().trim())
   );
 
+  // 3. Validasi Ketat: Jika sedang aktif membuka template tabungan di editor saat ini,
+  // sel F7 WAJIB terisi benar (=SUM(F2:F6), =D7-E7, atau 48000).
+  // Jika sel F7 masih kosong/salah, MAKA DIJAMIN BELUM TUNTAS (skor 0)!
+  let isF7CurrentlyInvalid = false;
+  if (isCurrentlyActive && typeof excelState !== 'undefined' && excelState.cells) {
+    const activeTpl = excelState.activeTemplate || 'tabungan';
+    if (activeTpl === 'tabungan') {
+      const liveF7 = excelState.cells['F7'] || '';
+      const evalLive = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(liveF7) : '';
+      const isLiveF7Valid = (Number(evalLive) === 48000) || 
+        (String(liveF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || 
+        (String(liveF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
+      if (!isLiveF7Valid) {
+        isF7CurrentlyInvalid = true;
+      }
+    }
+  }
+
+  // Cek juga draft sel tersimpan di localStorage khusus untuk siswa ini
+  const activeCellsKey = student.nis ? `educode_excel_active_cells_${student.nis}` : (student.id ? `educode_excel_active_cells_${student.id}` : null);
+  if (activeCellsKey) {
+    try {
+      const savedCells = localStorage.getItem(activeCellsKey);
+      if (savedCells && savedCells.includes('"cells"')) {
+        const parsed = JSON.parse(savedCells);
+        if (parsed && parsed.cells && (parsed.activeTemplate === 'tabungan' || !parsed.activeTemplate)) {
+          const f7Draft = String(parsed.cells['F7'] || '').trim().replace(/\s+/g, '').toUpperCase();
+          const evalDraft = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(f7Draft) : '';
+          const isDraftValid = (Number(evalDraft) === 48000) || f7Draft === '48000' || f7Draft === '=SUM(F2:F6)' || f7Draft === '=D7-E7';
+          if (!isDraftValid && isCurrentlyActive) {
+            isF7CurrentlyInvalid = true;
+          }
+        }
+      }
+    } catch (eDraft) {}
+  }
+
+  // Jika terbukti sel F7 masih kosong/salah di lembar kerja aktif:
+  if (isF7CurrentlyInvalid) {
+    nilaiExcel = 0;
+    excelTabel = 0;
+    student.nilaiExcel = 0;
+    student.excelTabel = 0;
+    if (student.nis) {
+      try {
+        localStorage.removeItem(`educode_excel_tabungan_done_${student.nis}`);
+        localStorage.removeItem(`educode_task_done_${student.nis}_sem1`);
+      } catch(e) {}
+    }
+    return { nilaiExcel: 0, excelTabel: 0 };
+  }
+
+  // 4. Cek flag pengerjaan resmi spesifik siswa
   const keysToCheck = [
-    student.nis ? `educode_task_done_${student.nis}_sem1` : null,
-    student.id ? `educode_task_done_${student.id}_sem1` : null,
-    student.nama ? `educode_task_done_${student.nama}_sem1` : null,
     student.nis ? `educode_excel_tabungan_done_${student.nis}` : null,
     student.id ? `educode_excel_tabungan_done_${student.id}` : null,
-    student.nis ? `educode_excel_active_cells_${student.nis}` : null,
-    student.id ? `educode_excel_active_cells_${student.id}` : null,
-    isCurrentlyActive ? 'educode_excel_tabungan_done' : null,
-    isCurrentlyActive ? 'educode_excel_active_cells_guest' : null
+    student.nis ? `educode_task_done_${student.nis}_sem1` : null,
+    student.id ? `educode_task_done_${student.id}_sem1` : null
   ].filter(Boolean);
 
   let hasDoneExcel = false;
@@ -30140,40 +30357,24 @@ function dapatkanStatusDanNilaiExcelSiswa(student) {
         hasDoneExcel = true;
         break;
       }
-      if (val && typeof val === 'string' && val.includes('"cells"')) {
-        const parsed = JSON.parse(val);
-        if (parsed && parsed.cells) {
-          const f7 = String(parsed.cells['F7'] || '').trim().replace(/\s+/g, '').toUpperCase();
-          if (f7 === '48000' || f7 === '=SUM(F2:F6)' || f7 === '=D7-E7') {
-            hasDoneExcel = true;
-            break;
-          }
-        }
-      }
     } catch (e) {}
   }
 
-  // Cek apakah tugas tabungan selesai secara global atau untuk siswa aktif
-  if (!hasDoneExcel) {
-    try {
-      if (localStorage.getItem('educode_excel_tabungan_done') === 'true') {
-        hasDoneExcel = true;
-      }
-    } catch (e) {}
+  if (nilaiExcel >= 70 && excelTabel >= 1) {
+    hasDoneExcel = true;
   }
-
-
 
   if (hasDoneExcel) {
     nilaiExcel = Math.max(nilaiExcel, 100);
     excelTabel = Math.max(excelTabel, 1);
-  } else if (excelTabel > 0 && nilaiExcel === 0) {
-    nilaiExcel = 88;
+  } else {
+    nilaiExcel = 0;
+    excelTabel = 0;
   }
 
-  // Sinkronkan kembali properti pada objek siswa jika ada nilai
-  if (nilaiExcel > 0) student.nilaiExcel = nilaiExcel;
-  if (excelTabel > 0) student.excelTabel = excelTabel;
+  // Sinkronkan kembali properti pada objek siswa
+  student.nilaiExcel = nilaiExcel;
+  student.excelTabel = excelTabel;
 
   return { nilaiExcel, excelTabel };
 }
@@ -33167,6 +33368,11 @@ window.bukaGaleriHasilPosterSiswa = typeof bukaGaleriHasilPosterSiswa === 'funct
 window.pilihKelasGuruNav = typeof pilihKelasGuruNav === 'function' ? pilihKelasGuruNav : function(){};
 window.pulihkanSemuaSiswaDefault = typeof pulihkanSemuaSiswaDefault === 'function' ? pulihkanSemuaSiswaDefault : function(){};
 
+// Bersihkan key kontaminasi global Excel lama secara otomatis
+try {
+  localStorage.removeItem('educode_excel_tabungan_done');
+} catch (eInitClean) {}
+
 // Panggil inisialisasi Database Guru & Pemulihan Sesi saat skrip dieksekusi dan saat DOM siap
 try {
   initTeacherDatabase();
@@ -35459,14 +35665,14 @@ function kirimTugasScratchK6(type) {
   if (is4Pilar) {
     k6.scratch4Pilar = {
       link: link,
-      judul: judul || 'Proyek Scratch 4 Pilar CT',
+      judul: judul || 'Game Scratch: Detektif Sampah (4 Pilar CT)',
       catatan: catatan,
       tgl: now
     };
   } else {
     k6.scratchAlgoritma = {
       link: link,
-      judul: judul || 'Proyek Scratch Algoritma',
+      judul: judul || 'Kerja Kelompok Scratch: Pelestarian Lingkungan',
       catatan: catatan,
       tgl: now
     };
@@ -35477,7 +35683,7 @@ function kirimTugasScratchK6(type) {
   perbaruiStatusMisiKelas6Siswa();
 
   playSound('fanfare');
-  showToast(is4Pilar ? 'Link Tugas Scratch 4 Pilar Berhasil Dikumpulkan! 🚀🐱' : 'Link Tugas Scratch Algoritma Berhasil Dikumpulkan! 🚀📜', 'success');
+  showToast(is4Pilar ? 'Karya Game "Detektif Sampah" Berhasil Dikumpulkan! 🎮✨' : 'Tugas Kelompok "Pelestarian Lingkungan" Berhasil Dikumpulkan! 🌿🚀', 'success');
 }
 window.kirimTugasScratchK6 = kirimTugasScratchK6;
 
@@ -35792,7 +35998,7 @@ function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
         ${evalK6.pilarData.catatan ? `<div class="p-2 bg-white rounded-lg border border-sky-100 text-[11px] text-slate-700 mt-1.5"><span class="font-bold text-sky-900">Refleksi Siswa:</span> "${evalK6.pilarData.catatan}"</div>` : ''}
       `;
     } else {
-      dPilar.innerHTML = '<div class="text-slate-500 italic">Siswa belum mengumpulkan link tugas Scratch 4 Pilar</div>';
+      dPilar.innerHTML = '<div class="text-slate-500 italic">Siswa belum mengumpulkan game Detektif Sampah</div>';
     }
   }
 
@@ -35811,7 +36017,7 @@ function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
     if (evalK6.hasScratchAlgoritma) {
       dAlgo.innerHTML = `
         <div class="font-bold text-slate-800 flex items-center justify-between">
-          <span>${evalK6.algoData.judul || 'Proyek Scratch Algoritma'}</span>
+          <span>${evalK6.algoData.judul || 'Kerja Kelompok: Pelestarian Lingkungan'}</span>
           <span class="text-[10px] text-slate-500">${evalK6.algoData.tgl || ''}</span>
         </div>
         <div class="flex items-center gap-2 pt-1">
@@ -35820,10 +36026,10 @@ function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
           </a>
           <span class="text-[11px] text-slate-500 truncate max-w-[200px] font-mono">${evalK6.algoData.link}</span>
         </div>
-        ${evalK6.algoData.catatan ? `<div class="p-2 bg-white rounded-lg border border-orange-100 text-[11px] text-slate-700 mt-1.5"><span class="font-bold text-orange-900">Refleksi Siswa:</span> "${evalK6.algoData.catatan}"</div>` : ''}
+        ${evalK6.algoData.catatan ? `<div class="p-2 bg-white rounded-lg border border-orange-100 text-[11px] text-slate-700 mt-1.5"><span class="font-bold text-orange-900">Anggota/Logika:</span> "${evalK6.algoData.catatan}"</div>` : ''}
       `;
     } else {
-      dAlgo.innerHTML = '<div class="text-slate-500 italic">Siswa belum mengumpulkan link tugas Scratch Algoritma</div>';
+      dAlgo.innerHTML = '<div class="text-slate-500 italic">Siswa belum mengumpulkan proyek kelompok Pelestarian Lingkungan</div>';
     }
   }
 
@@ -35847,7 +36053,7 @@ function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
   const inAntar = document.getElementById('mon-k6-input-nilai-antarteman');
   if (inAntar) inAntar.value = evalK6.nilaiAntarTeman || (evalK6.hasAntarTeman ? 100 : 0);
 
-  // CARD 4: Kuis Komputasi (Kuis6)
+  // CARD 4: Kuis Komputasi (EduCode AI)
   const bKuis = document.getElementById('mon-k6-badge-kuis');
   if (bKuis) {
     bKuis.className = evalK6.hasKuis6 ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300' : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200';
@@ -35857,8 +36063,8 @@ function bukaModalMonitoringTugasKelas6(studentIdentifier, targetMisi) {
   const dKuis = document.getElementById('mon-k6-detail-kuis');
   if (dKuis) {
     dKuis.innerHTML = evalK6.hasKuis6
-      ? '<div class="text-emerald-700 font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Siswa telah menyelesaikan kuis di kuis6.netlify.app</div>'
-      : '<div class="text-slate-500 italic">Siswa belum menyelesaikan kuis di kuis6.netlify.app</div>';
+      ? '<div class="text-emerald-700 font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> Siswa telah menyelesaikan Kuis Komputasi &amp; Algoritma (EduCode AI)</div>'
+      : '<div class="text-slate-500 italic">Siswa belum menyelesaikan Kuis Komputasi &amp; Algoritma di EduCode AI</div>';
   }
 
   const inKuis = document.getElementById('mon-k6-input-nilai-kuis');
@@ -36148,9 +36354,8 @@ function cekJawabanTabunganDanBukaKuis(silent = false) {
   const isCorrect = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
 
   if (isCorrect) {
-    // Simpan status tuntas
+    // Simpan status tuntas khusus profil siswa yang sedang aktif
     try {
-      localStorage.setItem('educode_excel_tabungan_done', 'true');
       let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
       if (!profile) {
         try {
