@@ -52,7 +52,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=20261116_quiz_fullscreen_v156">
+  <link rel="stylesheet" href="styles.css?v=20261116_fix_nav_k6_v158">
   <style>
     /* Jaminan Anti-Freeze Universal Modal Popup & Non-Blocking Overlay */
     .hidden,
@@ -474,8 +474,11 @@
                 }
               } catch(eStd){}
               if (activeStd && (activeStd.nama || activeStd.nis || activeStd.id)) {
-                var isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1;
-                if (isKelas5 || tabId === 'petualangan5') {
+                var isKelas6 = String(activeStd.kelas || '').indexOf('6') !== -1 || String(activeStd.kelas || '').toUpperCase().indexOf('VI') !== -1;
+                var isKelas5 = String(activeStd.kelas || '').indexOf('5') !== -1 || String(activeStd.kelas || '').toUpperCase().indexOf('V') !== -1;
+                if (isKelas6 || tabId === 'petualangan6' || tabId === 'algoritma' || tabId === 'antarteman') {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas6');
+                } else if (isKelas5 || tabId === 'petualangan5') {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas5');
                 } else {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
@@ -485,7 +488,9 @@
                   sessionStorage.setItem('educode_student_active_tab_v1', tabId);
                 } catch(eSave){}
               } else {
-                if (tabId === 'petualangan5') {
+                if (tabId === 'petualangan6' || tabId === 'algoritma' || tabId === 'antarteman') {
+                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas6');
+                } else if (tabId === 'petualangan5') {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas5');
                 } else if (tabId === 'beranda' || tabId === 'antariksa') {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('utama');
@@ -497,7 +502,7 @@
           }
         } catch (eNav) {}
 
-        var tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5'];
+        var tabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa', 'guru', 'labirin', 'ketik', 'petualangan5', 'petualangan6', 'algoritma', 'antarteman'];
         for (var i = 0; i < tabs.length; i++) {
           var t = tabs[i];
           var sec = document.getElementById('tab-' + t);
@@ -522,6 +527,50 @@
               nav.classList.remove('text-white');
               nav.classList.add('text-slate-300');
             }
+          }
+        }
+
+        // Sinkronkan styling tombol aktif navigasi Kelas 6 SD
+        var allK6Btns = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis'];
+        for (var k = 0; k < allK6Btns.length; k++) {
+          var bK6 = document.getElementById(allK6Btns[k]);
+          if (bK6) {
+            bK6.classList.remove('active-tab', 'text-white');
+            bK6.classList.add('text-slate-300');
+          }
+        }
+        var navK6Map = {
+          'beranda': 'nav-p6-beranda',
+          'modul': 'nav-p6-modul',
+          'petualangan6': 'nav-p6-4pilar',
+          'algoritma': 'nav-p6-algoritma',
+          'antarteman': 'nav-p6-antarteman',
+          'kuis': 'nav-p6-kuis'
+        };
+        if (navK6Map[tabId]) {
+          var activeK6 = document.getElementById(navK6Map[tabId]);
+          if (activeK6) {
+            activeK6.classList.add('active-tab', 'text-white');
+            activeK6.classList.remove('text-slate-300');
+          }
+        }
+
+        // Khusus Kelas 6 di tab Kuis: Munculkan frame Kuis6
+        if (tabId === 'kuis') {
+          var isK6Tab = false;
+          try {
+            var rawK6Std = localStorage.getItem('educode_active_student_v1');
+            if (rawK6Std && rawK6Std !== 'LOGGED_OUT') {
+              var sObj = JSON.parse(rawK6Std);
+              if (sObj && (String(sObj.kelas || '').indexOf('6') !== -1 || String(sObj.kelas || '').toUpperCase().indexOf('VI') !== -1)) isK6Tab = true;
+            }
+          } catch(eK6Check){}
+          var k6BoxEl = document.getElementById('kuis-kelas6-container');
+          var k4BoxEl = document.getElementById('quiz-box');
+          if (isK6Tab) {
+            if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas6');
+            if (k6BoxEl) { k6BoxEl.classList.remove('hidden'); k6BoxEl.style.removeProperty('display'); k6BoxEl.style.setProperty('display', 'block', 'important'); }
+            if (k4BoxEl) { k4BoxEl.classList.add('hidden'); k4BoxEl.style.setProperty('display', 'none', 'important'); }
           }
         }
         // Sinkronkan status kartu sambutan siswa jika tab beranda dibuka
@@ -2546,7 +2595,7 @@
                 <span class="text-purple-300 font-bold">3. Antar Teman</span>
                 <span id="badge-mini-k6-antarteman" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Belum</span>
               </div>
-              <div class="text-[11px] text-slate-300 group-hover:text-white transition">evalscore.netlify.app</div>
+              <div class="text-[11px] text-slate-300 group-hover:text-white transition">ningdrn79.github.io/evalscore</div>
             </div>
 
             <!-- Misi 4: Kuis6 -->
@@ -5256,7 +5305,7 @@
                 <i class="fa-solid fa-heart"></i> Budaya Humanis Tzu Chi • Hu Ai &amp; Zun Zhong
               </span>
               <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
-                <i class="fa-solid fa-globe"></i> evalscore.netlify.app
+                <i class="fa-solid fa-globe"></i> ningdrn79.github.io/evalscore
               </span>
             </div>
 
@@ -5272,7 +5321,7 @@
 
           <!-- Tombol Aksi Header -->
           <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full sm:w-auto shrink-0">
-            <a href="https://evalscore.netlify.app" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-purple-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95" title="Buka website EvalScore di Tab Baru">
+            <a href="https://ningdrn79.github.io/evalscore/" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-purple-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95" title="Buka website EvalScore di Tab Baru">
               <i class="fa-solid fa-arrow-up-right-from-square text-yellow-300"></i> <span>Buka di Tab Baru 🚀</span>
             </a>
             <button type="button" onclick="window.tandaiMisiK6Selesai('antarteman')" id="btn-status-selesai-evalscore" class="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-emerald-300 font-title font-bold text-xs border border-emerald-500/40 transition flex items-center justify-center gap-1.5 cursor-pointer">
@@ -5289,13 +5338,13 @@
             <span class="w-3 h-3 rounded-full bg-rose-500"></span>
             <span class="w-3 h-3 rounded-full bg-amber-500"></span>
             <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-            <span class="font-mono text-purple-300 ml-2">https://evalscore.netlify.app</span>
+            <span class="font-mono text-purple-300 ml-2">https://ningdrn79.github.io/evalscore/</span>
           </div>
-          <a href="https://evalscore.netlify.app" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 flex items-center gap-1 text-xs">
+          <a href="https://ningdrn79.github.io/evalscore/" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 flex items-center gap-1 text-xs">
             <span>Buka Layar Penuh</span> <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
           </a>
         </div>
-        <iframe src="https://evalscore.netlify.app" class="w-full h-[720px] border-none bg-slate-900" allow="fullscreen; clipboard-write; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        <iframe src="https://ningdrn79.github.io/evalscore/" class="w-full h-[720px] border-none bg-slate-900" allow="fullscreen; clipboard-write; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
       </div>
 
     </section>
@@ -21650,8 +21699,8 @@
 
             <div class="space-y-1.5 text-xs">
               <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-slate-600 flex items-center justify-between">
-                <span>Platform: <strong class="text-purple-700">evalscore.netlify.app</strong></span>
-                <a href="https://evalscore.netlify.app" target="_blank" class="text-purple-600 hover:underline font-bold text-[11px]">Buka Platform ↗</a>
+                <span>Platform: <strong class="text-purple-700">ningdrn79.github.io/evalscore</strong></span>
+                <a href="https://ningdrn79.github.io/evalscore/" target="_blank" class="text-purple-600 hover:underline font-bold text-[11px]">Buka Platform ↗</a>
               </div>
               <div class="flex items-center justify-between gap-2 pt-1">
                 <span class="text-slate-500 font-semibold text-[11px]">Nilai Karakter / Kerjasama (0-100):</span>
@@ -21838,7 +21887,7 @@
                 </div>
                 <div>
                   <h5 class="font-title font-bold text-slate-800 text-sm">Penilaian Antar Teman</h5>
-                  <p class="text-[11px] text-slate-500">evalscore.netlify.app • Hu Ai &amp; Zun Zhong</p>
+                  <p class="text-[11px] text-slate-500">ningdrn79.github.io/evalscore • Hu Ai &amp; Zun Zhong</p>
                 </div>
               </div>
               <span id="mon-k6-badge-antarteman" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
@@ -23454,7 +23503,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261116_quiz_fullscreen_v156"></script>
+  <script charset="UTF-8" src="app.js?v=20261116_fix_nav_k6_v158"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

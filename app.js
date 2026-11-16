@@ -1929,8 +1929,8 @@ function switchTab(tabId) {
   } else {
     const student = getActiveStudentProfile();
     if (student) {
-      const isKelas6 = String(student.kelas || '').includes('6');
-      const isKelas5 = String(student.kelas || '').includes('5');
+      const isKelas6 = String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI');
+      const isKelas5 = String(student.kelas || '').includes('5') || String(student.kelas || '').toUpperCase().includes('V');
       if (isKelas6) {
         setHeaderNavMode('kelas6');
       } else if (isKelas5) {
@@ -1939,7 +1939,11 @@ function switchTab(tabId) {
         setHeaderNavMode('sem1');
       }
     } else {
-      if (tabId === 'beranda' || tabId === 'antariksa') {
+      if (state.headerNavMode === 'kelas6' || state.tingkatKelasGuru === '6') {
+        setHeaderNavMode('kelas6');
+      } else if (state.headerNavMode === 'kelas5' || state.tingkatKelasGuru === '5') {
+        setHeaderNavMode('kelas5');
+      } else if (tabId === 'beranda' || tabId === 'antariksa') {
         const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
                       (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
                       (window.__TEACHER_SESSION_ACTIVE__ === true);
@@ -2037,21 +2041,19 @@ function switchTab(tabId) {
   } else if (tabId === 'kuis') {
     const b = document.getElementById('nav-p6-kuis');
     if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
-    
-    // Reset & render kisi-kisi kuis minggu ini untuk Kelas 4
-    if (!isK6Kuis) {
-      if (typeof pilihSubTabKuis === 'function') pilihSubTabKuis('pg');
-    }
 
     // Khusus Siswa Kelas 6: Tampilkan Webview Kuis6 (kuis6.netlify.app)
     try {
       const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-      const isK6Kuis = (activeStd && String(activeStd.kelas || '').includes('6')) || (state.tingkatKelasGuru === '6');
+      const isK6Kuis = (activeStd && (String(activeStd.kelas || '').includes('6') || String(activeStd.kelas || '').toUpperCase().includes('VI'))) || 
+                       (state.tingkatKelasGuru === '6') || 
+                       (state.headerNavMode === 'kelas6');
       const k6Container = document.getElementById('kuis-kelas6-container');
       const k4QuizBox = document.getElementById('quiz-box');
       const k4LockedBox = document.getElementById('quiz-locked-box');
       const k4CertBox = document.getElementById('certificate-box');
       if (isK6Kuis) {
+        setHeaderNavMode('kelas6');
         if (k6Container) {
           k6Container.classList.remove('hidden');
           k6Container.style.removeProperty('display');
@@ -2069,8 +2071,12 @@ function switchTab(tabId) {
           k6Container.style.setProperty('display', 'none', 'important');
         }
         if (k4QuizBox) k4QuizBox.classList.remove('hidden');
+        // Reset & render kisi-kisi kuis minggu ini untuk Kelas 4
+        if (typeof pilihSubTabKuis === 'function') pilihSubTabKuis('pg');
       }
-    } catch(eKuis6) {}
+    } catch(eKuis6) {
+      console.error('Error in switchTab kuis:', eKuis6);
+    }
   }
 
   if (tabId === 'guru') {
@@ -27283,7 +27289,7 @@ function renderTabelGradebook(students, totalAll) {
             </span>
           </div>
         </td>
-        <!-- 3. Antar Teman (evalscore.netlify.app) -->
+        <!-- 3. Antar Teman (ningdrn79.github.io/evalscore) -->
         <td class="${padRow} px-2 text-center">
           <div class="inline-flex flex-col items-center leading-tight cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'antarteman')" title="Periksa Tugas 3: Penilaian Antar Teman EvalScore">
             <span class="font-title font-black ${szAngka} text-purple-700 group-hover:scale-110 transition">${evalK6.nilaiAntarTeman}</span>
