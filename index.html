@@ -10250,14 +10250,18 @@
             <i class="fa-solid fa-crop-simple text-[10px]"></i> Picture Format
           </button>
 
-          <!-- Tombol Simpan & Nilai Poster (AI) di Pojok Kanan Atas -->
-          <div class="ml-auto flex items-center gap-2 pr-1">
-            <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & Dapatkan Nilai Otomatis dari Sistem AI (TP 2.1)">
-              <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i>
-              <span>Simpan &amp; Nilai Poster (AI) 🚀</span>
+          <!-- Tombol Simpan ke Lemari Karya Poster, Kirim Nilai ke Guru & Unduh PNG di Pojok Kanan Atas -->
+          <div class="ml-auto flex items-center gap-1.5 pr-1 shrink-0">
+            <button type="button" onclick="simpanPosterKeGaleriWord()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap" title="Simpan karya poster ke Lemari Karya Poster Siswa (Praktik 4)">
+              <i class="fa-solid fa-box-archive text-amber-200"></i>
+              <span>Simpan ke Lemari Karya Poster 🖼️</span>
             </button>
-            <button onclick="simpanPosterWord()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer" title="Unduh hasil poster sebagai file gambar PNG">
-              <i class="fa-solid fa-download"></i> Unduh PNG
+            <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-500 hover:to-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap" title="Kirim poster ke guru, dinilai otomatis oleh sistem AI (0-100) & disimpan ke Buku Nilai Rapor">
+              <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i>
+              <span>Kirim Nilai ke Guru (AI) 🚀</span>
+            </button>
+            <button type="button" onclick="simpanPosterWord()" class="bg-white/20 hover:bg-white/30 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap" title="Unduh hasil poster sebagai file gambar PNG">
+              <i class="fa-solid fa-download"></i> <span>Unduh PNG</span>
             </button>
           </div>
 
@@ -15811,9 +15815,6 @@
             <button type="button" onclick="kirimNilaiKuisKeGuru()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-title font-black rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer transform hover:scale-105 active:scale-95" title="Kirim Nilai Kuis ini ke Buku Nilai Guru & Google Sheets">
               <i class="fa-solid fa-cloud-arrow-up text-amber-300"></i>
               <span>Kirim Nilai ke Guru 💾</span>
-            </button>
-            <button id="btn-lihat-sertifikat-top" type="button" onclick="tampilkanSertifikatTersimpanSiswa()" class="hidden px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-title font-bold rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer">
-              <i class="fa-solid fa-award text-amber-900"></i> <span>Lihat Sertifikat Kelulusan</span>
             </button>
             <button type="button" onclick="toggleQuizFullscreen()" id="btn-quiz-fullscreen" class="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-title font-bold rounded-2xl text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer" title="Mode Layar Penuh Kuis (F11 / ESC)">
               <i id="icon-quiz-fullscreen" class="fa-solid fa-expand text-amber-300"></i>
@@ -23291,7 +23292,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261117_blank_paper_clean_v183"></script>
+  <script charset="UTF-8" src="app.js?v=20261117_fix_gallery_save_v187"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

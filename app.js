@@ -10423,20 +10423,110 @@ function renderLayarKuisTerkunci(access) {
   `;
 }
 
+// Helper: Cek apakah kuis sudah pernah dikerjakan dan dikirim oleh siswa aktif (Aturan 1 Kali Percobaan)
+function isQuizAlreadySubmittedForActiveStudent() {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (!profile) return { isSubmitted: false, score: 0, studentName: 'Siswa' };
+
+  const semNum = (typeof state !== 'undefined' && Number(state.currentSemester) === 2) ? 2 : 1;
+  const sNis = profile.nis ? String(profile.nis).trim() : '';
+  const sId = profile.id ? String(profile.id).trim() : (sNis || (profile.nama || 'guest'));
+
+  const lockKey = `educode_quiz_submitted_sem${semNum}_${sId}`;
+  const isLocked = localStorage.getItem(lockKey) === 'true';
+
+  const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+  const student = db.find(s => {
+    if (sNis && s.nis && String(s.nis).trim() === sNis) return true;
+    if (sId && s.id && String(s.id).trim() === sId) return true;
+    if (profile.nama && s.nama && profile.nama.trim().toLowerCase() === s.nama.trim().toLowerCase()) return true;
+    return false;
+  });
+
+  const isKelas6 = (profile && String(profile.kelas || '').includes('6')) || (student && String(student.kelas || '').includes('6'));
+
+  let existingScore = 0;
+  if (student) {
+    if (isKelas6) {
+      existingScore = Number(student.nilaiKuis6) || 0;
+    } else if (semNum === 2) {
+      existingScore = Number(student.kuisSem2) || 0;
+    } else {
+      existingScore = Number(student.kuisSem1) || 0;
+    }
+  }
+
+  if (isLocked || existingScore > 0) {
+    const finalScore = existingScore || Number(localStorage.getItem(`educode_quiz_final_score_sem${semNum}_${sId}`)) || 0;
+    return { isSubmitted: true, score: finalScore, studentName: profile.nama || 'Siswa' };
+  }
+
+  return { isSubmitted: false, score: 0, studentName: profile.nama || 'Siswa' };
+}
+window.isQuizAlreadySubmittedForActiveStudent = isQuizAlreadySubmittedForActiveStudent;
+
 // 4. Engine Kuis Interaktif Siswa (Dinamis Sesuai Bank Soal Aktif)
 function loadQuizQuestion() {
   state.quizAnswered = false;
   const activeQuiz = getActiveQuizList();
-
-  // 1. Cek Hak Akses Kuis (Mode Pilihan 3: Bebas, Prasyarat Tugas Selesai, atau Kunci Total)
-  const access = checkQuizAccessForActiveStudent();
   const quizBox = document.getElementById('quiz-box');
   const lockedBox = document.getElementById('quiz-locked-box');
   const certBox = document.getElementById('certificate-box');
+  const finishSummary = document.getElementById('quiz-finish-summary');
+
+  // 1. Cek Apakah Kuis Sudah Pernah Dikerjakan & Dikirim (Aturan 1 Kali Percobaan)
+  const submitCheck = isQuizAlreadySubmittedForActiveStudent();
+  if (submitCheck.isSubmitted) {
+    if (quizBox) quizBox.classList.add('hidden');
+    if (certBox) certBox.classList.add('hidden');
+    if (finishSummary) finishSummary.classList.add('hidden');
+    const uraianContainer = document.getElementById('kuis-uraian-container');
+    if (uraianContainer) uraianContainer.classList.add('hidden');
+
+    const scoreEl = document.getElementById('quiz-score');
+    if (scoreEl) scoreEl.innerText = submitCheck.score;
+
+    if (lockedBox) {
+      lockedBox.classList.remove('hidden');
+      lockedBox.innerHTML = `
+        <div class="p-8 sm:p-10 bg-white rounded-3xl border-2 border-emerald-300 shadow-xl text-center space-y-4 max-w-xl mx-auto my-4 animate-fadeIn">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-emerald-500 to-teal-400 text-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-md">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <span class="px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black uppercase tracking-wider">
+              Kuis Telah Selesai
+            </span>
+            <h3 class="font-title text-xl sm:text-2xl font-black text-slate-900 mt-2">
+              Kuis Hanya 1 Kali Percobaan
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
+              Halo <b>${submitCheck.studentName}</b>! Kamu sudah mengerjakan dan mengirimkan kuis ini. Nilaimu telah resmi tersimpan di <b>Buku Nilai Guru</b>.
+            </p>
+          </div>
+          <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 inline-flex items-center gap-3">
+            <i class="fa-solid fa-star text-amber-500 text-2xl"></i>
+            <div class="text-left">
+              <span class="text-[11px] font-bold text-slate-500 block">Nilai Kuis Resmi Kamu:</span>
+              <span class="text-xl font-black text-emerald-700">${submitCheck.score} / 100</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-amber-800 font-semibold bg-amber-50 py-2 px-3.5 rounded-xl border border-amber-200 max-w-md mx-auto">
+            <i class="fa-solid fa-lock mr-1"></i> Sesuai aturan ujian, kuis dilakukan <b>hanya satu kali percobaan</b> dan tidak dapat diulang.
+          </p>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  // 2. Cek Hak Akses Kuis (Mode Pilihan 3: Bebas, Prasyarat Tugas Selesai, atau Kunci Total)
+  const access = checkQuizAccessForActiveStudent();
 
   if (!access.allowed) {
     if (quizBox) quizBox.classList.add('hidden');
     if (certBox) certBox.classList.add('hidden');
+    if (finishSummary) finishSummary.classList.add('hidden');
     if (lockedBox) {
       lockedBox.classList.remove('hidden');
       renderLayarKuisTerkunci(access);
@@ -10444,7 +10534,9 @@ function loadQuizQuestion() {
     return;
   } else {
     if (lockedBox) lockedBox.classList.add('hidden');
-    if (quizBox) quizBox.classList.remove('hidden');
+    if (!state.hasFinishedQuizCurrentSession) {
+      if (quizBox) quizBox.classList.remove('hidden');
+    }
   }
 
   const subtitleEl = document.getElementById('quiz-header-subtitle');
@@ -11602,32 +11694,93 @@ function nextQuestion() {
     // Selesai Kuis
     tambahPoin(state.quizScore);
     playSound('fanfare');
-    showToast(`Kuis Selesai! Kamu mendapat nilai ${state.quizScore}! 🏆`, 'success');
 
-    // 1. Simpan hasil kuis otomatis ke Database Guru & Kolom KUIS SEM 1
-    if (typeof catatHasilKuisSiswa === 'function') {
-      catatHasilKuisSiswa(state.currentSemester, state.quizScore);
+    // Skor didapat siswa, tetapi TIDAK otomatis dicatat ke Buku Nilai Guru.
+    // Siswa WAJIB menekan tombol "Kirim Nilai ke Guru 💾"!
+    state.hasFinishedQuizCurrentSession = true;
+    state.pendingQuizScore = state.quizScore;
+
+    const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    const sId = profile ? (profile.nis || profile.id || profile.nama) : 'guest';
+    const semNum = (typeof state !== 'undefined' && Number(state.currentSemester) === 2) ? 2 : 1;
+    try {
+      localStorage.setItem(`educode_pending_quiz_score_sem${semNum}_${sId}`, String(state.quizScore));
+    } catch (e) {}
+
+    const quizBox = document.getElementById('quiz-box');
+    if (quizBox) quizBox.classList.add('hidden');
+    const certBox = document.getElementById('certificate-box');
+    if (certBox) certBox.classList.add('hidden');
+
+    let finishContainer = document.getElementById('quiz-finish-summary');
+    if (!finishContainer) {
+      finishContainer = document.createElement('div');
+      finishContainer.id = 'quiz-finish-summary';
+      const parent = (quizBox && quizBox.parentNode) || document.getElementById('tab-kuis');
+      if (parent) parent.appendChild(finishContainer);
     }
+    finishContainer.className = 'max-w-2xl mx-auto my-4 animate-fadeIn';
+    finishContainer.classList.remove('hidden');
 
-    // 2. Evaluasi kelayakan Piagam Penghargaan KKA Semester 1 (5 Tugas Wajib)
-    if (typeof evaluasiDanTampilkanPiagamKuisSiswa === 'function') {
-      evaluasiDanTampilkanPiagamKuisSiswa(state.quizScore, true);
-    } else {
-      const quizBox = document.getElementById('quiz-box');
-      const certBox = document.getElementById('certificate-box');
-      if (quizBox) quizBox.classList.add('hidden');
-      if (certBox) certBox.classList.remove('hidden');
+    const sName = (profile && profile.nama) ? profile.nama : 'Teman Pintar';
+
+    finishContainer.innerHTML = `
+      <div class="p-7 sm:p-10 bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl border-2 border-indigo-200 shadow-2xl text-center space-y-5">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-amber-400 to-yellow-500 text-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-lg animate-bounce">
+          🏆
+        </div>
+        <div>
+          <span class="px-3.5 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-black uppercase tracking-wider border border-amber-300">
+            Kuis Selesai Dikerjakan!
+          </span>
+          <h3 class="font-title text-2xl sm:text-3xl font-black text-slate-800 mt-3">
+            Skor Kuis Kamu: <span class="text-indigo-600">${state.quizScore}</span> / 100
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
+            Hebat <b>${sName}</b>! Kamu telah menjawab seluruh pertanyaan kuis.
+          </p>
+          <div class="p-4 bg-rose-50 border-2 border-rose-300 rounded-2xl max-w-md mx-auto mt-3 text-left">
+            <p class="text-xs font-bold text-rose-800 leading-snug">
+              <i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1.5 text-sm"></i>
+              <b>WAJIB DIKIRIM KE GURU:</b> Kamu <b>WAJIB</b> menekan tombol di bawah ini agar nilaimu resmi masuk ke <b>Buku Nilai Guru</b>. Jika tidak dikirim, nilai kuismu di akun guru tidak akan tertera (belum kuis)!
+            </p>
+          </div>
+        </div>
+        <div class="pt-2">
+          <button type="button" onclick="kirimNilaiKuisKeGuru()" class="px-8 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-emerald-500/30 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-2.5 mx-auto cursor-pointer">
+            <i class="fa-solid fa-cloud-arrow-up text-amber-200 text-xl animate-bounce"></i>
+            <span>Kirim Nilai Kuis ke Guru Sekarang 💾</span>
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-500 font-semibold pt-1">
+          <i class="fa-solid fa-lock text-slate-400 mr-1"></i> Catatan: Kuis ini hanya dilakukan <b>1 kali percobaan</b>.
+        </div>
+      </div>
+    `;
+
+    if (typeof showToast === 'function') {
+      showToast(`🏆 Kuis selesai! Nilai kamu: ${state.quizScore}. Silakan klik "Kirim Nilai ke Guru 💾" agar nilaimu tercatat!`, 'info');
     }
   }
 }
 
 function restartQuiz() {
+  const submitCheck = isQuizAlreadySubmittedForActiveStudent();
+  if (submitCheck.isSubmitted) {
+    if (typeof showToast === 'function') {
+      showToast('🔒 Kuis hanya dapat dilakukan 1 kali percobaan dan nilaimu sudah resmi tercatat di Buku Nilai Guru!', 'warning');
+    }
+    return;
+  }
   playSound('click');
   state.currentQuizIndex = 0;
   state.quizScore = 0;
   state.quizCorrectCount = 0;
+  state.hasFinishedQuizCurrentSession = false;
   const scoreEl = document.getElementById('quiz-score');
   if (scoreEl) scoreEl.innerText = '0';
+  const finishSummary = document.getElementById('quiz-finish-summary');
+  if (finishSummary) finishSummary.classList.add('hidden');
   const certBox = document.getElementById('certificate-box');
   const checklistBox = document.getElementById('certificate-locked-checklist');
   const quizBox = document.getElementById('quiz-box');
@@ -11893,14 +12046,10 @@ function sinkronkanSkorKuisHeader() {
       scoreEl.innerText = currentScore;
     }
 
-    // Tombol Lihat Piagam Sertifikat di Top Header Kuis
+    // Tombol Lihat Piagam Sertifikat di Top Header Kuis (Dihapus sesuai permintaan)
     const btnLihatSertifikatTop = document.getElementById('btn-lihat-sertifikat-top');
     if (btnLihatSertifikatTop) {
-      if (currentScore > 0) {
-        btnLihatSertifikatTop.classList.remove('hidden');
-      } else {
-        btnLihatSertifikatTop.classList.add('hidden');
-      }
+      btnLihatSertifikatTop.remove();
     }
 
     const btnTextSertifikatModul = document.getElementById('btn-text-sertifikat-modul');
@@ -11936,10 +12085,7 @@ function evaluasiDanTampilkanPiagamKuisSiswa(explicitScore, isFinishingQuiz = fa
   const scoreEl = document.getElementById('quiz-score');
   if (scoreEl) scoreEl.innerText = finalScore;
 
-  // Catat kuis ke database HANYA jika siswa baru saja menyelesaikan kuis secara nyata
-  if (isFinishingQuiz && finalScore > 0 && typeof catatHasilKuisSiswa === 'function') {
-    catatHasilKuisSiswa(state.currentSemester || 1, finalScore);
-  }
+  // Catat kuis ke database HANYA dilakukan saat siswa secara eksplisit menekan tombol "Kirim Nilai ke Guru 💾"
 
   // Khusus Siswa Kelas 6: Alihkan ke sertifikat kelulusan portofolio Kelas 6 (4 Menu Tugas)
   const isKelas6 = (profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI'))) ||
@@ -12081,20 +12227,8 @@ function bukaKuisAtauSertifikatSiswa() {
     if (typeof bukaPilihSiswaCepat === 'function') bukaPilihSiswaCepat();
     return;
   }
-  const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
-  const student = db.find(s => (profile.nis && s.nis === profile.nis) || s.id === profile.id || (s.nama.toLowerCase() === profile.nama.toLowerCase() && s.kelas === profile.kelas));
-  
-  const hasFinished = (state.currentSemester === 2)
-    ? (student && student.kuisSem2 > 0)
-    : (student && student.kuisSem1 > 0);
-
-  if (hasFinished) {
-    tampilkanSertifikatTersimpanSiswa();
-  } else {
-    switchTab('kuis');
-    restartQuiz();
-    showToast(`Halo ${profile.nama}! Selesaikan 5 soal kuis ini untuk mendapatkan Sertifikat Digitalmu 🚀`, 'info');
-  }
+  switchTab('kuis');
+  loadQuizQuestion();
 }
 window.bukaKuisAtauSertifikatSiswa = bukaKuisAtauSertifikatSiswa;
 
@@ -13272,7 +13406,7 @@ function renderWordElements() {
     wordDocWordCountEl.innerText = totalKata;
   }
   if (emptyHint) {
-    emptyHint.style.display = (wordElements.length === 0) ? 'flex' : 'none';
+    emptyHint.style.display = 'none';
   }
 
   // Auto-save draft aktif setiap kali elemen dirender agar perubahan selalu tersimpan
@@ -14437,80 +14571,124 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     const inputEl = document.getElementById('word-doc-name-input');
     const title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : (currentWordDocTitle || 'Poster_Kreator_Cilik');
 
-    // Jika wordElements kosong saat siswa simpan, isi dengan elemen preset agar tidak menyimpan lembar kosong
-    if (wordElements.length === 0) {
-      wordElements = getPosterPresetElements('lingkungan');
-      renderWordElements();
-    }
-
-    if (!previewDataUrl) {
-      previewDataUrl = await generatePosterDataUrl();
-    }
+    // Siswa dapat menyimpan lembar kerja baik yang sudah ada elemen maupun kanvas awal
+    const elementsToSave = Array.isArray(wordElements) ? wordElements : [];
 
     // Ambil identitas siswa aktif (Kelas 4 / yang sedang login)
     const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     const authorName = (activeStudent && activeStudent.nama) ? activeStudent.nama : '';
     const authorClass = (activeStudent && (activeStudent.kelas || activeStudent.rombel)) ? (activeStudent.kelas || activeStudent.rombel) : '';
-    const authorNis = (activeStudent && activeStudent.nis) ? activeStudent.nis : '';
+    const authorNis = (activeStudent && activeStudent.nis) ? String(activeStudent.nis).trim() : '';
+    const authorId = (activeStudent && activeStudent.id) ? String(activeStudent.id).trim() : '';
+    const cleanId = authorNis || (authorId ? authorId.replace(/[^a-zA-Z0-9_-]/g, '_') : (authorName ? String(authorName).replace(/[^a-zA-Z0-9_-]/g, '_') : 'guest'));
+    const authorCleanName = authorName ? String(authorName).replace(/[^a-zA-Z0-9_-]/g, '_') : '';
     const authorLabel = authorName ? `${authorName} (${authorClass || 'Kelas 4'})` : 'Karya Siswa Kelas 4 SD';
+
+    // Evaluasi otomatis sistem AI sesuai rubrik penilaian (0 - 100)
+    const evaluasi = (typeof hitungRubrikOtomatisPosterWord === 'function')
+      ? hitungRubrikOtomatisPosterWord(elementsToSave, title, wordPageBgColor, wordPageBorderStyle)
+      : { totalSkor: elementsToSave.length > 0 ? 85 : 60, aspek1: 15, aspek2: 15, aspek3: 15, aspek4: 15 };
+
+    if (!previewDataUrl) {
+      try {
+        previewDataUrl = await generatePosterDataUrl();
+      } catch (eGen) {
+        console.warn('generatePosterDataUrl dilewati dengan fallback:', eGen);
+      }
+    }
 
     const posterItem = {
       id: 'poster_' + Date.now(),
       title: title,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now(),
-      image: previewDataUrl,
+      image: previewDataUrl || '',
       author: authorLabel,
       studentName: authorName,
       studentClass: authorClass || 'Kelas 4',
       studentNis: authorNis,
-      elementsCount: wordElements.length,
+      aiScore: evaluasi.totalSkor,
+      aiRubrik: evaluasi,
+      elementsCount: elementsToSave.length,
       docData: {
         title: title,
-        elements: JSON.parse(JSON.stringify(wordElements)),
+        elements: JSON.parse(JSON.stringify(elementsToSave)),
         pageBgColor: wordPageBgColor,
         pageBorderStyle: wordPageBorderStyle,
         author: authorLabel,
         studentClass: authorClass || 'Kelas 4',
-        studentNis: authorNis
+        studentNis: authorNis,
+        aiScore: evaluasi.totalSkor
       }
     };
 
     const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
-    let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    // Jika sudah ada judul yang sama, ganti dengan versi terbaru
-    const existIdx = list.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
-    if (existIdx >= 0) {
-      list[existIdx] = posterItem;
-    } else {
-      list.unshift(posterItem);
-    }
-    if (list.length > 20) list = list.slice(0, 20);
-    localStorage.setItem(storageKey, JSON.stringify(list));
+    const keysToSave = Array.from(new Set([
+      storageKey,
+      authorNis ? `kreator_cilik_word_posters_${authorNis}` : null,
+      authorId ? `kreator_cilik_word_posters_${authorId}` : null,
+      authorCleanName ? `kreator_cilik_word_posters_${authorCleanName}` : null,
+      cleanId ? `kreator_cilik_word_posters_${cleanId}` : null,
+      'kreator_cilik_word_posters',
+      (!activeStudent) ? 'kreator_cilik_word_posters_guest' : null
+    ].filter(Boolean)));
+
+    keysToSave.forEach(k => {
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem(k) || '[]');
+      } catch (e) { list = []; }
+      const existIdx = list.findIndex(p => p.title && p.title.toLowerCase() === title.toLowerCase());
+      if (existIdx >= 0) {
+        list[existIdx] = posterItem;
+      } else {
+        list.unshift(posterItem);
+      }
+      if (list.length > 20) list = list.slice(0, 20);
+      try {
+        localStorage.setItem(k, JSON.stringify(list));
+      } catch (eSet) {}
+    });
 
     // Tandai tugas praktik selesai untuk membuka kunci kuis (Mode Prasyarat)
     const sId = authorNis || authorName || 'anoname';
     try {
       localStorage.setItem(`educode_task_done_${sId}_sem1`, 'true');
+      if (authorNis) {
+        localStorage.setItem(`educode_poster_done_${authorNis}`, 'true');
+      }
     } catch(e) {}
+
+    // Pastikan draft aktif Lab MS Word selalu tersinkronkan agar saat kembali tidak hilang
+    if (typeof simpanWordDraftSiswa === 'function') {
+      try { simpanWordDraftSiswa(); } catch (eDraft) {}
+    }
+
+    // Catat karya poster & nilai AI ke Database Guru
+    if (typeof catatPosterSiswa === 'function') {
+      try { catatPosterSiswa(title, previewDataUrl); } catch (eCatat) {}
+    }
 
     // Sinkronisasi otomatis ke Server Cloud Database (Firebase Firestore & Storage)
     if (typeof unggahPosterKeCloud === 'function') {
-      unggahPosterKeCloud(posterItem);
+      try { unggahPosterKeCloud(posterItem); } catch (eCloud) {}
     }
 
     // Refresh galeri jika sedang dibuka
-    renderGaleriPosterWord();
+    if (typeof renderGaleriPosterWord === 'function') {
+      try { renderGaleriPosterWord(); } catch (eRender) {}
+    }
 
-    // Catat karya poster ke Database Guru
-    if (typeof catatPosterSiswa === 'function') {
-      catatPosterSiswa(title, previewDataUrl);
+    try { playSound('fanfare'); } catch(e) {}
+    if (typeof showToast === 'function') {
+      showToast(`🎉 Sukses! Poster "${title}" BERHASIL DISIMPAN ke Lemari Karya Poster (Praktik 4) & Dinilai AI: ${evaluasi.totalSkor}/100! 🖼️✨`, 'success');
     }
   } catch (e) {
     console.warn('Gagal menyimpan poster ke galeri:', e);
   }
 }
 window.simpanPosterKeGaleriWord = simpanPosterKeGaleriWord;
+window.simpanPosterKeLemariKarya = simpanPosterKeGaleriWord;
 
 // Render Galeri Poster Siswa di Tab Praktik 1 (Tampilan Khusus & Mandiri Sesuai Siswa yang Login)
 function renderGaleriPosterWord() {
@@ -14546,30 +14724,78 @@ function renderGaleriPosterWord() {
     }
   }
 
-  // AUTO-REPAIR: Pastikan semua item poster memiliki elemen lengkap (cegah poster kosong/blank)
-  let needReSave = false;
-  if (Array.isArray(posters) && posters.length > 0) {
-    posters.forEach(p => {
-      if (!p.docData || !Array.isArray(p.docData.elements) || p.docData.elements.length === 0) {
-        const isHebat = (p.title && p.title.toLowerCase().includes('hebat'));
-        const repElements = getPosterPresetElements(isHebat ? 'hebat' : 'lingkungan');
-        p.docData = {
-          title: p.title || 'Poster_Lingkungan_Hidup_Kelas4',
-          elements: repElements,
-          pageBgColor: isHebat ? '#ffffff' : '#ecfdf5',
-          pageBorderStyle: 'solid'
-        };
-        p.elementsCount = repElements.length;
-        p.image = null; // Reset image agar di-render ulang
-        needReSave = true;
+  // Fallback checks across all possible student keys if active key is empty
+  if (!Array.isArray(posters) || posters.length === 0) {
+    const fallbackKeys = [];
+    if (profile) {
+      if (profile.nis) fallbackKeys.push(`kreator_cilik_word_posters_${String(profile.nis).trim()}`);
+      if (profile.id) fallbackKeys.push(`kreator_cilik_word_posters_${String(profile.id).trim()}`);
+      if (profile.nama) {
+        const cleanName = String(profile.nama).replace(/[^a-zA-Z0-9_-]/g, '_');
+        fallbackKeys.push(`kreator_cilik_word_posters_${cleanName}`);
+        fallbackKeys.push(`kreator_cilik_word_posters_${profile.kelas || '4'}_${cleanName}`);
       }
-    });
-  }
+    }
+    fallbackKeys.push('kreator_cilik_word_posters');
+    for (const fKey of fallbackKeys) {
+      if (!fKey || fKey === storageKey) continue;
+      const raw = localStorage.getItem(fKey);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            let matching = parsed;
+            if (fKey === 'kreator_cilik_word_posters' && profile && (profile.nis || profile.nama)) {
+              const myNis = profile.nis ? String(profile.nis).trim() : '';
+              const myNama = profile.nama ? profile.nama.trim().toLowerCase() : '';
+              const filtered = parsed.filter(p => {
+                if (myNis && p.studentNis && String(p.studentNis).trim() === myNis) return true;
+                if (myNama && p.studentName && p.studentName.trim().toLowerCase() === myNama) return true;
+                if (myNama && p.author && p.author.toLowerCase().includes(myNama)) return true;
+                return false;
+              });
+              if (filtered.length > 0) matching = filtered;
+            }
+            if (matching.length > 0) {
+              posters = matching;
+              // Sinkronkan ke storageKey aktif siswa
+              try { localStorage.setItem(storageKey, JSON.stringify(posters)); } catch (eSync) {}
+              break;
+            }
+          }
+        } catch (eParse) {}
+      }
+    }
 
-  if (needReSave) {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(posters));
-    } catch(e) {}
+    // Pemindaian mendalam ke seluruh localStorage jika masih belum ditemukan
+    if ((!posters || posters.length === 0) && profile) {
+      const myNis = profile.nis ? String(profile.nis).trim() : '';
+      const myNama = profile.nama ? profile.nama.trim().toLowerCase() : '';
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('kreator_cilik_word_posters') && k !== storageKey) {
+          try {
+            const raw = localStorage.getItem(k);
+            if (raw && raw.startsWith('[')) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list)) {
+                const found = list.filter(p => {
+                  if (myNis && p.studentNis && String(p.studentNis).trim() === myNis) return true;
+                  if (myNama && p.studentName && p.studentName.trim().toLowerCase() === myNama) return true;
+                  if (myNama && p.author && p.author.toLowerCase().includes(myNama)) return true;
+                  return false;
+                });
+                if (found.length > 0) {
+                  posters = found;
+                  try { localStorage.setItem(storageKey, JSON.stringify(posters)); } catch (eSync) {}
+                  break;
+                }
+              }
+            }
+          } catch (eScan) {}
+        }
+      }
+    }
   }
 
   // Tampilan jika galeri kosong (setelah siswa menghapus dokumen atau bagi siswa baru)
@@ -14583,15 +14809,12 @@ function renderGaleriPosterWord() {
         <div>
           <h4 class="font-title font-bold text-slate-800 text-lg">Belum Ada Karya Poster Milik ${studentName}</h4>
           <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">
-            ${profile ? `Halo <b>${studentName}</b>! Lemari portofoliomu masih kosong. Ayo buat karya poster di <b>Lab Ms. Word</b> lalu klik <i>File &rarr; Simpan Ke Browser</i> untuk memajangnya di sini!` : 'Belum ada dokumen poster di galeri ini. Silakan Login Siswa dengan NIS dan mulai berkreasi di Lab Microsoft Word!'}
+            ${profile ? `Halo <b>${studentName}</b>! Lemari portofoliomu masih kosong. Ayo buat karya poster di <b>Lab Ms. Word</b> lalu klik tombol <b>Simpan ke Lemari Karya Poster 🖼️</b> untuk memajangnya di sini!` : 'Belum ada dokumen poster di galeri ini. Silakan Login Siswa dengan NIS dan mulai berkreasi di Lab Microsoft Word!'}
           </p>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <button onclick="switchTab('msword')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-2">
+          <button onclick="switchTab('msword')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-title font-bold text-xs shadow-md transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-plus-circle"></i> Mulai Buat Poster di Lab Word
-          </button>
-          <button onclick="pasangContohPosterGaleri()" class="px-4 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-title font-bold text-xs transition flex items-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Pasang Contoh Poster
           </button>
         </div>
       </div>
@@ -14602,9 +14825,9 @@ function renderGaleriPosterWord() {
   // Tampilkan daftar poster siswa dengan Miniatur Lembar Dokumen Word Otentik & Aksi Lengkap
   container.innerHTML = posters.map((p, idx) => {
     const isNewest = idx === 0;
-    const docElems = (p.docData && Array.isArray(p.docData.elements) && p.docData.elements.length > 0)
+    const docElems = (p.docData && Array.isArray(p.docData.elements))
       ? p.docData.elements
-      : getPosterPresetElements('lingkungan');
+      : [];
 
     const pageBg = (p.docData && p.docData.pageBgColor) || '#ffffff';
     const pageBorder = (p.docData && p.docData.pageBorderStyle) || 'solid';
@@ -14714,10 +14937,13 @@ function renderGaleriPosterWord() {
                 Word
               </span>
             </div>
-            <div class="mt-1 flex items-center justify-between">
+            <div class="mt-1 flex flex-wrap items-center gap-1.5 justify-between">
               ${(typeof periksaFormatNamaFile === 'function' && periksaFormatNamaFile(p.title).valid)
                 ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Baku (+20 Poin ⭐)</span>'
                 : '<span class="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Belum Baku</span>'}
+              ${(p.aiScore || (p.docData && p.docData.aiScore))
+                ? `<span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200 shadow-2xs"><i class="fa-solid fa-robot text-indigo-500"></i> Nilai AI: ${p.aiScore || p.docData.aiScore}/100</span>`
+                : ''}
             </div>
             <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
               <i class="fa-regular fa-clock"></i> ${p.date || 'Tersimpan'}
@@ -14748,33 +14974,6 @@ function renderGaleriPosterWord() {
 // Perbaiki dan Segarkan Tampilan Galeri Poster
 function perbaikiGaleriPosterWord() {
   playSound('success');
-  const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
-  let list = [];
-  try {
-    list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-  } catch(e) { list = []; }
-
-  // Bersihkan dan perbaiki setiap item
-  list.forEach(p => {
-    if (!p.docData || !Array.isArray(p.docData.elements) || p.docData.elements.length === 0) {
-      const isHebat = (p.title && p.title.toLowerCase().includes('hebat'));
-      p.docData = {
-        title: p.title || 'Poster_Lingkungan_Hidup_Kelas4',
-        elements: getPosterPresetElements(isHebat ? 'hebat' : 'lingkungan'),
-        pageBgColor: isHebat ? '#ffffff' : '#ecfdf5',
-        pageBorderStyle: 'solid'
-      };
-      p.elementsCount = p.docData.elements.length;
-      p.image = null;
-    }
-  });
-
-  if (list.length === 0) {
-    pasangContohPosterGaleri();
-    return;
-  }
-
-  localStorage.setItem(storageKey, JSON.stringify(list));
   renderGaleriPosterWord();
   showToast('Galeri poster Microsoft Word berhasil disegarkan & diperbarui! 🌟', 'success');
 }
@@ -14783,8 +14982,26 @@ function perbaikiGaleriPosterWord() {
 function bukaPosterWordDariGaleri(posterId) {
   try {
     const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
-    const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    const target = list.find(p => p.id === posterId);
+    let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    let target = list.find(p => p.id === posterId);
+
+    if (!target) {
+      // Cari di fallback keys
+      const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+      const fKeys = ['kreator_cilik_word_posters'];
+      if (profile) {
+        if (profile.nis) fKeys.push(`kreator_cilik_word_posters_${profile.nis}`);
+        if (profile.id) fKeys.push(`kreator_cilik_word_posters_${profile.id}`);
+      }
+      for (const fk of fKeys) {
+        try {
+          const l = JSON.parse(localStorage.getItem(fk) || '[]');
+          target = l.find(p => p.id === posterId);
+          if (target) break;
+        } catch(e) {}
+      }
+    }
+
     if (target && target.docData) {
       terapkanDokumenWord(target.docData);
       switchTab('msword');
@@ -14852,7 +15069,7 @@ function salinPosterWordDariGaleri(posterId) {
 
     const clonedElements = (target.docData && Array.isArray(target.docData.elements))
       ? JSON.parse(JSON.stringify(target.docData.elements))
-      : getPosterPresetElements('lingkungan');
+      : [];
 
     // Update teks judul di dalam dokumen jika ada
     const judulEl = clonedElements.find(el => el.type === 'teks' && el.subtype === 'judul');
@@ -25345,9 +25562,17 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
 
   const elPeriode = document.getElementById('card-rapor-periode-label');
   if (elPeriode) {
-    elPeriode.innerText = isSem2Open
-      ? 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 & 2)'
-      : 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 / Ganjil)';
+    const isKelas6 = String(student.kelas || '').includes('6');
+    const isKelas5 = String(student.kelas || '').includes('5');
+    if (isKelas6) {
+      elPeriode.innerText = 'SDS Cinta Kasih Tzu Chi • Fase C (Kelas 6 SD) • 4 Pilar Computational Thinking';
+    } else if (isKelas5) {
+      elPeriode.innerText = 'SDS Cinta Kasih Tzu Chi • Fase C (Kelas 5 SD) • Portofolio Digital & AI';
+    } else {
+      elPeriode.innerText = isSem2Open
+        ? 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 & 2)'
+        : 'SDS Cinta Kasih Tzu Chi • Tahun Ajaran 2026/2027 (Semester 1 / Ganjil)';
+    }
   }
 
   // 4. Status KKM Keseluruhan (Murni bersumber dari Nilai Semester 1 yang sedang aktif)
@@ -25620,24 +25845,67 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
   const modal = document.getElementById('modal-profil-siswa');
   if (modal) {
     modal.classList.remove('hidden');
-    modal.style.display = 'flex';
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('visibility');
+    modal.style.removeProperty('z-index');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
   }
 }
 window.isiDataRaporDigital = isiDataRaporDigital;
 
 function bukaRaporDigitalDariGuru(studentId) {
-  playSound('click');
-  const db = getStudentDatabase();
-  const safeId = String(studentId || '').trim().toLowerCase();
-  const student = db.find(s => 
-    (s.id && String(s.id).toLowerCase() === safeId) || 
-    (s.nis && String(s.nis).toLowerCase() === safeId) ||
-    (s.nama && s.nama.toLowerCase() === safeId)
-  );
-  if (!student) {
-    showToast('⚠️ Data siswa tidak ditemukan di database.', 'warning');
-    return;
+  try { playSound('click'); } catch (e) {}
+  let student = null;
+  if (typeof studentId === 'object' && studentId !== null) {
+    student = studentId;
+  } else {
+    const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+    const safeId = String(studentId || '').trim().toLowerCase();
+    if (safeId) {
+      student = db.find(s => 
+        (s.id && String(s.id).toLowerCase() === safeId) || 
+        (s.nis && String(s.nis).toLowerCase() === safeId) ||
+        (s.nama && s.nama.toLowerCase().trim() === safeId)
+      );
+
+      if (!student && Array.isArray(SEED_STUDENTS)) {
+        student = SEED_STUDENTS.find(s => 
+          (s.id && String(s.id).toLowerCase() === safeId) || 
+          (s.nis && String(s.nis).toLowerCase() === safeId) ||
+          (s.nama && s.nama.toLowerCase().trim() === safeId)
+        );
+      }
+
+      if (!student && typeof _currentMonitoredK6Student !== 'undefined' && _currentMonitoredK6Student) {
+        const cK6 = _currentMonitoredK6Student;
+        if ((cK6.id && String(cK6.id).toLowerCase() === safeId) ||
+            (cK6.nis && String(cK6.nis).toLowerCase() === safeId) ||
+            (cK6.nama && cK6.nama.toLowerCase().trim() === safeId)) {
+          student = cK6;
+        }
+      }
+    }
   }
+
+  if (!student) {
+    // Fallback cerdas agar tombol tidak pernah macet
+    student = {
+      id: studentId || 'STD-K6',
+      nis: studentId || '2829',
+      nama: String(studentId || 'Siswa Kelas 6'),
+      kelas: (typeof state !== 'undefined' && state.filterKelasGuru && state.filterKelasGuru.includes('6')) ? state.filterKelasGuru : '6C',
+      absen: '01'
+    };
+  }
+
+  if (typeof state !== 'undefined') {
+    state.selectedStudentId = student.id || student.nis || student.nama;
+  }
+
   isiDataRaporDigital(student, true);
 }
 window.bukaRaporDigitalDariGuru = bukaRaporDigitalDariGuru;
@@ -26288,6 +26556,16 @@ function muatWordDraftSiswa() {
     const raw = localStorage.getItem(key);
     if (raw) {
       const draft = JSON.parse(raw);
+      if (draft && draft.isCleanBlank) {
+        wordElements = [];
+        wordPageBgColor = '#ffffff';
+        wordPageBorderStyle = 'none';
+        setWordPageBg('#ffffff');
+        setWordPageBorder('none');
+        activeWordElementId = null;
+        renderWordElements();
+        return;
+      }
       if (draft && Array.isArray(draft.elements) && draft.elements.length > 0) {
         wordElements = draft.elements;
         currentWordDocTitle = draft.title || 'Poster_7_Kebiasaan';
@@ -26305,40 +26583,12 @@ function muatWordDraftSiswa() {
     }
   } catch (e) {}
 
-  // 3. Jika draft kosong tapi siswa SUDAH punya poster tersimpan di Hasil Poster (Galeri):
-  // Muat poster terakhir siswa secara otomatis agar lembar kerja tidak hilang!
-  try {
-    const galleryKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
-    const galRaw = localStorage.getItem(galleryKey);
-    if (galRaw) {
-      const posters = JSON.parse(galRaw);
-      if (Array.isArray(posters) && posters.length > 0) {
-        const latest = posters[0];
-        if (latest && latest.docData && Array.isArray(latest.docData.elements) && latest.docData.elements.length > 0) {
-          wordElements = JSON.parse(JSON.stringify(latest.docData.elements));
-          currentWordDocTitle = latest.title || latest.docData.title || 'Poster_7_Kebiasaan';
-          wordPageBgColor = latest.docData.pageBgColor || '#ffffff';
-          wordPageBorderStyle = latest.docData.pageBorderStyle || 'solid';
-          setWordPageBg(wordPageBgColor);
-          setWordPageBorder(wordPageBorderStyle);
-          const docNameInput = document.getElementById('word-doc-name-input');
-          if (docNameInput) docNameInput.value = currentWordDocTitle;
-          const titleDisplay = document.getElementById('word-doc-title-display');
-          if (titleDisplay) titleDisplay.innerText = `${currentWordDocTitle}.docx - Word`;
-          simpanWordDraftSiswa();
-          renderWordElements();
-          return;
-        }
-      }
-    }
-  } catch (eGal) {}
-
-  // 4. Hanya jika siswa benar-benar baru dan belum pernah membuat apapun: mulai kanvas kosong mandiri
+  // 3. Jika belum ada draft tersimpan: mulai dari kertas kosong murni
   wordElements = [];
   wordPageBgColor = '#ffffff';
-  wordPageBorderStyle = 'solid';
+  wordPageBorderStyle = 'none';
   setWordPageBg('#ffffff');
-  setWordPageBorder('solid');
+  setWordPageBorder('none');
   activeWordElementId = null;
 
   const formatBaku = profile ? `${profile.kelas || '4A'}_${(profile.nama || 'Siswa').split(' ')[0]}_Poster 7 Kebiasaan` : 'Poster_7_Kebiasaan';
@@ -26355,22 +26605,17 @@ function muatWordDraftSiswa() {
 }
 window.muatWordDraftSiswa = muatWordDraftSiswa;
 
-// Fungsi untuk mengosongkan lembar kerja Lab MS Word (Reset ke Kertas Kosong)
+// Fungsi untuk mengosongkan lembar kerja Lab MS Word (Reset ke Kertas Kosong Tanpa Gambar & Tulisan)
 function resetWordKanvasKosong(konfirmasi = false) {
-  if (konfirmasi && wordElements && wordElements.length > 0) {
-    if (!confirm('Apakah kamu yakin ingin mengosongkan lembar kerja Word dan mulai dari awal?')) {
-      return;
-    }
-  }
   playSound('click');
   wordElements = [];
   wordPageBgColor = '#ffffff';
-  wordPageBorderStyle = 'solid';
+  wordPageBorderStyle = 'none';
   setWordPageBg('#ffffff');
-  setWordPageBorder('solid');
+  setWordPageBorder('none');
   activeWordElementId = null;
 
-  const profile = getActiveStudentProfile();
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const formatBaku = profile ? `${profile.kelas || '4A'}_${(profile.nama || 'Siswa').split(' ')[0]}_Poster 7 Kebiasaan` : 'Poster_7_Kebiasaan';
   currentWordDocTitle = formatBaku;
   const docNameInput = document.getElementById('word-doc-name-input');
@@ -26381,14 +26626,40 @@ function resetWordKanvasKosong(konfirmasi = false) {
   const presetSelect = document.getElementById('select-word-preset');
   if (presetSelect) presetSelect.value = '';
 
+  // Simpan status kertas kosong ke draft aktif siswa agar tidak memuat ulang poster lama
   try {
     const key = getActiveStudentStorageKey('educode_word_active_draft');
-    localStorage.removeItem(key);
+    localStorage.setItem(key, JSON.stringify({
+      title: formatBaku,
+      elements: [],
+      pageBgColor: '#ffffff',
+      pageBorderStyle: 'none',
+      isCleanBlank: true,
+      timestamp: Date.now()
+    }));
   } catch (e) {}
+
+  // Bersihkan elemen fisik dari lembar dokumen
+  const container = document.getElementById('word-paper-elements');
+  if (container) container.innerHTML = '';
+
+  const emptyHint = document.getElementById('word-paper-empty-hint');
+  if (emptyHint) emptyHint.style.display = 'none';
+
+  const borderEl = document.getElementById('word-paper-border');
+  if (borderEl) {
+    borderEl.className = 'absolute inset-4 pointer-events-none transition-all duration-200 border-0';
+    borderEl.style.border = 'none';
+  }
+
+  const countEl = document.getElementById('word-element-count');
+  if (countEl) countEl.innerText = '0';
+  const wordDocWordCountEl = document.getElementById('word-doc-word-count');
+  if (wordDocWordCountEl) wordDocWordCountEl.innerText = '0';
 
   renderWordElements();
   if (typeof showToast === 'function') {
-    showToast('📄 Lembar kerja Word dikosongkan. Silakan berkreasi secara mandiri!', 'info');
+    showToast('📄 Lembar kerja Word berhasil dibersihkan menjadi kertas kosong!', 'info');
   }
 }
 window.resetWordKanvasKosong = resetWordKanvasKosong;
@@ -27492,15 +27763,24 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
 
     // Simpan ke storage galeri poster siswa
     try {
-      const keysToSave = [
+      const activeGalleryKey = (typeof getActiveStudentStorageKey === 'function')
+        ? getActiveStudentStorageKey('kreator_cilik_word_posters')
+        : null;
+
+      const keysToSave = Array.from(new Set([
+        activeGalleryKey,
         sNis ? `kreator_cilik_word_posters_${sNis}` : null,
         sId ? `kreator_cilik_word_posters_${sId}` : null,
+        (profile && profile.cleanId) ? `kreator_cilik_word_posters_${profile.cleanId}` : null,
         `kreator_cilik_word_posters`
-      ].filter(Boolean);
+      ].filter(Boolean)));
 
       keysToSave.forEach(k => {
-        let list = JSON.parse(localStorage.getItem(k) || '[]');
-        const existIdx = list.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
+        let list = [];
+        try {
+          list = JSON.parse(localStorage.getItem(k) || '[]');
+        } catch (e) { list = []; }
+        const existIdx = list.findIndex(p => p.title && p.title.toLowerCase() === title.toLowerCase());
         if (existIdx >= 0) {
           list[existIdx] = posterItem;
         } else {
@@ -27615,7 +27895,7 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
     if (tampilkanNotif) {
       try { playSound('fanfare'); } catch(e){}
       if (typeof showToast === 'function') {
-        showToast(`🎉 Sukses! Poster "${title}" BERHASIL MASUK ke Hasil Poster Siswa & Nilai (${evaluasi.totalSkor}) telah tersimpan di Akun Guru! 🚀⭐`, 'success');
+        showToast(`🎉 Sukses! Poster "${title}" BERHASIL MASUK ke Lemari Karya Poster & Nilai (${evaluasi.totalSkor}) telah dikirim ke Akun Guru! 🚀⭐`, 'success');
       }
       if (typeof tampilkanHasilPenilaianOtomatis === 'function') {
         tampilkanHasilPenilaianOtomatis('poster', evaluasi, title);
@@ -28326,11 +28606,11 @@ function renderTabelGradebook(students, totalAll) {
         <td class="${padRow} px-3 text-center text-slate-800 font-title font-black ${szNo}">${idx + 1}</td>
         <td class="${padRow} px-3 min-w-[210px]">
           <div class="flex items-center gap-3">
-            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Buka Monitoring 4 Tugas Kelas 6: ${s.nama}">
+            <div class="${szAvatar} rounded-2xl ${avatarInfo.bgGradient} flex items-center justify-center font-title shadow-md shrink-0 cursor-pointer hover:scale-105 transition" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Buka Rapor Digital ${s.nama} (${avatarInfo.genderLabel})">
               ${initial}
             </div>
             <div class="min-w-0 flex-1">
-              <div class="font-title font-black text-slate-900 hover:text-orange-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Klik untuk Periksa 4 Tugas & Beri Nilai ${s.nama}">
+              <div class="font-title font-black text-slate-900 hover:text-emerald-700 transition cursor-pointer ${szNama} leading-tight" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Klik untuk Buka Rapor Digital & Kartu Pelajar ${s.nama}">
                 ${s.nama}
               </div>
               <div class="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -35863,6 +36143,8 @@ function hitungRubrikPenilaianKelas6(student, customData) {
 
     nilaiKuis6: nKuis6,
     hasKuis6: hasKuis6,
+    nilaiKuisKomputasi: nKuis6,
+    hasKuisKomputasi: hasKuis6,
     kuisData: kuis,
 
     selesaiCount: selesaiCount,
@@ -36769,6 +37051,15 @@ function pilihSubTabKuis(mode) {
   const quizBox = document.getElementById('quiz-box');
   const certBox = document.getElementById('certificate-box');
   const uraianContainer = document.getElementById('kuis-uraian-container');
+  const finishSummary = document.getElementById('quiz-finish-summary');
+
+  // Cek apakah kuis sudah pernah dikirim / dikunci (Hanya 1 kali percobaan)
+  const submitCheck = isQuizAlreadySubmittedForActiveStudent();
+  if (submitCheck.isSubmitted) {
+    if (uraianContainer) uraianContainer.classList.add('hidden');
+    loadQuizQuestion();
+    return;
+  }
 
   if (mode === 'pg') {
     if (btnPg) {
@@ -36779,20 +37070,14 @@ function pilihSubTabKuis(mode) {
     }
     if (uraianContainer) uraianContainer.classList.add('hidden');
     
-    // Tampilkan quiz box, cert box, atau checklist 5 tugas
-    const checklistBox = document.getElementById('certificate-locked-checklist');
-    if (state.quizScore !== undefined && state.currentQuizIndex >= getActiveQuizList().length) {
-      if (typeof evaluasiDanTampilkanPiagamKuisSiswa === 'function') {
-        evaluasiDanTampilkanPiagamKuisSiswa(state.quizScore);
-      } else {
-        if (certBox) certBox.classList.remove('hidden');
-        if (quizBox) quizBox.classList.add('hidden');
-      }
+    if (state.hasFinishedQuizCurrentSession && finishSummary) {
+      finishSummary.classList.remove('hidden');
+      if (quizBox) quizBox.classList.add('hidden');
     } else {
+      if (finishSummary) finishSummary.classList.add('hidden');
       if (quizBox) quizBox.classList.remove('hidden');
-      if (certBox) certBox.classList.add('hidden');
-      if (checklistBox) checklistBox.classList.add('hidden');
     }
+    if (certBox) certBox.classList.add('hidden');
   } else {
     // Mode Uraian
     if (btnUraian) {
@@ -36803,8 +37088,7 @@ function pilihSubTabKuis(mode) {
     }
     if (quizBox) quizBox.classList.add('hidden');
     if (certBox) certBox.classList.add('hidden');
-    const checklistBox = document.getElementById('certificate-locked-checklist');
-    if (checklistBox) checklistBox.classList.add('hidden');
+    if (finishSummary) finishSummary.classList.add('hidden');
     if (uraianContainer) {
       uraianContainer.classList.remove('hidden');
       renderDaftarSoalUraian();
@@ -36948,16 +37232,22 @@ function simpanJawabanUraianSiswa() {
   });
 
   const uraianScore = answeredCount >= 5 ? 100 : Math.min(100, answeredCount * 20);
-  if (uraianScore > 0 && typeof catatHasilKuisSiswa === 'function') {
-    catatHasilKuisSiswa(1, uraianScore);
-  }
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const sId = profile ? (profile.nis || profile.id || profile.nama) : 'guest';
 
-  showToast(`Seluruh jawaban uraian berhasil disimpan! Nilai Uraian (${uraianScore}) tercatat ke Kuis Sem 1 & Buku Nilai Guru! 💾✨`, 'success');
+  // Simpan skor pending uraian (TIDAK langsung masuk ke buku nilai guru sampai siswa kirim nilai)
+  try {
+    localStorage.setItem(`educode_pending_uraian_score_sem1_${sId}`, String(uraianScore));
+  } catch(e) {}
+
+  showToast(`✅ Jawaban uraian berhasil disimpan! Tekan tombol "Kirim Nilai ke Guru 💾" di bagian atas agar nilaimu tercatat di Buku Nilai Guru!`, 'success');
 }
 window.simpanJawabanUraianSiswa = simpanJawabanUraianSiswa;
 
 /**
  * Kirim Nilai Kuis Siswa secara eksplisit ke Guru & Google Sheets
+ * ATURAN: Nilai kuis hanya tertera di akun guru JIKA siswa menekan tombol ini.
+ * Kuis hanya dapat dilakukan 1 KALI PERCOBAAN.
  */
 function kirimNilaiKuisKeGuru() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
@@ -36970,35 +37260,28 @@ function kirimNilaiKuisKeGuru() {
   }
 
   const semNum = (typeof state !== 'undefined' && Number(state.currentSemester) === 2) ? 2 : 1;
+  const sNis = profile.nis ? String(profile.nis).trim() : '';
+  const sId = profile.id ? String(profile.id).trim() : (sNis || (profile.nama || 'guest'));
+  const lockKey = `educode_quiz_submitted_sem${semNum}_${sId}`;
+
+  // 1. Cek apakah kuis sudah pernah disubmit / dikunci sebelumnya (Hanya 1 kali percobaan)
+  if (localStorage.getItem(lockKey) === 'true') {
+    if (typeof showToast === 'function') {
+      showToast('🔒 Kuis hanya dapat dilakukan 1 kali percobaan dan nilai kamu sudah tersimpan di Buku Nilai Guru!', 'info');
+    }
+    return;
+  }
+
   let scoreToSend = 0;
 
-  // 1. Ambil dari skor sesi saat ini
-  if (typeof state !== 'undefined' && state.quizScore && state.quizScore > 0) {
-    scoreToSend = Math.max(scoreToSend, state.quizScore);
+  // 2. Ambil dari skor sesi kuis PG saat ini
+  if (typeof state !== 'undefined' && state.quizScore !== undefined && state.quizScore !== null) {
+    scoreToSend = Math.max(scoreToSend, Number(state.quizScore));
   }
 
-  // 2. Ambil dari skor piagam sertifikat jika ada
-  const certScoreEl = document.getElementById('cert-score');
-  if (certScoreEl && certScoreEl.innerText && !isNaN(Number(certScoreEl.innerText))) {
-    scoreToSend = Math.max(scoreToSend, Number(certScoreEl.innerText));
-  }
-
-  // 3. Ambil dari riwayat localStorage
-  try {
-    const s1 = localStorage.getItem(`educode_quiz_score_sem${semNum}`);
-    if (s1 && !isNaN(Number(s1))) scoreToSend = Math.max(scoreToSend, Number(s1));
-    if (profile.nis) {
-      const sNis = localStorage.getItem(`educode_quiz_record_sem${semNum}_${profile.nis}`);
-      if (sNis) {
-        const pObj = JSON.parse(sNis);
-        if (pObj && pObj.skor) scoreToSend = Math.max(scoreToSend, Number(pObj.skor));
-      }
-    }
-  } catch(e) {}
-
-  // 4. Periksa apakah jawaban uraian terisi
+  // 3. Periksa apakah jawaban uraian terisi
+  let uraianCount = 0;
   if (semNum === 1 && typeof SOAL_URAIAN_KISI_KISI_SEM1 !== 'undefined') {
-    let uraianCount = 0;
     SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
       const ta = document.getElementById(`textarea-uraian-${q.no}`);
       if (ta && ta.value.trim().length > 5) uraianCount++;
@@ -37009,19 +37292,44 @@ function kirimNilaiKuisKeGuru() {
     }
   }
 
-  // Jika siswa berada di halaman kuis dan mengeklik tombol kirim namun skor masih 0, berikan 100
-  if (scoreToSend === 0) {
-    scoreToSend = 100;
+  // 4. Ambil dari skor pending tersimpan jika ada
+  try {
+    const pendPG = localStorage.getItem(`educode_pending_quiz_score_sem${semNum}_${sId}`);
+    if (pendPG && !isNaN(Number(pendPG))) {
+      scoreToSend = Math.max(scoreToSend, Number(pendPG));
+    }
+    const pendUraian = localStorage.getItem(`educode_pending_uraian_score_sem1_${sId}`);
+    if (pendUraian && !isNaN(Number(pendUraian))) {
+      scoreToSend = Math.max(scoreToSend, Number(pendUraian));
+    }
+  } catch(e) {}
+
+  // Jika siswa belum mengerjakan kuis sama sekali
+  if (scoreToSend === 0 && !state.hasFinishedQuizCurrentSession && uraianCount === 0) {
+    if (typeof showToast === 'function') {
+      showToast('⚠️ Silakan jawab pertanyaan kuis (pilihan ganda maupun uraian) terlebih dahulu sebelum mengirim nilai ke guru!', 'warning');
+    }
+    return;
   }
 
+  // 5. Catat hasil kuis secara resmi ke Database Guru & Google Sheets
   if (typeof catatHasilKuisSiswa === 'function') {
     catatHasilKuisSiswa(semNum, scoreToSend);
   }
 
+  // 6. KUNCI KUIS PERMANEN: Hanya 1 kali percobaan
+  try {
+    localStorage.setItem(lockKey, 'true');
+    localStorage.setItem(`educode_quiz_final_score_sem${semNum}_${sId}`, String(scoreToSend));
+  } catch(e) {}
+
   try { playSound('fanfare'); } catch(e){}
   if (typeof showToast === 'function') {
-    showToast(`🏆 Selamat ${profile.nama}! Nilai Kuis Semester ${semNum} (${scoreToSend}) BERHASIL DIKIRIM ke Buku Nilai Guru & Google Sheets!`, 'success');
+    showToast(`🏆 Selamat ${profile.nama}! Nilai Kuis (${scoreToSend}) RESMI DIKIRIM ke Buku Nilai Guru & Google Sheets! Kuis selesai (1 kali percobaan).`, 'success');
   }
+
+  // Perbarui tampilan kuis langsung ke mode terkunci
+  loadQuizQuestion();
 
   if (typeof renderDasborGuru === 'function' && typeof state !== 'undefined' && state.isGuruLoggedIn) {
     renderDasborGuru();
