@@ -13281,9 +13281,40 @@ function handleWordImageUpload(event) {
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    sisipkanGambarLuarKeWord(dataUrl, file.name);
-    event.target.value = ''; // reset agar bisa upload file yang sama
+    const rawData = e.target.result;
+    // Otomatis kompresi gambar agar tidak membebani memori localStorage (maks 480px, ~30-40 KB)
+    const img = new Image();
+    img.onload = function() {
+      try {
+        const maxDim = 480;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const cvs = document.createElement('canvas');
+        cvs.width = w;
+        cvs.height = h;
+        const ctx = cvs.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressedData = cvs.toDataURL('image/jpeg', 0.82);
+        sisipkanGambarLuarKeWord(compressedData, file.name);
+      } catch (eCvs) {
+        sisipkanGambarLuarKeWord(rawData, file.name);
+      }
+      event.target.value = '';
+    };
+    img.onerror = function() {
+      sisipkanGambarLuarKeWord(rawData, file.name);
+      event.target.value = '';
+    };
+    img.src = rawData;
   };
   reader.readAsDataURL(file);
 }
@@ -14595,21 +14626,18 @@ function getPosterPresetElements(key = 'lingkungan') {
 // ==========================================
 function isDummyPoster(p) {
   if (!p) return true;
+  // 1. Karya asli siswa yang disimpan dari Lab MS Word (isStudentWork === true atau memiliki NIS/Nama siswa terdaftar)
+  if (p.isStudentWork === true) return false;
+  if (p.studentNis && String(p.studentNis).trim() && !p.isPreset && !p.isDummyTemplate) return false;
+  if (p.studentName && p.studentName !== 'Guest' && p.studentName !== 'Siswa' && !p.isPreset && !p.isDummyTemplate) return false;
+
+  // 2. Hanya buang yang secara eksplisit merupakan preset / dummy template sistem bawaan lama
+  if (p.isPreset === true || p.isDummyTemplate === true || p.id === 'contoh_poster_preset') return true;
+
+  // 3. Template contoh bawaan lama tanpa kepemilikan siswa
   const title = String(p.title || '').trim().toLowerCase();
-  if (title === 'poster_7_kebiasaan_anak_indonesia_hebat' || 
-      title === 'tujuh kebiasaan anak indonesia hebat' ||
-      title === 'contoh poster' ||
-      title.includes('contoh poster') ||
-      p.isPreset === true || p.isDummyTemplate === true) {
-    return true;
-  }
-  // Elemen persis preset bawaan sistem
-  if (p.docData && Array.isArray(p.docData.elements)) {
-    const hasPresetW1 = p.docData.elements.some(el => el.id === 'w1' && el.text && el.text.includes('TUJUH KEBIASAAN ANAK INDONESIA HEBAT'));
-    if (hasPresetW1 && p.docData.elements.length <= 8) return true;
-    const hasAstaCitaW1 = p.docData.elements.some(el => el.id === 'w1' && el.text && el.text.includes('MEWUJUDKAN ASTA CITA BANGSA'));
-    if (hasAstaCitaW1 && p.docData.elements.length <= 8) return true;
-  }
+  if ((title === 'contoh poster' || title.startsWith('contoh poster')) && !p.studentNis) return true;
+
   return false;
 }
 window.isDummyPoster = isDummyPoster;
@@ -14632,7 +14660,7 @@ function bersihkanTemplateDasarDariSemuaStorage() {
         if (!Array.isArray(list)) return;
 
         let changed = false;
-        // 1. Hapus template dasar / dummy preset
+        // 1. Hapus hanya template dasar / dummy preset eksplisit (Karya siswa dijamin AMAN)
         const filtered = list.filter(p => {
           if (isDummyPoster(p)) {
             changed = true;
@@ -14641,7 +14669,7 @@ function bersihkanTemplateDasarDariSemuaStorage() {
           return true;
         });
 
-        // 2. Kosongkan base64 raksasa (> 500 karakter) agar kuota 5MB localStorage aman
+        // 2. Kosongkan base64 raksasa (> 500 karakter) dari p.image agar kuota 5MB localStorage aman
         filtered.forEach(p => {
           if (p.image && p.image.length > 500) {
             p.image = '';
@@ -14683,12 +14711,6 @@ try { bersihkanTemplateDasarDariSemuaStorage(); } catch (eInitClean) {}
 // Simpan poster ke galeri koleksi siswa di Praktik 1 (Terisolasi Khusus Akun Siswa Aktif)
 async function simpanPosterKeGaleriWord(previewDataUrl = null) {
   try {
-    const inputEl = document.getElementById('word-doc-name-input');
-    const title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : (currentWordDocTitle || 'Poster_Kreator_Cilik');
-
-    // Siswa dapat menyimpan lembar kerja baik yang sudah ada elemen maupun kanvas awal
-    const elementsToSave = Array.isArray(wordElements) ? wordElements : [];
-
     // Ambil identitas siswa aktif (Kelas 4 / yang sedang login)
     const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     const authorName = (activeStudent && activeStudent.nama) ? activeStudent.nama : '';
@@ -14699,13 +14721,19 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     const authorCleanName = authorName ? String(authorName).replace(/[^a-zA-Z0-9_-]/g, '_') : '';
     const authorLabel = authorName ? `${authorName} (${authorClass || 'Kelas 4'})` : 'Karya Siswa Kelas 4 SD';
 
+    const inputEl = document.getElementById('word-doc-name-input');
+    let title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : (currentWordDocTitle || '');
+    if (!title || title === 'Poster_Kreator_Cilik' || title === 'Document1') {
+      title = authorName ? `${authorClass || '4A'}_${authorName.split(' ')[0]}_Poster 7 Kebiasaan` : 'Poster_7_Kebiasaan';
+    }
+
+    // Siswa dapat menyimpan lembar kerja baik yang sudah ada elemen maupun kanvas awal
+    const elementsToSave = Array.isArray(wordElements) ? wordElements : [];
+
     // Evaluasi otomatis sistem AI sesuai rubrik penilaian (0 - 100)
     const evaluasi = (typeof hitungRubrikOtomatisPosterWord === 'function')
       ? hitungRubrikOtomatisPosterWord(elementsToSave, title, wordPageBgColor, wordPageBorderStyle)
       : { totalSkor: elementsToSave.length > 0 ? 85 : 60, aspek1: 15, aspek2: 15, aspek3: 15, aspek4: 15 };
-
-    // Bersihkan template dasar dari semua storage sebelum menyimpan karya baru
-    bersihkanTemplateDasarDariSemuaStorage();
 
     const posterItem = {
       id: 'poster_' + Date.now(),
@@ -14713,6 +14741,7 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now(),
       image: '', // Tidak menyimpan string base64 raksasa di localStorage agar tidak QuotaExceededError (thumbnail dirender langsung via docData.elements)
+      isStudentWork: true, // Tanda mutlak: Karya asli siswa yang sah
       author: authorLabel,
       studentName: authorName,
       studentClass: authorClass || 'Kelas 4',
@@ -14736,6 +14765,8 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     const keysToSave = Array.from(new Set([
       storageKey,
       authorNis ? `kreator_cilik_word_posters_${authorNis}` : null,
+      authorCleanName ? `kreator_cilik_word_posters_${authorCleanName}` : null,
+      cleanId ? `kreator_cilik_word_posters_${cleanId}` : null,
       (!activeStudent) ? 'kreator_cilik_word_posters_guest' : null
     ].filter(Boolean)));
 
@@ -14744,8 +14775,10 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       try {
         list = JSON.parse(localStorage.getItem(k) || '[]');
       } catch (e) { list = []; }
-      // Buang template dasar / dummy preset
+      
+      // Buang hanya jika benar-benar dummy preset lama tanpa kepemilikan siswa
       list = list.filter(p => !isDummyPoster(p));
+      
       const existIdx = list.findIndex(p => p.title && p.title.toLowerCase() === title.toLowerCase());
       if (existIdx >= 0) {
         list.splice(existIdx, 1);
@@ -14932,6 +14965,37 @@ function renderGaleriPosterWord() {
             }
           }
         } catch (eParse) {}
+      }
+    }
+  }
+
+  // Pemindaian mendalam ke seluruh localStorage jika masih belum ditemukan di key aktif
+  if (posters.length === 0 && profile) {
+    const myNis = profile.nis ? String(profile.nis).trim() : '';
+    const myNama = profile.nama ? profile.nama.trim().toLowerCase() : '';
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('kreator_cilik_word_posters') && k !== storageKey) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw && raw.startsWith('[')) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+              const found = list.filter(p => {
+                if (isDummyPoster(p)) return false;
+                if (myNis && p.studentNis && String(p.studentNis).trim() === myNis) return true;
+                if (myNama && p.studentName && p.studentName.trim().toLowerCase() === myNama) return true;
+                if (myNama && p.author && p.author.toLowerCase().includes(myNama)) return true;
+                return false;
+              });
+              if (found.length > 0) {
+                posters = found.slice(0, 6);
+                try { localStorage.setItem(storageKey, JSON.stringify(posters)); } catch (eSync) {}
+                break;
+              }
+            }
+          }
+        } catch (eScan) {}
       }
     }
   }
@@ -27167,6 +27231,13 @@ function muatProfilSiswa() {
       sinkronkanSkorKuisHeader();
     }
   } catch (eKuisCert) {}
+
+  // Segarkan Papan Peringkat 5 Besar Siswa Berprestasi di Beranda
+  try {
+    if (typeof renderTop5SiswaLeaderboard === 'function') {
+      renderTop5SiswaLeaderboard();
+    }
+  } catch (eTop5) {}
 }
 window.muatProfilSiswa = muatProfilSiswa;
 
@@ -27900,6 +27971,7 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now(),
       image: '', // Tidak menyimpan string base64 raksasa di localStorage
+      isStudentWork: true, // Tanda mutlak: Karya asli siswa yang sah
       author: authorLabel,
       studentName: sNama,
       studentClass: sKelas,
@@ -27920,17 +27992,15 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
 
     // Simpan ke storage galeri poster siswa
     try {
-      if (typeof bersihkanTemplateDasarDariSemuaStorage === 'function') {
-        bersihkanTemplateDasarDariSemuaStorage();
-      }
-
       const activeGalleryKey = (typeof getActiveStudentStorageKey === 'function')
         ? getActiveStudentStorageKey('kreator_cilik_word_posters')
         : null;
 
       const keysToSave = Array.from(new Set([
         activeGalleryKey,
-        sNis ? `kreator_cilik_word_posters_${sNis}` : null
+        sNis ? `kreator_cilik_word_posters_${sNis}` : null,
+        sNama ? `kreator_cilik_word_posters_${String(sNama).replace(/[^a-zA-Z0-9_-]/g, '_')}` : null,
+        sId ? `kreator_cilik_word_posters_${String(sId).replace(/[^a-zA-Z0-9_-]/g, '_')}` : null
       ].filter(Boolean)));
 
       keysToSave.forEach(k => {
@@ -36726,6 +36796,13 @@ function perbaruiStatusMisiKelas6Siswa() {
       lblSertif.innerText = `Sertifikat Terkunci (${evalK6.selesaiCount}/4 Selesai) ⏳`;
     }
   }
+
+  // Segarkan Papan Peringkat 5 Besar Siswa Berprestasi
+  try {
+    if (typeof renderTop5SiswaLeaderboard === 'function') {
+      renderTop5SiswaLeaderboard();
+    }
+  } catch (eTop5) {}
 }
 window.perbaruiStatusMisiKelas6Siswa = perbaruiStatusMisiKelas6Siswa;
 
@@ -37702,5 +37779,348 @@ function toggleQuizFullscreen(forceState = null) {
   }
 }
 window.toggleQuizFullscreen = toggleQuizFullscreen;
+
+// ========================================================================
+// SISTEM PAPAN PERINGKAT 5 BESAR SISWA BERPRESTASI (TOP 5 LEADERBOARD)
+// Terhubung Langsung ke Buku Nilai Resmi Guru & Progres Capaian Belajar
+// ========================================================================
+
+/**
+ * Menghitung nilai akhir, persentase progress, bintang & skor gabungan peringkat siswa
+ */
+function hitungDataPeringkatSiswa(student) {
+  if (!student) return null;
+  const isK6 = String(student.kelas || '').includes('6');
+  const isK5 = String(student.kelas || '').includes('5');
+
+  let nilaiAkhir = 0;
+  let selesaiCount = 0;
+  let totalMisi = 4;
+  let persentase = 0;
+  let rincianMisi = '';
+
+  if (isK6) {
+    const evalK6 = (typeof hitungRubrikPenilaianKelas6 === 'function')
+      ? hitungRubrikPenilaianKelas6(student)
+      : { nilaiAkhir: 0, selesaiCount: 0, persentase: 0 };
+    nilaiAkhir = Number(evalK6.nilaiAkhir) || 0;
+    selesaiCount = Number(evalK6.selesaiCount) || 0;
+    persentase = Number(evalK6.persentase) || Math.round((selesaiCount / 4) * 100);
+    rincianMisi = `${selesaiCount}/4 Misi CT`;
+  } else if (isK5) {
+    const evalK5 = (typeof hitungRubrikPenilaianKelas5 === 'function')
+      ? hitungRubrikPenilaianKelas5(student)
+      : { nilaiAkhir: 0, selesaiCount: 0, persentase: 0 };
+    nilaiAkhir = Number(evalK5.nilaiAkhir) || 0;
+    selesaiCount = Number(evalK5.selesaiCount) || 0;
+    persentase = Number(evalK5.persentase) || Math.round((selesaiCount / 4) * 100);
+    rincianMisi = `${selesaiCount}/4 Misi Portofolio`;
+  } else {
+    // Kelas 4 SD
+    let nilaiDrive = (student.nilaiDrive !== undefined) ? Number(student.nilaiDrive) : 0;
+    if (nilaiDrive === 0 && typeof dapatkanDriveSiswa === 'function') {
+      try {
+        const dData = dapatkanDriveSiswa(student);
+        const eDrive = hitungNilaiDrive7Kebiasaan(dData);
+        nilaiDrive = eDrive.totalSkor || 0;
+      } catch (e) {}
+    }
+    const posterData = (typeof dapatkanStatusDanNilaiPosterSiswa === 'function')
+      ? dapatkanStatusDanNilaiPosterSiswa(student)
+      : { nilaiPoster: student.nilaiPoster || 0 };
+    const nPoster = Number(posterData.nilaiPoster) || Number(student.nilaiPoster) || 0;
+
+    const exData = (typeof dapatkanStatusDanNilaiExcelSiswa === 'function')
+      ? dapatkanStatusDanNilaiExcelSiswa(student)
+      : { nilaiExcel: student.nilaiExcel || 0 };
+    const nExcel = Number(exData.nilaiExcel) || Number(student.nilaiExcel) || 0;
+
+    const nKuis = (typeof dapatkanStatusDanNilaiKuisSiswa === 'function')
+      ? (dapatkanStatusDanNilaiKuisSiswa(student, 1) || Number(student.kuisSem1) || 0)
+      : (Number(student.kuisSem1) || 0);
+
+    nilaiAkhir = Math.round((nKuis * 0.25) + (nilaiDrive * 0.25) + (nPoster * 0.25) + (nExcel * 0.25));
+
+    selesaiCount = 0;
+    if (nPoster > 0) selesaiCount++;
+    if (nExcel > 0) selesaiCount++;
+    if (nilaiDrive > 0) selesaiCount++;
+    if (nKuis > 0) selesaiCount++;
+    persentase = Math.round((selesaiCount / 4) * 100);
+    rincianMisi = `${selesaiCount}/4 Praktik`;
+  }
+
+  const poinBintang = Number(student.poinBintang) || 0;
+  // Bobot skor peringkat: Nilai Rapor (1000) + Progress % (10) + Poin Bintang (1)
+  const skorPeringkat = (nilaiAkhir * 1000) + (persentase * 10) + poinBintang;
+
+  return {
+    student: student,
+    id: student.id || student.nis || student.nama,
+    nama: student.nama || 'Siswa',
+    kelas: student.kelas || '-',
+    nis: student.nis || '-',
+    absen: student.absen || '-',
+    jenisKelamin: student.jenisKelamin || 'L',
+    nilaiAkhir: nilaiAkhir,
+    selesaiCount: selesaiCount,
+    totalMisi: totalMisi,
+    persentase: persentase,
+    rincianMisi: rincianMisi,
+    poinBintang: poinBintang,
+    skorPeringkat: skorPeringkat
+  };
+}
+window.hitungDataPeringkatSiswa = hitungDataPeringkatSiswa;
+
+/**
+ * Mengambil daftar 5 siswa dengan nilai & capaian progres tertinggi
+ */
+function dapatkanTop5Siswa(filterKategori = 'auto') {
+  let db = [];
+  try {
+    db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+  } catch (e) {
+    db = [];
+  }
+  if (!Array.isArray(db) || db.length === 0) {
+    if (typeof SEED_STUDENTS !== 'undefined' && Array.isArray(SEED_STUDENTS)) {
+      db = SEED_STUDENTS;
+    } else {
+      return { top5: [], posisiSaya: null, activeCategory: 'kelas6', totalSiswa: 0 };
+    }
+  }
+
+  // Siswa aktif saat ini
+  let activeStudent = null;
+  try {
+    activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  } catch (e) {}
+
+  let targetFilter = filterKategori;
+  if (!targetFilter || targetFilter === 'auto') {
+    if (activeStudent && activeStudent.kelas) {
+      if (String(activeStudent.kelas).includes('6')) targetFilter = 'kelas6';
+      else if (String(activeStudent.kelas).includes('5')) targetFilter = 'kelas5';
+      else targetFilter = 'kelas4';
+    } else {
+      targetFilter = 'kelas6';
+    }
+  }
+
+  let filtered = db.slice();
+  if (targetFilter === 'kelas6') {
+    filtered = filtered.filter(s => String(s.kelas || '').includes('6'));
+  } else if (targetFilter === 'kelas5') {
+    filtered = filtered.filter(s => String(s.kelas || '').includes('5'));
+  } else if (targetFilter === 'kelas4') {
+    filtered = filtered.filter(s => String(s.kelas || '').includes('4'));
+  }
+
+  const evaluatedList = filtered.map(s => hitungDataPeringkatSiswa(s)).filter(Boolean);
+
+  evaluatedList.sort((a, b) => {
+    if (b.skorPeringkat !== a.skorPeringkat) return b.skorPeringkat - a.skorPeringkat;
+    if (b.nilaiAkhir !== a.nilaiAkhir) return b.nilaiAkhir - a.nilaiAkhir;
+    if (b.persentase !== a.persentase) return b.persentase - a.persentase;
+    if (b.poinBintang !== a.poinBintang) return b.poinBintang - a.poinBintang;
+    return (a.nama || '').localeCompare(b.nama || '');
+  });
+
+  evaluatedList.forEach((item, index) => {
+    item.rank = index + 1;
+  });
+
+  const top5 = evaluatedList.slice(0, 5);
+
+  let posisiSaya = null;
+  if (activeStudent) {
+    const actId = activeStudent.id || activeStudent.nis || activeStudent.nama;
+    posisiSaya = evaluatedList.find(item => {
+      return (item.id === actId) ||
+        (item.nis && item.nis === activeStudent.nis) ||
+        (String(item.nama || '').toLowerCase() === String(activeStudent.nama || '').toLowerCase() && item.kelas === activeStudent.kelas);
+    });
+  }
+
+  return {
+    top5: top5,
+    posisiSaya: posisiSaya,
+    activeCategory: targetFilter,
+    totalSiswa: evaluatedList.length
+  };
+}
+window.dapatkanTop5Siswa = dapatkanTop5Siswa;
+
+/**
+ * Merender Widget Papan Peringkat 5 Besar Siswa di Beranda
+ */
+function renderTop5SiswaLeaderboard(kategori = 'auto') {
+  const container = document.getElementById('list-top5-siswa');
+  if (!container) return;
+
+  const data = dapatkanTop5Siswa(kategori);
+  const selectFilter = document.getElementById('select-filter-top5');
+  if (selectFilter && selectFilter.value !== data.activeCategory && kategori !== 'auto') {
+    selectFilter.value = data.activeCategory;
+  }
+
+  if (!data.top5 || data.top5.length === 0) {
+    container.innerHTML = `
+      <div class="p-3 text-center text-xs text-slate-300 italic bg-white/5 rounded-xl border border-white/10">
+        Belum ada data nilai siswa untuk kategori ini.
+      </div>
+    `;
+    return;
+  }
+
+  const actStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const actId = actStudent ? (actStudent.id || actStudent.nis || actStudent.nama) : null;
+
+  let html = '';
+  data.top5.forEach((item) => {
+    const isMe = actId && (
+      item.id === actId ||
+      item.nis === actStudent.nis ||
+      (String(item.nama || '').toLowerCase() === String(actStudent.nama || '').toLowerCase() && item.kelas === actStudent.kelas)
+    );
+
+    // Badge Medali Berdasarkan Peringkat
+    let medalBadge = '';
+    let rowBorder = 'border-white/10 hover:border-yellow-400/40 bg-slate-800/60';
+    if (item.rank === 1) {
+      medalBadge = `
+        <span class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-200 text-slate-950 font-black text-xs flex items-center justify-center shadow-md ring-2 ring-yellow-300/80 animate-pulse shrink-0" title="Juara 1">
+          🥇1
+        </span>
+      `;
+      rowBorder = 'border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-slate-800/80 hover:border-amber-400';
+    } else if (item.rank === 2) {
+      medalBadge = `
+        <span class="w-7 h-7 rounded-full bg-gradient-to-tr from-slate-200 via-slate-100 to-slate-400 text-slate-950 font-black text-xs flex items-center justify-center shadow-md ring-1 ring-white/60 shrink-0" title="Juara 2">
+          🥈2
+        </span>
+      `;
+      rowBorder = 'border-slate-400/30 bg-slate-800/70 hover:border-slate-300';
+    } else if (item.rank === 3) {
+      medalBadge = `
+        <span class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-700 via-amber-600 to-amber-800 text-white font-black text-xs flex items-center justify-center shadow-md ring-1 ring-amber-500/60 shrink-0" title="Juara 3">
+          🥉3
+        </span>
+      `;
+      rowBorder = 'border-amber-700/30 bg-slate-800/60 hover:border-amber-600';
+    } else {
+      medalBadge = `
+        <span class="w-7 h-7 rounded-full bg-slate-800/90 border border-emerald-400/50 text-emerald-300 font-black text-xs flex items-center justify-center shadow-xs shrink-0" title="Peringkat ${item.rank}">
+          ${item.rank}
+        </span>
+      `;
+    }
+
+    if (isMe) {
+      rowBorder = 'border-emerald-400/80 bg-emerald-950/70 ring-2 ring-emerald-400 shadow-md shadow-emerald-950/50';
+    }
+
+    const avatarInfo = (typeof dapatkanGayaAvatarSiswa === 'function')
+      ? dapatkanGayaAvatarSiswa(item.student)
+      : { initial: item.nama ? item.nama.charAt(0).toUpperCase() : 'S', bgGradient: 'bg-emerald-500 text-white' };
+
+    html += `
+      <div onclick="if(typeof bukaRaporDigitalDariGuru==='function'){bukaRaporDigitalDariGuru('${item.id}');}" class="flex items-center justify-between gap-2 p-2 rounded-xl ${rowBorder} transition cursor-pointer group backdrop-blur-xs" title="Klik untuk lihat Rapor Digital ${item.nama}">
+        <!-- Sisi Kiri: Medali, Avatar, Nama & Kelas -->
+        <div class="flex items-center gap-2 min-w-0">
+          ${medalBadge}
+          <div class="w-7 h-7 rounded-full ${avatarInfo.bgGradient} flex items-center justify-center font-black text-[11px] shadow-inner shrink-0 group-hover:scale-105 transition">
+            ${avatarInfo.initial}
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-title font-bold text-xs text-white group-hover:text-yellow-300 transition truncate max-w-[130px] sm:max-w-[180px]">
+                ${item.nama}
+              </span>
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-white/10 text-sky-200 border border-white/20">
+                ${item.kelas}
+              </span>
+              ${isMe ? '<span class="px-1.5 py-0.2 rounded-full text-[8px] font-black bg-emerald-400 text-slate-950 animate-pulse">⭐ KAMU</span>' : ''}
+            </div>
+            <div class="flex items-center gap-2 mt-0.5 text-[10px]">
+              <span class="text-emerald-300 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-[9px]"></i> ${item.rincianMisi} (${item.persentase}%)
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sisi Kanan: Nilai Rapor & Poin Bintang -->
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="text-right">
+            <div class="font-title font-black text-xs text-yellow-300 leading-tight">
+              ${item.nilaiAkhir}<span class="text-[9px] text-slate-400 font-normal">/100</span>
+            </div>
+            <div class="text-[9px] text-slate-300 font-medium">Nilai Akhir</div>
+          </div>
+          <div class="px-1.5 py-1 rounded-lg bg-amber-400/15 border border-amber-400/30 text-amber-300 font-black text-[10px] flex items-center gap-1 shadow-2xs">
+            <i class="fa-solid fa-star text-amber-400 text-[9px]"></i>
+            <span>${item.poinBintang}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // Render Footer Posisi Siswa Aktif
+  const footerEl = document.getElementById('footer-top5-posisi-saya');
+  if (footerEl) {
+    if (data.posisiSaya) {
+      const p = data.posisiSaya;
+      const isTop5 = p.rank <= 5;
+      footerEl.innerHTML = `
+        <div class="flex items-center justify-between w-full flex-wrap gap-1">
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-400 font-bold">📍 Posisi Kamu:</span>
+            <span class="px-2 py-0.5 rounded-md font-black ${isTop5 ? 'bg-amber-500 text-slate-950 ring-1 ring-yellow-300' : 'bg-indigo-900/80 text-yellow-300 border border-indigo-400/30'} text-[11px]">
+              #${p.rank} ${isTop5 ? '🏆 TOP 5' : `dari ${data.totalSiswa} Siswa`}
+            </span>
+            <span class="text-slate-300 text-[10px]">(Nilai: <strong class="text-white">${p.nilaiAkhir}</strong> • ${p.rincianMisi})</span>
+          </div>
+          <span class="text-[10px] text-yellow-300 italic">
+            ${isTop5 ? 'Pertahankan prestasimu! 🌟' : 'Ayo tuntaskan misi untuk tembus 5 Besar! 🚀'}
+          </span>
+        </div>
+      `;
+    } else if (actStudent) {
+      footerEl.innerHTML = `
+        <div class="flex items-center justify-between w-full text-[10px] text-slate-300">
+          <span>👦 Akun: <strong class="text-white">${actStudent.nama || 'Siswa'}</strong> (${actStudent.kelas || '-'})</span>
+          <span class="text-yellow-300">Selesaikan tugas untuk masuk pemeringkatan! 🚀</span>
+        </div>
+      `;
+    } else {
+      footerEl.innerHTML = `
+        <div class="flex items-center justify-between w-full text-[10px] text-slate-300">
+          <span>💡 Masuk akun siswa untuk melihat peringkatmu di kelas.</span>
+          <button type="button" onclick="bukaPilihSiswaCepat()" class="text-yellow-300 font-bold hover:underline cursor-pointer">
+            Login Siswa 🚀
+          </button>
+        </div>
+      `;
+    }
+  }
+}
+window.renderTop5SiswaLeaderboard = renderTop5SiswaLeaderboard;
+
+// Inisialisasi otomatis Papan Peringkat saat DOM siap
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(renderTop5SiswaLeaderboard, 300);
+    });
+  } else {
+    setTimeout(renderTop5SiswaLeaderboard, 300);
+  }
+}
+
 
 

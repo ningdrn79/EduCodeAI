@@ -2007,10 +2007,10 @@
         <div class="absolute top-1/2 left-2 text-cyan-200/40 text-base pointer-events-none">🫧</div>
         <div class="absolute bottom-3 right-1/4 text-white/30 text-xs pointer-events-none">✨</div>
 
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-center">
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
           
-          <!-- Kiri: Headline, Deskripsi Singkat & Tombol Semester (4 Kolom) -->
-          <div class="lg:col-span-4 space-y-3.5">
+          <!-- Kiri: Headline, Deskripsi Singkat, Tombol Semester & Papan Peringkat 5 Besar (5 Kolom) -->
+          <div class="lg:col-span-5 space-y-3.5">
             <div class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/30 shadow-xs">
               <span id="hero-badge" data-i18n="heroBadge">EduCode AI • Semester 1</span>
             </div>
@@ -2046,10 +2046,55 @@
               </button>
             </div>
 
+            <!-- ======================================================== -->
+            <!-- PAPAN PERINGKAT 5 BESAR SISWA BERPRESTASI (LEADERBOARD) -->
+            <!-- Sinkron otomatis dengan Buku Nilai Guru & Progres Siswa -->
+            <!-- ======================================================== -->
+            <div id="hero-top5-leaderboard-card" class="mt-4 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/20 p-3.5 sm:p-4 text-white shadow-xl shadow-blue-950/40 transition-all duration-300">
+              
+              <!-- Header Papan Peringkat -->
+              <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-white/15">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">🏆</span>
+                  <div>
+                    <h4 class="font-title font-black text-xs sm:text-sm tracking-wide text-yellow-300 flex items-center gap-1.5">
+                      5 Besar Siswa Berprestasi
+                      <span class="px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">TOP 5</span>
+                    </h4>
+                    <p class="text-[10px] text-slate-300">Sinkron Buku Nilai &amp; Progres Siswa</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                  <select id="select-filter-top5" onchange="renderTop5SiswaLeaderboard(this.value)" class="bg-slate-800 text-yellow-300 text-[10px] font-bold px-2 py-1 rounded-lg border border-yellow-400/30 outline-none cursor-pointer hover:bg-slate-700 transition" title="Pilih Tingkat Kelas">
+                    <option value="auto">🎯 Kelas Aktif</option>
+                    <option value="kelas6">Kelas 6 SD</option>
+                    <option value="kelas5">Kelas 5 SD</option>
+                    <option value="kelas4">Kelas 4 SD</option>
+                    <option value="semua">Semua Siswa</option>
+                  </select>
+
+                  <button type="button" onclick="renderTop5SiswaLeaderboard()" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xs transition active:scale-95 cursor-pointer shadow-xs" title="Segarkan Papan Peringkat">
+                    <i class="fa-solid fa-rotate"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- List Kontainer 5 Siswa Teratas -->
+              <div id="list-top5-siswa" class="space-y-1.5 mt-2.5">
+                <div class="text-center py-3 text-xs text-slate-300 italic">Memuat peringkat 5 besar siswa... ⏳</div>
+              </div>
+
+              <!-- Footer Posisi Siswa yang Sedang Login -->
+              <div id="footer-top5-posisi-saya" class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-300">
+                <!-- Diisi otomatis oleh JavaScript -->
+              </div>
+            </div>
+
   </div>
 
-  <!-- Kanan: Area Kotak Jawaban Teks & Maskot Robot (Lebih Besar) DI SAMPING KANANNYA TEKS (8 Kolom) -->
-          <div class="lg:col-span-8 flex flex-col md:flex-row items-center justify-center gap-5 relative">
+  <!-- Kanan: Area Kotak Jawaban Teks & Maskot Robot (Lebih Besar) DI SAMPING KANANNYA TEKS (7 Kolom) -->
+          <div class="lg:col-span-7 flex flex-col md:flex-row items-center justify-center gap-5 relative">
             
             <!-- Aura Cahaya Warna-Warni di Belakang Maskot -->
             <div class="absolute inset-0 bg-gradient-to-tr from-yellow-300/25 via-pink-400/20 to-sky-300/35 rounded-full blur-2xl pointer-events-none"></div>
@@ -14235,8 +14280,6 @@
               <button onclick="perbaikiGaleriPosterWord()" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer" title="Perbarui dan Segarkan Tampilan Galeri">
                 <i class="fa-solid fa-rotate text-emerald-300"></i> Segarkan
               </button>
-                <i class="fa-solid fa-rotate text-emerald-300"></i> Segarkan
-              </button>
               <button onclick="switchTab('msword')" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center gap-2">
                 <i class="fa-solid fa-plus-circle text-blue-900"></i> Buka Lab Ms. Word
               </button>
@@ -23292,7 +23335,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261117_fix_word_poster_gallery_limit6_v192"></script>
+  <script charset="UTF-8" src="app.js?v=20261118_add_top5_leaderboard_v194"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
