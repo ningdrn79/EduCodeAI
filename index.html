@@ -10180,7 +10180,7 @@
             </div>
 
             <!-- Tombol Kertas Kosong (Mulai dari Awal) -->
-            <button onclick="resetWordKanvasKosong(true)" class="bg-blue-900/80 hover:bg-blue-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-400/40 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap cursor-pointer" title="Kosongkan lembar kerja untuk membuat poster secara mandiri dari awal">
+            <button onclick="resetWordKanvasKosong()" class="bg-blue-900/80 hover:bg-blue-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-400/40 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap cursor-pointer" title="Kosongkan lembar kerja untuk membuat poster secara mandiri dari awal">
               <i class="fa-regular fa-file text-xs text-blue-200"></i>
               <span>Kertas Kosong</span>
             </button>
@@ -11280,14 +11280,8 @@
                     <!-- Elemen dinamis akan ditambahkan di sini oleh JavaScript -->
                   </div>
 
-  <!-- Petunjuk Awal jika belum ada elemen -->
-                  <div id="word-paper-empty-hint" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 pointer-events-none text-slate-300">
-                    <i class="fa-regular fa-file-lines text-6xl mb-3 text-slate-200"></i>
-                    <h5 class="font-title font-bold text-slate-400 text-base sm:text-lg">Lembar Kerja Microsoft Word Siap Digunakan</h5>
-                    <p class="text-xs text-slate-400 max-w-xs mt-1">
-                      Klik teks atau gambar dari <b>Bank Bahan di sebelah kiri</b> untuk menaruh konten di lembar dokumen ini!
-                    </p>
-                  </div>
+                  <!-- Petunjuk Awal jika belum ada elemen: Bersih / Kertas Kosong Murni seperti Ms Word -->
+                  <div id="word-paper-empty-hint" class="hidden"></div>
 
   </div>
 
@@ -23297,7 +23291,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261117_poster_sync_cleanup_v182"></script>
+  <script charset="UTF-8" src="app.js?v=20261117_blank_paper_clean_v183"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
