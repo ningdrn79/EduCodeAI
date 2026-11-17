@@ -14482,15 +14482,18 @@ async function generatePosterDataUrl(customDocData = null) {
       } else if (item.type === 'gambar_luar' && item.src) {
         try {
           const imgObj = await new Promise((resolve) => {
+            const timeout = setTimeout(() => resolve(null), 300);
             const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => resolve(img);
-            img.onerror = () => resolve(null);
+            if (typeof item.src === 'string' && item.src.startsWith('data:')) {
+              img.crossOrigin = 'anonymous';
+            }
+            img.onload = () => { clearTimeout(timeout); resolve(img); };
+            img.onerror = () => { clearTimeout(timeout); resolve(null); };
             img.src = item.src;
           });
           if (imgObj) {
             const rWidth = (item.width || 140) * scale;
-            const aspect = imgObj.naturalHeight / (imgObj.naturalWidth || 1);
+            const aspect = (imgObj.naturalHeight || 1) / (imgObj.naturalWidth || 1);
             const rHeight = rWidth * aspect;
 
             if (rot !== 0) {
@@ -14589,11 +14592,14 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       ? hitungRubrikOtomatisPosterWord(elementsToSave, title, wordPageBgColor, wordPageBorderStyle)
       : { totalSkor: elementsToSave.length > 0 ? 85 : 60, aspek1: 15, aspek2: 15, aspek3: 15, aspek4: 15 };
 
+    // Generate preview PNG dengan batas waktu maksimal 350ms agar proses simpan 100% instan dan tidak pernah freeze
     if (!previewDataUrl) {
       try {
-        previewDataUrl = await generatePosterDataUrl();
+        const genP = (typeof generatePosterDataUrl === 'function') ? generatePosterDataUrl() : Promise.resolve(null);
+        const timeoutP = new Promise(resolve => setTimeout(() => resolve(null), 350));
+        previewDataUrl = await Promise.race([genP, timeoutP]);
       } catch (eGen) {
-        console.warn('generatePosterDataUrl dilewati dengan fallback:', eGen);
+        previewDataUrl = null;
       }
     }
 
@@ -14640,14 +14646,18 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       } catch (e) { list = []; }
       const existIdx = list.findIndex(p => p.title && p.title.toLowerCase() === title.toLowerCase());
       if (existIdx >= 0) {
-        list[existIdx] = posterItem;
-      } else {
-        list.unshift(posterItem);
+        list.splice(existIdx, 1);
       }
+      list.unshift(posterItem);
       if (list.length > 20) list = list.slice(0, 20);
       try {
         localStorage.setItem(k, JSON.stringify(list));
-      } catch (eSet) {}
+      } catch (eSet) {
+        try {
+          list = list.slice(0, 5);
+          localStorage.setItem(k, JSON.stringify(list));
+        } catch (eTrim) {}
+      }
     });
 
     // Tandai tugas praktik selesai untuk membuka kunci kuis (Mode Prasyarat)
@@ -14683,12 +14693,62 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     if (typeof showToast === 'function') {
       showToast(`🎉 Sukses! Poster "${title}" BERHASIL DISIMPAN ke Lemari Karya Poster (Praktik 4) & Dinilai AI: ${evaluasi.totalSkor}/100! 🖼️✨`, 'success');
     }
+
+    if (typeof tampilkanModalSuksesSimpanPoster === 'function') {
+      tampilkanModalSuksesSimpanPoster(title, evaluasi.totalSkor);
+    }
   } catch (e) {
     console.warn('Gagal menyimpan poster ke galeri:', e);
   }
 }
 window.simpanPosterKeGaleriWord = simpanPosterKeGaleriWord;
 window.simpanPosterKeLemariKarya = simpanPosterKeGaleriWord;
+
+// Modal shortcut sukses simpan poster
+function tampilkanModalSuksesSimpanPoster(title, skor) {
+  try {
+    const existing = document.getElementById('modal-sukses-simpan-poster');
+    if (existing) existing.remove();
+
+    const safeTitle = (typeof escapeXml === 'function') ? escapeXml(title) : String(title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const div = document.createElement('div');
+    div.id = 'modal-sukses-simpan-poster';
+    div.className = 'fixed bottom-5 right-5 z-[99999] max-w-sm bg-slate-900/95 border-2 border-emerald-500 text-white p-4 rounded-2xl shadow-2xl backdrop-blur-md animate-bounceIn flex flex-col gap-2.5';
+    div.innerHTML = `
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-box-archive"></i>
+          </span>
+          <div>
+            <h5 class="text-xs font-black text-emerald-300 uppercase tracking-wider">Tersimpan di Lemari Karya!</h5>
+            <p class="text-xs font-bold text-white line-clamp-1">${safeTitle}</p>
+          </div>
+        </div>
+        <button type="button" onclick="this.closest('#modal-sukses-simpan-poster').remove()" class="text-slate-400 hover:text-white p-1 text-xs cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700/60 flex items-center justify-between text-xs">
+        <span class="text-slate-300"><i class="fa-solid fa-robot text-indigo-400"></i> Nilai Otomatis AI:</span>
+        <span class="font-black text-amber-400 font-mono text-sm">${skor || 85}/100</span>
+      </div>
+      <div class="flex items-center gap-2 pt-1">
+        <button type="button" onclick="bukaHasilPosterSiswaDariPraktik4(); document.getElementById('modal-sukses-simpan-poster')?.remove();" class="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold transition shadow-sm hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-images"></i> <span>Buka Lemari Poster ➡️</span>
+        </button>
+        <button type="button" onclick="this.closest('#modal-sukses-simpan-poster').remove()" class="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-medium transition cursor-pointer">
+          Lanjut
+        </button>
+      </div>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => {
+      if (div && div.parentNode) div.remove();
+    }, 10000);
+  } catch (e) {}
+}
+window.tampilkanModalSuksesSimpanPoster = tampilkanModalSuksesSimpanPoster;
 
 // Render Galeri Poster Siswa di Tab Praktik 1 (Tampilan Khusus & Mandiri Sesuai Siswa yang Login)
 function renderGaleriPosterWord() {
