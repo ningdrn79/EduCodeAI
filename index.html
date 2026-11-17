@@ -20427,7 +20427,7 @@
   <!-- SEKTOR 1: PENILAIAN SEMESTER 1 (KONTEN DIGITAL, WORD & EXCEL) -->
         <div class="space-y-2 pt-1">
           <div class="flex items-center justify-between text-xs px-1">
-            <span class="font-title font-black text-indigo-950 flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
+            <span id="card-siswa-sektor-title" class="font-title font-black text-indigo-950 flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
               <i class="fa-solid fa-book-open text-indigo-600"></i> Capaian Nilai Semester 1 (Konten Digital, Word & Excel)
             </span>
             <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">KKM: 80</span>
@@ -20436,35 +20436,35 @@
   <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
             <!-- 1. Kuis Sem 1 -->
             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-center flex flex-col justify-between">
-              <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kuis Sem 1</div>
+              <div id="card-siswa-label-kuis1" class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kuis Sem 1</div>
               <div id="card-siswa-kuis1" class="text-xl font-black text-slate-900 my-0.5">0</div>
               <div id="card-siswa-kuis1-status" class="text-[10px] text-rose-600 font-bold">REMEDIAL</div>
             </div>
 
   <!-- 2. Drive 7 Kebiasaan (TP 2.1) -->
             <div class="p-2.5 rounded-xl bg-purple-50/70 border border-purple-200 text-center flex flex-col justify-between">
-              <div class="text-[10px] text-purple-800 font-bold uppercase tracking-wider">Drive TP 2.1</div>
+              <div id="card-siswa-label-drive" class="text-[10px] text-purple-800 font-bold uppercase tracking-wider">Drive TP 2.1</div>
               <div id="card-siswa-drive" class="text-xl font-black text-purple-700 my-0.5">0</div>
               <div id="card-siswa-drive-sub" class="text-[10px] text-purple-600 font-semibold">0 Gambar</div>
             </div>
 
   <!-- 3. 1. Poster Word -->
             <div class="p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200 text-center flex flex-col justify-between">
-              <div class="text-[10px] text-indigo-800 font-bold uppercase tracking-wider">1. Poster Word</div>
+              <div id="card-siswa-label-poster" class="text-[10px] text-indigo-800 font-bold uppercase tracking-wider">1. Poster Word</div>
               <div id="card-siswa-poster" class="text-xl font-black text-indigo-700 my-0.5">0</div>
               <div id="card-siswa-poster-sub" class="text-[10px] text-indigo-600 font-semibold">0 Poster</div>
             </div>
 
   <!-- 4. 2. Tabel Excel -->
             <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-center flex flex-col justify-between">
-              <div class="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">2. Tabel Excel</div>
+              <div id="card-siswa-label-excel" class="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">2. Tabel Excel</div>
               <div id="card-siswa-excel" class="text-xl font-black text-emerald-700 my-0.5">0</div>
               <div id="card-siswa-excel-sub" class="text-[10px] text-emerald-600 font-semibold">0 Latihan</div>
             </div>
 
   <!-- 5. Nilai Sem 1 -->
             <div class="p-2.5 rounded-xl bg-blue-50/80 border-2 border-blue-300 text-center flex flex-col justify-between shadow-2xs col-span-2 sm:col-span-1">
-              <div class="text-[10px] text-blue-900 font-black uppercase tracking-wider">Nilai Sem 1</div>
+              <div id="card-siswa-label-nilai-akhir" class="text-[10px] text-blue-900 font-black uppercase tracking-wider">Nilai Sem 1</div>
               <div id="card-siswa-nilai-sem1" class="text-xl font-black text-blue-900 my-0.5">0</div>
               <div id="card-siswa-nilai-sem1-status" class="text-[10px] text-rose-600 font-black">REMEDIAL</div>
             </div>
@@ -23307,7 +23307,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261117_hide_rapor_siswa_v178"></script>
+  <script charset="UTF-8" src="app.js?v=20261117_unify_aksi_all_grades_v180"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

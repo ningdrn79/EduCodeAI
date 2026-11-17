@@ -25389,58 +25389,157 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
       : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-2xs animate-pulse';
   }
 
-  // SEMESTER 1 (KUIS, DRIVE 7 KEBIASAAN, WORD & EXCEL)
+  // BACA DATA PER ELEMEN KARTU
+  const elSektorTitle = document.getElementById('card-siswa-sektor-title');
+  const elLabelKuis1 = document.getElementById('card-siswa-label-kuis1');
+  const elLabelDrive = document.getElementById('card-siswa-label-drive');
+  const elLabelPoster = document.getElementById('card-siswa-label-poster');
+  const elLabelExcel = document.getElementById('card-siswa-label-excel');
+  const elLabelNilaiAkhir = document.getElementById('card-siswa-label-nilai-akhir');
+  const sektorSem2 = document.getElementById('sektor-rapor-sem2');
+
   const elKuis1 = document.getElementById('card-siswa-kuis1');
   const elKuis1Status = document.getElementById('card-siswa-kuis1-status');
-  if (elKuis1) elKuis1.innerText = kuis1;
-  if (elKuis1Status) {
-    elKuis1Status.innerText = isKuis1Pass ? 'TUNTAS' : 'REMEDIAL';
-    elKuis1Status.className = isKuis1Pass ? 'text-[10px] text-emerald-600 font-bold' : 'text-[10px] text-rose-600 font-bold';
-  }
-
-  // Drive 7 Kebiasaan (TP 2.1)
   const elDrive = document.getElementById('card-siswa-drive');
   const elDriveSub = document.getElementById('card-siswa-drive-sub');
-  if (elDrive) elDrive.innerText = nilaiDrive;
-  if (elDriveSub) elDriveSub.innerText = `${koleksiDrive} / 7 Gambar`;
-
   const elPoster = document.getElementById('card-siswa-poster');
   const elPosterSub = document.getElementById('card-siswa-poster-sub');
-  if (elPoster) elPoster.innerText = p1_s1;
-  if (elPosterSub) elPosterSub.innerText = `${student.posterWord || 0} Poster`;
-
   const elExcel = document.getElementById('card-siswa-excel');
   const elExcelSub = document.getElementById('card-siswa-excel-sub');
-  if (elExcel) elExcel.innerText = p2_s1;
-  if (elExcelSub) elExcelSub.innerText = `${exDataRapor.excelTabel || 0} Latihan`;
-
   const elNilaiSem1 = document.getElementById('card-siswa-nilai-sem1');
   const elNilaiSem1Status = document.getElementById('card-siswa-nilai-sem1-status');
-  if (elNilaiSem1) elNilaiSem1.innerText = nilaiSem1;
-  if (elNilaiSem1Status) {
-    elNilaiSem1Status.innerText = isSem1Pass ? 'TUNTAS KKM' : 'REMEDIAL';
-    elNilaiSem1Status.className = isSem1Pass ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
-  }
 
+  const isKelas6StudentRapor = String(student.kelas || '').includes('6');
   const isKelas5StudentRapor = String(student.kelas || '').includes('5');
-  if (isKelas5StudentRapor) {
+
+  if (isKelas6StudentRapor) {
+    const evalK6 = (typeof hitungRubrikPenilaianKelas6 === 'function')
+      ? hitungRubrikPenilaianKelas6(student)
+      : { nilaiScratch4Pilar: 0, nilaiScratchAlgoritma: 0, nilaiAntarTeman: 0, nilaiKuis6: 0, nilaiAkhir: 0, isTuntas: false, hasScratch4Pilar: false, hasScratchAlgoritma: false, hasAntarTeman: false, hasKuis6: false };
+
+    if (elSektorTitle) elSektorTitle.innerHTML = '<i class="fa-solid fa-puzzle-piece text-orange-600"></i> Capaian Nilai 4 Pilar Computational Thinking (Kelas 6)';
+    if (elStatusKkm) {
+      elStatusKkm.innerText = evalK6.isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
+      elStatusKkm.className = evalK6.isTuntas
+        ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-900 shadow-2xs'
+        : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-2xs animate-pulse';
+    }
+
+    if (elLabelKuis1) elLabelKuis1.innerText = '1. Detektif Sampah';
+    if (elKuis1) elKuis1.innerText = evalK6.nilaiScratch4Pilar;
+    if (elKuis1Status) {
+      elKuis1Status.innerText = evalK6.hasScratch4Pilar ? 'Karya Dikirim ✅' : 'Belum Kumpul';
+      elKuis1Status.className = evalK6.hasScratch4Pilar ? 'text-[10px] text-emerald-600 font-bold' : 'text-[10px] text-rose-600 font-bold';
+    }
+
+    if (elLabelDrive) elLabelDrive.innerText = '2. Pelestarian Lingkungan';
+    if (elDrive) elDrive.innerText = evalK6.nilaiScratchAlgoritma;
+    if (elDriveSub) elDriveSub.innerText = evalK6.hasScratchAlgoritma ? 'Proyek Kelompok ✅' : 'Belum Kumpul';
+
+    if (elLabelPoster) elLabelPoster.innerText = '3. Antar Teman';
+    if (elPoster) elPoster.innerText = evalK6.nilaiAntarTeman;
+    if (elPosterSub) elPosterSub.innerText = evalK6.hasAntarTeman ? 'Penilaian Selesai ✅' : 'Belum Menilai';
+
+    if (elLabelExcel) elLabelExcel.innerText = '4. Kuis Komputasi';
+    if (elExcel) elExcel.innerText = evalK6.nilaiKuis6;
+    if (elExcelSub) elExcelSub.innerText = evalK6.hasKuis6 ? 'Kuis Selesai ✅' : 'Belum Kuis';
+
+    if (elLabelNilaiAkhir) elLabelNilaiAkhir.innerText = 'Nilai Rapor';
+    if (elNilaiSem1) elNilaiSem1.innerText = evalK6.nilaiAkhir;
+    if (elNilaiSem1Status) {
+      elNilaiSem1Status.innerText = evalK6.isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
+      elNilaiSem1Status.className = evalK6.isTuntas ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+    }
+
+    if (sektorSem2) {
+      sektorSem2.classList.add('hidden');
+      sektorSem2.style.display = 'none';
+    }
+  } else if (isKelas5StudentRapor) {
     const evalK5 = hitungRubrikPenilaianKelas5(student);
+    if (elSektorTitle) elSektorTitle.innerHTML = '<i class="fa-solid fa-folder-tree text-purple-600"></i> Capaian Nilai Portofolio Digital & AI (Kelas 5)';
     if (elStatusKkm) {
       elStatusKkm.innerText = evalK5.isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
       elStatusKkm.className = evalK5.isTuntas
         ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-900 shadow-2xs'
         : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-2xs animate-pulse';
     }
-    if (elDrive) elDrive.innerText = evalK5.nilaiPresentasi;
-    if (elDriveSub) elDriveSub.innerText = `${evalK5.berkasPptCount}/2 Berkas PPT`;
-    if (elPoster) elPoster.innerText = evalK5.nilaiSertifikat;
-    if (elPosterSub) elPosterSub.innerText = evalK5.hasSertifikat ? 'Hour of Code Resmi' : 'Belum Ada';
-    if (elExcel) elExcel.innerText = evalK5.nilaiPosterCanva;
-    if (elExcelSub) elExcelSub.innerText = evalK5.hasPoster ? 'Poster PNG Canva' : 'Belum Ada';
+
+    if (elLabelKuis1) elLabelKuis1.innerText = '1. Presentasi PPT';
+    if (elKuis1) elKuis1.innerText = evalK5.nilaiPresentasi;
+    if (elKuis1Status) {
+      elKuis1Status.innerText = `${evalK5.berkasPptCount}/2 Berkas PPT`;
+      elKuis1Status.className = evalK5.berkasPptCount > 0 ? 'text-[10px] text-purple-600 font-bold' : 'text-[10px] text-rose-600 font-bold';
+    }
+
+    if (elLabelDrive) elLabelDrive.innerText = '2. Sertifikat HOC';
+    if (elDrive) elDrive.innerText = evalK5.nilaiSertifikat;
+    if (elDriveSub) elDriveSub.innerText = evalK5.hasSertifikat ? 'Hour of Code Resmi' : 'Belum Ada';
+
+    if (elLabelPoster) elLabelPoster.innerText = '3. Poster Canva';
+    if (elPoster) elPoster.innerText = evalK5.nilaiPosterCanva;
+    if (elPosterSub) elPosterSub.innerText = evalK5.hasPoster ? 'Poster PNG Canva' : 'Belum Ada';
+
+    if (elLabelExcel) elLabelExcel.innerText = '4. Game Coding';
+    if (elExcel) elExcel.innerText = evalK5.nilaiGameCoding;
+    if (elExcelSub) elExcelSub.innerText = evalK5.hasGame ? 'Projek Scratch' : 'Belum Ada';
+
+    if (elLabelNilaiAkhir) elLabelNilaiAkhir.innerText = 'Nilai Akhir';
     if (elNilaiSem1) elNilaiSem1.innerText = evalK5.nilaiAkhir;
     if (elNilaiSem1Status) {
       elNilaiSem1Status.innerText = evalK5.isTuntas ? 'TUNTAS KKM' : 'REMEDIAL';
       elNilaiSem1Status.className = evalK5.isTuntas ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+    }
+
+    if (sektorSem2) {
+      sektorSem2.classList.add('hidden');
+      sektorSem2.style.display = 'none';
+    }
+  } else {
+    // Kelas 4 SD
+    if (elSektorTitle) elSektorTitle.innerHTML = '<i class="fa-solid fa-book-open text-indigo-600"></i> Capaian Nilai Semester 1 (Konten Digital, Word & Excel)';
+    if (elStatusKkm) {
+      elStatusKkm.innerText = statusKkmFinal;
+      elStatusKkm.className = isSem1Pass
+        ? 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-900 shadow-2xs'
+        : 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-2xs animate-pulse';
+    }
+
+    if (elLabelKuis1) elLabelKuis1.innerText = 'Kuis Sem 1';
+    if (elKuis1) elKuis1.innerText = kuis1;
+    if (elKuis1Status) {
+      elKuis1Status.innerText = isKuis1Pass ? 'TUNTAS' : 'REMEDIAL';
+      elKuis1Status.className = isKuis1Pass ? 'text-[10px] text-emerald-600 font-bold' : 'text-[10px] text-rose-600 font-bold';
+    }
+
+    if (elLabelDrive) elLabelDrive.innerText = 'Drive TP 2.1';
+    if (elDrive) elDrive.innerText = nilaiDrive;
+    if (elDriveSub) elDriveSub.innerText = `${koleksiDrive} / 7 Gambar`;
+
+    if (elLabelPoster) elLabelPoster.innerText = '1. Poster Word';
+    if (elPoster) elPoster.innerText = p1_s1;
+    if (elPosterSub) elPosterSub.innerText = `${student.posterWord || 0} Poster`;
+
+    if (elLabelExcel) elLabelExcel.innerText = '2. Tabel Excel';
+    if (elExcel) elExcel.innerText = p2_s1;
+    if (elExcelSub) elExcelSub.innerText = `${exDataRapor.excelTabel || 0} Latihan`;
+
+    if (elLabelNilaiAkhir) elLabelNilaiAkhir.innerText = 'Nilai Sem 1';
+    if (elNilaiSem1) elNilaiSem1.innerText = nilaiSem1;
+    if (elNilaiSem1Status) {
+      elNilaiSem1Status.innerText = isSem1Pass ? 'TUNTAS KKM' : 'REMEDIAL';
+      elNilaiSem1Status.className = isSem1Pass ? 'text-[10px] text-emerald-600 font-black' : 'text-[10px] text-rose-600 font-black';
+    }
+
+    if (sektorSem2) {
+      const isSem2Open = (typeof isSemester2Unlocked === 'function') ? isSemester2Unlocked() : (state.currentSemester === 2);
+      if (isSem2Open) {
+        sektorSem2.classList.remove('hidden');
+        sektorSem2.style.display = 'block';
+      } else {
+        sektorSem2.classList.add('hidden');
+        sektorSem2.style.display = 'none';
+      }
     }
   }
 
@@ -25499,7 +25598,19 @@ function isiDataRaporDigital(student, isTeacherMode = false) {
     btnEditNilai.style.display = isTeacherMode ? '' : 'none';
     btnEditNilai.onclick = () => {
       tutupModalProfilSiswa();
-      bukaModalDetailSiswa(student.id);
+      if (isKelas6StudentRapor) {
+        if (typeof bukaModalMonitoringTugasKelas6 === 'function') {
+          bukaModalMonitoringTugasKelas6(student.id || student.nis || student.nama);
+        }
+      } else if (isKelas5StudentRapor) {
+        if (typeof bukaModalMonitoringPortofolioKelas5 === 'function') {
+          bukaModalMonitoringPortofolioKelas5(student.id || student.nis || student.nama);
+        }
+      } else {
+        if (typeof bukaModalDetailSiswa === 'function') {
+          bukaModalDetailSiswa(student.id);
+        }
+      }
     };
   }
 
@@ -28092,7 +28203,7 @@ function renderTabelGradebook(students, totalAll) {
           <th class="py-4 px-2 text-center w-28">Nilai Akhir</th>
           <th class="py-4 px-2 text-center w-32">Status KKM</th>
           <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
-          <th class="py-4 px-2 text-center w-28">Aksi</th>
+          <th class="py-4 px-2 text-center w-32">Aksi</th>
         </tr>
       `;
     } else if (mode === 1) {
@@ -28108,7 +28219,7 @@ function renderTabelGradebook(students, totalAll) {
           <th class="py-4 px-2 text-center w-28">Nilai Sem 1</th>
           <th class="py-4 px-2 text-center w-32">Status KKM</th>
           <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
-          <th class="py-4 px-2 text-center w-28">Aksi</th>
+          <th class="py-4 px-2 text-center w-32">Aksi</th>
         </tr>
       `;
     } else if (mode === 2) {
@@ -28123,7 +28234,7 @@ function renderTabelGradebook(students, totalAll) {
           <th class="py-4 px-2 text-center w-28">Nilai Sem 2</th>
           <th class="py-4 px-2 text-center w-32">Status KKM</th>
           <th class="py-4 px-3 min-w-[170px]">Catatan Guru</th>
-          <th class="py-4 px-2 text-center w-24">Aksi</th>
+          <th class="py-4 px-2 text-center w-32">Aksi</th>
         </tr>
       `;
     } else {
@@ -28139,7 +28250,7 @@ function renderTabelGradebook(students, totalAll) {
           <th class="py-4 px-2 text-center w-28">Kuis (S1/S2)</th>
           <th class="py-4 px-2 text-center w-24">Rata-Rata</th>
           <th class="py-4 px-2 text-center w-28">Status KKM</th>
-          <th class="py-4 px-2 text-center w-24">Aksi</th>
+          <th class="py-4 px-2 text-center w-32">Aksi</th>
         </tr>
       `;
     }
@@ -28282,25 +28393,25 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <!-- Catatan Guru -->
         <td class="${padRow} px-3 cursor-pointer group" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'catatan')" title="Klik untuk mengedit Catatan Guru ${s.nama}">
-          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px] group-hover:text-orange-700 transition flex items-center justify-between gap-1.5" title="${s.catatanGuru || 'Belum ada catatan'}">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px] group-hover:text-purple-700 transition flex items-center justify-between gap-1.5" title="${s.catatanGuru || 'Belum ada catatan'}">
             <span class="truncate">${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">Belum ada catatan</span>'}</span>
-            <i class="fa-solid fa-pen-to-square text-[11px] text-orange-500 opacity-60 group-hover:opacity-100 transition shrink-0 pointer-events-none"></i>
+            <i class="fa-solid fa-pen-to-square text-[11px] text-purple-500 opacity-60 group-hover:opacity-100 transition shrink-0 pointer-events-none"></i>
           </div>
         </td>
         <!-- Aksi -->
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
-            <button type="button" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Monitoring & Beri Nilai 4 Tugas Kelas 6" class="${szAksi} rounded-xl bg-orange-50 hover:bg-orange-600 hover:text-white text-orange-700 border border-orange-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+            <button type="button" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Monitoring 4 Tugas Kelas 6" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
-            <button type="button" onclick="bukaModalSertifikatKelas6('${s.id || s.nis || s.nama}')" title="Piagam Sertifikat Kelulusan Kelas 6" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-award"></i>
+            <button type="button" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card pointer-events-none"></i>
             </button>
-            <button type="button" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}')" title="Beri Nilai & Catatan Guru Kelas 6" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <button type="button" onclick="bukaModalMonitoringTugasKelas6('${s.id || s.nis || s.nama}', 'catatan')" title="Beri Nilai & Catatan Guru Kelas 6" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square pointer-events-none"></i>
             </button>
             <button type="button" onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-trash-can"></i>
+              <i class="fa-solid fa-trash-can pointer-events-none"></i>
             </button>
           </div>
         </td>
@@ -28506,9 +28617,10 @@ function renderTabelGradebook(students, totalAll) {
             ${isSem1Pass ? '✅ TUNTAS' : (hasActivitySem1 ? '⚠️ REMEDIAL' : '⏳ BELUM AKTIF')}
           </span>
         </td>
-        <td class="${padRow} px-3">
-          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px]" title="${s.catatanGuru || 'Belum ada catatan'}">
-            ${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}
+        <td class="${padRow} px-3 cursor-pointer group" onclick="bukaModalDetailSiswa('${s.id}')" title="Klik untuk mengedit Catatan Guru ${s.nama}">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px] group-hover:text-purple-700 transition flex items-center justify-between gap-1.5" title="${s.catatanGuru || 'Belum ada catatan'}">
+            <span class="truncate">${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}</span>
+            <i class="fa-solid fa-pen-to-square text-[11px] text-purple-500 opacity-60 group-hover:opacity-100 transition shrink-0 pointer-events-none"></i>
           </div>
         </td>
         <td class="${padRow} px-2 text-center">
@@ -28516,14 +28628,14 @@ function renderTabelGradebook(students, totalAll) {
             <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id || s.nis || s.nama}')" title="Monitoring Drive 7 Kebiasaan Siswa" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
               <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
-            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-id-card"></i>
+            <button type="button" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card pointer-events-none"></i>
             </button>
-            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square pointer-events-none"></i>
             </button>
-            <button onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-trash-can"></i>
+            <button type="button" onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can pointer-events-none"></i>
             </button>
           </div>
         </td>
@@ -28581,21 +28693,25 @@ function renderTabelGradebook(students, totalAll) {
             ${isSem2Pass ? '✅ TUNTAS' : '⚠️ REMEDIAL'}
           </span>
         </td>
-        <td class="${padRow} px-3">
-          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px]" title="${s.catatanGuru || 'Belum ada catatan'}">
-            ${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}
+        <td class="${padRow} px-3 cursor-pointer group" onclick="bukaModalDetailSiswa('${s.id}')" title="Klik untuk mengedit Catatan Guru ${s.nama}">
+          <div class="${szCatatan} text-slate-700 font-semibold leading-relaxed max-w-[200px] group-hover:text-purple-700 transition flex items-center justify-between gap-1.5" title="${s.catatanGuru || 'Belum ada catatan'}">
+            <span class="truncate">${s.catatanGuru ? `"${s.catatanGuru}"` : '<span class="text-slate-400 font-normal italic">-</span>'}</span>
+            <i class="fa-solid fa-pen-to-square text-[11px] text-purple-500 opacity-60 group-hover:opacity-100 transition shrink-0 pointer-events-none"></i>
           </div>
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
-            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-id-card"></i>
+            <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id || s.nis || s.nama}')" title="Monitoring Drive 7 Kebiasaan Siswa" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
-            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <button type="button" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card pointer-events-none"></i>
             </button>
-            <button onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-trash-can"></i>
+            <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square pointer-events-none"></i>
+            </button>
+            <button type="button" onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can pointer-events-none"></i>
             </button>
           </div>
         </td>
@@ -28636,14 +28752,17 @@ function renderTabelGradebook(students, totalAll) {
         </td>
         <td class="${padRow} px-2 text-center">
           <div class="flex items-center justify-center gap-1.5">
-            <button onclick="bukaRaporDigitalDariGuru('${s.id}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-id-card"></i>
+            <button type="button" onclick="bukaModalMonitoringDriveGuru('${s.id || s.nis || s.nama}')" title="Monitoring Drive 7 Kebiasaan Siswa" class="${szAksi} rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-folder-open pointer-events-none"></i>
             </button>
-            <button onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <button type="button" onclick="bukaRaporDigitalDariGuru('${s.id || s.nis || s.nama}')" title="Buka Rapor Digital Siswa" class="${szAksi} rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-id-card pointer-events-none"></i>
             </button>
-            <button onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
-              <i class="fa-solid fa-trash-can"></i>
+            <button type="button" onclick="bukaModalDetailSiswa('${s.id}')" title="Detail & Nilai Guru" class="${szAksi} rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-pen-to-square pointer-events-none"></i>
+            </button>
+            <button type="button" onclick="hapusSiswaById('${s.id}')" title="Hapus Siswa" class="${szAksi} rounded-xl bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 transition flex items-center justify-center shadow-xs cursor-pointer">
+              <i class="fa-solid fa-trash-can pointer-events-none"></i>
             </button>
           </div>
         </td>
