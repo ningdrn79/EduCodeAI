@@ -10185,16 +10185,6 @@
               <span>Kertas Kosong</span>
             </button>
 
-            <!-- Tombol Kirim ke Hasil Poster Siswa & Nilai Otomatis Guru -->
-            <button onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-black px-3 py-1 rounded-lg border border-emerald-300/80 flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & kirim nilai otomatis ke Akun Guru">
-              <i class="fa-solid fa-cloud-arrow-up text-xs text-amber-200"></i>
-              <span>Kirim Poster ke Guru 🚀</span>
-            </button>
-            <button onclick="evaluasiDanNilaiOtomatisPosterWord()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-300/60 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap" title="Sistem AI menilai poster Word secara otomatis (0-100) berdasarkan 4 aspek rubrik">
-              <i class="fa-solid fa-robot text-xs text-amber-200"></i>
-              <span>Nilai AI</span>
-            </button>
-
             <!-- Tombol Layar Penuh Seperti di Ms. Excel -->
             <button onclick="toggleMaximizeWordWindow()" id="btn-word-fullscreen-title" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1 rounded-lg border border-blue-400/60 flex items-center gap-1.5 transition shadow-xs hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap" title="Tampilkan Satu Layar Penuh (Fullscreen)">
               <i id="word-fullscreen-icon" class="fa-solid fa-expand text-xs"></i>
@@ -10260,13 +10250,14 @@
             <i class="fa-solid fa-crop-simple text-[10px]"></i> Picture Format
           </button>
 
-          <!-- Tombol Simpan ke Hasil Poster & Share di Pojok Kanan Atas -->
+          <!-- Tombol Simpan & Nilai Poster (AI) di Pojok Kanan Atas -->
           <div class="ml-auto flex items-center gap-2 pr-1">
-            <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & kirim nilai ke Akun Guru">
-              <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i> Simpan ke Hasil Poster
+            <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 cursor-pointer" title="Simpan karya Lab Word ke Hasil Poster Siswa & Dapatkan Nilai Otomatis dari Sistem AI (TP 2.1)">
+              <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i>
+              <span>Simpan &amp; Nilai Poster (AI) 🚀</span>
             </button>
-            <button onclick="simpanPosterWord()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition">
-              <i class="fa-solid fa-share-nodes"></i> Share
+            <button onclick="simpanPosterWord()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer" title="Unduh hasil poster sebagai file gambar PNG">
+              <i class="fa-solid fa-download"></i> Unduh PNG
             </button>
           </div>
 
@@ -11205,11 +11196,11 @@
             <div class="w-full bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 text-slate-800 px-3.5 py-1.5 text-xs font-bold border-b border-emerald-200 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
               <div class="flex items-center gap-2">
                 <span class="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px] font-black shrink-0">✓</span>
-                <span class="text-[11px] text-slate-700">Lab MS Word terhubung otomatis ke <b>Hasil Poster Siswa</b> &amp; <b>Buku Nilai Guru (TP 2.1)</b>.</span>
+                <span class="text-[11px] text-slate-700">Lab MS Word terhubung otomatis ke <b>Hasil Poster Siswa (Praktik 4)</b> &amp; <b>Buku Nilai Guru (TP 2.1)</b>.</span>
               </div>
-              <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition flex items-center gap-1 cursor-pointer">
-                <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i> <span>Kirim Nilai ke Guru 🚀</span>
-              </button>
+              <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                <i class="fa-solid fa-check-double text-emerald-600"></i> Otomatis Dinilai AI
+              </span>
             </div>
             
             <!-- BAR PENGGARIS HORIZONTAL & TAB STOP CORNER -->
@@ -14240,13 +14231,12 @@
   </div>
 
   <div class="flex flex-wrap items-center gap-2 shrink-0">
-              <button onclick="pasangContohPosterGaleri()" class="px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5" title="Muat Contoh Poster Lengkap Kilat">
-                <i class="fa-solid fa-wand-magic-sparkles text-yellow-300"></i> Buat Contoh Lengkap
-              </button>
-              <button onclick="bukaModalHapusSemuaPoster()" class="px-3.5 py-2 rounded-xl bg-rose-500/25 hover:bg-rose-500 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5" title="Bersihkan dan Hapus Seluruh Dokumen Poster">
+              <button onclick="bukaModalHapusSemuaPoster()" class="px-3.5 py-2 rounded-xl bg-rose-500/25 hover:bg-rose-500 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer" title="Bersihkan dan Hapus Seluruh Dokumen Poster">
                 <i class="fa-solid fa-trash-can text-rose-200"></i> Hapus Semua
               </button>
-              <button onclick="perbaikiGaleriPosterWord()" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5" title="Perbarui dan Perbaiki Tampilan Galeri">
+              <button onclick="perbaikiGaleriPosterWord()" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer" title="Perbarui dan Segarkan Tampilan Galeri">
+                <i class="fa-solid fa-rotate text-emerald-300"></i> Segarkan
+              </button>
                 <i class="fa-solid fa-rotate text-emerald-300"></i> Segarkan
               </button>
               <button onclick="switchTab('msword')" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center gap-2">
@@ -23307,7 +23297,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261117_unify_aksi_all_grades_v180"></script>
+  <script charset="UTF-8" src="app.js?v=20261117_poster_sync_cleanup_v182"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
