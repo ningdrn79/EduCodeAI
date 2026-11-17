@@ -2094,6 +2094,16 @@ function switchTab(tabId) {
         }
       }
 
+      // Reset skor sesi kuis saat baru dibuka jika belum disubmit dan belum menyelesaikan sesi saat ini
+      const submitCheck = (typeof isQuizAlreadySubmittedForActiveStudent === 'function')
+        ? isQuizAlreadySubmittedForActiveStudent()
+        : { isSubmitted: false, score: 0 };
+      if (!submitCheck.isSubmitted && !state.hasFinishedQuizCurrentSession) {
+        state.quizScore = 0;
+        state.quizCorrectCount = 0;
+        state.currentQuizIndex = 0;
+      }
+
       // Muat soal sesuai bank soal aktif (Kelas 6 memuat DEFAULT_BANK_SOAL_K6)
       if (typeof loadQuizQuestion === 'function') {
         loadQuizQuestion();
@@ -10138,10 +10148,6 @@ function simulasiTandaiTugasSelesai() {
     localStorage.setItem(`educode_task_done_${sId}_sem${sem}`, 'true');
   } catch(e) {}
 
-  if (typeof pasangContohPosterGaleri === 'function') {
-    pasangContohPosterGaleri();
-  }
-
   showToast('🎉 Tugas praktik berhasil ditandai selesai! Soal kuis kini DIBUKA! 🚀', 'success');
   loadQuizQuestion();
 }
@@ -10537,6 +10543,10 @@ function loadQuizQuestion() {
     if (!state.hasFinishedQuizCurrentSession) {
       if (quizBox) quizBox.classList.remove('hidden');
     }
+  }
+
+  if (typeof sinkronkanSkorKuisHeader === 'function') {
+    sinkronkanSkorKuisHeader();
   }
 
   const subtitleEl = document.getElementById('quiz-header-subtitle');
@@ -11707,6 +11717,10 @@ function nextQuestion() {
       localStorage.setItem(`educode_pending_quiz_score_sem${semNum}_${sId}`, String(state.quizScore));
     } catch (e) {}
 
+    if (typeof sinkronkanSkorKuisHeader === 'function') {
+      sinkronkanSkorKuisHeader();
+    }
+
     const quizBox = document.getElementById('quiz-box');
     if (quizBox) quizBox.classList.add('hidden');
     const certBox = document.getElementById('certificate-box');
@@ -11779,6 +11793,8 @@ function restartQuiz() {
   state.hasFinishedQuizCurrentSession = false;
   const scoreEl = document.getElementById('quiz-score');
   if (scoreEl) scoreEl.innerText = '0';
+  const btnKirimTop = document.getElementById('btn-kirim-kuis-top');
+  if (btnKirimTop) btnKirimTop.classList.add('hidden');
   const finishSummary = document.getElementById('quiz-finish-summary');
   if (finishSummary) finishSummary.classList.add('hidden');
   const certBox = document.getElementById('certificate-box');
@@ -11787,6 +11803,7 @@ function restartQuiz() {
   if (certBox) certBox.classList.add('hidden');
   if (checklistBox) checklistBox.classList.add('hidden');
   if (quizBox) quizBox.classList.remove('hidden');
+  if (typeof sinkronkanSkorKuisHeader === 'function') sinkronkanSkorKuisHeader();
   loadQuizQuestion();
 }
 
@@ -12023,27 +12040,27 @@ window.navigasiKeTugasKka = navigasiKeTugasKka;
 function sinkronkanSkorKuisHeader() {
   try {
     const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-    const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
-    const sNis = profile && profile.nis ? String(profile.nis).trim() : '';
-    const student = (profile && db.find(s => (sNis && s.nis && String(s.nis).trim() === sNis) || (s.id && profile.id && s.id === profile.id))) || profile || {};
+    const submitCheck = (typeof isQuizAlreadySubmittedForActiveStudent === 'function')
+      ? isQuizAlreadySubmittedForActiveStudent()
+      : { isSubmitted: false, score: 0 };
 
-    let currentScore = 0;
-    const isK6Std = (student && (String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI'))) ||
-                    (profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI')));
-    if (isK6Std) {
-      currentScore = (student && student.nilaiKuis6 && Number(student.nilaiKuis6) > 0) 
-        ? Number(student.nilaiKuis6) 
-        : ((student && student.kuisSem1 && Number(student.kuisSem1) > 0) ? Number(student.kuisSem1) : (state.quizScore || 0));
-    } else if (state.currentSemester === 2) {
-      currentScore = (student && student.kuisSem2 && Number(student.kuisSem2) > 0) ? Number(student.kuisSem2) : (state.quizScore || 0);
-    } else {
-      currentScore = (student && student.kuisSem1 && Number(student.kuisSem1) > 0) ? Number(student.kuisSem1) : (state.quizScore || 0);
-    }
-
-    // Perbarui badge Skor Kamu di header kuis
     const scoreEl = document.getElementById('quiz-score');
-    if (scoreEl) {
-      scoreEl.innerText = currentScore;
+    const btnKirimTop = document.getElementById('btn-kirim-kuis-top');
+
+    if (submitCheck.isSubmitted) {
+      // 1. Siswa sudah selesai mengerjakan dan nilainya sudah resmi dikirim (Kuis Terkunci)
+      if (scoreEl) scoreEl.innerText = submitCheck.score || 0;
+      if (btnKirimTop) btnKirimTop.classList.add('hidden');
+    } else if (typeof state !== 'undefined' && state.hasFinishedQuizCurrentSession) {
+      // 2. Siswa baru saja menyelesaikan seluruh soal di sesi ini, skor akhir siap dikirim
+      if (scoreEl) scoreEl.innerText = state.quizScore || 0;
+      if (btnKirimTop) btnKirimTop.classList.remove('hidden');
+    } else {
+      // 3. Siswa belum selesai / baru mulai / sedang menjawab di sesi ini:
+      // Tampilkan skor progres kuis saat ini (Mulai dari 0, BUKAN 100!)
+      const curScore = (typeof state !== 'undefined' && state.quizScore) ? state.quizScore : 0;
+      if (scoreEl) scoreEl.innerText = curScore;
+      if (btnKirimTop) btnKirimTop.classList.add('hidden');
     }
 
     // Tombol Lihat Piagam Sertifikat di Top Header Kuis (Dihapus sesuai permintaan)
@@ -12054,7 +12071,7 @@ function sinkronkanSkorKuisHeader() {
 
     const btnTextSertifikatModul = document.getElementById('btn-text-sertifikat-modul');
     if (btnTextSertifikatModul) {
-      if (currentScore > 0) {
+      if (submitCheck.isSubmitted && submitCheck.score > 0) {
         btnTextSertifikatModul.innerText = 'Lihat Status Kelulusan KKA & Piagam 🏆';
       } else {
         btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat 🏆';
@@ -13196,6 +13213,7 @@ function sisipkanTeksKeWord(text, subtype = 'slogan', color = '#0f172a') {
   wordElements.push(newElem);
   activeWordElementId = newElem.id;
   renderWordElements();
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (eDraft) {}
   showToast(`Teks "${text.substring(0, 18)}..." disisipkan ke Word! 🔤`, 'success');
 }
 
@@ -13239,6 +13257,7 @@ function sisipkanGambarKeWord(key) {
   wordElements.push(newElem);
   activeWordElementId = newElem.id;
   renderWordElements();
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (eDraft) {}
   showToast(`Gambar ${imgData.name} disisipkan ke Word! 🖼️`, 'success');
 }
 
@@ -13299,6 +13318,7 @@ function sisipkanGambarLuarKeWord(imageSrc, imageName = 'Gambar Luar') {
   wordElements.push(newElem);
   activeWordElementId = newElem.id;
   renderWordElements();
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (eDraft) {}
   showToast('Gambar luar (hasil download) disisipkan ke Word! 🖼️', 'success');
 }
 
@@ -13308,6 +13328,7 @@ function ubahUkuranGambarLuarWord(id, delta) {
   if (!item || item.type !== 'gambar_luar') return;
   item.width = Math.max(50, Math.min(380, item.width + delta));
   renderWordElements();
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (eDraft) {}
 }
 
 function dapatkanElemenAktifWord() {
@@ -13765,6 +13786,7 @@ function endResizeWord() {
     document.removeEventListener('touchmove', onResizeWordMove);
     document.removeEventListener('touchend', endResizeWord);
     renderWordElements();
+    try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (eDraft) {}
   }
 }
 
@@ -14568,6 +14590,96 @@ function getPosterPresetElements(key = 'lingkungan') {
   ];
 }
 
+// ==========================================
+// PEMBERSIH TEMPLATE DASAR & DETEKSI DUMMY PRESET
+// ==========================================
+function isDummyPoster(p) {
+  if (!p) return true;
+  const title = String(p.title || '').trim().toLowerCase();
+  if (title === 'poster_7_kebiasaan_anak_indonesia_hebat' || 
+      title === 'tujuh kebiasaan anak indonesia hebat' ||
+      title === 'contoh poster' ||
+      title.includes('contoh poster') ||
+      p.isPreset === true || p.isDummyTemplate === true) {
+    return true;
+  }
+  // Elemen persis preset bawaan sistem
+  if (p.docData && Array.isArray(p.docData.elements)) {
+    const hasPresetW1 = p.docData.elements.some(el => el.id === 'w1' && el.text && el.text.includes('TUJUH KEBIASAAN ANAK INDONESIA HEBAT'));
+    if (hasPresetW1 && p.docData.elements.length <= 8) return true;
+    const hasAstaCitaW1 = p.docData.elements.some(el => el.id === 'w1' && el.text && el.text.includes('MEWUJUDKAN ASTA CITA BANGSA'));
+    if (hasAstaCitaW1 && p.docData.elements.length <= 8) return true;
+  }
+  return false;
+}
+window.isDummyPoster = isDummyPoster;
+
+function bersihkanTemplateDasarDariSemuaStorage() {
+  try {
+    const keysToCheck = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('kreator_cilik_word_posters')) {
+        keysToCheck.push(k);
+      }
+    }
+
+    keysToCheck.forEach(k => {
+      try {
+        const raw = localStorage.getItem(k);
+        if (!raw || !raw.startsWith('[')) return;
+        let list = JSON.parse(raw);
+        if (!Array.isArray(list)) return;
+
+        let changed = false;
+        // 1. Hapus template dasar / dummy preset
+        const filtered = list.filter(p => {
+          if (isDummyPoster(p)) {
+            changed = true;
+            return false;
+          }
+          return true;
+        });
+
+        // 2. Kosongkan base64 raksasa (> 500 karakter) agar kuota 5MB localStorage aman
+        filtered.forEach(p => {
+          if (p.image && p.image.length > 500) {
+            p.image = '';
+            changed = true;
+          }
+        });
+
+        // 3. Maksimal 6 poster sesuai instruksi pengguna
+        let finalList = filtered;
+        if (finalList.length > 6) {
+          finalList = finalList.slice(0, 6);
+          changed = true;
+        }
+
+        if (changed || finalList.length !== list.length) {
+          localStorage.setItem(k, JSON.stringify(finalList));
+        }
+      } catch (eKey) {}
+    });
+
+    // Bersihkan key global jika kosong atau hanya berisi dummy
+    const globalRaw = localStorage.getItem('kreator_cilik_word_posters');
+    if (globalRaw && globalRaw.startsWith('[')) {
+      try {
+        const gList = JSON.parse(globalRaw);
+        const gFiltered = gList.filter(p => !isDummyPoster(p));
+        if (gFiltered.length === 0) {
+          localStorage.removeItem('kreator_cilik_word_posters');
+        } else {
+          localStorage.setItem('kreator_cilik_word_posters', JSON.stringify(gFiltered.slice(0, 6)));
+        }
+      } catch(eG) {}
+    }
+  } catch (e) {}
+}
+window.bersihkanTemplateDasarDariSemuaStorage = bersihkanTemplateDasarDariSemuaStorage;
+try { bersihkanTemplateDasarDariSemuaStorage(); } catch (eInitClean) {}
+
 // Simpan poster ke galeri koleksi siswa di Praktik 1 (Terisolasi Khusus Akun Siswa Aktif)
 async function simpanPosterKeGaleriWord(previewDataUrl = null) {
   try {
@@ -14592,23 +14704,15 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       ? hitungRubrikOtomatisPosterWord(elementsToSave, title, wordPageBgColor, wordPageBorderStyle)
       : { totalSkor: elementsToSave.length > 0 ? 85 : 60, aspek1: 15, aspek2: 15, aspek3: 15, aspek4: 15 };
 
-    // Generate preview PNG dengan batas waktu maksimal 350ms agar proses simpan 100% instan dan tidak pernah freeze
-    if (!previewDataUrl) {
-      try {
-        const genP = (typeof generatePosterDataUrl === 'function') ? generatePosterDataUrl() : Promise.resolve(null);
-        const timeoutP = new Promise(resolve => setTimeout(() => resolve(null), 350));
-        previewDataUrl = await Promise.race([genP, timeoutP]);
-      } catch (eGen) {
-        previewDataUrl = null;
-      }
-    }
+    // Bersihkan template dasar dari semua storage sebelum menyimpan karya baru
+    bersihkanTemplateDasarDariSemuaStorage();
 
     const posterItem = {
       id: 'poster_' + Date.now(),
       title: title,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now(),
-      image: previewDataUrl || '',
+      image: '', // Tidak menyimpan string base64 raksasa di localStorage agar tidak QuotaExceededError (thumbnail dirender langsung via docData.elements)
       author: authorLabel,
       studentName: authorName,
       studentClass: authorClass || 'Kelas 4',
@@ -14632,10 +14736,6 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
     const keysToSave = Array.from(new Set([
       storageKey,
       authorNis ? `kreator_cilik_word_posters_${authorNis}` : null,
-      authorId ? `kreator_cilik_word_posters_${authorId}` : null,
-      authorCleanName ? `kreator_cilik_word_posters_${authorCleanName}` : null,
-      cleanId ? `kreator_cilik_word_posters_${cleanId}` : null,
-      'kreator_cilik_word_posters',
       (!activeStudent) ? 'kreator_cilik_word_posters_guest' : null
     ].filter(Boolean)));
 
@@ -14644,17 +14744,20 @@ async function simpanPosterKeGaleriWord(previewDataUrl = null) {
       try {
         list = JSON.parse(localStorage.getItem(k) || '[]');
       } catch (e) { list = []; }
+      // Buang template dasar / dummy preset
+      list = list.filter(p => !isDummyPoster(p));
       const existIdx = list.findIndex(p => p.title && p.title.toLowerCase() === title.toLowerCase());
       if (existIdx >= 0) {
         list.splice(existIdx, 1);
       }
       list.unshift(posterItem);
-      if (list.length > 20) list = list.slice(0, 20);
+      // Maksimal 6 poster sesuai instruksi pengguna
+      if (list.length > 6) list = list.slice(0, 6);
       try {
         localStorage.setItem(k, JSON.stringify(list));
       } catch (eSet) {
         try {
-          list = list.slice(0, 5);
+          list = list.slice(0, 3);
           localStorage.setItem(k, JSON.stringify(list));
         } catch (eTrim) {}
       }
@@ -14755,6 +14858,9 @@ function renderGaleriPosterWord() {
   const container = document.getElementById('p1-word-poster-gallery');
   if (!container) return;
 
+  // Bersihkan template dummy bawaan terlebih dahulu
+  bersihkanTemplateDasarDariSemuaStorage();
+
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const storageKey = getActiveStudentStorageKey('kreator_cilik_word_posters');
 
@@ -14766,7 +14872,7 @@ function renderGaleriPosterWord() {
   if (profile && profile.nama) {
     if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-id-badge text-amber-300"></i> Portofolio Digital: <b>${profile.nama}</b> (${profile.kelas} • NIS: ${profile.nis || '-'})`;
     if (titleEl) titleEl.innerText = `Lemari Karya Poster: ${profile.nama}`;
-    if (descEl) descEl.innerHTML = `Setiap poster yang dibuat dan disimpan oleh <b>${profile.nama}</b> di Lab Ms. Word tersimpan khusus di sini sebagai portofolio karya digital pribadimu!`;
+    if (descEl) descEl.innerHTML = `Setiap poster yang dibuat dan disimpan oleh <b>${profile.nama}</b> di Lab Ms. Word tersimpan khusus di sini sebagai portofolio karya digital pribadimu! (Maks. 6 poster)`;
   } else {
     if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-user-clock text-amber-300"></i> Mode Tamu (Belum Login Siswa)`;
     if (titleEl) titleEl.innerText = `Galeri & Lemari Penyimpanan Poster Microsoft Word`;
@@ -14784,19 +14890,27 @@ function renderGaleriPosterWord() {
     }
   }
 
-  // Fallback checks across all possible student keys if active key is empty
-  if (!Array.isArray(posters) || posters.length === 0) {
+  // Filter ketat: buang template dasar / dummy bawaan sistem
+  if (Array.isArray(posters)) {
+    posters = posters.filter(p => !isDummyPoster(p));
+  } else {
+    posters = [];
+  }
+
+  // Fallback checks across student keys if active key is empty
+  if (posters.length === 0 && profile) {
     const fallbackKeys = [];
-    if (profile) {
-      if (profile.nis) fallbackKeys.push(`kreator_cilik_word_posters_${String(profile.nis).trim()}`);
-      if (profile.id) fallbackKeys.push(`kreator_cilik_word_posters_${String(profile.id).trim()}`);
-      if (profile.nama) {
-        const cleanName = String(profile.nama).replace(/[^a-zA-Z0-9_-]/g, '_');
-        fallbackKeys.push(`kreator_cilik_word_posters_${cleanName}`);
-        fallbackKeys.push(`kreator_cilik_word_posters_${profile.kelas || '4'}_${cleanName}`);
-      }
+    if (profile.nis) fallbackKeys.push(`kreator_cilik_word_posters_${String(profile.nis).trim()}`);
+    if (profile.id) fallbackKeys.push(`kreator_cilik_word_posters_${String(profile.id).trim()}`);
+    if (profile.nama) {
+      const cleanName = String(profile.nama).replace(/[^a-zA-Z0-9_-]/g, '_');
+      fallbackKeys.push(`kreator_cilik_word_posters_${cleanName}`);
+      fallbackKeys.push(`kreator_cilik_word_posters_${profile.kelas || '4'}_${cleanName}`);
     }
-    fallbackKeys.push('kreator_cilik_word_posters');
+
+    const myNis = profile.nis ? String(profile.nis).trim() : '';
+    const myNama = profile.nama ? profile.nama.trim().toLowerCase() : '';
+
     for (const fKey of fallbackKeys) {
       if (!fKey || fKey === storageKey) continue;
       const raw = localStorage.getItem(fKey);
@@ -14804,21 +14918,15 @@ function renderGaleriPosterWord() {
         try {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            let matching = parsed;
-            if (fKey === 'kreator_cilik_word_posters' && profile && (profile.nis || profile.nama)) {
-              const myNis = profile.nis ? String(profile.nis).trim() : '';
-              const myNama = profile.nama ? profile.nama.trim().toLowerCase() : '';
-              const filtered = parsed.filter(p => {
-                if (myNis && p.studentNis && String(p.studentNis).trim() === myNis) return true;
-                if (myNama && p.studentName && p.studentName.trim().toLowerCase() === myNama) return true;
-                if (myNama && p.author && p.author.toLowerCase().includes(myNama)) return true;
-                return false;
-              });
-              if (filtered.length > 0) matching = filtered;
-            }
-            if (matching.length > 0) {
-              posters = matching;
-              // Sinkronkan ke storageKey aktif siswa
+            const filtered = parsed.filter(p => {
+              if (isDummyPoster(p)) return false;
+              if (myNis && p.studentNis && String(p.studentNis).trim() === myNis) return true;
+              if (myNama && p.studentName && p.studentName.trim().toLowerCase() === myNama) return true;
+              if (myNama && p.author && p.author.toLowerCase().includes(myNama)) return true;
+              return false;
+            });
+            if (filtered.length > 0) {
+              posters = filtered.slice(0, 6);
               try { localStorage.setItem(storageKey, JSON.stringify(posters)); } catch (eSync) {}
               break;
             }
@@ -14826,36 +14934,11 @@ function renderGaleriPosterWord() {
         } catch (eParse) {}
       }
     }
+  }
 
-    // Pemindaian mendalam ke seluruh localStorage jika masih belum ditemukan
-    if ((!posters || posters.length === 0) && profile) {
-      const myNis = profile.nis ? String(profile.nis).trim() : '';
-      const myNama = profile.nama ? profile.nama.trim().toLowerCase() : '';
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('kreator_cilik_word_posters') && k !== storageKey) {
-          try {
-            const raw = localStorage.getItem(k);
-            if (raw && raw.startsWith('[')) {
-              const list = JSON.parse(raw);
-              if (Array.isArray(list)) {
-                const found = list.filter(p => {
-                  if (myNis && p.studentNis && String(p.studentNis).trim() === myNis) return true;
-                  if (myNama && p.studentName && p.studentName.trim().toLowerCase() === myNama) return true;
-                  if (myNama && p.author && p.author.toLowerCase().includes(myNama)) return true;
-                  return false;
-                });
-                if (found.length > 0) {
-                  posters = found;
-                  try { localStorage.setItem(storageKey, JSON.stringify(posters)); } catch (eSync) {}
-                  break;
-                }
-              }
-            }
-          } catch (eScan) {}
-        }
-      }
-    }
+  // Batasi maksimal 6 poster karya siswa sesuai instruksi pengguna
+  if (posters.length > 6) {
+    posters = posters.slice(0, 6);
   }
 
   // Tampilan jika galeri kosong (setelah siswa menghapus dokumen atau bagi siswa baru)
@@ -15295,15 +15378,9 @@ window.bersihkanSemuaPosterWord = bersihkanSemuaPosterWord;
 window.salinPosterWordDariGaleri = salinPosterWordDariGaleri;
 
 // Pasang contoh poster awal langsung ke galeri jika siswa ingin melihat hasil kilat
+// Dinonaktifkan: Galeri murni hanya menampilkan karya poster buatan siswa dari Lab Ms. Word
 async function pasangContohPosterGaleri() {
-  playSound('success');
-  loadPresetPosterLingkungan('indonesia_hebat');
-  currentWordDocTitle = 'Poster_7_Kebiasaan_Anak_Indonesia_Hebat';
-  setTimeout(async () => {
-    const pngDataUrl = await generatePosterDataUrl();
-    await simpanPosterKeGaleriWord(pngDataUrl);
-    showToast('Contoh Poster 7 Kebiasaan Anak Indonesia Hebat berhasil dipajang di galeri! 🌟', 'success');
-  }, 150);
+  // Tidak lagi memasang dummy template ke galeri
 }
 
 // ==========================================
@@ -16339,6 +16416,9 @@ function initExcelSpreadsheet() {
     updateExcelStats();
   }
   renderTPExcelContent(currentTPExcel);
+  if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
+    sinkronkanStatusTombolKirimExcel();
+  }
 }
 
 function muatTemplateExcel(tplKey, notify = true) {
@@ -16373,6 +16453,10 @@ function muatTemplateExcel(tplKey, notify = true) {
   pilihSelExcel('B2');
   renderExcelMiniChart();
   updateExcelStats();
+
+  if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
+    sinkronkanStatusTombolKirimExcel();
+  }
 
   if (notify) {
     playSound('success');
@@ -26588,17 +26672,22 @@ function simpanProfilSiswa() {
 function simpanWordDraftSiswa() {
   try {
     const key = getActiveStudentStorageKey('educode_word_active_draft');
+    const isBlank = (!wordElements || wordElements.length === 0);
     const draft = {
       title: currentWordDocTitle || 'Poster_7_Kebiasaan',
       elements: JSON.parse(JSON.stringify(wordElements || [])),
       pageBgColor: wordPageBgColor || '#ffffff',
       pageBorderStyle: wordPageBorderStyle || 'solid',
+      isCleanBlank: isBlank,
       timestamp: Date.now()
     };
     localStorage.setItem(key, JSON.stringify(draft));
   } catch (e) {}
 }
 window.simpanWordDraftSiswa = simpanWordDraftSiswa;
+window.addEventListener('beforeunload', () => {
+  try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
+});
 
 function muatWordDraftSiswa() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
@@ -26616,7 +26705,7 @@ function muatWordDraftSiswa() {
     const raw = localStorage.getItem(key);
     if (raw) {
       const draft = JSON.parse(raw);
-      if (draft && draft.isCleanBlank) {
+      if (draft && draft.isCleanBlank && (!draft.elements || draft.elements.length === 0)) {
         wordElements = [];
         wordPageBgColor = '#ffffff';
         wordPageBorderStyle = 'none';
@@ -27395,7 +27484,7 @@ function hitungRubrikOtomatisExcel() {
   const formats = (typeof excelState !== 'undefined' && excelState.formats) || tpl.formats || {};
 
   // Khusus template tabungan: jika sel F7 masih kosong atau belum dihitung, jangan beri nilai tuntas!
-  if (typeof excelState !== 'undefined' && excelState.activeTemplate === 'tabungan') {
+  if (typeof excelState !== 'undefined' && (!excelState.activeTemplate || excelState.activeTemplate === 'tabungan')) {
     const valF7 = cells['F7'] || '';
     const hasilF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(valF7) : '';
     const isF7Valid = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
@@ -27409,6 +27498,14 @@ function hitungRubrikOtomatisExcel() {
         grade: 'Sel F7 Belum Dihitung (0/100)'
       };
     }
+    return {
+      totalSkor: 100,
+      aspek1: 25,
+      aspek2: 25,
+      aspek3: 25,
+      aspek4: 25,
+      grade: 'Sempurna (A+)'
+    };
   }
 
   // Aspek 1: Struktur Kolom & Header Tabel (Maks 25 Poin)
@@ -27802,7 +27899,7 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
       title: title,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: Date.now(),
-      image: previewDataUrl || 'materi_word_tp2_1_poster.jpg',
+      image: '', // Tidak menyimpan string base64 raksasa di localStorage
       author: authorLabel,
       studentName: sNama,
       studentClass: sKelas,
@@ -27823,16 +27920,17 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
 
     // Simpan ke storage galeri poster siswa
     try {
+      if (typeof bersihkanTemplateDasarDariSemuaStorage === 'function') {
+        bersihkanTemplateDasarDariSemuaStorage();
+      }
+
       const activeGalleryKey = (typeof getActiveStudentStorageKey === 'function')
         ? getActiveStudentStorageKey('kreator_cilik_word_posters')
         : null;
 
       const keysToSave = Array.from(new Set([
         activeGalleryKey,
-        sNis ? `kreator_cilik_word_posters_${sNis}` : null,
-        sId ? `kreator_cilik_word_posters_${sId}` : null,
-        (profile && profile.cleanId) ? `kreator_cilik_word_posters_${profile.cleanId}` : null,
-        `kreator_cilik_word_posters`
+        sNis ? `kreator_cilik_word_posters_${sNis}` : null
       ].filter(Boolean)));
 
       keysToSave.forEach(k => {
@@ -27840,13 +27938,16 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
         try {
           list = JSON.parse(localStorage.getItem(k) || '[]');
         } catch (e) { list = []; }
+        if (typeof isDummyPoster === 'function') {
+          list = list.filter(p => !isDummyPoster(p));
+        }
         const existIdx = list.findIndex(p => p.title && p.title.toLowerCase() === title.toLowerCase());
         if (existIdx >= 0) {
           list[existIdx] = posterItem;
         } else {
           list.unshift(posterItem);
         }
-        if (list.length > 20) list = list.slice(0, 20);
+        if (list.length > 6) list = list.slice(0, 6);
         localStorage.setItem(k, JSON.stringify(list));
       });
 
@@ -27990,23 +28091,129 @@ async function evaluasiDanNilaiOtomatisPosterWord() {
 }
 window.evaluasiDanNilaiOtomatisPosterWord = evaluasiDanNilaiOtomatisPosterWord;
 
-function simpanDanNilaiExcel() {
+// Sinkronkan status visual tombol "Kirim Nilai ke Guru" di Lab MS Excel
+function sinkronkanStatusTombolKirimExcel() {
+  try {
+    const btnKirim = document.getElementById('btn-kirim-nilai-excel');
+    if (!btnKirim) return;
+
+    let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (!profile) {
+      try {
+        const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+        if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+      } catch (eLs) {}
+    }
+    const sId = profile ? (profile.nis || profile.id || profile.nama) : null;
+    const isTabDone = sId && (localStorage.getItem(`educode_excel_tabungan_done_${sId}`) === 'true');
+    const hasHighExcel = profile && Number(profile.nilaiExcel || 0) >= 80;
+
+    if (isTabDone || hasHighExcel) {
+      btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-title font-black text-xs sm:text-sm shadow-md shadow-emerald-500/30 transition flex items-center gap-1.5 cursor-pointer active:scale-95';
+      btnKirim.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-200 text-sm"></i> <span>Terkirim ke Guru! ✅</span>';
+      btnKirim.title = 'Nilai Excel (100) sudah tersimpan di Buku Nilai Guru. Klik untuk mengirim ulang / memperbarui nilai!';
+    } else {
+      btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95';
+      btnKirim.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> <span>Kirim Nilai ke Guru 💾✅</span>';
+      btnKirim.title = 'Kirim Nilai Excel ke Guru & Google Sheets';
+    }
+  } catch (err) {}
+}
+window.sinkronkanStatusTombolKirimExcel = sinkronkanStatusTombolKirimExcel;
+
+async function simpanDanNilaiExcel() {
   playSound('click');
-  // Jika sedang membuka latihan Tabungan & Uang Saku, periksa dan catat nilai 100
-  if (typeof excelState !== 'undefined' && excelState.activeTemplate === 'tabungan') {
-    if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
-      const isDone = cekJawabanTabunganDanBukaKuis(false);
-      if (!isDone) {
-        // Hentikan proses! Jangan beri nilai atau catat latihan jika sel F7 belum benar!
-        return;
+
+  // 1. Terapkan nilai sel yang sedang diedit jika fokus masih berada di dalam sel / formula input
+  try {
+    if (typeof excelState !== 'undefined' && excelState.isEditing) {
+      if (typeof terapkanFormulaExcel === 'function') terapkanFormulaExcel(false);
+    }
+  } catch (eF) {}
+
+  const btnKirim = document.getElementById('btn-kirim-nilai-excel');
+  const originalHtml = btnKirim ? btnKirim.innerHTML : '';
+  const originalCls = btnKirim ? btnKirim.className : '';
+
+  // 2. Berikan umpan balik visual seketika pada tombol: Tampilkan status loading spinner
+  if (btnKirim) {
+    btnKirim.disabled = true;
+    btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-700 to-blue-800 text-white font-title font-black text-xs sm:text-sm shadow-inner transition flex items-center gap-2 cursor-wait opacity-90';
+    btnKirim.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Mengirim Nilai ke Guru...</span>';
+  }
+
+  // Jeda singkat agar pengguna dapat melihat animasi proses pengiriman
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // 3. Ambil data profil siswa aktif
+  let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  if (!profile) {
+    try {
+      const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+      if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+    } catch (eLs) {}
+  }
+
+  if (!profile) {
+    if (btnKirim) {
+      btnKirim.disabled = false;
+      btnKirim.className = originalCls;
+      btnKirim.innerHTML = originalHtml;
+    }
+    playSound('warning');
+    showToast('⚠️ Silakan masuk atau pilih akun siswa terlebih dahulu agar nilaimu dapat dikirim ke guru!', 'warning');
+    if (typeof bukaPilihSiswaCepat === 'function') bukaPilihSiswaCepat();
+    return;
+  }
+
+  // 4. Periksa jenis template (Tabungan atau template umum lainnya)
+  const isTabungan = (typeof excelState !== 'undefined' && (!excelState.activeTemplate || excelState.activeTemplate === 'tabungan'));
+  const tpl = (typeof excelState !== 'undefined' && EXCEL_TEMPLATES && EXCEL_TEMPLATES[excelState.activeTemplate]) || {};
+  const namaLatihan = isTabungan ? 'Latihan Menghitung Total Tabungan (Sel F7)' : (tpl.sheetTitle || 'Latihan Tabel Spreadsheet');
+
+  if (isTabungan) {
+    const valF7 = (excelState && excelState.cells) ? (excelState.cells['F7'] || '') : '';
+    const hasilF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(valF7) : '';
+    const isF7Valid = (Number(hasilF7) === 48000) || 
+                      (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || 
+                      (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
+
+    if (!isF7Valid) {
+      playSound('error');
+      if (btnKirim) {
+        btnKirim.disabled = false;
+        btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer animate-pulse';
+        btnKirim.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-200"></i> <span>Isi Sel F7 Dulu (Rp 48.000) ⚠️</span>';
+        setTimeout(() => {
+          if (btnKirim) sinkronkanStatusTombolKirimExcel();
+        }, 3500);
+      }
+      if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
+        cekJawabanTabunganDanBukaKuis(false);
       }
       return;
     }
+
+    // Jika sel F7 sudah valid: catat dan buka kuis secara silent
+    if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
+      cekJawabanTabunganDanBukaKuis(true);
+    }
   }
-  const tpl = (typeof excelState !== 'undefined' && EXCEL_TEMPLATES && EXCEL_TEMPLATES[excelState.activeTemplate]) || {};
-  const namaLatihan = tpl.sheetTitle || 'Latihan Tabel Spreadsheet';
+
+  // 5. Catat latihan siswa ke database guru, sinkronkan ke Google Sheets Webhook, dan tampilkan modal rubrik AI
   catatLatihanExcelSiswa(namaLatihan);
+
+  // 6. Ubah tombol menjadi status SUKSES (Hijau Zamrud & Centang)
+  if (btnKirim) {
+    btnKirim.disabled = false;
+    btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/40 transition flex items-center gap-1.5 cursor-pointer active:scale-95 animate-fadeIn';
+    btnKirim.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-200 text-sm"></i> <span>Terkirim ke Guru! ✅</span>';
+    btnKirim.title = 'Nilai Excel (100) resmi tersimpan di Buku Nilai Guru & Google Sheets!';
+  }
+
+  showToast(`🎉 Luar biasa ${profile.nama || ''}! Nilai ${namaLatihan} RESMI TERKIRIM ke Buku Nilai Guru & Google Sheets! 📊✨`, 'success');
 }
+window.simpanDanNilaiExcel = simpanDanNilaiExcel;
 
 // --------------------------------------------------------------------------
 // RENDERING DASBOR GURU & KPI METRICS
@@ -30888,6 +31095,15 @@ function dapatkanStatusDanNilaiKuisSiswa(student, sem = 1) {
   let currentScore = (semNum === 2)
     ? ((student.kuisSem2 !== undefined && student.kuisSem2 !== null && Number(student.kuisSem2) > 0) ? Number(student.kuisSem2) : 0)
     : ((student.kuisSem1 !== undefined && student.kuisSem1 !== null && Number(student.kuisSem1) > 0) ? Number(student.kuisSem1) : 0);
+
+  // Sesuai aturan: siswa WAJIB klik "Kirim Nilai ke Guru" agar nilai kuis resmi tercatat di Buku Nilai Guru.
+  // Jika siswa belum mengirimkan (belum dikunci), jangan auto-inflate nilai kuis di buku nilai!
+  const stdId = student.nis || student.id || (student.nama ? student.nama.replace(/\s+/g, '_') : 'guest');
+  const isOfficiallySubmitted = localStorage.getItem(`educode_quiz_submitted_sem${semNum}_${stdId}`) === 'true';
+
+  if (!isOfficiallySubmitted && currentScore === 0) {
+    return 0;
+  }
 
   // Jika skor sudah ada dan >= 80, langsung kembalikan
   if (currentScore >= 80) return currentScore;
@@ -37057,6 +37273,10 @@ function cekJawabanTabunganDanBukaKuis(silent = false) {
       btnPeriksa.onclick = function() {
         switchTab('kuis');
       };
+    }
+
+    if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
+      sinkronkanStatusTombolKirimExcel();
     }
 
     if (!silent) {
