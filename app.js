@@ -579,18 +579,21 @@ function playSound(type) {
 window.playSound = playSound;
 
 // ==========================================
-// 2. SISTEM POIN & NOTIFIKASI TOAST
-// ==========================================
 // 2. SISTEM POIN, I18N, & NOTIFIKASI TOAST
 // ==========================================
+function updateAllUserPointsUI(pts) {
+  const points = (pts !== undefined && pts !== null) ? pts : ((typeof state !== 'undefined' && state.userPoints !== undefined) ? state.userPoints : 0);
+  const ids = ['user-points', 'user-points-sem1', 'user-points-kelas5', 'user-points-kelas6', 'welcome-siswa-bintang'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = points;
+  });
+}
+window.updateAllUserPointsUI = updateAllUserPointsUI;
+
 function tambahPoin(jumlah) {
   state.userPoints += jumlah;
-  const p1 = document.getElementById('user-points');
-  if (p1) p1.innerText = state.userPoints;
-  const p2 = document.getElementById('user-points-sem1');
-  if (p2) p2.innerText = state.userPoints;
-  const wb = document.getElementById('welcome-siswa-bintang');
-  if (wb) wb.innerText = state.userPoints;
+  updateAllUserPointsUI(state.userPoints);
   playSound('success');
 
   // Sinkronkan poin ke identitas siswa di database
@@ -9608,276 +9611,525 @@ function jalankanSimulasiDiseminasi() {
 
 // 1. Bank Soal Standar Kurikulum Semester 1 (TP 2.1 - TP 2.4, MS Word & Excel)
 const DEFAULT_BANK_SOAL_SEM1 = [
-  // --- KELOMPOK 1: TP 1.1 ANTARMUKA DASAR EXCEL & IDENTIFIKASI DATA (SOAL 1 - 5) ---
   {
-    id: 'kisi_sem1_1',
-    tp: 'TP 1.1 • Antarmuka Spreadsheet',
-    question: '1. Kotak perpotongan antara Kolom vertikal dan Baris horizontal di Microsoft Excel, contohnya "B2", dinamakan...',
-    options: [
-      'Cell (Sel)',
-      'Ribbon Menu',
-      'Worksheet Halaman',
-      'Quick Access Toolbar'
+    "id": "k4_pg_1",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "1. Kotak perpotongan antara Kolom vertikal dan Baris horizontal di Microsoft Excel, contohnya \"B2\", dinamakan...",
+    "options": [
+      "Cell (Sel)",
+      "Ribbon Menu",
+      "Worksheet Halaman",
+      "Quick Access Toolbar"
     ],
-    correct: 0,
-    explanation: 'Pertemuan antara kolom huruf (seperti B) dan baris angka (seperti 2) disebut Sel (Cell).'
+    "correct": 0,
+    "explanation": "Pertemuan antara kolom huruf (seperti B) dan baris angka (seperti 2) disebut Sel (Cell)."
   },
   {
-    id: 'kisi_sem1_2',
-    tp: 'TP 1.1 • Antarmuka Spreadsheet',
-    question: '2. Huruf abjad vertikal (A, B, C, ...) pada bagian atas lembar spreadsheet Excel menunjukkan...',
-    options: [
-      'Kolom (Column)',
-      'Baris (Row)',
-      'Nomor Halaman',
-      'Ukuran Font Huruf'
+    "id": "k4_pg_2",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "2. Huruf abjad vertikal (A, B, C, ...) pada bagian atas lembar spreadsheet Excel menunjukkan...",
+    "options": [
+      "Kolom (Column)",
+      "Baris (Row)",
+      "Nomor Halaman",
+      "Ukuran Font Huruf"
     ],
-    correct: 0,
-    explanation: 'Kolom di Excel ditandai dengan huruf abjad tegak ke bawah dari A sampai Z dan seterusnya.'
+    "correct": 0,
+    "explanation": "Kolom di Excel ditandai dengan huruf abjad tegak ke bawah dari A sampai Z dan seterusnya."
   },
   {
-    id: 'kisi_sem1_3',
-    tp: 'TP 1.1 • Antarmuka Spreadsheet',
-    question: '3. Deretan angka mendatar (1, 2, 3, ...) pada sisi paling kiri lembar Excel menunjukkan...',
-    options: [
-      'Baris (Row)',
-      'Kolom (Column)',
-      'Format Mata Uang',
-      'Banyaknya Grafik'
+    "id": "k4_pg_3",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "3. Deretan angka mendatar (1, 2, 3, ...) pada sisi paling kiri lembar Excel menunjukkan...",
+    "options": [
+      "Baris (Row)",
+      "Kolom (Column)",
+      "Format Mata Uang",
+      "Banyaknya Grafik"
     ],
-    correct: 0,
-    explanation: 'Baris di Excel ditandai dengan angka horizontal mendatar dari atas ke bawah.'
+    "correct": 0,
+    "explanation": "Baris di Excel ditandai dengan nomor urut angka mendatar dari atas ke bawah."
   },
   {
-    id: 'kisi_sem1_4',
-    tp: 'TP 1.1 • Antarmuka Spreadsheet',
-    question: '4. Setiap lembar kerja tempat kita memasukkan tabel dan angka di dalam file buku kerja (Workbook) Excel dinamakan...',
-    options: [
-      'Worksheet (Sheet)',
-      'Slide Presentasi',
-      'WordArt Hiasan',
-      'Folder Komputer'
+    "id": "k4_pg_4",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "4. Kotak kecil di sebelah kiri atas formula bar yang menunjukkan alamat sel yang sedang aktif (misalnya \"C5\") disebut...",
+    "options": [
+      "Name Box (Kotak Nama)",
+      "Status Bar",
+      "Title Bar",
+      "Scroll Bar"
     ],
-    correct: 0,
-    explanation: 'Setiap lembar kerja dokumen di Excel dinamakan Worksheet atau Sheet (misal: Sheet1, Sheet2).'
+    "correct": 0,
+    "explanation": "Name Box berfungsi menampilkan alamat atau nama sel yang saat ini sedang dipilih atau aktif."
   },
   {
-    id: 'kisi_sem1_5',
-    tp: 'TP 1.1 • Pengolahan Masalah Sehari-hari',
-    question: '5. Jika kamu ingin mencatat uang saku harian, pengeluaran jajan, dan menghitung sisa tabungan mingguan secara rapi dan otomatis, aplikasi yang paling tepat digunakan adalah...',
-    options: [
-      'Microsoft Excel (Spreadsheet)',
-      'Pemutar Musik (Media Player)',
-      'Aplikasi Game Online',
-      'Notepad Tanpa Tabel'
+    "id": "k4_pg_5",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "5. Bagian panjang di atas lembar kerja yang digunakan untuk menuliskan atau melihat isi rumus matematika disebut...",
+    "options": [
+      "Formula Bar",
+      "Taskbar",
+      "Ribbon Home",
+      "Sheet Tab"
     ],
-    correct: 0,
-    explanation: 'Spreadsheet seperti Microsoft Excel dirancang khusus untuk mengolah data keuangan dan tabel angka otomatis.'
-  },
-
-  // --- KELOMPOK 2: TP 1.2 INPUT, FORMAT & MERAPIKAN TABEL EXCEL (SOAL 6 - 10) ---
-  {
-    id: 'kisi_sem1_6',
-    tp: 'TP 1.2 • Aturan Rumus Excel',
-    question: '6. Setiap kali kita ingin menuliskan rumus atau operasi hitung matematika di Excel, karakter pertama yang wajib diketik adalah...',
-    options: [
-      'Tanda sama dengan (=)',
-      'Tanda tambah (+)',
-      'Tanda tanya (?)',
-      'Tanda seru (!)'
-    ],
-    correct: 0,
-    explanation: 'Tanda sama dengan (=) adalah kunci utama agar Excel mengenali bahwa teks yang dimasukkan adalah rumus perhitungan.'
+    "correct": 0,
+    "explanation": "Formula Bar berfungsi menampilkan, mengetik, dan mengedit data maupun rumus pada sel yang dipilih."
   },
   {
-    id: 'kisi_sem1_7',
-    tp: 'TP 1.2 • Merapikan Format Sel',
-    question: '7. Ikon tombol di Excel yang berfungsi menggabungkan beberapa sel menjadi satu sel yang lebar dan meletakkan teks tepat di tengah adalah...',
-    options: [
-      'Merge & Center',
-      'Wrap Text',
-      'Conditional Formatting',
-      'Sort & Filter'
+    "id": "k4_pg_6",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "6. Lembaran kerja kisi-kisi tempat kita memasukkan data tabel di Excel dinamakan...",
+    "options": [
+      "Worksheet (Lembar Kerja)",
+      "Slide Presentasi",
+      "Canvas Gambar",
+      "WordArt Box"
     ],
-    correct: 0,
-    explanation: 'Merge & Center digunakan untuk menyatukan sel dan mengatur posisinya tepat di tengah tabel (biasanya untuk judul tabel).'
+    "correct": 0,
+    "explanation": "Worksheet adalah lembar kerja berpetak-petak di dalam sebuah buku kerja (workbook) Excel."
   },
   {
-    id: 'kisi_sem1_8',
-    tp: 'TP 1.2 • Border Tabel',
-    question: '8. Untuk memberikan garis tepi kotak-kotak tabel yang tegas dan rapi agar terlihat saat dicetak (print), fitur yang digunakan adalah...',
-    options: [
-      'Border (All Borders)',
-      'Fill Color (Warna Sel)',
-      'Font Size (Ukuran Teks)',
-      'Orientation (Kemiringan Teks)'
+    "id": "k4_pg_7",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "7. Tanda tab di bagian bawah layar lembar Excel seperti \"Sheet1\" dan tanda tambah (+) berfungsi untuk...",
+    "options": [
+      "Menambah lembar kerja (Worksheet) baru",
+      "Menghapus komputer",
+      "Menutup aplikasi Excel",
+      "Mencetak dokumen ke printer"
     ],
-    correct: 0,
-    explanation: 'Garis bantu abu-abu Excel tidak akan tercetak di kertas kecuali jika kita memberi garis Border tabel (All Borders).'
+    "correct": 0,
+    "explanation": "Tombol tambah (+) di sebelah tab lembar kerja digunakan untuk menambah worksheet baru dalam satu buku kerja."
   },
   {
-    id: 'kisi_sem1_9',
-    tp: 'TP 1.2 • Format Angka Mata Uang',
-    question: '9. Format sel yang digunakan untuk menampilkan lambang mata uang "Rp" secara otomatis di depan angka uang saku adalah...',
-    options: [
-      'Currency / Rupiah (Rp)',
-      'Percentage (%)',
-      'Short Date (Tanggal)',
-      'Fraction (Pecahan)'
+    "id": "k4_pg_8",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "8. Jika sel A1 digabungkan dengan sel B1 dan C1 menjadi satu kotak besar di tengah, fitur yang digunakan adalah...",
+    "options": [
+      "Merge & Center",
+      "Wrap Text",
+      "Conditional Formatting",
+      "AutoSum"
     ],
-    correct: 0,
-    explanation: 'Format Currency / Rupiah menambahkan simbol Rp dan pemisah ribuan secara otomatis tanpa merusak perhitungan rumus.'
+    "correct": 0,
+    "explanation": "Merge & Center berfungsi menggabungkan beberapa sel yang bersebelahan menjadi satu sel tunggal di tengah."
   },
   {
-    id: 'kisi_sem1_10',
-    tp: 'TP 1.2 • Merapikan Teks Panjang',
-    question: '10. Fitur yang membuat teks yang sangat panjang di dalam satu sel melipat ke bawah secara otomatis tanpa memperlebar kolom adalah...',
-    options: [
-      'Wrap Text',
-      'Merge Cells',
-      'Insert Picture',
-      'Zoom In'
+    "id": "k4_pg_9",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "9. Jika teks pada sel terlalu panjang dan ingin dibuat otomatis turun ke baris bawah dalam satu sel, kita menggunakan...",
+    "options": [
+      "Wrap Text",
+      "Merge Cells",
+      "Bold",
+      "Underline"
     ],
-    correct: 0,
-    explanation: 'Wrap Text membungkus teks panjang menjadi beberapa baris bersusun ke bawah di dalam satu sel yang sama.'
-  },
-
-  // --- KELOMPOK 3: TP 1.3 RUMUS ANALISIS DATA (SUM, AVERAGE, MAX, MIN, OPERASI SELISIH) (SOAL 11 - 15) ---
-  {
-    id: 'kisi_sem1_11',
-    tp: 'TP 1.3 • Fungsi Penjumlahan =SUM',
-    question: '11. Rumus Excel yang paling tepat untuk menjumlahkan seluruh sisa tabungan dari sel F2 sampai sel F6 adalah...',
-    options: [
-      '=SUM(F2:F6)',
-      '=AVERAGE(F2:F6)',
-      '=MAX(F2:F6)',
-      '=COUNT(F2:F6)'
-    ],
-    correct: 0,
-    explanation: 'Fungsi =SUM(F2:F6) menjumlahkan seluruh nilai angka dari sel F2 sampai sel F6 secara cepat dan akurat.'
+    "correct": 0,
+    "explanation": "Wrap Text membungkus teks yang panjang sehingga otomatis berpindah ke baris baru di dalam sel yang sama."
   },
   {
-    id: 'kisi_sem1_12',
-    tp: 'TP 1.3 • Rumus Pengurangan / Selisih',
-    question: '12. Jika uang saku hari Senin di sel D2 bernilai Rp 15.000 dan uang jajan di sel E2 bernilai Rp 5.000, rumus untuk menghitung sisa tabungan hari Senin di sel F2 adalah...',
-    options: [
-      '=D2-E2',
-      '=D2+E2',
-      '=D2*E2',
-      '=D2/E2'
+    "id": "k4_pg_10",
+    "tp": "TP 1.1 • Antarmuka Spreadsheet",
+    "question": "10. Perintah pintasan keyboard untuk menyimpan (Save) dokumen Excel yang sedang kita kerjakan adalah...",
+    "options": [
+      "Ctrl + S",
+      "Ctrl + P",
+      "Ctrl + C",
+      "Ctrl + Z"
     ],
-    correct: 0,
-    explanation: 'Sisa tabungan diperoleh dari uang saku dikurangi uang jajan, yaitu rumus =D2-E2 (hasilnya Rp 10.000).'
+    "correct": 0,
+    "explanation": "Ctrl + S adalah shortcut standar untuk menyimpan (Save) dokumen kerja agar tidak hilang."
   },
   {
-    id: 'kisi_sem1_13',
-    tp: 'TP 1.3 • Fungsi Rata-Rata =AVERAGE',
-    question: '13. Fungsi Excel yang digunakan untuk menghitung nilai rata-rata uang jajan harian siswa selama satu minggu adalah...',
-    options: [
-      '=AVERAGE',
-      '=SUM',
-      '=MIN',
-      '=MAX'
+    "id": "k4_pg_11",
+    "tp": "TP 1.2 • Identifikasi & Format Data",
+    "question": "11. Secara standar di Excel, jika kita mengetik data berupa Teks (huruf nama), perataannya otomatis menempel di sisi...",
+    "options": [
+      "Kiri sel",
+      "Kanan sel",
+      "Tengah sel",
+      "Bawah sel"
     ],
-    correct: 0,
-    explanation: '=AVERAGE menghitung nilai tengah atau rata-rata dari sekumpulan data angka yang dipilih.'
+    "correct": 0,
+    "explanation": "Data berjenis Teks secara bawaan di Excel otomatis merapat ke sisi kiri sel (Align Left)."
   },
   {
-    id: 'kisi_sem1_14',
-    tp: 'TP 1.3 • Nilai Tertinggi =MAX',
-    question: '14. Untuk mencari pengeluaran uang jajan yang paling besar (tertinggi) selama 5 hari sekolah, rumus fungsi yang digunakan adalah...',
-    options: [
-      '=MAX(...)',
-      '=MIN(...)',
-      '=SUM(...)',
-      '=AVERAGE(...)'
+    "id": "k4_pg_12",
+    "tp": "TP 1.2 • Identifikasi & Format Data",
+    "question": "12. Jika kita mengetik data berupa Angka (numerik), secara bawaan perataannya otomatis merapat ke sisi...",
+    "options": [
+      "Kanan sel",
+      "Kiri sel",
+      "Atas sel",
+      "Tengah sel"
     ],
-    correct: 0,
-    explanation: 'Fungsi =MAX(...) digunakan untuk menemukan angka terbesar/tertinggi dari rentang sel data.'
+    "correct": 0,
+    "explanation": "Data berjenis Angka secara bawaan di Excel otomatis merapat ke sisi kanan sel (Align Right)."
   },
   {
-    id: 'kisi_sem1_15',
-    tp: 'TP 1.3 • Nilai Terendah =MIN',
-    question: '15. Untuk mengetahui sisa tabungan harian yang paling sedikit (terendah) dalam satu minggu, rumus fungsi yang digunakan adalah...',
-    options: [
-      '=MIN(...)',
-      '=MAX(...)',
-      '=COUNT(...)',
-      '=SUM(...)'
+    "id": "k4_pg_13",
+    "tp": "TP 1.2 • Identifikasi & Format Data",
+    "question": "13. Format angka di Excel yang digunakan untuk menampilkan simbol mata uang rupiah seperti \"Rp 50.000\" adalah...",
+    "options": [
+      "Currency / Accounting",
+      "Percentage (%)",
+      "Short Date",
+      "Scientific"
     ],
-    correct: 0,
-    explanation: 'Fungsi =MIN(...) digunakan untuk menemukan angka terkecil/terendah dari rentang sel data.'
-  },
-
-  // --- KELOMPOK 4: TP 1.4 PENYAJIAN GRAFIK BATANG (SOAL 16) ---
-  {
-    id: 'kisi_sem1_16',
-    tp: 'TP 1.4 • Visualisasi Grafik Batang',
-    question: '16. Keuntungan utama mengubah data tabel sisa tabungan siswa menjadi bentuk Diagram Batang (Bar Chart) di Excel adalah...',
-    options: [
-      'Memudahkan mata melihat perbandingan naik turunnya tabungan secara visual dan seketika',
-      'Menghapus baris tabel yang angkanya kecil secara otomatis',
-      'Membuat ukuran file dokumen komputer menjadi sangat besar',
-      'Mengubah angka uang menjadi huruf kata-kata'
-    ],
-    correct: 0,
-    explanation: 'Diagram Batang memberikan representasi visual yang jelas sehingga tinggi rendahnya tabungan langsung terbaca oleh mata.'
-  },
-
-  // --- KELOMPOK 5: TP 2.1 & TP 2.2 KONTEN DIGITAL TEKS, GAMBAR & DEKOMPOSISI DI MS WORD (SOAL 17 - 18) ---
-  {
-    id: 'kisi_sem1_17',
-    tp: 'TP 2.2 • Dekomposisi Poster Word',
-    question: '17. Dalam pilar Berpikir Komputasional, memecah rancangan poster menjadi bagian judul, gambar ilustrasi, dan teks ajakan secara terpisah sebelum digabung dinamakan...',
-    options: [
-      'Dekomposisi (Decomposition)',
-      'Pengenalan Pola (Pattern Recognition)',
-      'Abstraksi (Abstraction)',
-      'Algoritma (Algorithm)'
-    ],
-    correct: 0,
-    explanation: 'Dekomposisi adalah teknik memecah masalah/proyek besar menjadi bagian-bagian lebih kecil agar mudah dirancang dan diperbaiki.'
+    "correct": 0,
+    "explanation": "Format Currency dan Accounting digunakan untuk menampilkan nilai uang dengan simbol mata uang seperti Rp."
   },
   {
-    id: 'kisi_sem1_18',
-    tp: 'TP 2.1 • Desain Judul Menarik WordArt',
-    question: '18. Fitur di Microsoft Word yang digunakan untuk membuat tulisan judul poster dengan efek seni artistik, gradasi warna, dan bayangan adalah...',
-    options: [
-      'WordArt',
-      'Shapes Kotak',
-      'Page Number',
-      'Header & Footer'
+    "id": "k4_pg_14",
+    "tp": "TP 1.2 • Identifikasi & Format Data",
+    "question": "14. Untuk mengatur agar teks judul kolom tabel berada persis di tengah-tengah sel secara horizontal, kita memilih...",
+    "options": [
+      "Center Alignment",
+      "Align Right",
+      "Align Left",
+      "Justify"
     ],
-    correct: 0,
-    explanation: 'WordArt adalah fitur pengolah kata untuk menciptakan teks dekoratif artistik yang menarik perhatian pembaca poster.'
-  },
-
-  // --- KELOMPOK 6: TP 2.3 & TP 2.4 KOMBINASI LOGIS & ETIKA BERINTERNET SEHAT (SOAL 19 - 20) ---
-  {
-    id: 'kisi_sem1_19',
-    tp: 'TP 2.3 • Kombinasi Logis Poster',
-    question: '19. Jika kamu membuat poster ajakan "Hemat Air Bersih di Sekolah", kombinasi teks slogan dan gambar yang paling logis dan tepat adalah...',
-    options: [
-      'Slogan "Tutup Keran Setelah Dipakai" dipadukan dengan gambar keran air tertutup rapat berteteskan air jernih',
-      'Slogan "Ayo Berhemat Air" dipadukan dengan gambar lapangan sepak bola',
-      'Slogan "Matikan Lampu Siang Hari" dipadukan dengan gambar keran air mengalir deras',
-      'Slogan "Jagalah Kebersihan" dipadukan dengan gambar semangkuk bakso kuah'
-    ],
-    correct: 0,
-    explanation: 'Kombinasi logis menuntut adanya keselarasan makna yang kuat antara teks pesan dan gambar visual yang disajikan.'
+    "correct": 0,
+    "explanation": "Center Alignment mengatur tulisan berada tepat di posisi tengah sel secara horizontal."
   },
   {
-    id: 'kisi_sem1_20',
-    tp: 'TP 2.4 • Etika Digital & Budaya Humanis',
-    question: '20. Sikap bijak dan beretika (Zun Zhong / Saling Menghargai) yang wajib kita terapkan saat menggunakan komputer dan internet adalah...',
-    options: [
-      'Menjaga kerahasiaan kata sandi pribadi dan mencantumkan sumber pembuat gambar/karya secara jujur',
-      'Menyebarkan alamat rumah dan nomor telepon pribadi kepada orang tak dikenal di internet',
-      'Mengakui hasil karya orang lain di internet sebagai buatan sendiri tanpa izin',
-      'Membuka dan menghapus file teman di komputer sekolah tanpa seizinnya'
+    "id": "k4_pg_15",
+    "tp": "TP 1.2 • Identifikasi & Format Data",
+    "question": "15. Mengapa penting membedakan data teks dan angka dalam tabel keuangan tabungan?",
+    "options": [
+      "Karena hanya data angka yang dapat dihitung dengan rumus matematika",
+      "Agar tabel berubah warna sendiri",
+      "Agar komputer tidak kehabisan baterai",
+      "Karena teks tidak bisa dicetak"
     ],
-    correct: 0,
-    explanation: 'Beretika di dunia digital meliputi menjaga keamanan privasi data diri sendiri serta menghormati hak cipta karya orang lain.'
+    "correct": 0,
+    "explanation": "Hanya sel dengan format angka yang dapat diproses dan dihitung oleh rumus matematika di Excel."
+  },
+  {
+    "id": "k4_pg_16",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "16. Setiap penulisan rumus dan fungsi perhitungan di Microsoft Excel WAJIB selalu diawali dengan tanda...",
+    "options": [
+      "Sama dengan (=)",
+      "Tanda tanya (?)",
+      "Tanda seru (!)",
+      "Tanda pagar (#)"
+    ],
+    "correct": 0,
+    "explanation": "Semua rumus dan formula di Excel harus diawali dengan tanda sama dengan (=)."
+  },
+  {
+    "id": "k4_pg_17",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "17. Uang saku ada di sel C4 sebesar Rp 10.000 dan jajan ada di sel D4 sebesar Rp 3.000. Rumus menghitung sisa tabungan adalah...",
+    "options": [
+      "=C4-D4",
+      "=C4+D4",
+      "=C4*D4",
+      "=C4/D4"
+    ],
+    "correct": 0,
+    "explanation": "Sisa uang tabungan dihitung dengan mengurangkan uang masuk (C4) dengan pengeluaran (D4), yaitu =C4-D4."
+  },
+  {
+    "id": "k4_pg_18",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "18. Fungsi bawaan Excel yang digunakan untuk menjumlahkan seluruh angka dalam rentang sel C4 sampai C8 adalah...",
+    "options": [
+      "=SUM(C4:C8)",
+      "=TOTAL(C4:C8)",
+      "=PLUS(C4:C8)",
+      "=COUNT(C4:C8)"
+    ],
+    "correct": 0,
+    "explanation": "Fungsi SUM digunakan untuk menjumlahkan sekumpulan data numerik dalam rentang sel."
+  },
+  {
+    "id": "k4_pg_19",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "19. Fungsi bawaan Excel yang digunakan untuk mencari nilai rata-rata dari rentang sel C4 sampai C8 adalah...",
+    "options": [
+      "=AVERAGE(C4:C8)",
+      "=MEAN(C4:C8)",
+      "=MEDIAN(C4:C8)",
+      "=SUM(C4:C8)"
+    ],
+    "correct": 0,
+    "explanation": "Fungsi AVERAGE digunakan untuk menghitung nilai rata-rata dari sekumpulan data."
+  },
+  {
+    "id": "k4_pg_20",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "20. Fungsi bawaan Excel yang digunakan untuk mencari angka tertinggi/terbesar dalam rentang nilai adalah...",
+    "options": [
+      "=MAX()",
+      "=MIN()",
+      "=TOP()",
+      "=HIGH()"
+    ],
+    "correct": 0,
+    "explanation": "Fungsi MAX digunakan untuk menemukan nilai terbesar atau tertinggi dalam rentang data."
+  },
+  {
+    "id": "k4_pg_21",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "21. Fungsi bawaan Excel yang digunakan untuk mencari angka terendah/terkecil dalam rentang nilai adalah...",
+    "options": [
+      "=MIN()",
+      "=MAX()",
+      "=LOW()",
+      "=BOTTOM()"
+    ],
+    "correct": 0,
+    "explanation": "Fungsi MIN digunakan untuk mencari nilai terendah atau terkecil dalam rentang data."
+  },
+  {
+    "id": "k4_pg_22",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "22. Simbol operator aritmatika yang digunakan untuk operasi PERKALIAN di Microsoft Excel adalah...",
+    "options": [
+      "Tanda bintang (*)",
+      "Tanda silang (x)",
+      "Tanda titik (.)",
+      "Tanda pagar (#)"
+    ],
+    "correct": 0,
+    "explanation": "Di komputer dan spreadsheet Excel, perkalian menggunakan tanda bintang (*), misalnya =A1*B1."
+  },
+  {
+    "id": "k4_pg_23",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "23. Simbol operator aritmatika yang digunakan untuk operasi PEMBAGIAN di Microsoft Excel adalah...",
+    "options": [
+      "Garis miring (/)",
+      "Titik dua (:)",
+      "Garis bagi (÷)",
+      "Tanda minus (-)"
+    ],
+    "correct": 0,
+    "explanation": "Pembagian di Excel menggunakan tanda garis miring (/), misalnya =A1/B1."
+  },
+  {
+    "id": "k4_pg_24",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "24. Jika rumus pada sel F7 tertulis =SUM(E4:E6), arti dari tanda titik dua (:) adalah...",
+    "options": [
+      "Sampai dengan (rentang sel dari E4 hingga E6)",
+      "Dibagi dengan",
+      "Dikalikan dengan",
+      "Bukan sel aktif"
+    ],
+    "correct": 0,
+    "explanation": "Titik dua (:) dalam formula Excel menyatakan rentang (range) sel dari sel awal sampai sel akhir."
+  },
+  {
+    "id": "k4_pg_25",
+    "tp": "TP 1.3 • Rumus Matematika Spreadsheet",
+    "question": "25. Kotak kecil di pojok kanan bawah sel aktif yang dapat ditarik ke bawah untuk menyalin rumus secara cepat dinamakan...",
+    "options": [
+      "Fill Handle",
+      "Scroll Bar",
+      "Zoom Slider",
+      "Mini Toolbar"
+    ],
+    "correct": 0,
+    "explanation": "Fill Handle adalah titik kecil di sudut kanan bawah sel aktif yang digunakan untuk auto-fill rumus dan deret data."
+  },
+  {
+    "id": "k4_pg_26",
+    "tp": "TP 1.4 • Penyajian Data & Grafik",
+    "question": "26. Garis pembatas kotak-kotak tabel agar terlihat jelas dan rapi saat dicetak dinamakan...",
+    "options": [
+      "Borders (All Borders)",
+      "Underline",
+      "Grid Screen",
+      "Shadow"
+    ],
+    "correct": 0,
+    "explanation": "Fitur Borders (seperti All Borders) memberikan garis pembatas tepi dan dalam pada tabel Excel."
+  },
+  {
+    "id": "k4_pg_27",
+    "tp": "TP 1.4 • Penyajian Data & Grafik",
+    "question": "27. Ikon ember tumpah (Fill Color) pada menu Home Excel digunakan untuk memberi warna pada...",
+    "options": [
+      "Latar belakang sel (Cell Background)",
+      "Huruf atau font teks",
+      "Kabel komputer",
+      "Garis kisi worksheet"
+    ],
+    "correct": 0,
+    "explanation": "Fill Color berfungsi memberi warna latar belakang (arsir) pada sel yang dipilih."
+  },
+  {
+    "id": "k4_pg_28",
+    "tp": "TP 1.4 • Penyajian Data & Grafik",
+    "question": "28. Diagram batang (Column/Bar Chart) paling tepat digunakan untuk menyajikan data...",
+    "options": [
+      "Perbandingan nilai tabungan harian antar hari",
+      "Menyimpan lagu rekaman",
+      "Menulis cerita panjang karangan",
+      "Mengunci dokumen dengan sandi"
+    ],
+    "correct": 0,
+    "explanation": "Diagram batang memudahkan pembaca membandingkan tinggi-rendahnya nilai data antar kategori secara visual."
+  },
+  {
+    "id": "k4_pg_29",
+    "tp": "TP 1.4 • Penyajian Data & Grafik",
+    "question": "29. Menu utama pada Excel yang kita klik untuk membuat grafik diagram batang atau diagram lingkaran adalah...",
+    "options": [
+      "Insert",
+      "Home",
+      "View",
+      "Review"
+    ],
+    "correct": 0,
+    "explanation": "Menu Insert menyediakan menu Charts untuk menyisipkan berbagai jenis grafik diagram."
+  },
+  {
+    "id": "k4_pg_30",
+    "tp": "TP 1.4 • Penyajian Data & Grafik",
+    "question": "30. Manfaat utama mengubah tabel angka tabungan menjadi diagram grafik batang adalah...",
+    "options": [
+      "Data lebih cepat dan mudah dipahami secara visual",
+      "Ukuran file menjadi nol kilobyte",
+      "Komputer tidak perlu listrik",
+      "Tabel otomatis terhapus"
+    ],
+    "correct": 0,
+    "explanation": "Grafik membuat data angka yang panjang menjadi gambar visual yang langsung mudah ditangkap mata."
+  },
+  {
+    "id": "k4_pg_31",
+    "tp": "TP 2.1 • Pengolah Kata & Poster Word",
+    "question": "31. Garis batas jarak antara tepi kertas fisik dengan teks tulisan di Microsoft Word dinamakan...",
+    "options": [
+      "Margins (Batas Margin)",
+      "Line Spacing",
+      "Page Break",
+      "Header"
+    ],
+    "correct": 0,
+    "explanation": "Margins menentukan jarak kosong antara tepi kertas (atas, bawah, kiri, kanan) dengan isi tulisan."
+  },
+  {
+    "id": "k4_pg_32",
+    "tp": "TP 2.1 • Pengolah Kata & Poster Word",
+    "question": "32. Posisi kertas tegak berdiri memanjang ke atas pada menu Page Setup disebut...",
+    "options": [
+      "Portrait",
+      "Landscape",
+      "Horizontal",
+      "Square"
+    ],
+    "correct": 0,
+    "explanation": "Portrait adalah orientasi kertas tegak (vertikal), sedangkan Landscape adalah orientasi melebar (horizontal)."
+  },
+  {
+    "id": "k4_pg_33",
+    "tp": "TP 2.1 • Pengolah Kata & Poster Word",
+    "question": "33. Fitur teks artistik dekoratif berwarna-warni yang sangat cocok untuk judul poster digital di MS Word dinamakan...",
+    "options": [
+      "WordArt",
+      "Drop Cap",
+      "Footnote",
+      "Watermark"
+    ],
+    "correct": 0,
+    "explanation": "WordArt adalah fitur seni huruf dekoratif dengan efek warna, bayangan, dan garis tepi artistik."
+  },
+  {
+    "id": "k4_pg_34",
+    "tp": "TP 2.1 • Pengolah Kata & Poster Word",
+    "question": "34. Agar gambar yang disisipkan di Word dapat digeser dengan bebas di atas kertas poster, Wrap Text diatur ke...",
+    "options": [
+      "In Front of Text / Square",
+      "In Line with Text",
+      "Behind Glass",
+      "Hide Picture"
+    ],
+    "correct": 0,
+    "explanation": "Mengatur Wrap Text ke In Front of Text atau Square memungkinkan gambar digeser secara bebas di mana saja."
+  },
+  {
+    "id": "k4_pg_35",
+    "tp": "TP 2.2 • Desain Konten 7 Kebiasaan",
+    "question": "35. Dalam poster \"7 Kebiasaan Anak Indonesia Hebat\", prinsip tata letak (layout) yang baik adalah...",
+    "options": [
+      "Judul tampak paling dominan, gambar jelas, dan teks mudah dibaca",
+      "Semua warna dibuat sama persis dengan latar belakang",
+      "Semua tulisan dibuat sangat kecil di pojok bawah",
+      "Menggunakan 20 jenis font berbeda yang rumit"
+    ],
+    "correct": 0,
+    "explanation": "Poster yang baik memiliki hierarki: judul mencolok, ilustrasi relevan, dan informasi ringkas mudah dibaca."
+  },
+  {
+    "id": "k4_pg_36",
+    "tp": "TP 2.3 • Manajemen File & Folder",
+    "question": "36. Tempat penyimpanan digital di komputer yang berfungsi seperti map untuk mengelompokkan dokumen dinamakan...",
+    "options": [
+      "Folder",
+      "Keyboard",
+      "Monitor",
+      "Speaker"
+    ],
+    "correct": 0,
+    "explanation": "Folder berfungsi sebagai wadah untuk merapikan, menyimpan, dan mengorganisir berbagai file dokumen di komputer."
+  },
+  {
+    "id": "k4_pg_37",
+    "tp": "TP 2.3 • Manajemen File & Folder",
+    "question": "37. Perintah di File Explorer yang digunakan untuk mengganti nama file atau folder adalah...",
+    "options": [
+      "Rename",
+      "Delete",
+      "Copy",
+      "Paste"
+    ],
+    "correct": 0,
+    "explanation": "Rename berfungsi mengubah nama file atau folder yang sudah ada."
+  },
+  {
+    "id": "k4_pg_38",
+    "tp": "TP 2.4 • Internet Sehat & Budaya Humanis",
+    "question": "38. Sikap bijak saat mengunduh gambar dari internet untuk karya tugas sekolah adalah...",
+    "options": [
+      "Memilih gambar bebas hak cipta dan mencantumkan sumber pembuatnya",
+      "Mengakuinya sebagai karya buatan sendiri",
+      "Menghapus nama pemilik asli tanpa izin",
+      "Menjual gambar tersebut ke teman tanpa izin"
+    ],
+    "correct": 0,
+    "explanation": "Menghargai karya orang lain dan mencantumkan sumber adalah perwujudan sikap jujur dan etika digital yang terpuji."
+  },
+  {
+    "id": "k4_pg_39",
+    "tp": "TP 2.4 • Internet Sehat & Budaya Humanis",
+    "question": "39. Jika kita menemukan pesan atau berita mencurigakan yang berisi kabar bohong (hoaks) di internet, tindakan terbaik adalah...",
+    "options": [
+      "Tidak menyebarkannya dan menanyakan kebenaran pada guru atau orang tua",
+      "Langsung meneruskannya ke semua grup WhatsApp",
+      "Menakut-nakuti teman sekelas",
+      "Membuat berita bohong tandingan"
+    ],
+    "correct": 0,
+    "explanation": "Menyaring informasi sebelum menyebarkannya melindungi diri kita dan orang lain dari bahaya hoaks."
+  },
+  {
+    "id": "k4_pg_40",
+    "tp": "TP 2.4 • Internet Sehat & Budaya Humanis",
+    "question": "40. Sikap Gan En (Bersyukur) dan Zun Zhong (Saling Menghargai) dalam penggunaan komputer di sekolah diwujudkan dengan...",
+    "options": [
+      "Merawat perangkat komputer dengan hati-hati dan menghargai hasil karya digital teman",
+      "Makan dan minum di dekat keyboard komputer",
+      "Menghapus file tugas milik teman lain",
+      "Mencoret-coret layar monitor lab"
+    ],
+    "correct": 0,
+    "explanation": "Menjaga kebersihan perangkat lab dan mengapresiasi karya teman adalah wujud nyata budaya humanis Tzu Chi."
   }
 ];
 
@@ -26715,10 +26967,7 @@ async function loginDenganNis() {
     saveActiveStudentSession(profile, targetTab);
 
     state.userPoints = student.poinBintang || 0;
-    const p1 = document.getElementById('user-points');
-    const p2 = document.getElementById('user-points-sem1');
-    if (p1) p1.innerText = state.userPoints;
-    if (p2) p2.innerText = state.userPoints;
+    updateAllUserPointsUI(state.userPoints);
 
     // Tutup modal profil siswa langsung setelah verifikasi berhasil
     tutupModalProfilSiswa();
@@ -26843,12 +27092,8 @@ function eksekusiLogoutSiswa() {
   } catch (e) {}
 
   // 4. Reset poin di layar
-  const p1 = document.getElementById('user-points');
-  const p2 = document.getElementById('user-points-sem1');
-  const pWelcome = document.getElementById('welcome-siswa-bintang');
-  if (p1) p1.innerText = '0';
-  if (p2) p2.innerText = '0';
-  if (pWelcome) pWelcome.innerText = '0';
+  state.userPoints = 0;
+  updateAllUserPointsUI(0);
 
   // 5. Bersihkan kanvas Paint & kuis agar karya/sertifikat siswa tidak tertinggal untuk siswa berikutnya
   try { if (typeof resetPaintCanvasUntukSiswa === 'function') resetPaintCanvasUntukSiswa(); } catch (e) {}
@@ -26988,10 +27233,7 @@ function pilihSiswaDariDropdown(studentId) {
 
   // Perbarui poin aktif sesuai poin tersimpan siswa
   state.userPoints = student.poinBintang || 0;
-  const p1 = document.getElementById('user-points');
-  const p2 = document.getElementById('user-points-sem1');
-  if (p1) p1.innerText = state.userPoints;
-  if (p2) p2.innerText = state.userPoints;
+  updateAllUserPointsUI(state.userPoints);
 
   if (student && student.kelas) {
     if (typeof state !== 'undefined') state.kelasSedangBerlangsung = String(student.kelas).trim().toUpperCase();
@@ -27380,10 +27622,7 @@ function muatProfilSiswa() {
     if (cardsSiswa) cardsSiswa.classList.add('hidden');
 
     state.userPoints = 0;
-    const p1 = document.getElementById('user-points');
-    const p2 = document.getElementById('user-points-sem1');
-    if (p1) p1.innerText = 0;
-    if (p2) p2.innerText = 0;
+    updateAllUserPointsUI(0);
     const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
                       (typeof state !== 'undefined' && state.isGuruLoggedIn) ||
                       (window.__TEACHER_SESSION_ACTIVE__ === true);
@@ -27486,11 +27725,7 @@ function muatProfilSiswa() {
     } catch (eDb) {}
 
     if (typeof state !== 'undefined') state.userPoints = activePoints;
-    if (welcomeBintang) welcomeBintang.innerText = activePoints;
-    const p1 = document.getElementById('user-points');
-    const p2 = document.getElementById('user-points-sem1');
-    if (p1) p1.innerText = activePoints;
-    if (p2) p2.innerText = activePoints;
+    updateAllUserPointsUI(activePoints);
     if (bintangWrap) bintangWrap.classList.remove('hidden');
 
     if (btnSemToggle) {
@@ -30973,10 +31208,7 @@ function simpanSiswaBaruManual() {
       absen: newStudent.absen
     }, 'modul');
     state.userPoints = newStudent.poinBintang;
-    const p1 = document.getElementById('user-points');
-    const p2 = document.getElementById('user-points-sem1');
-    if (p1) p1.innerText = state.userPoints;
-    if (p2) p2.innerText = state.userPoints;
+    updateAllUserPointsUI(state.userPoints);
     muatProfilSiswa();
     setHeaderNavMode('sem1');
     bukaModalProfilSiswa();
@@ -36132,228 +36364,488 @@ const DEFAULT_BANK_SOAL_K6 = [
     ],
     "correct": 2,
     "answer": 2,
-    "explanation": "Abstraksi berfokus pada informasi penting dan inti masalah, seraya menyisihkan rincian yang tidak diperlukan dalam penyelesaian masalah."
+    "explanation": "Abstraksi berfokus pada informasi penting yang dibutuhkan untuk menyelesaikan masalah dan membuang detail yang tidak perlu."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Urutan langkah-langkah logis, bertahap, dan terstruktur yang dibuat untuk menyelesaikan suatu tugas disebut...",
+    "question": "Menyusun rangkaian instruksi atau langkah-langkah kerja yang teratur, logis, dan berurutan untuk menyelesaikan suatu tugas disebut...",
     "options": [
       "Algoritma",
-      "Pola",
       "Abstraksi",
+      "Dekomposisi",
+      "Kompresi"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Algoritma adalah rancangan langkah demi langkah yang teratur dan sistematis untuk mencapai hasil yang diinginkan."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Seorang dokter memeriksa gejala pasien mulai dari tensi darah, suhu tubuh, riwayat makan, lalu memeriksa lab. Dokter tersebut menerapkan pilar...",
+    "options": [
+      "Dekomposisi",
+      "Abstraksi",
+      "Pengenalan Pola",
+      "Pengurutan"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Memecah pemeriksaan kesehatan pasien ke dalam beberapa aspek kecil dan terpisah merupakan contoh penerapan Dekomposisi."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Aplikasi Google Maps menampilkan jalur jalan raya utama dan nama daerah, tetapi tidak menampilkan warna atap rumah warga. Ini adalah contoh penerapan...",
+    "options": [
+      "Pengenalan Pola",
+      "Dekomposisi",
+      "Abstraksi",
+      "Pengulangan"
+    ],
+    "correct": 2,
+    "answer": 2,
+    "explanation": "Peta hanya menyajikan informasi penting navigasi (jalan dan rute) dan mengabaikan detail warna atap rumah (Abstraksi)."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Jika kita menyadari bahwa setiap hari Senin seluruh siswa selalu memakai seragam putih-putih dan upacara bendera, kita sedang menerapkan pilar...",
+    "options": [
+      "Pengenalan Pola",
+      "Abstraksi",
+      "Dekomposisi",
+      "Algoritma"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Melihat pengulangan jadwal dan rutinitas mingguan adalah proses identifikasi pola (Pattern Recognition)."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Buku petunjuk resep masakan yang memuat daftar bahan dan langkah 1, 2, 3 cara memasak adalah perwujudan dari pilar...",
+    "options": [
+      "Algoritma",
+      "Abstraksi",
+      "Pengenalan Pola",
       "Dekomposisi"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Algoritma adalah serangkaian instruksi atau prosedur logis langkah demi langkah yang harus diikuti untuk mencapai hasil yang diinginkan."
+    "explanation": "Urutan langkah instruksi memasak dari awal hingga matang adalah representasi nyata dari Algoritma."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Dalam membuat diagram alir (Flowchart), simbol berbentuk belah ketupat (diamond) digunakan untuk menunjukkan...",
+    "question": "Manakah di bawah ini yang BUKAN merupakan salah satu dari 4 pilar utama Computational Thinking?",
     "options": [
-      "Awal atau akhir program",
-      "Keputusan / Pilihan logika (Ya / Tidak)",
-      "Proses perhitungan",
-      "Arah aliran data"
+      "Dekomposisi",
+      "Pengenalan Pola",
+      "Abstraksi",
+      "Menghafal Cepat"
     ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Simbol belah ketupat (Decision) digunakan untuk percabangan atau pengambilan keputusan logika berdasarkan kondisi tertentu."
+    "correct": 3,
+    "answer": 3,
+    "explanation": "4 pilar dasar Berpikir Komputasional adalah Dekomposisi, Pengenalan Pola, Abstraksi, dan Perancangan Algoritma."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Di aplikasi Scratch, blok perintah yang digunakan agar Sprite mengulang suatu instruksi secara terus-menerus adalah...",
+    "question": "Tujuan utama belajar Berpikir Komputasional (Computational Thinking) bagi siswa adalah...",
     "options": [
-      "wait 1 secs",
-      "forever",
-      "stop all",
-      "when green flag clicked"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Blok 'forever' (selamanya) adalah perulangan tak berhingga (infinite loop) yang menjalankan perintah di dalamnya terus-menerus."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Apa fungsi dari sebuah Variabel dalam program komputer?",
-    "options": [
-      "Menghapus seluruh file",
-      "Tempat menyimpan data atau nilai yang bisa berubah",
-      "Memutar suara latar",
-      "Mengubah warna monitor"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Variabel adalah wadah penyimpanan dalam memori komputer yang menampung data (seperti skor kuis, jumlah koin, atau sisa waktu) yang nilainya dapat berubah."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Jika program Scratch kita tidak berjalan sesuai rencana karena ada kesalahan urutan blok logika, tindakan mencari dan memperbaiki kesalahan tersebut disebut...",
-    "options": [
-      "Debugging",
-      "Compiling",
-      "Formatting",
-      "Downloading"
+      "Melatih kemampuan berpikir kritis dan sistematis untuk menyelesaikan berbagai masalah",
+      "Menjadi ahli merakit komponen kabel komputer",
+      "Menghabiskan waktu dengan bermain ponsel",
+      "Membeli perangkat komputer yang paling mahal"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Debugging adalah proses mendeteksi, melacak, dan memperbaiki bug atau kesalahan logika dalam kode program."
+    "explanation": "CT melatih pola pikir terstruktur yang bermanfaat untuk memecahkan masalah kompleks dalam kehidupan sehari-hari."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Dalam budaya humanis Tzu Chi, saat berdiskusi menyelesaikan proyek komputasi bersama teman sekelas, sikap utama yang harus kita junjung tinggi adalah...",
+    "question": "Saat merancang game Scratch tentang memilah sampah, siswa membaginya menjadi: desain grafis, logika poin, dan suara. Siswa tersebut menerapkan...",
     "options": [
-      "Meremehkan pendapat teman lain",
-      "Saling menghargai (Zun Zhong) dan bekerja sama dengan cinta kasih (Hu Ai)",
-      "Bekerja sendiri tanpa mau berbagi tugas",
-      "Memaksa teman mengikuti cara kita"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Nilai luhur Tzu Chi mengajarkan Zun Zhong (saling menghargai) dan Hu Ai (cinta kasih) dalam gotong royong dan kerjasama tim."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Kecerdasan Artifisial (Artificial Intelligence / AI) adalah teknologi komputer yang dirancang agar mampu...",
-    "options": [
-      "Menghasilkan panas ruangan",
-      "Meniru kemampuan berpikir, mengenali pola, dan memecahkan masalah seperti manusia",
-      "Menggantikan seluruh guru di sekolah",
-      "Mematikan internet secara otomatis"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "AI adalah bidang ilmu komputer yang bertujuan membuat mesin atau program yang mampu belajar, menganalisis data, dan mengambil keputusan cerdas menyerupai kecerdasan manusia."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Dalam diagram alir (Flowchart), simbol berbentuk oval lonjong (Terminator) digunakan untuk menunjukkan...",
-    "options": [
-      "Titik awal (Mulai) atau akhir (Selesai) dari suatu alur program",
-      "Langkah perhitungan matematika",
-      "Pengambilan keputusan logika Ya/Tidak",
-      "Mencetak dokumen ke printer"
+      "Dekomposisi",
+      "Abstraksi",
+      "Kompresi",
+      "Looping"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Simbol Oval (Terminator) menandakan titik awal (Start/Mulai) dan titik akhir (Stop/Selesai) dari sebuah alur program dalam flowchart."
+    "explanation": "Membagi pembuatan game ke dalam bagian grafis, koding skor, dan efek suara adalah Dekomposisi proyek."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Dalam diagram alir (Flowchart), simbol berbentuk persegi panjang (Rectangle) digunakan untuk menggambarkan...",
+    "question": "Mengamati bahwa sampah botol plastik dan kaleng selalu dimasukkan ke tempat sampah anorganik adalah bentuk penerapan...",
     "options": [
-      "Langkah proses pengolahan data atau perhitungan instruksi",
-      "Awal dan akhir alur logika",
-      "Kondisi percabangan Ya / Tidak",
-      "Pemberhentian darurat listrik"
-    ],
-    "correct": 0,
-    "answer": 0,
-    "explanation": "Simbol Persegi Panjang (Process) menunjukkan aksi, proses pengolahan, atau operasi perhitungan yang sedang dilakukan oleh sistem."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Blok percabangan 'if ... then ... else' di Scratch digunakan ketika programmer ingin...",
-    "options": [
-      "Menjalankan aksi A jika kondisi terpenuhi, dan aksi B jika kondisi tidak terpenuhi",
-      "Mengulang program selamanya tanpa henti",
-      "Menghapus semua Sprite di layar",
-      "Mematikan koneksi internet laptop"
-    ],
-    "correct": 0,
-    "answer": 0,
-    "explanation": "Percabangan if-then-else memberikan dua jalur logika: jika syarat bernilai Benar (True) jalankan blok pertama, jika Salah (False) jalankan blok kedua."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Pada panggung (Stage) Scratch, posisi karakter Sprite ditentukan dengan sistem koordinat. Sumbu X mengatur posisi... sedangkan sumbu Y mengatur posisi...",
-    "options": [
-      "Horizontal (kiri-kanan) dan Vertikal (atas-bawah)",
-      "Warna kostum dan Volume suara",
-      "Ukuran sprite dan Kecepatan rotasi",
-      "Nama pemain dan Jumlah nyawa"
-    ],
-    "correct": 0,
-    "answer": 0,
-    "explanation": "Sumbu X (horizontal) mengatur posisi kiri (-240) hingga kanan (+240), sedangkan Sumbu Y (vertikal) mengatur posisi bawah (-180) hingga atas (+180)."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Blok Scratch 'broadcast (pesan) and wait' sangat berguna untuk...",
-    "options": [
-      "Mengirim sinyal komunikasi atau pesan antar-Sprite agar bereaksi bersamaan",
-      "Menghapus variabel skor",
-      "Mengganti nama pengguna laptop",
-      "Merekam suara dari mikrofon"
-    ],
-    "correct": 0,
-    "answer": 0,
-    "explanation": "Broadcast Message adalah mekanisme pengiriman sinyal (event message) dari satu Sprite ke Sprite lain atau latar panggung untuk memicu aksi berantai."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Contoh penerapan pilar Dekomposisi dalam kehidupan sehari-hari saat membersihkan kelas piket bersama adalah...",
-    "options": [
-      "Membagi tugas menjadi: menyapu lantai, menghapus papan tulis, dan merapikan meja",
-      "Menyuruh satu orang mengerjakan seluruh piket sendirian",
-      "Meninggalkan ruang kelas dalam keadaan kotor",
-      "Menunggu bel pulang baru mulai merapikan meja"
-    ],
-    "correct": 0,
-    "answer": 0,
-    "explanation": "Dekomposisi memecah tugas besar (membersihkan kelas) menjadi subtugas spesifik (menyapu, menghapus papan, merapikan meja) agar selesai lebih cepat dan mudah."
-  },
-  {
-    "tp": "Fase C • Kelas 6 SD",
-    "question": "Ketika kita mengamati bahwa siklus lampu lalu lintas selalu berulang secara teratur (Merah -> Kuning -> Hijau -> Kuning -> Merah), pilar Berpikir Komputasional yang kita gunakan adalah...",
-    "options": [
-      "Pengenalan Pola (Pattern Recognition)",
+      "Pengenalan Pola",
       "Abstraksi",
       "Dekomposisi",
-      "Debugging"
+      "Algoritma"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Mengamati siklus urutan lampu lalu lintas yang konsisten dan berulang adalah contoh nyata pengenalan pola dalam kehidupan sehari-hari."
+    "explanation": "Mengidentifikasi kesamaan karakteristik bahan sampah adalah Pengenalan Pola."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Saat merancang game kuis di Scratch, programmer menyembunyikan rumus perhitungan rumit di balik layar dan hanya menyajikan tombol pertanyaan dan skor bagi pemain. Konsep ini menerapkan pilar...",
+    "question": "Ketika membuat grafik persentase nilai rapor, kita hanya mengambil nilai akhir tanpa mencatat merek pensil yang digunakan siswa. Ini adalah pilar...",
     "options": [
-      "Abstraksi (Abstraction)",
+      "Abstraksi",
+      "Algoritma",
+      "Dekomposisi",
+      "Pola"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Menyaring hanya nilai angka dan mengabaikan detail pensil adalah Abstraksi."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Langkah-langkah menyalakan komputer: 1. Pasang kabel, 2. Tekan tombol power CPU, 3. Nyalakan monitor. Ini adalah bentuk...",
+    "options": [
+      "Algoritma",
+      "Abstraksi",
+      "Dekomposisi",
+      "Evaluasi"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Urutan tahapan baku operasional menyalakan komputer adalah Algoritma."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Mengapa urutan langkah dalam algoritma harus jelas dan tidak boleh tertukar?",
+    "options": [
+      "Agar komputer dapat menjalankan perintah dengan benar dan tidak terjadi kesalahan",
+      "Agar komputer tidak kehabisan tinta printer",
+      "Supaya warna layar monitor tidak berubah",
+      "Karena algoritma hanya bisa dibaca oleh robot"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Komputer mengeksekusi instruksi secara harfiah sesuai urutan; urutan yang salah menghasilkan eror atau hasil keliru."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Saat mendesain ikon tombol aplikasi di layar ponsel, desainer hanya menggambar garis sederhana simbol rumah untuk 'Beranda'. Ini menerapkan...",
+    "options": [
+      "Abstraksi",
+      "Dekomposisi",
       "Debugging",
-      "Perulangan tak berhingga",
-      "Dekomposisi parsial"
+      "Sorting"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Abstraksi berfokus menyajikan antarmuka esensial yang penting bagi pengguna dan menyembunyikan rincian kode yang rumit di baliknya."
+    "explanation": "Ikon menyederhanakan bentuk rumah asli menjadi simbol minimalis yang esensial (Abstraksi)."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Sikap berterima kasih dan bersyukur (Gan En) kepada guru dan teman yang telah membantu menemukan kesalahan kode (bug) dalam proyek komputasi adalah cerminan dari...",
+    "question": "Menemukan bahwa rumus luas persegi panjang selalu Panjang x Lebar untuk semua jenis persegi panjang adalah contoh...",
     "options": [
-      "Budaya Humanis Tzu Chi dalam menuntut ilmu",
-      "Kelemahan seorang programmer",
-      "Tindakan yang membuang waktu",
-      "Ketakutan akan nilai rendah"
+      "Pengenalan Pola dan Abstraksi",
+      "Dekomposisi fisik",
+      "Instalasi software",
+      "Debugging jaringan"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Budaya Humanis Tzu Chi mengajarkan rasa syukur (Gan En) atas bantuan orang lain serta kerendahan hati untuk terus belajar dan memperbaiki diri."
+    "explanation": "Menemukan pola kesamaan rumus umum matematika adalah perpaduan Pengenalan Pola dan Abstraksi matematis."
   },
   {
     "tp": "Fase C • Kelas 6 SD",
-    "question": "Mengapa pemahaman Berpikir Komputasional (Computational Thinking) sangat penting dipelajari oleh siswa sekolah dasar?",
+    "question": "Jika sebuah algoritma memiliki langkah yang tidak jelas atau bermakna ganda (ambigu), maka akibatnya adalah...",
     "options": [
-      "Membentuk kemampuan memecahkan masalah kompleks secara logis, kreatif, dan terstruktur",
-      "Agar siswa menghabiskan waktu bermain game seharian",
-      "Agar siswa tidak perlu lagi membaca buku pelajaran lain",
-      "Untuk menggantikan fungsi pensil dan buku tulis di sekolah"
+      "Komputer akan mengalami kegagalan logika (error) atau hasil tidak sesuai target",
+      "Komputer langsung mati terbakar",
+      "Program otomatis menjadi pintar sendiri",
+      "Kecepatan internet otomatis bertambah"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Computational Thinking melatih nalar logika analitis, kreativitas, dan ketangkasan memecahkan masalah nyata yang bermanfaat untuk segala bidang masa depan."
+    "explanation": "Instruksi yang ambigu membuat mesin komputer bingung atau mengeksekusi tindakan yang keliru."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Dalam Computational Thinking, proses generalisasi dari pola yang ditemukan untuk membuat solusi yang berlaku umum disebut...",
+    "options": [
+      "Pemodelan / Generalisasi Pola",
+      "Dekomposisi Parsial",
+      "Debugging Visual",
+      "Input Data"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Generalisasi pola merumuskan formula atau aturan universal yang bisa diterapkan pada kasus sejenis lainnya."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Seseorang yang memiliki kemampuan Berpikir Komputasional yang baik akan memandang masalah besar yang sulit sebagai...",
+    "options": [
+      "Tantangan menarik yang bisa dipecahkan dengan membaginya ke langkah-langkah kecil",
+      "Beban mustahil yang harus segera dihindari",
+      "Sesuatu yang harus diselesaikan tanpa rencana apapun",
+      "Masalah yang hanya bisa diselesaikan oleh orang dewasa"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "CT menanamkan kepercayaan diri logis untuk mengurai tantangan rumit menjadi bagian-bagian yang dapat diselesaikan."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Diagram yang menggambarkan langkah-langkah dan alur pengambilan keputusan suatu algoritma menggunakan simbol grafis dinamakan...",
+    "options": [
+      "Bagan Alir (Flowchart)",
+      "Grafik Batang",
+      "Peta Tematik",
+      "Tabel Distribusi"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Flowchart (Bagan Alir) adalah representasi visual grafis dari urutan logika langkah-langkah dalam algoritma."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Simbol bangun datar Oval (Terminator) pada bagan alir (Flowchart) digunakan untuk menandai...",
+    "options": [
+      "Titik Mulai (Start) dan Titik Selesai (End) alur program",
+      "Operasi perhitungan matematika",
+      "Pengambilan keputusan bercabang (Decision)",
+      "Pemasukan data dari keyboard"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Simbol Terminator (oval/elips) adalah penanda awal (Start) dan akhir (End/Stop) dari sebuah flowchart."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Simbol bangun datar Persegi Panjang (Process) pada bagan alir digunakan untuk menggambarkan...",
+    "options": [
+      "Proses pengolahan data atau tindakan instruksi kerja",
+      "Awal jalannya program",
+      "Pilihan Ya atau Tidak",
+      "Koneksi printer"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Persegi panjang merepresentasikan aktivitas, operasi pemrosesan, atau tindakan eksekusi instruksi."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Simbol bangun datar Belah Ketupat (Decision) pada bagan alir berfungsi untuk...",
+    "options": [
+      "Pengambilan keputusan kondisi logika yang memiliki percabangan (Ya / Tidak)",
+      "Menutup program",
+      "Menyambungkan kabel monitor",
+      "Memasukkan nama file"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Belah ketupat (Decision) menguji sebuah kondisi: jika Ya mengalir ke satu jalur, jika Tidak ke jalur lain."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Simbol garis bertanda panah (Flowline) pada bagan alir berfungsi untuk...",
+    "options": [
+      "Menunjukkan arah aliran langkah berikutnya dalam program",
+      "Menghapus simbol persegi panjang",
+      "Menunjukkan berat file dokumen",
+      "Mengganti warna panggung"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Flowline (garis alir) menghubungkan antar-simbol dan mengarahkan urutan jalannya eksekusi program."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Simbol bangun datar Jajar Genjang pada bagan alir digunakan untuk operasi...",
+    "options": [
+      "Input data (masukan) atau Output data (keluaran)",
+      "Menghentikan komputer",
+      "Perulangan tanpa batas",
+      "Menampilkan gambar bergerak"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Jajargenjang melambangkan operasi input (membaca data) atau output (menampilkan hasil cetak)."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Keuntungan utama menyusun bagan alir (flowchart) sebelum mulai menulis kode di Scratch adalah...",
+    "options": [
+      "Memastikan alur logika program benar, runtut, dan tidak ada langkah yang terlewat",
+      "Agar komputer bisa menyala sendiri tanpa listrik",
+      "Menghilangkan kebutuhan akan keyboard",
+      "Ukuran game menjadi 0 kilobyte"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Flowchart berfungsi sebagai cetak biru (blueprint) logis yang mencegah kebingungan saat mengoding."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Titik pusat koordinat (tengah-tengah) panggung pementasan Scratch berada pada nilai...",
+    "options": [
+      "X: 0 dan Y: 0",
+      "X: 100 dan Y: 100",
+      "X: -240 dan Y: -180",
+      "X: 480 dan Y: 360"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Titik pusat panggung Scratch adalah koordinat kartesius (0, 0)."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Rentang batas koordinat horizontal sumbu X di panggung Scratch adalah dari...",
+    "options": [
+      "-240 (paling kiri) sampai +240 (paling kanan)",
+      "-180 sampai +180",
+      "0 sampai 1000",
+      "-50 sampai +50"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Lebar panggung Scratch adalah 480 piksel, dengan rentang sumbu X dari -240 di kiri hingga +240 di kanan."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Rentang batas koordinat vertikal sumbu Y di panggung Scratch adalah dari...",
+    "options": [
+      "-180 (paling bawah) sampai +180 (paling atas)",
+      "-240 sampai +240",
+      "0 sampai 100",
+      "-500 sampai +500"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Tinggi panggung Scratch adalah 360 piksel, dengan rentang sumbu Y dari -180 di dasar hingga +180 di puncak."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Jika kita ingin menggerakkan Sprite ke arah atas panggung, blok perintah yang digunakan adalah...",
+    "options": [
+      "change y by (angka positif)",
+      "change x by (angka positif)",
+      "change y by (angka negatif)",
+      "set x to 0"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Nilai positif sumbu Y menaikkan posisi sprite ke atas, sedangkan nilai negatif Y menurunkannya ke bawah."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Blok logika 'If ... Then ... Else' pada Scratch berfungsi untuk...",
+    "options": [
+      "Menjalankan perintah A jika syarat benar, atau menjalankan perintah B jika syarat salah",
+      "Mengulang lagu tanpa henti",
+      "Menghapus sprite seketika",
+      "Mengubah warna panggung secara acak"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "If-Then-Else memberikan dua cabang tindakan: satu jika kondisi terpenuhi, satu lagi alternatif jika tidak terpenuhi."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Operator perbandingan logika di Scratch yang digunakan untuk mengecek apakah nilai variabel skor lebih besar dari 100 adalah...",
+    "options": [
+      "[skor] > 100",
+      "[skor] < 100",
+      "[skor] = 100",
+      "[skor] + 100"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Tanda '>' adalah operator matematika dan logika komputasi untuk perbandingan 'lebih besar dari'."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Mekanisme di Scratch yang digunakan agar satu Sprite dapat mengirimkan sinyal pesan rahasia kepada Sprite lain dinamakan...",
+    "options": [
+      "Broadcast Message & When I Receive",
+      "Pen Color",
+      "Cloud Variable",
+      "Costume Switcher"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Broadcast Message memancarkan pesan ke seluruh sprite panggung, dan blok 'When I Receive' menangkap pesan tersebut untuk bereaksi."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Fitur di Scratch yang memungkinkan satu Sprite membuat tiruan ganda dirinya sendiri secara dinamis saat permainan berlangsung dinamakan...",
+    "options": [
+      "Cloning (create clone of myself)",
+      "Duplicate Script",
+      "Backup Stage",
+      "Export Sprite"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Cloning memungkinkan pembuatan banyak objek tiruan (seperti hujan peluru atau koin jatuh) dari satu sprite utama."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Saat game dijalankan, Sprite tidak mau melompat saat tombol spasi ditekan. Sikap berpikir komputasional yang tepat adalah...",
+    "options": [
+      "Melakukan debugging: memeriksa blok Event tombol spasi dan nilai koordinat Y secara teliti",
+      "Langsung menutup laptop dan marah",
+      "Menyalahkan teman sekelas",
+      "Menghapus seluruh proyek game"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Debugging dengan kepala dingin dan memeriksa susunan blok logika adalah kompetensi utama pemrogram sejati."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Agar sebuah game memiliki batas waktu bermain selama 60 detik, kita menggunakan kombinasi blok...",
+    "options": [
+      "Variabel waktu, perulangan repeat 60, wait 1 seconds, dan change [waktu] by -1",
+      "Blok play sound 60 kali berturut-turut",
+      "Blok move 60 steps",
+      "Blok turn right 60 degrees"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Countdown timer dibuat dengan mengurangi variabel waktu setiap 1 detik hingga menyentuh angka 0."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Kecerdasan Artifisial (Artificial Intelligence / AI) pada dasarnya adalah sistem komputer yang dirancang untuk...",
+    "options": [
+      "Meniru kemampuan berpikir dan belajar manusia seperti mengenali gambar, suara, dan teks",
+      "Menggantikan manusia bernafas",
+      "Menghilangkan kebutuhan manusia berbuat baik",
+      "Membuat komputer menjadi makhluk hidup bernyawa"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "AI adalah cabang ilmu komputer yang menciptakan mesin cerdas yang mampu belajar dan memecahkan masalah menyerupai kognisi manusia."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Sikap etika digital yang bijak dan berintegritas saat menggunakan teknologi AI untuk belajar adalah...",
+    "options": [
+      "Memanfaatkan AI sebagai sarana belajar mencari ide dan memeriksa kembali kebenaran faktanya secara mandiri",
+      "Menyalin mentah-mentah seluruh jawaban AI lalu mengakuinya sebagai karya sendiri",
+      "Meminta AI mengerjakan seluruh ulangan sekolah tanpa belajar",
+      "Menggunakan AI untuk menyebarkan fitnah tentang teman"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Integritas akademik menuntut kita menggunakan teknologi sebagai alat bantu belajar, bukan menggantikan kejujuran diri."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Pengamalan tiga pilar budaya humanis Tzu Chi (Gan En, Zun Zhong, Hu Ai) dalam era kecerdasan digital diwujudkan dengan...",
+    "options": [
+      "Bersyukur atas kemajuan teknologi, saling menghargai privasi dan karya orang lain, serta saling mengasihi dan tolong-menolong di dunia digital",
+      "Merasa diri paling pintar dan meremehkan orang lain",
+      "Menggunakan media sosial untuk mencela teman yang berbeda pendapat",
+      "Menolak semua kemajuan teknologi komputer"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Gan En (Bersyukur), Zun Zhong (Menghargai), dan Hu Ai (Saling Mengasihi) adalah benteng karakter luhur pemanfaatan teknologi yang bermartabat."
   }
 ];
 
@@ -36423,228 +36915,488 @@ const DEFAULT_BANK_SOAL_K5 = [
     ],
     "correct": 2,
     "answer": 2,
-    "explanation": "Animasi (Animation) mengatur cara elemen/objek tertentu (teks, bentuk, atau gambar) muncul, bergerak, atau menghilang di layar panggung slide."
+    "explanation": "Animation adalah efek gerak dinamis pada teks, bentuk, atau gambar individual di dalam lembar slide."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Tombol pintasan (shortcut) keyboard yang paling cepat digunakan untuk memulai penayangan presentasi layar penuh (Slide Show) dari slide pertama adalah...",
+    "question": "Tombol pintasan (shortcut) pada keyboard untuk memulai tayangan presentasi (Slide Show) dari halaman pertama adalah...",
     "options": [
       "F5",
       "Ctrl + P",
+      "Ctrl + S",
+      "Esc"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Tombol F5 langsung memulai tayangan Slide Show layar penuh dari slide paling awal (pertama)."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Jika ingin memulai Slide Show tepat dari slide yang sedang aktif dibuka saat ini, tombol kombinasi keyboard yang ditekan adalah...",
+    "options": [
+      "Shift + F5",
       "Alt + F4",
-      "Ctrl + S"
+      "Ctrl + Z",
+      "F1"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Menekan tombol F5 di keyboard akan langsung memulai penayangan Slide Show dari halaman pertama secara otomatis."
+    "explanation": "Shift + F5 memulai tayangan presentasi langsung dari slide yang sedang dipilih saat ini."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Saat menyiapkan slide presentasi di depan kelas, aturan tata letak yang baik agar materi mudah dibaca oleh teman-teman adalah...",
+    "question": "Dalam prinsip desain presentasi yang efektif, aturan 6x6 berarti...",
     "options": [
-      "Tulis seluruh isi buku ke dalam satu slide penuh tanpa gambar",
-      "Gunakan teks yang ringkas, kontras warna yang jelas, dan gambar relevan",
-      "Gunakan warna tulisan kuning cerah di atas latar belakang putih",
-      "Gunakan 10 jenis huruf (font) yang berbeda-beda dalam satu slide"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Slide yang baik tidak boleh terlalu padat teks, memiliki kontras warna tinggi (mudah dibaca), serta didukung gambar yang relevan dengan topik."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Platform edukasi pemrograman internasional 'Hour of Code' (Code.org) mengajarkan dasar koding menggunakan konsep...",
-    "options": [
-      "Mengetik kode biner 0 dan 1 secara manual",
-      "Memperbaiki kabel monitor yang rusak",
-      "Menginstal sistem operasi komputer",
-      "Pemrograman visual berbasis balok warna-warni (Block-based coding)"
-    ],
-    "correct": 3,
-    "answer": 3,
-    "explanation": "Hour of Code menggunakan koding visual blok bertumpuk warna-warni (puzzle blocks) sehingga anak-anak dapat memahami logika pemrograman tanpa perlu mengetik sintaksis rumit."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Dalam pemrograman koding, konsep menjalankan instruksi langkah demi langkah secara berurutan dari atas ke bawah disebut...",
-    "options": [
-      "Sequence (Urutan Langkah)",
-      "Loop (Perulangan)",
-      "Condition (Percabangan)",
-      "Variable (Variabel)"
+      "Maksimal 6 baris teks per slide dan sekitar 6 kata per baris",
+      "Membuat slide berukuran 6 meter kali 6 meter",
+      "Menggunakan 6 jenis font tulisan berbeda",
+      "Presentasi harus selesai dalam 6 detik"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Sequence (urutan langkah) adalah eksekusi perintah secara berurutan sesuai baris kode dari awal hingga akhir."
+    "explanation": "Aturan 6x6 menjaga slide tetap ringkas, bersih, dan mudah dibaca oleh audiens tanpa teks yang berjejal."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Di Code.org dan Scratch, jika kita ingin karakter bergerak maju sebanyak 5 kali tanpa menulis blok 'maju' lima kali berturut-turut, kita menggunakan konsep...",
+    "question": "Wadah kotak tempat mengetik teks di PowerPoint atau Google Slides dinamakan...",
     "options": [
-      "Stop All",
-      "Selection",
-      "Loop / Repeat (Perulangan)",
-      "Variable"
-    ],
-    "correct": 2,
-    "answer": 2,
-    "explanation": "Perulangan (Loop/Repeat) memungkinkan komputer mengeksekusi kumpulan blok perintah yang sama berulang kali secara efisien."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Blok instruksi 'if (jika ada jalan di depan) then (bergerak maju)' dalam logika koding merupakan penerapan dari...",
-    "options": [
-      "Loop tak berhingga",
-      "Condition / Selection (Percabangan Kondisi)",
-      "Variabel angka",
-      "Fungsi cetak"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Condition (kondisi percabangan) memeriksa suatu syarat: jika syarat terpenuhi (True), aksi tertentu akan dijalankan."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Canva adalah aplikasi berbasis web dan grafis yang sangat populer untuk...",
-    "options": [
-      "Mendesain poster, infografis, dan materi visual secara kreatif",
-      "Menghitung laporan laba rugi perusahaan",
-      "Menulis kode bahasa assembly",
-      "Membuat partisi harddisk"
+      "Text Box",
+      "Formula Bar",
+      "Picture Frame",
+      "Word Column"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Canva menyediakan ribuan template dan elemen grafis untuk mendesain poster, banner, kartu ucapan, dan konten visual kreatif dengan mudah."
+    "explanation": "Text Box adalah kotak penampung teks yang posisinya dapat digeser bebas di atas lembar presentasi."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Dalam mendesain poster digital di Canva, unsur 'Hierarki Tipografi' berarti...",
+    "question": "Diagram terstruktur visual bawaan PowerPoint untuk bagan alur proses, hierarki struktur, atau daftar siklus adalah...",
     "options": [
-      "Menyamakan ukuran semua teks dari judul hingga isi",
-      "Menggunakan huruf yang paling kecil agar muat banyak",
-      "Membuat ukuran judul utama paling besar dan menonjol dibanding subjudul dan isi",
-      "Menghapus semua teks pada poster"
+      "SmartArt",
+      "WordArt",
+      "ClipArt",
+      "Paint Brush"
     ],
-    "correct": 2,
-    "answer": 2,
-    "explanation": "Hierarki Tipografi memandu mata pembaca dengan membuat Judul Utama paling besar dan tebal, diikuti subjudul, dan teks penjelas yang lebih ringkas."
+    "correct": 0,
+    "answer": 0,
+    "explanation": "SmartArt menyediakan diagram visual profesional untuk menyajikan konsep, siklus, dan bagan alur."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Agar warna pada poster terlihat harmonis, nyaman dilihat, dan profesional, desainer grafis sebaiknya...",
+    "question": "Untuk keluar dari mode tayangan layar penuh (Slide Show) dan kembali ke mode pengeditan presentasi, kita menekan tombol...",
     "options": [
-      "Menggunakan 20 warna pelangi secara acak tanpa pola",
-      "Menggunakan kombinasi palet 2-3 warna utama yang serasi dan konsisten",
-      "Memilih warna latar belakang hitam dengan tulisan abu-abu gelap",
-      "Menghindari penggunaan gambar sama sekali"
+      "Esc (Escape)",
+      "Enter",
+      "Space",
+      "Tab"
     ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Pemilihan palet 2-3 warna utama yang serasi menciptakan kesatuan visual (harmoni) dan membuat poster menarik serta nyaman dipandang."
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Tombol Esc di pojok kiri atas keyboard digunakan untuk mengakhiri tayangan slide show seketika."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Pada aplikasi Scratch, karakter atau objek animasi yang dapat diprogram gerak, kostum, dan suaranya disebut...",
+    "question": "Penyusunan warna latar belakang dan warna teks pada slide yang baik harus memperhatikan...",
     "options": [
+      "Kontras warna tinggi (teks terang di atas latar gelap, atau sebaliknya)",
+      "Warna teks dan latar belakang harus sama persis",
+      "Menggunakan seluruh warna pelangi pada setiap kata",
+      "Latar belakang dibuat berkedip-kedip cepat"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Kontras yang tinggi memastikan teks tulisan presentasi terbaca jelas oleh audiens dari jarak jauh."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Kegiatan global 'Hour of Code' dan platform Code.org bertujuan untuk memperkenalkan...",
+    "options": [
+      "Dasar-dasar logika pemrograman komputer dan computational thinking secara menyenangkan",
+      "Cara memperbaiki stopkontak listrik",
+      "Cara membongkar harddisk komputer",
+      "Membeli komponen elektronik mahal"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Hour of Code dirancang untuk mengenalkan konsep ilmu komputer dan koding kepada pelajar dengan cara visual dan interaktif."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Urutan langkah-langkah terstruktur dan logis yang harus dijalankan komputer dari awal sampai akhir disebut...",
+    "options": [
+      "Algoritma (Sequence)",
+      "Hardware",
+      "Antivirus",
+      "Wallpaper"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Algoritma adalah urutan langkah terencana dan sistematis untuk memecahkan suatu masalah atau menjalankan tugas."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Dalam koding visual, blok perintah yang digunakan untuk mengulang suatu tindakan sebanyak 5 kali tanpa menulis ulang blok disebut...",
+    "options": [
+      "Blok Repeat / Loop (Perulangan)",
+      "Blok Delete",
+      "Blok Turn Off",
+      "Blok Sound"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Blok Repeat (Loops) mengulang serangkaian perintah berkali-kali secara efisien sehingga kode menjadi rapi dan ringkas."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Jika karakter Angry Bird harus berjalan maju sebanyak 10 langkah, cara paling efisien dalam koding blok adalah...",
+    "options": [
+      "Gunakan blok 'Repeat 10' dengan perintah 'Move Forward' di dalamnya",
+      "Pasang 10 blok 'Move Forward' berderet panjang",
+      "Gunakan blok 'Turn Left' 10 kali",
+      "Tutup peramban komputer"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Memanfaatkan blok perulangan Repeat mempersingkat 10 blok menjadi 1 blok perulangan terstruktur."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Blok kode 'If ... Then' (Kondisi/Percabangan) digunakan dalam program komputer ketika...",
+    "options": [
+      "Ada keputusan yang hanya dijalankan jika suatu syarat/kondisi tertentu terpenuhi",
+      "Komputer ingin mematikan monitor secara paksa",
+      "Ingin menggambar bentuk segitiga semata",
+      "Program tidak memiliki alur sama sekali"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Percabangan kondisi mengecek syarat: jika kondisi benar (true), aksi tertentu baru dijalankan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Istilah untuk mencari dan memperbaiki kesalahan atau kesalahan logika dalam kode program komputer dinamakan...",
+    "options": [
+      "Debugging",
+      "Download",
+      "Formatting",
+      "Typing"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Debugging adalah proses melacak, menganalisis, dan memperbaiki kesalahan (bug) pada alur kode program."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Kesalahan perintah pada koding yang menyebabkan karakter menabrak dinding batu dinamakan...",
+    "options": [
+      "Bug (Kutu/Kesalahan Program)",
+      "Pixel",
+      "Megabyte",
+      "Cookie"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Bug adalah istilah umum untuk kesalahan, kegagalan, atau cacat pada program komputer yang menyebabkan hasil tidak sesuai."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Blok 'Repeat Until' pada koding game memiliki arti bahwa tindakan akan terus diulang sampai...",
+    "options": [
+      "Kondisi tujuan akhir tercapai (misalnya: sampai mencapai bunga/tujuan)",
+      "Baterai komputer habis total",
+      "Komputer mengeluarkan suara musik",
+      "Siswa menekan tombol spasi 100 kali"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Repeat Until terus melakukan pengulangan sampai kondisi penghenti yang ditentukan menjadi kenyataan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Sertifikat resmi yang diperoleh setelah menyelesaikan 100% misi tantangan Hour of Code membuktikan bahwa siswa telah...",
+    "options": [
+      "Mempelajari dan mempraktikkan konsep dasar ilmu komputer dan algoritma",
+      "Membeli lisensi perangkat lunak berbayar",
+      "Merusak sistem operasi komputer",
+      "Membuat akun media sosial baru"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Sertifikat Hour of Code adalah apresiasi internasional atas ketekunan siswa mempelajari dasar pemrograman."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Manfaat melatih kemampuan koding sejak usia sekolah dasar adalah melatih anak untuk...",
+    "options": [
+      "Berpikir logis, terstruktur, kritis, dan pantang menyerah saat memecahkan masalah",
+      "Bermain game sepanjang hari tanpa belajar",
+      "Menghindari interaksi dengan teman lain",
+      "Menghafal rumus tanpa mengerti maknanya"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Koding mengasah cara berpikir sistematis dan pemecahan masalah (problem solving) yang berguna di semua bidang."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Canva adalah platform desain grafis berbasis web yang sangat populer karena...",
+    "options": [
+      "Menyediakan ribuan template siap pakai yang mudah diatur dengan sistem drag-and-drop",
+      "Hanya bisa digunakan oleh insinyur penerbangan",
+      "Tidak memerlukan koneksi internet sama sekali",
+      "Khusus untuk menghitung gaji pegawai bank"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Canva memudahkan pembuatan poster, banner, dan presentasi melalui sistem seret dan lepas (drag-and-drop) yang ramah pemula."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Dalam membuat poster kampanye Pelestarian Lingkungan di Canva, prinsip hierarki teks yang benar adalah...",
+    "options": [
+      "Judul dibuat paling besar dan mencolok, subjudul sedang, penjelasan pelengkap lebih kecil",
+      "Semua ukuran tulisan dibuat sama rata sebesar 8 pt",
+      "Penjelasan dibuat sangat besar menutupi seluruh gambar ilustrasi",
+      "Judul disembunyikan di balik bingkai"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Hierarki tipografi memandu mata audiens untuk membaca pesan utama terlebih dahulu, baru ke detail berikutnya."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Jumlah kombinasi jenis huruf (font) yang disarankan dalam satu desain poster agar tetap rapi dan tidak membingungkan adalah...",
+    "options": [
+      "Maksimal 2 sampai 3 jenis font yang harmonis",
+      "Minimal 10 jenis font berbeda",
+      "Semua kata harus memiliki font berbeda",
+      "Tidak boleh ada font sama sekali"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Membatasi 2 hingga 3 keluarga font membuat desain poster tampak serasi, teratur, dan profesional."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Format penyimpanan file gambar beresolusi tinggi dengan kompresi tanpa pecah yang paling cocok untuk poster digital adalah...",
+    "options": [
+      ".PNG (Portable Network Graphics)",
+      ".TXT",
+      ".MP3",
+      ".EXE"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": ".PNG mendukung ketajaman gambar tinggi dan transparansi latar belakang yang sangat cocok untuk karya grafis."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Menu di Canva yang digunakan untuk menyisipkan ikon daun, pohon, kotak garis, dan ilustrasi kartun adalah...",
+    "options": [
+      "Elements (Elemen)",
+      "Draw",
+      "Audio",
+      "Upload"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Menu Elements menyediakan berbagai stiker, ilustrasi, bentuk geometris, dan ikon grafis menarik."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Mengapa pemilihan warna hijau dan biru sangat cocok untuk tema poster pelestarian bumi dan hemat energi?",
+    "options": [
+      "Karena melambangkan kesegaran alam pepohonan (hijau) dan kebersihan air/udara bumi (biru)",
+      "Karena warna lain dilarang oleh pembuat komputer",
+      "Karena warna hijau membuat file lebih ringan diunduh",
+      "Supaya teks di dalamnya tidak bisa dibaca"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Psikologi warna hijau dan biru erat hubungannya dengan pelestarian lingkungan, alam, air bersih, dan ketenangan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Tombol di Canva yang kita klik untuk mengunduh karya poster ke komputer dalam bentuk gambar adalah...",
+    "options": [
+      "Share (Bagikan) > Download (Unduh)",
+      "File > Exit",
+      "Help > Contact",
+      "Delete All"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Menu Share menyediakan opsi Download untuk mengekspor desain ke format PNG, JPG, atau PDF."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Tujuan utama membuat poster digital tentang cinta lingkungan di sekolah adalah...",
+    "options": [
+      "Mengajak dan mengedukasi warga sekolah untuk peduli, berhemat energi, dan menjaga kebersihan bumi",
+      "Mendapat banyak uang tunai langsung",
+      "Menghabiskan waktu luang tanpa tujuan",
+      "Menyimpan file sampah di komputer"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Poster digital adalah media komunikasi visual efektif untuk menyebarkan pesan positif dan ajakan kebaikan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Karakter atau objek grafis yang dapat kita gerakkan dan atur perilakunya menggunakan blok kode di Scratch dinamakan...",
+    "options": [
+      "Sprite",
       "Stage",
       "Backdrop",
-      "Costume",
-      "Sprite"
-    ],
-    "correct": 3,
-    "answer": 3,
-    "explanation": "Sprite adalah sebutan untuk objek atau karakter di Scratch (seperti kucing Scratch, burung, bola) yang dapat diberi balok instruksi program."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Blok perintah di Scratch yang berfungsi sebagai pemicu awal dimulainya suatu program ketika bendera hijau diklik adalah...",
-    "options": [
-      "when green flag clicked (Kategori Events)",
-      "move 10 steps (Kategori Motion)",
-      "say Hello (Kategori Looks)",
-      "play sound (Kategori Sound)"
+      "Soundtrack"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Blok 'when green flag clicked' dari kategori Events adalah pemicu utama yang menjalankan seluruh baris program saat tombol bendera hijau ditekan."
+    "explanation": "Sprite adalah objek visual (seperti kucing, ikan, bola) yang dapat diprogram untuk bergerak, berbicara, atau bereaksi."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Blok Scratch yang digunakan untuk mendeteksi apakah karakter Sprite menyentuh objek lain (misalnya menyentuh rintangan atau bintang) berada pada kategori...",
+    "question": "Area panggung tempat seluruh Sprite beraksi dan menampilkan pergerakan dinamakan...",
     "options": [
-      "Operators (Operator)",
-      "Sensing (Sensor)",
-      "Variables (Variabel)",
-      "Motion (Gerak)"
-    ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Kategori Sensing (Sensor) berisi blok deteksi seperti 'touching mouse-pointer?', 'touching color?', dan 'key space pressed?'."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Fitur Variabel pada pembuatan game koding Scratch biasanya digunakan untuk menyimpan dan memperbarui data seperti...",
-    "options": [
-      "Warna kabel mouse komputer",
-      "Kecepatan kipas pendingin laptop",
-      "Skor pemain, jumlah koin yang dikumpulkan, dan sisa nyawa",
-      "Merek monitor yang digunakan"
-    ],
-    "correct": 2,
-    "answer": 2,
-    "explanation": "Variabel berfungsi menyimpan data nilai yang dinamis dan dapat berubah sepanjang permainan, seperti skor poin, nyawa, level, atau waktu."
-  },
-  {
-    "tp": "Fase C • Kelas 5 SD",
-    "question": "Saat mengunggah karya poster atau presentasi ke internet, etika digital yang benar dalam menghargai hak cipta karya orang lain adalah...",
-    "options": [
-      "Mencantumkan sumber referensi atau menggunakan gambar bebas lisensi (Creative Commons)",
-      "Mengaku bahwa karya orang lain adalah buatan kita sendiri",
-      "Menghapus nama pembuat asli karya tersebut",
-      "Menjual gambar teman tanpa izin"
+      "Stage (Panggung)",
+      "Costume Tab",
+      "Backpack",
+      "Paint Area"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Menghargai hak cipta (copyright) dengan mencantumkan sumber kredit atau menggunakan aset berlisensi bebas adalah wujud kejujuran dan etika digital."
+    "explanation": "Stage adalah layar utama di mana seluruh aksi sprite dan latar belakang (backdrop) berlangsung."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Sikap bijak dan aman dalam menggunakan media sosial dan internet di era teknologi informasi adalah...",
+    "question": "Blok Event paling mendasar yang digunakan untuk memulai jalannya seluruh program Scratch saat bendera hijau diklik adalah...",
     "options": [
-      "Membagikan kata sandi akun ke semua teman",
-      "Mempercayai semua informasi di internet tanpa mengecek kebenarannya",
-      "Menggunakan kata-kata kasar saat berkomentar di media sosial",
-      "Menjaga kerahasiaan kata sandi dan tidak membagikan data pribadi seperti alamat rumah"
+      "when green flag clicked",
+      "when stop clicked",
+      "when sprite hidden",
+      "wait 100 seconds"
     ],
-    "correct": 3,
-    "answer": 3,
-    "explanation": "Menjaga kerahasiaan data pribadi (privacy) dan berpikir kritis terhadap informasi adalah pilar keamanan siber (cyber security) bagi siswa."
+    "correct": 0,
+    "answer": 0,
+    "explanation": "'when green flag clicked' adalah pemicu utama untuk memulai permainan atau animasi secara bersamaan."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
-    "question": "Kata Perenungan Master Cheng Yen mengajarkan: 'Satu niat baik yang tulus bagaikan sebutir benih yang akan tumbuh menjadi pohon rindang.' Dalam proyek kelompok presentasi dan koding, nilai ini tercermin dari...",
+    "question": "Wadah penampung nilai angka yang dapat berubah selama permainan berjalan (misalnya untuk mencatat nilai poin pemain) dinamakan...",
     "options": [
-      "Mengejek teman yang belum paham koding Scratch",
-      "Saling membantu teman yang kesulitan koding dengan sabar dan ikhlas (Hu Ai)",
-      "Mengerjakan tugas teman dengan meminta imbalan uang",
-      "Menyembunyikan trik koding agar nilai sendiri paling tinggi"
+      "Variable (Variabel)",
+      "Operator",
+      "Motion",
+      "Sound"
     ],
-    "correct": 1,
-    "answer": 1,
-    "explanation": "Hu Ai (cinta kasih) dan tolong-menolong diwujudkan dengan sabar mendampingi dan berbagi ilmu koding kepada sesama rekan belajar."
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Variabel berfungsi seperti kotak yang menyimpan data (seperti skor atau waktu) yang nilainya dapat bertambah atau berkurang."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Jika Sprite ikan menyentuh sampah plastik lalu poin pemain bertambah 1, blok sensor yang digunakan adalah...",
+    "options": [
+      "touching [Sprite Sampah] ?",
+      "distance to mouse-pointer",
+      "mouse down ?",
+      "key pressed ?"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Blok 'touching [objek] ?' pada kategori Sensing mendeteksi sentuhan antar-dua sprite secara langsung."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Agar animasi Sprite bergerak terus menerus tanpa henti selama permainan berlangsung, perintah dimasukkan ke dalam blok...",
+    "options": [
+      "forever (selamanya)",
+      "repeat 1",
+      "if on edge, bounce",
+      "stop all"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Blok 'forever' menjalankan perintah di dalamnya secara berulang-ulang tanpa batas waktu hingga tombol stop ditekan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Koleksi tampilan kostum berbeda dari sebuah Sprite yang dapat berganti-ganti untuk menciptakan ilusi berjalan dinamakan...",
+    "options": [
+      "Costumes (Kostum)",
+      "Sounds",
+      "Variables",
+      "Extensions"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Mengganti kostum menggunakan perintah 'next costume' menciptakan efek gerak animasi seperti orang sedang melangkah."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Blok kode Scratch yang digunakan untuk menghentikan seluruh aktivitas permainan (Game Over) adalah...",
+    "options": [
+      "stop [all]",
+      "hide",
+      "clear graphic effects",
+      "play sound"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Blok 'stop [all]' menghentikan semua script koding yang sedang berjalan di panggung seketika."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Dalam proyek kelompok koding game Scratch, sikap 'Hu Ai' (Saling Mengasihi dan Bekerjasama) diwujudkan dengan...",
+    "options": [
+      "Saling membantu teman yang kesulitan membuat logika kode dan berbagi tugas secara adil",
+      "Menyembunyikan kode agar nilai teman lebih jelek",
+      "Menghapus hasil karya teman kelompok",
+      "Bekerja sendiri tanpa mau berdiskusi"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Budaya Hu Ai mengajarkan kita untuk saling menyayangi, mendukung, dan bekerjasama demi keberhasilan bersama."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Etika yang benar saat memodifikasi (Remix) proyek karya Scratch buatan orang lain adalah...",
+    "options": [
+      "Memberikan kredit dan ucapan terima kasih pada catatan proyek (Notes & Credits)",
+      "Mengakuinya 100% sebagai ciptaan sendiri dari nol",
+      "Menghina pembuat aslinya di kolom komentar",
+      "Menjualnya tanpa izin pembuat"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Mencantumkan Notes & Credits adalah bentuk apresiasi dan kejujuran intelektual dalam komunitas koding digital."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Mengapa kita tidak boleh menyebarkan informasi pribadi (seperti alamat rumah dan kata sandi) saat beraktivitas koding online?",
+    "options": [
+      "Untuk menjaga keamanan privasi diri dari kejahatan siber di internet",
+      "Agar kuota internet tidak cepat habis",
+      "Supaya game koding berjalan lebih cepat",
+      "Karena kata sandi membuat monitor rusak"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Menjaga kerahasiaan data pribadi adalah fondasi utama keselamatan berinternet (cyber safety)."
   },
   {
     "tp": "Fase C • Kelas 5 SD",
     "question": "Manfaat utama belajar menyusun portofolio digital (PPT, sertifikat koding, poster, dan game) sejak kelas 5 SD adalah...",
     "options": [
-      "Mendokumentasikan perkembangan keterampilan berkarya digital secara rapi dan membanggakan",
-      "Hanya untuk menghabiskan kuota internet",
-      "Agar bisa pamer dan merendahkan karya orang lain",
-      "Mengisi memori komputer hingga penuh"
+      "Mendokumentasikan perkembangan keterampilan teknologi, karya nyata, dan prestasi belajar secara teratur",
+      "Memenuhi memori komputer dengan data tidak berguna",
+      "Bisa pamer barang mewah ke teman lain",
+      "Menghindari membaca buku pelajaran"
     ],
     "correct": 0,
     "answer": 0,
-    "explanation": "Portofolio digital adalah rekam jejak karya nyata yang mendokumentasikan kreativitas, logika komputasi, dan pencapaian belajar siswa secara terstruktur."
+    "explanation": "Portofolio digital menjadi rekam jejak otentik atas kreativitas, karya, dan ketekunan belajar siswa."
   }
 ];
 
