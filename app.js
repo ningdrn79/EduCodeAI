@@ -816,17 +816,22 @@ function terapkanBahasa() {
   }
 
   // Hero section update
-  const heroBadge = document.getElementById('hero-badge');
-  const heroTitle = document.getElementById('hero-title');
-  const heroDesc = document.getElementById('hero-desc');
-  if (state.currentSemester === 2) {
-    if (heroBadge) heroBadge.innerText = dict.heroBadgeSem2;
-    if (heroTitle) heroTitle.innerHTML = dict.heroTitleSem2;
-    if (heroDesc) heroDesc.innerText = dict.heroDescSem2;
+  const heroTop5Box = document.getElementById('hero-top5-leaderboard-box');
+  if (heroTop5Box && typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+    perbaruiPeringkatKelasRealtimeOtomatis(true);
   } else {
-    if (heroBadge) heroBadge.innerText = dict.heroBadge;
-    if (heroTitle) heroTitle.innerHTML = dict.heroTitleSem1;
-    if (heroDesc) heroDesc.innerText = dict.heroDescSem1;
+    const heroBadge = document.getElementById('hero-badge');
+    const heroTitle = document.getElementById('hero-title');
+    const heroDesc = document.getElementById('hero-desc');
+    if (state.currentSemester === 2) {
+      if (heroBadge) heroBadge.innerText = dict.heroBadgeSem2;
+      if (heroTitle) heroTitle.innerHTML = dict.heroTitleSem2;
+      if (heroDesc) heroDesc.innerText = dict.heroDescSem2;
+    } else {
+      if (heroBadge) heroBadge.innerText = dict.heroBadge;
+      if (heroTitle) heroTitle.innerHTML = dict.heroTitleSem1;
+      if (heroDesc) heroDesc.innerText = dict.heroDescSem1;
+    }
   }
 
   // Update teks balon maskot jika masih berupa salam awal
@@ -10675,7 +10680,11 @@ function selectQuizAnswer(selectedIndex, buttonEl) {
     btn.classList.remove('cursor-pointer', 'hover:-translate-y-0.5', 'hover:border-indigo-400');
   });
 
-  const correctIdx = Number(currentQ.correct);
+  let rawCorrect = currentQ.correct;
+  if (rawCorrect === undefined || isNaN(Number(rawCorrect))) {
+    rawCorrect = (currentQ.answer !== undefined) ? currentQ.answer : ((currentQ.kunci !== undefined) ? currentQ.kunci : 0);
+  }
+  const correctIdx = Number(rawCorrect);
   const selectedLetter = String.fromCharCode(65 + selectedIndex);
   const correctLetter = String.fromCharCode(65 + correctIdx);
 
@@ -15515,9 +15524,13 @@ function pilihSemester(semNumber) {
     if (btnSem2) btnSem2.className = 'bg-white hover:bg-slate-50 text-[#0284C7] px-7 py-3.5 rounded-full font-title font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-lg transition transform hover:-translate-y-0.5 border border-transparent';
     if (pillSem1) pillSem1.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs';
     if (pillSem2) pillSem2.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white';
-    if (heroBadge) heroBadge.innerText = 'EduCode AI • Semester 1';
-    if (heroTitle) heroTitle.innerHTML = 'Belajar Coding & AI<br>Bersama, Untuk Masa Depan';
-    if (heroDesc) heroDesc.innerText = 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan karakter baik di era teknologi bersama SDS Cinta Kasih Tzu Chi.';
+    if (document.getElementById('hero-top5-leaderboard-box') && typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+      perbaruiPeringkatKelasRealtimeOtomatis(true);
+    } else {
+      if (heroBadge) heroBadge.innerText = 'EduCode AI • Semester 1';
+      if (heroTitle) heroTitle.innerHTML = 'Belajar Coding & AI<br>Bersama, Untuk Masa Depan';
+      if (heroDesc) heroDesc.innerText = 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan karakter baik di era teknologi bersama SDS Cinta Kasih Tzu Chi.';
+    }
     if (robotSpeech) robotSpeech.innerText = '🤖 Halo! Aku Robo-Tzu Chi, ayo belajar Konten Digital & MS Word Semester 1!';
     if (navLabText) navLabText.innerText = 'Lab MS Word';
     if (navLabIcon) navLabIcon.className = 'fa-solid fa-file-word text-blue-400 icon-3d-glow';
@@ -15549,9 +15562,13 @@ function pilihSemester(semNumber) {
     if (btnSem2) btnSem2.className = 'bg-[#6D28D9] hover:bg-[#5B21B6] text-white px-7 py-3.5 rounded-full font-title font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-lg shadow-purple-950/30 border border-white/30 transition transform hover:-translate-y-0.5';
     if (pillSem1) pillSem1.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-300 hover:text-white';
     if (pillSem2) pillSem2.className = 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-purple-600 text-white shadow-xs';
-    if (heroBadge) heroBadge.innerText = 'EduCode AI • Semester 2';
-    if (heroTitle) heroTitle.innerHTML = 'Petualangan Coding & AI Cilik<br>Animasi, Game & Robot Pintar';
-    if (heroDesc) heroDesc.innerText = 'Mempelajari pemrograman visual (Scratch/Blockly), logika percabangan robot cerdas, dan pengenalan sensor kamera AI bersama SDS Cinta Kasih Tzu Chi.';
+    if (document.getElementById('hero-top5-leaderboard-box') && typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+      perbaruiPeringkatKelasRealtimeOtomatis(true);
+    } else {
+      if (heroBadge) heroBadge.innerText = 'EduCode AI • Semester 2';
+      if (heroTitle) heroTitle.innerHTML = 'Petualangan Coding & AI Cilik<br>Animasi, Game & Robot Pintar';
+      if (heroDesc) heroDesc.innerText = 'Mempelajari pemrograman visual (Scratch/Blockly), logika percabangan robot cerdas, dan pengenalan sensor kamera AI bersama SDS Cinta Kasih Tzu Chi.';
+    }
     if (robotSpeech) robotSpeech.innerText = '🚀 Semangat Semester 2! Ayo buat blok kode Scratch & kendalikan sensor AI!';
     if (navLabText) navLabText.innerText = 'Lab Coding & AI';
     if (navLabIcon) navLabIcon.className = 'fa-solid fa-robot text-purple-600';
@@ -27057,52 +27074,30 @@ function muatProfilSiswa() {
       if (cardsSiswa4) cardsSiswa4.classList.add('hidden');
       if (cardsSiswa5) cardsSiswa5.classList.add('hidden');
       if (cardsSiswa6) cardsSiswa6.classList.remove('hidden');
-      if (heroBadge) heroBadge.innerText = 'EduCode AI • Fase C (Kelas 6 SD)';
-      if (heroTitle) heroTitle.innerText = '4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!';
-      if (heroDesc) heroDesc.innerText = 'Pelajari Dekomposisi, Pengenalan Pola, Abstraksi, dan Algoritma secara interaktif untuk memecahkan masalah sehari-hari.';
-      if (heroSemBtns) {
-        heroSemBtns.innerHTML = `
-          <button type="button" onclick="switchTab('petualangan6')" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-5 py-2.5 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
-            <i class="fa-solid fa-brain text-slate-950"></i>
-            <span>Buka 4 Pilar Komputasi 🚀</span>
-            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
-          <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-            <span>🧩 Dekomposisi</span>
-          </button>
-          <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-            <span>🧸 Pola</span>
-          </button>
-        `;
-      }
     } else if (isKelas5) {
       if (cardsSiswa4) cardsSiswa4.classList.add('hidden');
       if (cardsSiswa6) cardsSiswa6.classList.add('hidden');
       if (cardsSiswa5) cardsSiswa5.classList.remove('hidden');
-      if (heroBadge) heroBadge.innerText = 'EduCode AI • Fase C (Kelas 5 SD)';
-      if (heroTitle) heroTitle.innerText = 'Portofolio Digital & AI Siswa Kelas 5 SD';
-      if (heroDesc) heroDesc.innerText = 'Pelajari presentasi PowerPoint vs Gemini AI, sertifikat Hour of Code, poster Canva, dan game Scratch.';
-      if (heroSemBtns) {
-        heroSemBtns.innerHTML = `
-          <button type="button" onclick="switchTab('petualangan5')" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white px-5 py-2.5 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-purple-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
-            <i class="fa-solid fa-rocket text-yellow-300"></i>
-            <span>Buka 4 Misi Kelas 5 🚀</span>
-            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
-          <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-            <span>📊 Presentasi</span>
-          </button>
-        `;
-      }
     } else {
       // Kelas 4 SD
       if (cardsSiswa4) cardsSiswa4.classList.remove('hidden');
       if (cardsSiswa5) cardsSiswa5.classList.add('hidden');
       if (cardsSiswa6) cardsSiswa6.classList.add('hidden');
-      if (heroBadge) heroBadge.innerText = (state.currentSemester === 2 ? 'EduCode AI • Semester 2' : 'EduCode AI • Semester 1');
-      if (heroTitle) heroTitle.innerText = 'Belajar Coding & AI Bersama, Untuk Masa Depan';
-      if (heroDesc) heroDesc.innerText = 'Membangun keterampilan digital, pengolah kata (MS Word), kreativitas, dan budi pekerti bersama SDS Cinta Kasih Tzu Chi.';
     }
+
+    // Tentukan & Segarkan Kelas yang Sedang Berlangsung di Papan Peringkat Realtime
+    const stdClass = profile && profile.kelas ? String(profile.kelas).trim().toUpperCase() : null;
+    if (stdClass) {
+      state.kelasSedangBerlangsung = stdClass;
+    } else if (!state.kelasSedangBerlangsung) {
+      state.kelasSedangBerlangsung = isKelas6 ? '6A' : (isKelas5 ? '5A' : '4A');
+    }
+
+    try {
+      if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+        perbaruiPeringkatKelasRealtimeOtomatis(true);
+      }
+    } catch (eRankInit) {}
     const avatarInfo = dapatkanGayaAvatarSiswa(profile);
     if (welcomeAvatar) {
       welcomeAvatar.innerText = avatarInfo.initial;
@@ -35742,74 +35737,97 @@ const DEFAULT_BANK_SOAL_K6 = [
   {
     question: "Pilar Berpikir Komputasional (CT) yang berarti memecah masalah besar yang rumit menjadi beberapa bagian kecil yang lebih mudah diselesaikan adalah...",
     options: ["Dekomposisi", "Pengenalan Pola", "Abstraksi", "Algoritma"],
+    correct: 0,
     answer: 0,
     explanation: "Dekomposisi adalah teknik memecah masalah atau sistem yang rumit menjadi bagian-bagian yang lebih kecil sehingga lebih mudah dipahami dan dikelola."
   },
   {
     question: "Ketika kita mengamati keteraturan atau kesamaan ciri-ciri pada beberapa data untuk menemukan solusi, kita sedang menerapkan pilar...",
     options: ["Abstraksi", "Pengenalan Pola", "Dekomposisi", "Pengulangan"],
+    correct: 1,
     answer: 1,
     explanation: "Pengenalan Pola (Pattern Recognition) adalah proses menemukan keteraturan, kesamaan bentuk, atau sifat yang berulang untuk memprediksi solusi."
   },
   {
     question: "Menyaring dan memilih hanya informasi yang penting serta mengabaikan rincian yang tidak relevan disebut...",
     options: ["Algoritma", "Dekomposisi", "Abstraksi", "Debugging"],
+    correct: 2,
     answer: 2,
     explanation: "Abstraksi berfokus pada informasi penting dan inti masalah, seraya menyisihkan rincian yang tidak diperlukan dalam penyelesaian masalah."
   },
   {
     question: "Urutan langkah-langkah logis, bertahap, dan terstruktur yang dibuat untuk menyelesaikan suatu tugas disebut...",
     options: ["Algoritma", "Pola", "Abstraksi", "Dekomposisi"],
+    correct: 0,
     answer: 0,
     explanation: "Algoritma adalah serangkaian instruksi atau prosedur logis langkah demi langkah yang harus diikuti untuk mencapai hasil yang diinginkan."
   },
   {
     question: "Dalam membuat diagram alir (Flowchart), simbol berbentuk belah ketupat (diamond) digunakan untuk menunjukkan...",
     options: ["Awal atau akhir program", "Keputusan / Pilihan logika (Ya / Tidak)", "Proses perhitungan", "Arah aliran data"],
+    correct: 1,
     answer: 1,
     explanation: "Simbol belah ketupat (Decision) digunakan untuk percabangan atau pengambilan keputusan logika berdasarkan kondisi tertentu."
   },
   {
     question: "Di aplikasi Scratch, blok perintah yang digunakan agar Sprite mengulang suatu instruksi secara terus-menerus adalah...",
     options: ["wait 1 secs", "forever", "stop all", "when green flag clicked"],
+    correct: 1,
     answer: 1,
     explanation: "Blok 'forever' (selamanya) adalah perulangan tak berhingga (infinite loop) yang menjalankan perintah di dalamnya terus-menerus."
   },
   {
     question: "Apa fungsi dari sebuah Variabel dalam program komputer?",
     options: ["Menghapus seluruh file", "Tempat menyimpan data atau nilai yang bisa berubah", "Memutar suara latar", "Mengubah warna monitor"],
+    correct: 1,
     answer: 1,
     explanation: "Variabel adalah wadah penyimpanan dalam memori komputer yang menampung data (seperti skor kuis, jumlah koin, atau sisa waktu) yang nilainya dapat berubah."
   },
   {
     question: "Jika program Scratch kita tidak berjalan sesuai rencana karena ada kesalahan urutan blok logika, tindakan mencari dan memperbaiki kesalahan tersebut disebut...",
     options: ["Debugging", "Compiling", "Formatting", "Downloading"],
+    correct: 0,
     answer: 0,
     explanation: "Debugging adalah proses mendeteksi, melacak, dan memperbaiki bug atau kesalahan logika dalam kode program."
   },
   {
     question: "Dalam budaya humanis Tzu Chi, saat berdiskusi menyelesaikan proyek komputasi bersama teman sekelas, sikap utama yang harus kita junjung tinggi adalah...",
     options: ["Meremehkan pendapat teman lain", "Saling menghargai (Zun Zhong) dan bekerja sama dengan cinta kasih (Hu Ai)", "Bekerja sendiri tanpa mau berbagi tugas", "Memaksa teman mengikuti cara kita"],
+    correct: 1,
     answer: 1,
     explanation: "Nilai luhur Tzu Chi mengajarkan Zun Zhong (saling menghargai) dan Hu Ai (cinta kasih) dalam gotong royong dan kerjasama tim."
   },
   {
     question: "Kecerdasan Artifisial (Artificial Intelligence / AI) adalah teknologi komputer yang dirancang agar mampu...",
     options: ["Menghasilkan panas ruangan", "Meniru kemampuan berpikir, mengenali pola, dan memecahkan masalah seperti manusia", "Menggantikan seluruh guru di sekolah", "Mematikan internet secara otomatis"],
+    correct: 1,
     answer: 1,
     explanation: "AI adalah bidang ilmu komputer yang bertujuan membuat mesin atau program yang mampu belajar, menganalisis data, dan mengambil keputusan cerdas menyerupai kecerdasan manusia."
   }
 ];
 
 function getBankSoalKelas6() {
+  let list = null;
   try {
     const raw = localStorage.getItem('educode_bank_soal_k6');
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
     }
   } catch(e) {}
-  return JSON.parse(JSON.stringify(DEFAULT_BANK_SOAL_K6));
+  if (!list) list = JSON.parse(JSON.stringify(DEFAULT_BANK_SOAL_K6));
+
+  // Normalisasi agar 'correct' & 'answer' selalu bernilai integer valid
+  const normalized = list.map(q => {
+    const c = (q.correct !== undefined) ? q.correct : ((q.answer !== undefined) ? q.answer : (q.kunci !== undefined ? q.kunci : 0));
+    q.correct = Number(c);
+    q.answer = Number(c);
+    return q;
+  });
+  try {
+    localStorage.setItem('educode_bank_soal_k6', JSON.stringify(normalized));
+  } catch (e) {}
+  return normalized;
 }
 window.getBankSoalKelas6 = getBankSoalKelas6;
 
@@ -37874,7 +37892,109 @@ function hitungDataPeringkatSiswa(student) {
 window.hitungDataPeringkatSiswa = hitungDataPeringkatSiswa;
 
 /**
+ * Menentukan Kelas yang Sedang Berlangsung secara Realtime
+ */
+function dapatkanKelasSedangBerlangsung() {
+  if (typeof state !== 'undefined' && state.kelasSedangBerlangsung) {
+    return String(state.kelasSedangBerlangsung).trim().toUpperCase();
+  }
+  // 1. Cek dari siswa yang sedang login aktif
+  let activeStudent = null;
+  try {
+    activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  } catch (e) {}
+  if (activeStudent && activeStudent.kelas) {
+    const k = String(activeStudent.kelas).trim().toUpperCase();
+    if (typeof state !== 'undefined') state.kelasSedangBerlangsung = k;
+    return k;
+  }
+  // 2. Cek jika guru sedang aktif dengan filter kelas tertentu
+  if (typeof state !== 'undefined' && state.filterKelasGuru && state.filterKelasGuru !== 'semua' && !state.filterKelasGuru.startsWith('tingkat_')) {
+    const k = String(state.filterKelasGuru).trim().toUpperCase();
+    state.kelasSedangBerlangsung = k;
+    return k;
+  }
+  // 3. Cek dari penyimpanan lokal browser
+  try {
+    const saved = localStorage.getItem('educode_kelas_berlangsung_v1');
+    if (saved) {
+      if (typeof state !== 'undefined') state.kelasSedangBerlangsung = saved;
+      return saved;
+    }
+  } catch (e) {}
+  // 4. Default: '6A' (Kelas 6 Fase C)
+  if (typeof state !== 'undefined') state.kelasSedangBerlangsung = '6A';
+  return '6A';
+}
+window.dapatkanKelasSedangBerlangsung = dapatkanKelasSedangBerlangsung;
+
+/**
+ * Mengganti Kelas yang Sedang Berlangsung Seketika (Realtime)
+ */
+function gantiKelasSedangBerlangsung(kelasBaru) {
+  playSound('click');
+  const target = String(kelasBaru || '6A').trim().toUpperCase();
+  if (typeof state !== 'undefined') state.kelasSedangBerlangsung = target;
+  try {
+    localStorage.setItem('educode_kelas_berlangsung_v1', target);
+  } catch (e) {}
+
+  // Jika guru sedang aktif, sinkronkan filter guru juga
+  if (typeof state !== 'undefined' && state.isGuruLoggedIn) {
+    state.filterKelasGuru = target;
+    if (typeof updateFilterKelasTabs === 'function') updateFilterKelasTabs();
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+  }
+
+  perbaruiPeringkatKelasRealtimeOtomatis(true);
+  showToast(`Papan Peringkat Realtime: Menampilkan Kelas ${target} 🏆`, 'info');
+}
+window.gantiKelasSedangBerlangsung = gantiKelasSedangBerlangsung;
+
+/**
+ * Membuka Materi Pembelajaran Sesuai Kelas yang Sedang Berlangsung
+ */
+function bukaMateriKelasSedangBerlangsung() {
+  playSound('click');
+  const cls = dapatkanKelasSedangBerlangsung();
+  if (cls.includes('6')) {
+    switchTab('petualangan6');
+  } else if (cls.includes('5')) {
+    switchTab('petualangan5');
+  } else {
+    bukaSemesterDariUtama(state.currentSemester || 1);
+  }
+}
+window.bukaMateriKelasSedangBerlangsung = bukaMateriKelasSedangBerlangsung;
+
+/**
+ * Membuka Buku Nilai / Rapor Sesuai Sesi Pengguna
+ */
+function bukaBukuNilaiKelasSedangBerlangsung() {
+  playSound('click');
+  const isGuru = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                 (typeof state !== 'undefined' && state.isGuruLoggedIn);
+  if (isGuru) {
+    const cls = dapatkanKelasSedangBerlangsung();
+    if (typeof setFilterKelasGuru === 'function' && cls !== 'SEMUA') {
+      setFilterKelasGuru(cls);
+    }
+    switchTab('guru');
+  } else {
+    const actStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (actStudent && typeof bukaModalRaporDigitalSiswa === 'function') {
+      bukaModalRaporDigitalSiswa();
+    } else {
+      showToast('Buku Nilai Guru memerlukan PIN Guru. Silakan masuk sebagai Guru untuk mengelola nilai.', 'info');
+      if (typeof bukaModalLoginGuru === 'function') bukaModalLoginGuru();
+    }
+  }
+}
+window.bukaBukuNilaiKelasSedangBerlangsung = bukaBukuNilaiKelasSedangBerlangsung;
+
+/**
  * Mengambil daftar 5 siswa dengan nilai & capaian progres tertinggi
+ * Mendukung filter spesifik kelas (misal: '6A', '6B', '4A', '5A') maupun angkatan
  */
 function dapatkanTop5Siswa(filterKategori = 'auto') {
   let db = [];
@@ -37887,7 +38007,7 @@ function dapatkanTop5Siswa(filterKategori = 'auto') {
     if (typeof SEED_STUDENTS !== 'undefined' && Array.isArray(SEED_STUDENTS)) {
       db = SEED_STUDENTS;
     } else {
-      return { top5: [], posisiSaya: null, activeCategory: 'kelas6', totalSiswa: 0 };
+      return { top5: [], posisiSaya: null, activeCategory: '6A', totalSiswa: 0 };
     }
   }
 
@@ -37899,13 +38019,7 @@ function dapatkanTop5Siswa(filterKategori = 'auto') {
 
   let targetFilter = filterKategori;
   if (!targetFilter || targetFilter === 'auto') {
-    if (activeStudent && activeStudent.kelas) {
-      if (String(activeStudent.kelas).includes('6')) targetFilter = 'kelas6';
-      else if (String(activeStudent.kelas).includes('5')) targetFilter = 'kelas5';
-      else targetFilter = 'kelas4';
-    } else {
-      targetFilter = 'kelas6';
-    }
+    targetFilter = dapatkanKelasSedangBerlangsung();
   }
 
   let filtered = db.slice();
@@ -37915,6 +38029,9 @@ function dapatkanTop5Siswa(filterKategori = 'auto') {
     filtered = filtered.filter(s => String(s.kelas || '').includes('5'));
   } else if (targetFilter === 'kelas4') {
     filtered = filtered.filter(s => String(s.kelas || '').includes('4'));
+  } else if (targetFilter !== 'semua' && targetFilter !== 'SEMUA') {
+    // Filter SPESIFIK KELAS (misal: '6A', '6B', '6C', '6D', '6E', '5A'..'5E', '4A'..'4E')
+    filtered = filtered.filter(s => String(s.kelas || '').trim().toUpperCase() === String(targetFilter).trim().toUpperCase());
   }
 
   const evaluatedList = filtered.map(s => hitungDataPeringkatSiswa(s)).filter(Boolean);
@@ -37959,16 +38076,41 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
   const container = document.getElementById('list-top5-siswa');
   if (!container) return;
 
-  const data = dapatkanTop5Siswa(kategori);
-  const selectFilter = document.getElementById('select-filter-top5');
-  if (selectFilter && selectFilter.value !== data.activeCategory && kategori !== 'auto') {
-    selectFilter.value = data.activeCategory;
+  const activeClass = (kategori && kategori !== 'auto') ? kategori : dapatkanKelasSedangBerlangsung();
+  const data = dapatkanTop5Siswa(activeClass);
+
+  // Sinkronkan badge live & label kelas di Hero
+  const badgeHero = document.getElementById('hero-badge');
+  if (badgeHero) {
+    badgeHero.innerText = (data.activeCategory === 'semua' || data.activeCategory === 'SEMUA')
+      ? 'Semua Siswa Sedang Berlangsung'
+      : `Kelas ${data.activeCategory} Sedang Berlangsung`;
+  }
+
+  const labelKelasHero = document.getElementById('label-kelas-nama-hero');
+  if (labelKelasHero) {
+    labelKelasHero.innerText = (data.activeCategory === 'semua' || data.activeCategory === 'SEMUA')
+      ? 'Semua Siswa'
+      : data.activeCategory;
+  }
+
+  const selectHero = document.getElementById('select-hero-kelas-berlangsung');
+  if (selectHero && selectHero.value !== data.activeCategory) {
+    selectHero.value = data.activeCategory;
+  }
+
+  // Label tombol materi
+  const btnLabel = document.getElementById('hero-btn-label-materi');
+  if (btnLabel) {
+    if (data.activeCategory.includes('6')) btnLabel.innerText = 'Buka 4 Pilar Komputasi 🚀';
+    else if (data.activeCategory.includes('5')) btnLabel.innerText = 'Buka 4 Misi Kelas 5 🚀';
+    else btnLabel.innerText = 'Buka Modul Belajar 🚀';
   }
 
   if (!data.top5 || data.top5.length === 0) {
     container.innerHTML = `
       <div class="p-3 text-center text-xs text-slate-300 italic bg-white/5 rounded-xl border border-white/10">
-        Belum ada data nilai siswa untuk kategori ini.
+        Belum ada data siswa untuk Kelas ${data.activeCategory}.
       </div>
     `;
     return;
@@ -38027,7 +38169,7 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
 
     html += `
       <div onclick="if(typeof bukaRaporDigitalDariGuru==='function'){bukaRaporDigitalDariGuru('${item.id}');}" class="flex items-center justify-between gap-2 p-2 rounded-xl ${rowBorder} transition cursor-pointer group backdrop-blur-xs" title="Klik untuk lihat Rapor Digital ${item.nama}">
-        <!-- Sisi Kiri: Medali, Avatar, Nama & Kelas -->
+        <!-- Sisi Kiri: Medali, Avatar, Nama & Absen -->
         <div class="flex items-center gap-2 min-w-0">
           ${medalBadge}
           <div class="w-7 h-7 rounded-full ${avatarInfo.bgGradient} flex items-center justify-center font-black text-[11px] shadow-inner shrink-0 group-hover:scale-105 transition">
@@ -38035,7 +38177,7 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-title font-bold text-xs text-white group-hover:text-yellow-300 transition truncate max-w-[130px] sm:max-w-[180px]">
+              <span class="font-title font-bold text-xs text-white group-hover:text-yellow-300 transition truncate max-w-[130px] sm:max-w-[170px]">
                 ${item.nama}
               </span>
               <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-white/10 text-sky-200 border border-white/20">
@@ -38057,7 +38199,7 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
             <div class="font-title font-black text-xs text-yellow-300 leading-tight">
               ${item.nilaiAkhir}<span class="text-[9px] text-slate-400 font-normal">/100</span>
             </div>
-            <div class="text-[9px] text-slate-300 font-medium">Nilai Akhir</div>
+            <div class="text-[9px] text-slate-300 font-medium">Buku Nilai</div>
           </div>
           <div class="px-1.5 py-1 rounded-lg bg-amber-400/15 border border-amber-400/30 text-amber-300 font-black text-[10px] flex items-center gap-1 shadow-2xs">
             <i class="fa-solid fa-star text-amber-400 text-[9px]"></i>
@@ -38070,7 +38212,7 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
 
   container.innerHTML = html;
 
-  // Render Footer Posisi Siswa Aktif
+  // Render Footer Posisi Siswa Aktif di Kelas Ini
   const footerEl = document.getElementById('footer-top5-posisi-saya');
   if (footerEl) {
     if (data.posisiSaya) {
@@ -38081,7 +38223,7 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
           <div class="flex items-center gap-1.5">
             <span class="text-emerald-400 font-bold">📍 Posisi Kamu:</span>
             <span class="px-2 py-0.5 rounded-md font-black ${isTop5 ? 'bg-amber-500 text-slate-950 ring-1 ring-yellow-300' : 'bg-indigo-900/80 text-yellow-300 border border-indigo-400/30'} text-[11px]">
-              #${p.rank} ${isTop5 ? '🏆 TOP 5' : `dari ${data.totalSiswa} Siswa`}
+              #${p.rank} ${isTop5 ? '🏆 5 BESAR' : `dari ${data.totalSiswa} Siswa`}
             </span>
             <span class="text-slate-300 text-[10px]">(Nilai: <strong class="text-white">${p.nilaiAkhir}</strong> • ${p.rincianMisi})</span>
           </div>
@@ -38094,13 +38236,13 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
       footerEl.innerHTML = `
         <div class="flex items-center justify-between w-full text-[10px] text-slate-300">
           <span>👦 Akun: <strong class="text-white">${actStudent.nama || 'Siswa'}</strong> (${actStudent.kelas || '-'})</span>
-          <span class="text-yellow-300">Selesaikan tugas untuk masuk pemeringkatan! 🚀</span>
+          <span class="text-yellow-300">Bukan di Kelas ${data.activeCategory}</span>
         </div>
       `;
     } else {
       footerEl.innerHTML = `
         <div class="flex items-center justify-between w-full text-[10px] text-slate-300">
-          <span>💡 Masuk akun siswa untuk melihat peringkatmu di kelas.</span>
+          <span>💡 Masuk akun siswa untuk melihat peringkatmu di kelas ${data.activeCategory}.</span>
           <button type="button" onclick="bukaPilihSiswaCepat()" class="text-yellow-300 font-bold hover:underline cursor-pointer">
             Login Siswa 🚀
           </button>
@@ -38111,14 +38253,49 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
 }
 window.renderTop5SiswaLeaderboard = renderTop5SiswaLeaderboard;
 
+/**
+ * Pembaruan Otomatis & Realtime Papan Peringkat Kelas
+ */
+let _leaderboardCacheKey = '';
+function perbaruiPeringkatKelasRealtimeOtomatis(force = false) {
+  try {
+    const rawDb = localStorage.getItem('educode_students_db_v1') || '';
+    const rawPort6 = localStorage.getItem('educode_portofolio_k6_v1') || '';
+    const activeCls = dapatkanKelasSedangBerlangsung();
+    const currentKey = `${rawDb.length}_${rawPort6.length}_${activeCls}`;
+
+    if (force || currentKey !== _leaderboardCacheKey) {
+      _leaderboardCacheKey = currentKey;
+      renderTop5SiswaLeaderboard(activeCls);
+    }
+  } catch (e) {
+    renderTop5SiswaLeaderboard();
+  }
+}
+window.perbaruiPeringkatKelasRealtimeOtomatis = perbaruiPeringkatKelasRealtimeOtomatis;
+
+// Listener Otomatis Realtime: Event Storage Antar-Tab & Multi-Komputer
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key && (e.key.includes('student') || e.key.includes('portofolio') || e.key.includes('nilai') || e.key.includes('kuis') || e.key.includes('drive'))) {
+      perbaruiPeringkatKelasRealtimeOtomatis(true);
+    }
+  });
+
+  // Poller Ringan Realtime Setiap 3.5 Detik (Mendeteksi perubahan nilai Buku Nilai seketika)
+  setInterval(() => {
+    perbaruiPeringkatKelasRealtimeOtomatis(false);
+  }, 3500);
+}
+
 // Inisialisasi otomatis Papan Peringkat saat DOM siap
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(renderTop5SiswaLeaderboard, 300);
+      setTimeout(() => perbaruiPeringkatKelasRealtimeOtomatis(true), 300);
     });
   } else {
-    setTimeout(renderTop5SiswaLeaderboard, 300);
+    setTimeout(() => perbaruiPeringkatKelasRealtimeOtomatis(true), 300);
   }
 }
 
