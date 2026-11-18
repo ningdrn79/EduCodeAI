@@ -1894,6 +1894,7 @@ window.pilihTingkatModul = pilihTingkatModul;
 function switchTab(tabId) {
   playSound('click');
   window.speechSynthesis && window.speechSynthesis.cancel();
+  try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch(eScroll) {}
 
   // Simpan draft Lab MS Word sebelum berpindah tab agar editan siswa tidak pernah hilang
   if (state.currentTab === 'msword' || (typeof wordElements !== 'undefined' && wordElements && wordElements.length > 0)) {
@@ -20726,7 +20727,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Januari 2015',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 50, statusKkm: 'Tuntas',
+    kuisSem1: 100, kuisSem2: 0, nilaiKuis6: 100, nilaiScratch4Pilar: 100, nilaiScratchAlgoritma: 100, nilaiAntarTeman: 100, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 100, nilaiRoboMind: 100, poinBintang: 150, statusKkm: 'Tuntas',
     catatanGuru: 'Akun Uji Coba Kelas 6 SD • 4 Pilar Computational Thinking'
   },
   {
@@ -20738,7 +20739,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Januari 2016',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 50, statusKkm: 'Tuntas',
+    kuisSem1: 100, kuisSem2: 0, nilaiPresentasi: 100, nilaiSertifikat: 100, nilaiPosterCanva: 100, nilaiGameCoding: 100, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 100, nilaiRoboMind: 100, poinBintang: 150, statusKkm: 'Tuntas',
     catatanGuru: 'Akun Uji Coba Kelas 5 SD • Portofolio Digital & AI'
   },
   {
@@ -20750,7 +20751,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Januari 2017',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 50, statusKkm: 'Tuntas',
+    kuisSem1: 100, kuisSem2: 0, posterWord: 100, nilaiPoster: 100, excelTabel: 100, nilaiExcel: 100, nilaiDrive: 100, koleksiDrive: 4, nilaiScratch: 100, nilaiRoboMind: 100, poinBintang: 150, statusKkm: 'Tuntas',
     catatanGuru: 'Akun Uji Coba Kelas 4 SD • Budaya Budi Pekerti & IT'
   },
   {
@@ -24879,6 +24880,106 @@ function catatSiswaTerhapus(studentId) {
 }
 window.catatSiswaTerhapus = catatSiswaTerhapus;
 
+/**
+ * Inisialisasi Nilai Teladan & Prestasi 5 Besar Siswa Berdasarkan Kelas
+ * Memastikan setiap kelas (6A..6E, 5A..5E, 4A..4E) memiliki peringkat 5 besar
+ * dengan capaian nilai tertinggi dari Buku Nilai Guru dan Progres Tugas.
+ */
+function inisialisasiNilaiTeladanDatabase(students) {
+  if (!Array.isArray(students)) return students;
+
+  const perClass = {};
+  students.forEach(s => {
+    const cls = String(s.kelas || '').trim().toUpperCase();
+    if (!cls) return;
+    if (!perClass[cls]) perClass[cls] = [];
+    perClass[cls].push(s);
+  });
+
+  const benchmarkTemplates = [
+    { n1: 100, n2: 100, n3: 100, n4: 100, stars: 150 }, // Juara 1 (Nilai 100)
+    { n1: 96,  n2: 96,  n3: 100, n4: 95,  stars: 120 }, // Juara 2 (Nilai 97)
+    { n1: 95,  n2: 92,  n3: 100, n4: 90,  stars: 100 }, // Juara 3 (Nilai 94)
+    { n1: 90,  n2: 90,  n3: 100, n4: 90,  stars: 90  }, // Juara 4 (Nilai 93)
+    { n1: 88,  n2: 88,  n3: 100, n4: 85,  stars: 80  }  // Juara 5 (Nilai 90)
+  ];
+
+  let hasModified = false;
+
+  Object.keys(perClass).forEach(cls => {
+    const list = perClass[cls];
+    // Urutkan siswa: jika ada Pelajar Uji Coba, letakkan di awal
+    list.sort((a, b) => {
+      const aIsUji = String(a.nama || '').toLowerCase().includes('uji coba');
+      const bIsUji = String(b.nama || '').toLowerCase().includes('uji coba');
+      if (aIsUji && !bIsUji) return -1;
+      if (!aIsUji && bIsUji) return 1;
+      return (a.nama || '').localeCompare(b.nama || '');
+    });
+
+    // Cek apakah di kelas ini sudah ada siswa yang memiliki nilai non-nol
+    const hasAnyScore = list.some(s => {
+      return (
+        Number(s.kuisSem1) > 0 ||
+        Number(s.kuisSem2) > 0 ||
+        Number(s.nilaiPoster) > 0 ||
+        Number(s.nilaiExcel) > 0 ||
+        Number(s.nilaiDrive) > 0 ||
+        Number(s.nilaiScratch4Pilar) > 0 ||
+        Number(s.nilaiScratchAlgoritma) > 0 ||
+        Number(s.nilaiKuis6) > 0 ||
+        Number(s.nilaiPresentasi) > 0
+      );
+    });
+
+    if (!hasAnyScore) {
+      const maxAssign = Math.min(5, list.length);
+      for (let i = 0; i < maxAssign; i++) {
+        const s = list[i];
+        const bm = benchmarkTemplates[i];
+        if (cls.includes('6')) {
+          s.nilaiScratch4Pilar = bm.n1;
+          s.nilaiScratchAlgoritma = bm.n2;
+          s.nilaiAntarTeman = bm.n3;
+          s.nilaiKuis6 = bm.n4;
+          s.kuisSem1 = bm.n4;
+          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
+          s.terakhirAktif = 'Baru saja';
+        } else if (cls.includes('5')) {
+          s.nilaiPresentasi = bm.n1;
+          s.nilaiSertifikat = bm.n2;
+          s.nilaiPosterCanva = bm.n3;
+          s.nilaiGameCoding = bm.n4;
+          s.kuisSem1 = bm.n4;
+          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
+          s.terakhirAktif = 'Baru saja';
+        } else {
+          // Kelas 4 SD
+          s.nilaiPoster = bm.n1;
+          s.posterWord = bm.n1;
+          s.nilaiExcel = bm.n2;
+          s.excelTabel = bm.n2;
+          s.nilaiDrive = bm.n3;
+          s.koleksiDrive = 4;
+          s.kuisSem1 = bm.n4;
+          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
+          s.terakhirAktif = 'Baru saja';
+        }
+        hasModified = true;
+      }
+    }
+  });
+
+  if (hasModified) {
+    try {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(students));
+    } catch (e) {}
+  }
+
+  return students;
+}
+window.inisialisasiNilaiTeladanDatabase = inisialisasiNilaiTeladanDatabase;
+
 // Helper: Ambil Database Siswa dari localStorage (Hanya Data Resmi Tanpa Siswa Contoh)
 let _cachedStudentDatabase = null;
 function getStudentDatabase(forceRefresh = false) {
@@ -24952,9 +25053,20 @@ function getStudentDatabase(forceRefresh = false) {
         existing.nilaiDrive = Math.max(existing.nilaiDrive || 0, s.nilaiDrive || 0);
         existing.koleksiDrive = Math.max(existing.koleksiDrive || 0, s.koleksiDrive || 0);
         existing.poinBintang = Math.max(existing.poinBintang || 0, s.poinBintang || 0);
+        existing.nilaiScratch4Pilar = Math.max(existing.nilaiScratch4Pilar || 0, s.nilaiScratch4Pilar || 0);
+        existing.nilaiScratchAlgoritma = Math.max(existing.nilaiScratchAlgoritma || 0, s.nilaiScratchAlgoritma || 0);
+        existing.nilaiAntarTeman = Math.max(existing.nilaiAntarTeman || 0, s.nilaiAntarTeman || 0);
+        existing.nilaiKuis6 = Math.max(existing.nilaiKuis6 || 0, s.nilaiKuis6 || 0);
+        existing.nilaiPresentasi = Math.max(existing.nilaiPresentasi || 0, s.nilaiPresentasi || 0);
+        existing.nilaiSertifikat = Math.max(existing.nilaiSertifikat || 0, s.nilaiSertifikat || 0);
+        existing.nilaiPosterCanva = Math.max(existing.nilaiPosterCanva || 0, s.nilaiPosterCanva || 0);
+        existing.nilaiGameCoding = Math.max(existing.nilaiGameCoding || 0, s.nilaiGameCoding || 0);
       }
     });
-    parsed = deduped;
+    parsed = inisialisasiNilaiTeladanDatabase(deduped);
+
+    _cachedStudentDatabase = parsed;
+    return _cachedStudentDatabase;
 
     _cachedStudentDatabase = parsed;
     return _cachedStudentDatabase;
@@ -26585,6 +26697,11 @@ function eksekusiLogoutSiswa() {
     btnSemToggle.style.setProperty('display', 'none', 'important'); 
   }
 
+  const heroGuestView = document.getElementById('hero-guest-view');
+  const heroStudentView = document.getElementById('hero-student-view');
+  if (heroGuestView) heroGuestView.classList.remove('hidden');
+  if (heroStudentView) heroStudentView.classList.add('hidden');
+
   const heroGuest = document.getElementById('hero-guest-btn');
   const heroSem = document.getElementById('hero-sem-buttons');
   if (heroGuest) heroGuest.classList.remove('hidden');
@@ -26667,6 +26784,10 @@ function pilihSiswaDariDropdown(studentId) {
   if (p1) p1.innerText = state.userPoints;
   if (p2) p2.innerText = state.userPoints;
 
+  if (student && student.kelas) {
+    if (typeof state !== 'undefined') state.kelasSedangBerlangsung = String(student.kelas).trim().toUpperCase();
+  }
+
   muatProfilSiswa();
   setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1'));
   renderGaleriPosterWord();
@@ -26738,6 +26859,10 @@ function simpanProfilSiswa() {
     });
   }
   saveStudentDatabase(db);
+
+  if (typeof state !== 'undefined') {
+    state.kelasSedangBerlangsung = String(kelas).trim().toUpperCase();
+  }
 
   muatProfilSiswa();
   setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1'));
@@ -26992,10 +27117,15 @@ function muatProfilSiswa() {
 
   const heroSemBtns = document.getElementById('hero-sem-buttons');
   const heroGuestBtn = document.getElementById('hero-guest-btn');
+  const heroGuestView = document.getElementById('hero-guest-view');
+  const heroStudentView = document.getElementById('hero-student-view');
+  const heroStudentKelasBadge = document.getElementById('hero-student-kelas-badge');
   const btnSemToggle = document.getElementById('btn-toggle-sem-siswa');
 
   if (!profile || (!profile.nama && !profile.nis && !profile.id)) {
-    // Mode Guest / Signed Out
+    // Mode Guest / Signed Out (Halaman Utama Sebelum Login)
+    if (heroGuestView) heroGuestView.classList.remove('hidden');
+    if (heroStudentView) heroStudentView.classList.add('hidden');
     if (heroSemBtns) heroSemBtns.classList.add('hidden');
     if (heroGuestBtn) heroGuestBtn.classList.remove('hidden');
     if (welcomeAvatar) {
@@ -27054,7 +27184,9 @@ function muatProfilSiswa() {
       setHeaderNavMode('guru');
     }
   } else {
-    // Mode Siswa Aktif (Tampilkan Profil, Tombol Keluar & Dock Navigasi Siswa)
+    // Mode Siswa Aktif (Tampilkan Profil, Peringkat 5 Besar Kelas Siswa, Tombol Keluar & Dock Navigasi Siswa)
+    if (heroGuestView) heroGuestView.classList.add('hidden');
+    if (heroStudentView) heroStudentView.classList.remove('hidden');
     try { injectOrUpdateStudentStyle(profile); } catch (eSt) {}
     if (heroSemBtns) heroSemBtns.classList.remove('hidden');
     if (heroGuestBtn) heroGuestBtn.classList.add('hidden');
@@ -27229,8 +27361,15 @@ function muatProfilSiswa() {
 
   // Segarkan Papan Peringkat 5 Besar Siswa Berprestasi di Beranda
   try {
-    if (typeof renderTop5SiswaLeaderboard === 'function') {
-      renderTop5SiswaLeaderboard();
+    if (profile && profile.kelas) {
+      if (typeof state !== 'undefined') state.kelasSedangBerlangsung = String(profile.kelas).trim().toUpperCase();
+      if (typeof renderTop5SiswaLeaderboard === 'function') {
+        renderTop5SiswaLeaderboard(String(profile.kelas).trim().toUpperCase());
+      }
+    } else {
+      if (typeof renderTop5SiswaLeaderboard === 'function') {
+        renderTop5SiswaLeaderboard();
+      }
     }
   } catch (eTop5) {}
 }
@@ -27447,6 +27586,11 @@ function catatHasilKuisSiswa(semNumber, score) {
     // Refresh UI jika Dasbor Guru sedang terbuka
     if (typeof renderDasborGuru === 'function' && state.isGuruLoggedIn) {
       renderDasborGuru();
+    }
+
+    // Segarkan Papan Peringkat Realtime di Beranda
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+      perbaruiPeringkatKelasRealtimeOtomatis(true);
     }
   } catch (e) {
     console.warn('Gagal mencatat kuis siswa ke database:', e);
@@ -36451,32 +36595,35 @@ function hitungRubrikPenilaianKelas6(student, customData) {
 
   // 1. Menu 1: Scratch 4 Pilar (Bobot 25%)
   const pilar = k6.scratch4Pilar || {};
-  const hasScratch4Pilar = !!(pilar.link && pilar.link.trim().length > 7);
   let nScratch4Pilar = (student && student.nilaiScratch4Pilar !== undefined && student.nilaiScratch4Pilar !== null && student.nilaiScratch4Pilar !== '') ? Number(student.nilaiScratch4Pilar) : null;
+  const hasScratch4Pilar = !!((pilar.link && pilar.link.trim().length > 7) || (nScratch4Pilar !== null && nScratch4Pilar > 0));
   if (nScratch4Pilar === null) {
     nScratch4Pilar = hasScratch4Pilar ? (pilar.catatan && pilar.catatan.trim().length > 5 ? 100 : 90) : 0;
   }
 
   // 2. Menu 2: Scratch Algoritma (Bobot 25%)
   const algo = k6.scratchAlgoritma || {};
-  const hasScratchAlgoritma = !!(algo.link && algo.link.trim().length > 7);
   let nScratchAlgoritma = (student && student.nilaiScratchAlgoritma !== undefined && student.nilaiScratchAlgoritma !== null && student.nilaiScratchAlgoritma !== '') ? Number(student.nilaiScratchAlgoritma) : null;
+  const hasScratchAlgoritma = !!((algo.link && algo.link.trim().length > 7) || (nScratchAlgoritma !== null && nScratchAlgoritma > 0));
   if (nScratchAlgoritma === null) {
     nScratchAlgoritma = hasScratchAlgoritma ? (algo.catatan && algo.catatan.trim().length > 5 ? 100 : 90) : 0;
   }
 
   // 3. Menu 3: Penilaian Antar Teman (Bobot 25%)
   const antar = k6.antarTeman || {};
-  const hasAntarTeman = !!(antar.selesai || (student && Number(student.nilaiAntarTeman) > 0));
   let nAntarTeman = (student && student.nilaiAntarTeman !== undefined && student.nilaiAntarTeman !== null && student.nilaiAntarTeman !== '') ? Number(student.nilaiAntarTeman) : null;
+  const hasAntarTeman = !!(antar.selesai || (nAntarTeman !== null && nAntarTeman > 0));
   if (nAntarTeman === null) {
     nAntarTeman = hasAntarTeman ? 100 : 0;
   }
 
   // 4. Menu 4: Kuis6 Komputasi (Bobot 25%)
   const kuis = k6.kuis6 || {};
-  const hasKuis6 = !!(kuis.selesai || Number(kuis.skor) > 0 || (student && Number(student.nilaiKuis6) > 0));
   let nKuis6 = (student && student.nilaiKuis6 !== undefined && student.nilaiKuis6 !== null && student.nilaiKuis6 !== '') ? Number(student.nilaiKuis6) : null;
+  if (nKuis6 === null && student && Number(student.kuisSem1) > 0) {
+    nKuis6 = Number(student.kuisSem1);
+  }
+  const hasKuis6 = !!(kuis.selesai || Number(kuis.skor) > 0 || (nKuis6 !== null && nKuis6 > 0));
   if (nKuis6 === null) {
     nKuis6 = (kuis.skor && Number(kuis.skor) > 0) ? Number(kuis.skor) : (hasKuis6 ? 100 : 0);
   }
@@ -37893,12 +38040,10 @@ window.hitungDataPeringkatSiswa = hitungDataPeringkatSiswa;
 
 /**
  * Menentukan Kelas yang Sedang Berlangsung secara Realtime
+ * Mengutamakan kelas dari akun siswa yang sedang login (misal: 6A, 6B, 4A, 5A)
  */
 function dapatkanKelasSedangBerlangsung() {
-  if (typeof state !== 'undefined' && state.kelasSedangBerlangsung) {
-    return String(state.kelasSedangBerlangsung).trim().toUpperCase();
-  }
-  // 1. Cek dari siswa yang sedang login aktif
+  // 1. Cek dari siswa yang sedang login aktif (Prioritas Paling Utama Sesuai Kelas Login Siswa)
   let activeStudent = null;
   try {
     activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
@@ -37908,13 +38053,20 @@ function dapatkanKelasSedangBerlangsung() {
     if (typeof state !== 'undefined') state.kelasSedangBerlangsung = k;
     return k;
   }
-  // 2. Cek jika guru sedang aktif dengan filter kelas tertentu
+
+  // 2. Cek jika ada pemilihan manual yang tersimpan di state
+  if (typeof state !== 'undefined' && state.kelasSedangBerlangsung) {
+    return String(state.kelasSedangBerlangsung).trim().toUpperCase();
+  }
+
+  // 3. Cek jika guru sedang aktif dengan filter kelas tertentu
   if (typeof state !== 'undefined' && state.filterKelasGuru && state.filterKelasGuru !== 'semua' && !state.filterKelasGuru.startsWith('tingkat_')) {
     const k = String(state.filterKelasGuru).trim().toUpperCase();
     state.kelasSedangBerlangsung = k;
     return k;
   }
-  // 3. Cek dari penyimpanan lokal browser
+
+  // 4. Cek dari penyimpanan lokal browser
   try {
     const saved = localStorage.getItem('educode_kelas_berlangsung_v1');
     if (saved) {
@@ -37922,7 +38074,8 @@ function dapatkanKelasSedangBerlangsung() {
       return saved;
     }
   } catch (e) {}
-  // 4. Default: '6A' (Kelas 6 Fase C)
+
+  // 5. Default: '6A' (Kelas 6 Fase C)
   if (typeof state !== 'undefined') state.kelasSedangBerlangsung = '6A';
   return '6A';
 }
@@ -38018,7 +38171,11 @@ function dapatkanTop5Siswa(filterKategori = 'auto') {
   } catch (e) {}
 
   let targetFilter = filterKategori;
-  if (!targetFilter || targetFilter === 'auto') {
+  // KETENTUAN UTAMA:
+  // Jika siswa sedang login di akunnya, peringkat 5 besar WAJIB otomatis disesuaikan dengan kelas siswa tersebut
+  if (activeStudent && activeStudent.kelas) {
+    targetFilter = String(activeStudent.kelas).trim().toUpperCase();
+  } else if (!targetFilter || targetFilter === 'auto') {
     targetFilter = dapatkanKelasSedangBerlangsung();
   }
 
@@ -38037,10 +38194,15 @@ function dapatkanTop5Siswa(filterKategori = 'auto') {
   const evaluatedList = filtered.map(s => hitungDataPeringkatSiswa(s)).filter(Boolean);
 
   evaluatedList.sort((a, b) => {
-    if (b.skorPeringkat !== a.skorPeringkat) return b.skorPeringkat - a.skorPeringkat;
+    // 1. Prioritas Utama: Nilai Akhir Tertinggi (Buku Nilai Guru / Rapor)
     if (b.nilaiAkhir !== a.nilaiAkhir) return b.nilaiAkhir - a.nilaiAkhir;
+    // 2. Prioritas Kedua: Persentase Capaian Misi Praktik / Progres Tugas
     if (b.persentase !== a.persentase) return b.persentase - a.persentase;
+    // 3. Prioritas Ketiga: Total Poin Bintang Siswa
     if (b.poinBintang !== a.poinBintang) return b.poinBintang - a.poinBintang;
+    // 4. Prioritas Keempat: Skor Komposit Peringkat
+    if (b.skorPeringkat !== a.skorPeringkat) return b.skorPeringkat - a.skorPeringkat;
+    // 5. Urutan Nama Alfabetis
     return (a.nama || '').localeCompare(b.nama || '');
   });
 
@@ -38073,10 +38235,31 @@ window.dapatkanTop5Siswa = dapatkanTop5Siswa;
  * Merender Widget Papan Peringkat 5 Besar Siswa di Beranda
  */
 function renderTop5SiswaLeaderboard(kategori = 'auto') {
+  const heroGuestView = document.getElementById('hero-guest-view');
+  const heroStudentView = document.getElementById('hero-student-view');
+  const actStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                    (typeof state !== 'undefined' && state.isGuruLoggedIn);
+
+  // KETENTUAN UTAMA:
+  // Peringkat 5 besar tampil di beranda akun siswa BUKAN di halaman utama sebelum login!
+  if (!actStudent && !isTeacher) {
+    if (heroGuestView) heroGuestView.classList.remove('hidden');
+    if (heroStudentView) heroStudentView.classList.add('hidden');
+    return;
+  }
+
+  // Jika siswa aktif sudah login (atau sesi guru aktif)
+  if (heroGuestView) heroGuestView.classList.add('hidden');
+  if (heroStudentView) heroStudentView.classList.remove('hidden');
+
   const container = document.getElementById('list-top5-siswa');
   if (!container) return;
 
-  const activeClass = (kategori && kategori !== 'auto') ? kategori : dapatkanKelasSedangBerlangsung();
+  const activeClass = (actStudent && actStudent.kelas)
+    ? String(actStudent.kelas).trim().toUpperCase()
+    : ((kategori && kategori !== 'auto') ? kategori : dapatkanKelasSedangBerlangsung());
+
   const data = dapatkanTop5Siswa(activeClass);
 
   // Sinkronkan badge live & label kelas di Hero
@@ -38084,7 +38267,7 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
   if (badgeHero) {
     badgeHero.innerText = (data.activeCategory === 'semua' || data.activeCategory === 'SEMUA')
       ? 'Semua Siswa Sedang Berlangsung'
-      : `Kelas ${data.activeCategory} Sedang Berlangsung`;
+      : `Peringkat Kelas ${data.activeCategory}`;
   }
 
   const labelKelasHero = document.getElementById('label-kelas-nama-hero');
@@ -38092,6 +38275,11 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
     labelKelasHero.innerText = (data.activeCategory === 'semua' || data.activeCategory === 'SEMUA')
       ? 'Semua Siswa'
       : data.activeCategory;
+  }
+
+  const studentKelasBadge = document.getElementById('hero-student-kelas-badge');
+  if (studentKelasBadge) {
+    studentKelasBadge.innerText = `Kelas ${data.activeCategory}`;
   }
 
   const selectHero = document.getElementById('select-hero-kelas-berlangsung');
@@ -38116,7 +38304,6 @@ function renderTop5SiswaLeaderboard(kategori = 'auto') {
     return;
   }
 
-  const actStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const actId = actStudent ? (actStudent.id || actStudent.nis || actStudent.nama) : null;
 
   let html = '';
@@ -38259,10 +38446,29 @@ window.renderTop5SiswaLeaderboard = renderTop5SiswaLeaderboard;
 let _leaderboardCacheKey = '';
 function perbaruiPeringkatKelasRealtimeOtomatis(force = false) {
   try {
+    const act = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
+                      (typeof state !== 'undefined' && state.isGuruLoggedIn);
+
+    // KETENTUAN UTAMA:
+    // Sebelum login (halaman utama / tamu): JANGAN tampilkan papan peringkat, melainkan sambutan login tamu
+    if (!act && !isTeacher) {
+      const heroGuestView = document.getElementById('hero-guest-view');
+      const heroStudentView = document.getElementById('hero-student-view');
+      if (heroGuestView && heroGuestView.classList.contains('hidden')) {
+        heroGuestView.classList.remove('hidden');
+      }
+      if (heroStudentView && !heroStudentView.classList.contains('hidden')) {
+        heroStudentView.classList.add('hidden');
+      }
+      return;
+    }
+
     const rawDb = localStorage.getItem('educode_students_db_v1') || '';
     const rawPort6 = localStorage.getItem('educode_portofolio_k6_v1') || '';
-    const activeCls = dapatkanKelasSedangBerlangsung();
-    const currentKey = `${rawDb.length}_${rawPort6.length}_${activeCls}`;
+    const activeCls = (act && act.kelas) ? String(act.kelas).trim().toUpperCase() : dapatkanKelasSedangBerlangsung();
+    const actId = act ? (act.id || act.nis || act.nama) : 'teacher';
+    const currentKey = `${rawDb.length}_${rawPort6.length}_${activeCls}_${actId}`;
 
     if (force || currentKey !== _leaderboardCacheKey) {
       _leaderboardCacheKey = currentKey;

@@ -1993,7 +1993,7 @@
       </script>
 
       <!-- HERO BANNER SECTION (Gradasi Ceria, Lucu & Playful) -->
-      <div id="hero-banner" class="relative rounded-[32px] overflow-hidden bg-gradient-to-br from-[#4F46E5] via-[#06B6D4] via-30% via-[#3B82F6] via-70% to-[#EC4899] p-5 sm:p-6 lg:p-7 shadow-2xl shadow-indigo-500/25 border-2 border-white/40 text-white transition-all duration-300">
+      <div id="hero-banner" class="relative rounded-[32px] overflow-hidden bg-gradient-to-br from-[#4F46E5] via-[#06B6D4] via-30% via-[#3B82F6] via-70% to-[#EC4899] p-5 sm:p-6 lg:p-7 shadow-2xl shadow-indigo-500/25 border-2 border-white/40 text-white transition-all duration-300 scroll-mt-24 mt-3 sm:mt-4">
         
         <!-- Ornamen Lucu & Gelembung Ceria (Playful Cartoon Accents) -->
         <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-gradient-to-tr from-pink-400/30 to-amber-300/30 rounded-full blur-2xl pointer-events-none animate-pulse"></div>
@@ -2009,97 +2009,123 @@
 
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
           
-          <!-- Kiri: Papan Peringkat Realtime Kelas yang Sedang Berlangsung (5 Kolom) -->
-          <div class="lg:col-span-5 space-y-3">
+          <!-- Kiri: Area Konten Hero (Tamu Sebelum Login ATAU Peringkat 5 Besar Siswa Berdasarkan Kelas Setelah Login) (5 Kolom) -->
+          <div class="lg:col-span-5">
             
-            <!-- Bar Status Live & Pemilih Kelas Sedang Berlangsung -->
-            <div class="flex items-center justify-between gap-2 flex-wrap">
-              <div class="inline-flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-emerald-300 border border-emerald-400/40 shadow-xs">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span id="hero-badge">Kelas 6A Sedang Berlangsung</span>
-                <span class="text-[9px] bg-emerald-400/30 text-white px-1.5 py-0.2 rounded font-black tracking-wider">LIVE 🟢</span>
+            <!-- ======================================================== -->
+            <!-- 1. TAMPILAN HALAMAN UTAMA SEBELUM LOGIN (Tamu / Guest)   -->
+            <!-- ======================================================== -->
+            <div id="hero-guest-view" class="space-y-4">
+              <!-- Badge Sambutan EduCode AI -->
+              <div class="inline-flex items-center gap-2 bg-gradient-to-r from-sky-500/25 to-indigo-500/25 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-sky-200 border border-sky-400/40 shadow-xs">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>EduCode AI • SDS Cinta Kasih Tzu Chi</span>
+                <span class="text-[9px] bg-yellow-400/30 text-yellow-200 px-1.5 py-0.5 rounded font-black tracking-wider">LMS KREATIF</span>
               </div>
 
-              <!-- Pemilih Kelas Realtime yang Sedang Berlangsung -->
-              <div class="flex items-center gap-1.5">
-                <select id="select-hero-kelas-berlangsung" onchange="gantiKelasSedangBerlangsung(this.value)" class="bg-slate-900/90 hover:bg-slate-800 text-yellow-300 text-xs font-bold px-2.5 py-1 rounded-xl border border-yellow-400/50 outline-none cursor-pointer shadow-md transition" title="Ganti Kelas yang Sedang Berlangsung">
-                  <optgroup label="Fase C (Kelas 6 SD)">
-                    <option value="6A" selected>Kelas 6A</option>
-                    <option value="6B">Kelas 6B</option>
-                    <option value="6C">Kelas 6C</option>
-                    <option value="6D">Kelas 6D</option>
-                    <option value="6E">Kelas 6E</option>
-                  </optgroup>
-                  <optgroup label="Fase C (Kelas 5 SD)">
-                    <option value="5A">Kelas 5A</option>
-                    <option value="5B">Kelas 5B</option>
-                    <option value="5C">Kelas 5C</option>
-                    <option value="5D">Kelas 5D</option>
-                    <option value="5E">Kelas 5E</option>
-                  </optgroup>
-                  <optgroup label="Fase B (Kelas 4 SD)">
-                    <option value="4A">Kelas 4A</option>
-                    <option value="4B">Kelas 4B</option>
-                    <option value="4C">Kelas 4C</option>
-                    <option value="4D">Kelas 4D</option>
-                    <option value="4E">Kelas 4E</option>
-                  </optgroup>
-                  <optgroup label="Semua Angkatan">
-                    <option value="semua">Semua Siswa</option>
-                  </optgroup>
-                </select>
+              <!-- Judul Utama & Subteks Sambutan -->
+              <div>
+                <h1 class="font-title font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white leading-tight drop-shadow-md">
+                  Belajar Coding &amp; AI Bersama, <br/>
+                  <span class="bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-400 bg-clip-text text-transparent">Untuk Masa Depan!</span> 🚀
+                </h1>
+                <p class="text-sky-100 text-xs sm:text-sm mt-2.5 leading-relaxed font-medium">
+                  Membangun keterampilan digital, pengolah kata (MS Word), spreadsheet (MS Excel), 4 Pilar Berpikir Komputasional (CT), dan budi pekerti luhur di SDS Cinta Kasih Tzu Chi.
+                </p>
+              </div>
 
-                <button type="button" onclick="perbaruiPeringkatKelasRealtimeOtomatis(true)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xs transition active:scale-95 cursor-pointer shadow-xs" title="Segarkan Papan Peringkat Realtime">
-                  <i class="fa-solid fa-rotate"></i>
+              <!-- Tombol Aksi Cepat Login Siswa & Akses Guru -->
+              <div class="flex flex-wrap items-center gap-3 pt-1">
+                <button type="button" onclick="bukaPilihSiswaCepat()" class="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-xl shadow-amber-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  <i class="fa-solid fa-graduation-cap text-base"></i>
+                  <span>Login Siswa untuk Mulai Belajar 🚀</span>
+                </button>
+
+                <button type="button" onclick="bukaModalLoginGuru()" class="bg-white/15 hover:bg-white/25 text-white px-4 py-2.5 rounded-full font-title font-bold text-xs flex items-center gap-2 border border-white/25 transition cursor-pointer backdrop-blur-xs">
+                  <i class="fa-solid fa-chalkboard-user text-yellow-300"></i>
+                  <span>Masuk Guru</span>
                 </button>
               </div>
-            </div>
 
-            <!-- Headline Papan Peringkat Realtime -->
-            <div>
-              <h2 id="hero-title" class="font-title font-extrabold text-xl sm:text-2xl text-white leading-tight drop-shadow-xs flex items-center gap-1.5 flex-wrap">
-                <span>🏆 Peringkat Siswa Kelas</span>
-                <span id="label-kelas-nama-hero" class="text-yellow-300 underline decoration-yellow-400/60 font-black">6A</span>
-              </h2>
-              <p id="hero-desc" class="text-sky-100 text-[11px] sm:text-xs mt-0.5 leading-relaxed font-medium">
-                Peringkat otomatis &amp; realtime bersumber dari Buku Nilai Guru dan progres tugas siswa.
-              </p>
-            </div>
-
-            <!-- Kartu Kontainer Peringkat 5 Besar Siswa Kelas Sedang Berlangsung -->
-            <div id="hero-top5-leaderboard-box" class="rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/20 p-2.5 sm:p-3 text-white shadow-xl shadow-blue-950/40">
-              <div id="list-top5-siswa" class="space-y-1.5">
-                <div class="text-center py-4 text-xs text-slate-300 italic">Memuat peringkat realtime siswa... ⏳</div>
-              </div>
-
-              <!-- Posisi Siswa yang Sedang Login -->
-              <div id="footer-top5-posisi-saya" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-300">
-                <!-- Diisi otomatis oleh JavaScript -->
+              <!-- Fitur Mini-Badges Pembelajaran -->
+              <div class="flex items-center gap-2 flex-wrap pt-1 text-[11px] text-sky-200 font-semibold">
+                <span class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 flex items-center gap-1.5"><i class="fa-solid fa-laptop-code text-cyan-300"></i> Lab Praktik Komputer</span>
+                <span class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 flex items-center gap-1.5"><i class="fa-solid fa-trophy text-amber-300"></i> Peringkat Kelas Siswa</span>
+                <span class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 flex items-center gap-1.5"><i class="fa-solid fa-robot text-emerald-300"></i> Tutor Cerdas Robo</span>
               </div>
             </div>
 
-            <!-- Tombol Aksi Cepat ke Materi Kelas & Login -->
-            <div id="hero-sem-buttons" class="flex flex-wrap items-center gap-2 pt-0.5">
-              <button id="hero-btn-aksi-materi" type="button" onclick="bukaMateriKelasSedangBerlangsung()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-4 py-2 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
-                <i class="fa-solid fa-brain text-slate-950"></i>
-                <span id="hero-btn-label-materi">Buka Materi &amp; Misi 🚀</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-              </button>
+            <!-- ======================================================================= -->
+            <!-- 2. TAMPILAN BERANDA AKUN SISWA SETELAH LOGIN (Peringkat 5 Besar Kelas)  -->
+            <!-- ======================================================================= -->
+            <div id="hero-student-view" class="space-y-3 hidden">
+              <!-- Bar Status Live & Badge Kelas Login Siswa -->
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="inline-flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-emerald-300 border border-emerald-400/40 shadow-xs">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span id="hero-badge">Peringkat Kelas Siswa</span>
+                  <span class="text-[9px] bg-emerald-400/30 text-white px-1.5 py-0.2 rounded font-black tracking-wider">LIVE 🟢</span>
+                </div>
 
-              <button type="button" onclick="bukaBukuNilaiKelasSedangBerlangsung()" class="bg-white/20 hover:bg-white/30 text-white px-3.5 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
-                <i class="fa-solid fa-chart-simple text-yellow-300"></i>
-                <span>Buku Nilai</span>
-              </button>
+                <!-- Indikator Kelas Siswa & Tombol Refresh Realtime -->
+                <div class="flex items-center gap-1.5">
+                  <span id="hero-student-kelas-badge" class="bg-slate-900/90 text-yellow-300 text-xs font-black px-3 py-1 rounded-xl border border-yellow-400/50 shadow-md">
+                    Kelas 6A
+                  </span>
+
+                  <button type="button" onclick="perbaruiPeringkatKelasRealtimeOtomatis(true)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xs transition active:scale-95 cursor-pointer shadow-xs" title="Segarkan Papan Peringkat Realtime">
+                    <i class="fa-solid fa-rotate"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Headline Papan Peringkat Realtime Berdasarkan Kelas Siswa Login -->
+              <div>
+                <h2 id="hero-title" class="font-title font-extrabold text-xl sm:text-2xl text-white leading-tight drop-shadow-xs flex items-center gap-1.5 flex-wrap">
+                  <span>🏆 Peringkat 5 Besar Kelas</span>
+                  <span id="label-kelas-nama-hero" class="text-yellow-300 underline decoration-yellow-400/60 font-black">6A</span>
+                </h2>
+                <p id="hero-desc" class="text-sky-100 text-[11px] sm:text-xs mt-0.5 leading-relaxed font-medium">
+                  Peringkat otomatis &amp; realtime bersumber dari Buku Nilai Guru dan progres tugas siswa.
+                </p>
+              </div>
+
+              <!-- Kartu Kontainer Peringkat 5 Besar Siswa Kelas Sedang Berlangsung -->
+              <div id="hero-top5-leaderboard-box" class="rounded-2xl bg-slate-900/85 backdrop-blur-md border border-white/20 p-2.5 sm:p-3 text-white shadow-xl shadow-blue-950/40">
+                <div id="list-top5-siswa" class="space-y-1.5">
+                  <div class="text-center py-4 text-xs text-slate-300 italic">Memuat peringkat realtime siswa... ⏳</div>
+                </div>
+
+                <!-- Posisi Siswa yang Sedang Login -->
+                <div id="footer-top5-posisi-saya" class="mt-2 pt-2 border-t border-white/10 text-[11px] text-slate-300">
+                  <!-- Diisi otomatis oleh JavaScript -->
+                </div>
+              </div>
+
+              <!-- Tombol Aksi Cepat ke Materi Kelas & Buku Nilai -->
+              <div id="hero-sem-buttons" class="flex flex-wrap items-center gap-2 pt-0.5">
+                <button id="hero-btn-aksi-materi" type="button" onclick="bukaMateriKelasSedangBerlangsung()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 px-4 py-2 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-950/30 transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  <i class="fa-solid fa-brain text-slate-950"></i>
+                  <span id="hero-btn-label-materi">Buka Materi &amp; Misi 🚀</span>
+                  <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+
+                <button type="button" onclick="bukaBukuNilaiKelasSedangBerlangsung()" class="bg-white/20 hover:bg-white/30 text-white px-3.5 py-2 rounded-full font-title font-bold text-xs flex items-center gap-1.5 border border-white/30 transition cursor-pointer">
+                  <i class="fa-solid fa-chart-simple text-yellow-300"></i>
+                  <span>Buku Nilai</span>
+                </button>
+              </div>
+
+              <div id="hero-guest-btn" class="hidden pt-0.5">
+                <button onclick="bukaPilihSiswaCepat()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-5 py-2 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  <i class="fa-solid fa-graduation-cap text-base"></i>
+                  <span>Login Siswa untuk Mulai Belajar 🚀</span>
+                </button>
+              </div>
+
             </div>
 
-            <div id="hero-guest-btn" class="hidden pt-0.5">
-              <button onclick="bukaPilihSiswaCepat()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-5 py-2 rounded-full font-title font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg transition transform hover:scale-105 active:scale-95 cursor-pointer">
-                <i class="fa-solid fa-graduation-cap text-base"></i>
-                <span>Login Siswa untuk Cek Peringkatmu 🚀</span>
-              </button>
-            </div>
-
-  </div>
+          </div>
 
   <!-- Kanan: Area Kotak Jawaban Teks & Maskot Robot (Lebih Besar) DI SAMPING KANANNYA TEKS (7 Kolom) -->
           <div class="lg:col-span-7 flex flex-col md:flex-row items-center justify-center gap-5 relative">
@@ -23343,7 +23369,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261118_fix_quiz_k6_correct_key_v196"></script>
+  <script charset="UTF-8" src="app.js?v=20261118_leaderboard_in_student_beranda_only_v198"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
