@@ -1905,6 +1905,15 @@ function switchTab(tabId) {
     } catch (eWordSave) {}
   }
 
+  // Simpan progres pengerjaan kuis siswa saat berpindah ke menu lain agar tidak hilang
+  if (state.currentTab === 'kuis') {
+    try {
+      if (typeof simpanProgressKuisSiswa === 'function') {
+        simpanProgressKuisSiswa();
+      }
+    } catch (eQuizSave) {}
+  }
+
   // Jika guru sedang login dan memanggil beranda, otomatis arahkan ke Dasbor Guru
   if (tabId === 'beranda' && (state.isGuruLoggedIn || (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()))) {
     tabId = 'guru';
@@ -2100,14 +2109,9 @@ function switchTab(tabId) {
         }
       }
 
-      // Reset skor sesi kuis saat baru dibuka jika belum disubmit dan belum menyelesaikan sesi saat ini
-      const submitCheck = (typeof isQuizAlreadySubmittedForActiveStudent === 'function')
-        ? isQuizAlreadySubmittedForActiveStudent()
-        : { isSubmitted: false, score: 0 };
-      if (!submitCheck.isSubmitted && !state.hasFinishedQuizCurrentSession) {
-        state.quizScore = 0;
-        state.quizCorrectCount = 0;
-        state.currentQuizIndex = 0;
+      // Muat progres kuis terakhir siswa jika ada (agar posisi pertanyaan tidak pernah ter-reset saat pindah menu)
+      if (typeof muatProgressKuisSiswa === 'function') {
+        muatProgressKuisSiswa();
       }
 
       // Muat soal sesuai bank soal aktif (Kelas 6 memuat DEFAULT_BANK_SOAL_K6)
@@ -9991,10 +9995,37 @@ window.resetBankSoalKeDefault = resetBankSoalKeDefault;
 var quizQuestions = getBankSoal(1);
 var quizQuestionsSem2 = getBankSoal(2);
 
-function getActiveQuizList() {
+function dapatkanTingkatKelasAktif() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-  if (profile && String(profile.kelas || '').includes('6')) {
-    return getBankSoalKelas6();
+  const kls = profile ? String(profile.kelas || '').trim().toUpperCase() : '';
+  const headerMode = (typeof state !== 'undefined' && state.headerNavMode) ? String(state.headerNavMode).toLowerCase() : '';
+
+  if (kls.includes('6') || kls.includes('VI') || headerMode.includes('kelas6') || headerMode.includes('k6')) {
+    return 6;
+  }
+  if (kls.includes('5') || kls.includes('V') || headerMode.includes('kelas5') || headerMode.includes('k5')) {
+    return 5;
+  }
+  if (kls.includes('4') || kls.includes('IV') || headerMode.includes('sem1') || headerMode.includes('sem2') || headerMode.includes('kelas4')) {
+    return 4;
+  }
+  if (typeof state !== 'undefined' && state.kelasSedangBerlangsung) {
+    const ksb = String(state.kelasSedangBerlangsung).trim().toUpperCase();
+    if (ksb.includes('6')) return 6;
+    if (ksb.includes('5')) return 5;
+    if (ksb.includes('4')) return 4;
+  }
+  return 4;
+}
+window.dapatkanTingkatKelasAktif = dapatkanTingkatKelasAktif;
+
+function getActiveQuizList() {
+  const tingkat = dapatkanTingkatKelasAktif();
+  if (tingkat === 6) {
+    return (typeof getBankSoalKelas6 === 'function') ? getBankSoalKelas6() : (typeof DEFAULT_BANK_SOAL_K6 !== 'undefined' ? DEFAULT_BANK_SOAL_K6 : []);
+  }
+  if (tingkat === 5) {
+    return (typeof getBankSoalKelas5 === 'function') ? getBankSoalKelas5() : (typeof DEFAULT_BANK_SOAL_K5 !== 'undefined' ? DEFAULT_BANK_SOAL_K5 : []);
   }
   return getBankSoal(state.currentSemester || 1);
 }
@@ -10013,7 +10044,7 @@ function getQuizAccessMode(sem = null) {
       return saved;
     }
   } catch(e) {}
-  return 'prasyarat'; // Default ke Mode 2: Prasyarat Tugas Selesai
+  return 'bebas'; // Default BUKA BEBAS agar kuis dapat langsung diakses & dikerjakan siswa
 }
 window.getQuizAccessMode = getQuizAccessMode;
 
@@ -10184,9 +10215,9 @@ function checkQuizAccessForActiveStudent() {
     };
   }
 
-  // Khusus Siswa Kelas 6: Langsung izinkan akses ke kuis internal komputasi & Scratch
-  const isKelas6 = profile && (String(profile.kelas || '').includes('6') || String(profile.kelas || '').toUpperCase().includes('VI'));
-  if (isKelas6) {
+  // Khusus Siswa Kelas 6 & Kelas 5: Langsung izinkan akses ke kuis materi masing-masing
+  const tingkat = (typeof dapatkanTingkatKelasAktif === 'function') ? dapatkanTingkatKelasAktif() : 4;
+  if (tingkat === 6 || tingkat === 5) {
     return { allowed: true, mode: mode, studentName: profile.nama };
   }
 
@@ -10435,7 +10466,7 @@ function renderLayarKuisTerkunci(access) {
   `;
 }
 
-// Helper: Cek apakah kuis sudah pernah dikerjakan dan dikirim oleh siswa aktif (Aturan 1 Kali Percobaan)
+// Helper: Cek skor kuis siswa aktif (Aturan 1 kali percobaan dihilangkan: siswa bebas berlatih & mengulang)
 function isQuizAlreadySubmittedForActiveStudent() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   if (!profile) return { isSubmitted: false, score: 0, studentName: 'Siswa' };
@@ -10443,9 +10474,6 @@ function isQuizAlreadySubmittedForActiveStudent() {
   const semNum = (typeof state !== 'undefined' && Number(state.currentSemester) === 2) ? 2 : 1;
   const sNis = profile.nis ? String(profile.nis).trim() : '';
   const sId = profile.id ? String(profile.id).trim() : (sNis || (profile.nama || 'guest'));
-
-  const lockKey = `educode_quiz_submitted_sem${semNum}_${sId}`;
-  const isLocked = localStorage.getItem(lockKey) === 'true';
 
   const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
   const student = db.find(s => {
@@ -10455,12 +10483,14 @@ function isQuizAlreadySubmittedForActiveStudent() {
     return false;
   });
 
-  const isKelas6 = (profile && String(profile.kelas || '').includes('6')) || (student && String(student.kelas || '').includes('6'));
+  const tingkat = (typeof dapatkanTingkatKelasAktif === 'function') ? dapatkanTingkatKelasAktif() : 4;
 
   let existingScore = 0;
   if (student) {
-    if (isKelas6) {
+    if (tingkat === 6) {
       existingScore = Number(student.nilaiKuis6) || 0;
+    } else if (tingkat === 5) {
+      existingScore = Number(student.nilaiKuis5 || student.kuisSem1) || 0;
     } else if (semNum === 2) {
       existingScore = Number(student.kuisSem2) || 0;
     } else {
@@ -10468,16 +10498,82 @@ function isQuizAlreadySubmittedForActiveStudent() {
     }
   }
 
-  if (isLocked || existingScore > 0) {
-    const finalScore = existingScore || Number(localStorage.getItem(`educode_quiz_final_score_sem${semNum}_${sId}`)) || 0;
-    return { isSubmitted: true, score: finalScore, studentName: profile.nama || 'Siswa' };
-  }
+  const savedFinal = Number(localStorage.getItem(`educode_quiz_final_score_sem${semNum}_${sId}`)) || 0;
+  const finalScore = existingScore || savedFinal;
 
-  return { isSubmitted: false, score: 0, studentName: profile.nama || 'Siswa' };
+  return {
+    isSubmitted: false, // Tidak dikunci: siswa bebas mengulang & memperbaiki nilai kuis kapan saja
+    hasPreviousScore: (finalScore > 0),
+    score: finalScore,
+    studentName: profile.nama || 'Siswa'
+  };
 }
 window.isQuizAlreadySubmittedForActiveStudent = isQuizAlreadySubmittedForActiveStudent;
 
-// 4. Engine Kuis Interaktif Siswa (Dinamis Sesuai Bank Soal Aktif)
+// ----------------------------------------------------
+// PERSISTENSI PROGRES KUIS SISWA (Menjaga posisi soal saat pindah menu)
+// ----------------------------------------------------
+function dapatkanKunciProgressKuis() {
+  const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+  const sId = profile ? (profile.nis || profile.id || profile.nama) : 'guest';
+  const tingkat = (typeof dapatkanTingkatKelasAktif === 'function') ? dapatkanTingkatKelasAktif() : 4;
+  const semNum = (typeof state !== 'undefined' && Number(state.currentSemester) === 2) ? 2 : 1;
+  return `educode_quiz_progress_k${tingkat}_sem${semNum}_${sId}`;
+}
+window.dapatkanKunciProgressKuis = dapatkanKunciProgressKuis;
+
+function simpanProgressKuisSiswa() {
+  try {
+    const key = dapatkanKunciProgressKuis();
+    const data = {
+      currentQuizIndex: Number(state.currentQuizIndex) || 0,
+      quizScore: Number(state.quizScore) || 0,
+      quizCorrectCount: Number(state.quizCorrectCount) || 0,
+      userQuizAnswers: state.userQuizAnswers || {},
+      hasFinishedQuizCurrentSession: Boolean(state.hasFinishedQuizCurrentSession),
+      timestamp: Date.now()
+    };
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {}
+}
+window.simpanProgressKuisSiswa = simpanProgressKuisSiswa;
+
+function muatProgressKuisSiswa() {
+  try {
+    const key = dapatkanKunciProgressKuis();
+    const raw = localStorage.getItem(key);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data && typeof data.currentQuizIndex === 'number') {
+      const activeQuiz = getActiveQuizList();
+      const maxIdx = activeQuiz.length > 0 ? activeQuiz.length - 1 : 0;
+      state.currentQuizIndex = Math.min(Math.max(0, data.currentQuizIndex), maxIdx);
+      state.quizScore = Number(data.quizScore) || 0;
+      state.quizCorrectCount = Number(data.quizCorrectCount) || 0;
+      state.userQuizAnswers = (typeof data.userQuizAnswers === 'object' && data.userQuizAnswers !== null) ? data.userQuizAnswers : {};
+      state.hasFinishedQuizCurrentSession = Boolean(data.hasFinishedQuizCurrentSession);
+      return true;
+    }
+  } catch (e) {}
+  return false;
+}
+window.muatProgressKuisSiswa = muatProgressKuisSiswa;
+
+function hapusProgressKuisSiswa() {
+  try {
+    const key = dapatkanKunciProgressKuis();
+    localStorage.removeItem(key);
+  } catch (e) {}
+  state.currentQuizIndex = 0;
+  state.quizScore = 0;
+  state.quizCorrectCount = 0;
+  state.userQuizAnswers = {};
+  state.hasFinishedQuizCurrentSession = false;
+  state.quizAnswered = false;
+}
+window.hapusProgressKuisSiswa = hapusProgressKuisSiswa;
+
+// 4. Engine Kuis Interaktif Siswa (Dinamis Sesuai Bank Soal Aktif Tiap Kelas)
 function loadQuizQuestion() {
   state.quizAnswered = false;
   const activeQuiz = getActiveQuizList();
@@ -10486,53 +10582,15 @@ function loadQuizQuestion() {
   const certBox = document.getElementById('certificate-box');
   const finishSummary = document.getElementById('quiz-finish-summary');
 
-  // 1. Cek Apakah Kuis Sudah Pernah Dikerjakan & Dikirim (Aturan 1 Kali Percobaan)
-  const submitCheck = isQuizAlreadySubmittedForActiveStudent();
-  if (submitCheck.isSubmitted) {
+  // Jika siswa sedang berada pada tampilan hasil akhir kuis yang baru saja selesai
+  if (state.hasFinishedQuizCurrentSession && finishSummary) {
     if (quizBox) quizBox.classList.add('hidden');
     if (certBox) certBox.classList.add('hidden');
-    if (finishSummary) finishSummary.classList.add('hidden');
-    const uraianContainer = document.getElementById('kuis-uraian-container');
-    if (uraianContainer) uraianContainer.classList.add('hidden');
-
-    const scoreEl = document.getElementById('quiz-score');
-    if (scoreEl) scoreEl.innerText = submitCheck.score;
-
-    if (lockedBox) {
-      lockedBox.classList.remove('hidden');
-      lockedBox.innerHTML = `
-        <div class="p-8 sm:p-10 bg-white rounded-3xl border-2 border-emerald-300 shadow-xl text-center space-y-4 max-w-xl mx-auto my-4 animate-fadeIn">
-          <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-tr from-emerald-500 to-teal-400 text-white rounded-3xl flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-md">
-            <i class="fa-solid fa-clipboard-check"></i>
-          </div>
-          <div>
-            <span class="px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black uppercase tracking-wider">
-              Kuis Telah Selesai
-            </span>
-            <h3 class="font-title text-xl sm:text-2xl font-black text-slate-900 mt-2">
-              Kuis Hanya 1 Kali Percobaan
-            </h3>
-            <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
-              Halo <b>${submitCheck.studentName}</b>! Kamu sudah mengerjakan dan mengirimkan kuis ini. Nilaimu telah resmi tersimpan di <b>Buku Nilai Guru</b>.
-            </p>
-          </div>
-          <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 inline-flex items-center gap-3">
-            <i class="fa-solid fa-star text-amber-500 text-2xl"></i>
-            <div class="text-left">
-              <span class="text-[11px] font-bold text-slate-500 block">Nilai Kuis Resmi Kamu:</span>
-              <span class="text-xl font-black text-emerald-700">${submitCheck.score} / 100</span>
-            </div>
-          </div>
-          <p class="text-[11px] text-amber-800 font-semibold bg-amber-50 py-2 px-3.5 rounded-xl border border-amber-200 max-w-md mx-auto">
-            <i class="fa-solid fa-lock mr-1"></i> Sesuai aturan ujian, kuis dilakukan <b>hanya satu kali percobaan</b> dan tidak dapat diulang.
-          </p>
-        </div>
-      `;
-    }
+    finishSummary.classList.remove('hidden');
     return;
   }
 
-  // 2. Cek Hak Akses Kuis (Mode Pilihan 3: Bebas, Prasyarat Tugas Selesai, atau Kunci Total)
+  // 1. Cek Hak Akses Kuis (Mode Bebas, Prasyarat Tugas Selesai, atau Kunci Total)
   const access = checkQuizAccessForActiveStudent();
 
   if (!access.allowed) {
@@ -10546,9 +10604,7 @@ function loadQuizQuestion() {
     return;
   } else {
     if (lockedBox) lockedBox.classList.add('hidden');
-    if (!state.hasFinishedQuizCurrentSession) {
-      if (quizBox) quizBox.classList.remove('hidden');
-    }
+    if (quizBox) quizBox.classList.remove('hidden');
   }
 
   if (typeof sinkronkanSkorKuisHeader === 'function') {
@@ -10557,14 +10613,15 @@ function loadQuizQuestion() {
 
   const subtitleEl = document.getElementById('quiz-header-subtitle');
   if (subtitleEl) {
-    const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-    const isK6Std = (activeStd && (String(activeStd.kelas || '').includes('6') || String(activeStd.kelas || '').toUpperCase().includes('VI'))) || (state.headerNavMode === 'kelas6');
-    if (isK6Std) {
+    const tingkat = (typeof dapatkanTingkatKelasAktif === 'function') ? dapatkanTingkatKelasAktif() : 4;
+    if (tingkat === 6) {
       subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis Computational Thinking & Algoritma Scratch untuk Siswa Kelas 6 SD!`;
+    } else if (tingkat === 5) {
+      subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis Presentasi PPT, Koding Code.org, Poster Canva & Game Scratch untuk Siswa Kelas 5 SD!`;
     } else if (state.currentSemester === 2) {
       subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis materi Semester 2 (Coding Scratch & RoboMind AI) untuk mendapatkan Sertifikat Digital!`;
     } else {
-      subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis materi Semester 1 (Konten Digital & MS Word) untuk mendapatkan Sertifikat Digital!`;
+      subtitleEl.innerText = `Jawab ${activeQuiz.length} pertanyaan kuis materi Kelas 4 (Pengolahan Data MS Excel, Konten Digital Word & Internet Sehat)!`;
     }
   }
 
@@ -10591,7 +10648,7 @@ function loadQuizQuestion() {
     const progEl = document.getElementById('quiz-progress-text');
     if (progEl) progEl.innerText = 'Pertanyaan 0 dari 0';
     const qEl = document.getElementById('quiz-question');
-    if (qEl) qEl.innerText = 'Belum ada soal kuis di Bank Soal untuk semester ini.';
+    if (qEl) qEl.innerText = 'Belum ada butir soal kuis untuk materi kelas ini.';
     const optContainer = document.getElementById('quiz-options');
     if (optContainer) optContainer.innerHTML = '<div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-xs text-center font-medium">Bapak/Ibu Guru dapat menambahkan butir soal kuis melalui Dasbor Guru &gt; Bank Soal Kuis.</div>';
     const expEl = document.getElementById('quiz-explanation');
@@ -10602,7 +10659,7 @@ function loadQuizQuestion() {
   }
 
   if (state.currentQuizIndex >= activeQuiz.length) {
-    state.currentQuizIndex = 0;
+    state.currentQuizIndex = Math.max(0, activeQuiz.length - 1);
   }
   const currentQ = activeQuiz[state.currentQuizIndex];
   
@@ -10616,10 +10673,25 @@ function loadQuizQuestion() {
   }
   
   const badgeEl = document.getElementById('quiz-tp-badge');
-  if (badgeEl) badgeEl.innerText = currentQ.tp || `TP Semester ${state.currentSemester}`;
+  if (badgeEl) {
+    const tingkat = (typeof dapatkanTingkatKelasAktif === 'function') ? dapatkanTingkatKelasAktif() : 4;
+    badgeEl.innerText = currentQ.tp || (tingkat === 6 ? 'Fase C • Kelas 6 SD' : (tingkat === 5 ? 'Fase C • Kelas 5 SD' : `TP Semester ${state.currentSemester || 1}`));
+  }
   
   const qEl = document.getElementById('quiz-question');
   if (qEl) qEl.innerText = currentQ.question;
+
+  // Hitung indeks jawaban benar
+  let rawCorrect = currentQ.correct;
+  if (rawCorrect === undefined || isNaN(Number(rawCorrect))) {
+    rawCorrect = (currentQ.answer !== undefined) ? currentQ.answer : ((currentQ.kunci !== undefined) ? currentQ.kunci : 0);
+  }
+  const correctIdx = Number(rawCorrect);
+
+  // Periksa apakah pertanyaan ini sudah pernah dijawab sebelumnya pada progres sesi tersimpan
+  const answeredInfo = (state.userQuizAnswers && state.userQuizAnswers[state.currentQuizIndex] !== undefined)
+    ? state.userQuizAnswers[state.currentQuizIndex]
+    : null;
 
   // Tema Badge Warna-warni Lucu & Kontras Tinggi untuk Opsi A, B, C, D
   const optionThemes = [
@@ -10630,37 +10702,156 @@ function loadQuizQuestion() {
   ];
 
   const optContainer = document.getElementById('quiz-options');
+  const expEl = document.getElementById('quiz-explanation');
+  const nextBtn = document.getElementById('quiz-next-btn');
+  const nextBtnText = document.getElementById('quiz-next-btn-text');
+
   if (optContainer) {
     optContainer.innerHTML = '';
-    (currentQ.options || []).forEach((opt, idx) => {
-      const theme = optionThemes[idx % optionThemes.length];
-      const letter = String.fromCharCode(65 + idx);
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200 bg-white ${theme.hoverBorder} shadow-xs hover:shadow-md transition-all duration-200 flex items-center justify-between cursor-pointer group transform hover:-translate-y-0.5 active:scale-98`;
-      btn.innerHTML = `
-        <div class="flex items-center gap-3.5 flex-1 pr-2">
-          <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${theme.badgeBg} font-title font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-            ${letter}
-          </span>
-          <span class="text-slate-900 font-bold text-xs sm:text-base leading-snug group-hover:text-indigo-950">
-            ${opt}
-          </span>
-        </div>
-        <div class="w-6 h-6 rounded-full border-2 border-slate-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 transition-all bg-white">
-          <div class="w-2.5 h-2.5 rounded-full bg-transparent group-hover:bg-indigo-100 transition-all"></div>
-        </div>
-      `;
-      btn.onclick = () => selectQuizAnswer(idx, btn);
-      optContainer.appendChild(btn);
-    });
-  }
 
-  const expEl = document.getElementById('quiz-explanation');
-  if (expEl) expEl.className = 'hidden p-4 sm:p-5 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-300';
-  
-  const nextBtn = document.getElementById('quiz-next-btn');
-  if (nextBtn) nextBtn.classList.add('hidden');
+    if (answeredInfo) {
+      // PERTANYAAN SUDAH PERNAH DIJAWAB (Pindah menu lalu kembali): Tampilkan jawaban siswa & kunci benar
+      state.quizAnswered = true;
+
+      (currentQ.options || []).forEach((opt, idx) => {
+        const theme = optionThemes[idx % optionThemes.length];
+        const letter = String.fromCharCode(65 + idx);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.disabled = true;
+
+        const isChosen = (idx === answeredInfo.selectedIndex);
+        const isTargetCorrect = (idx === correctIdx);
+
+        if (isChosen) {
+          if (answeredInfo.isCorrect) {
+            btn.className = 'w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/90 shadow-md ring-2 ring-emerald-400/40 flex items-center justify-between transition-all';
+            btn.innerHTML = `
+              <div class="flex items-center gap-3.5 flex-1 pr-2">
+                <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-600 text-white font-title font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                  ${letter}
+                </span>
+                <span class="text-emerald-950 font-extrabold text-xs sm:text-base leading-snug">
+                  ${opt}
+                </span>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-emerald-600 text-white font-title font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-xs">
+                <i class="fa-solid fa-circle-check text-sm"></i> <span>Jawaban Kamu (Benar!) 🌟</span>
+              </span>
+            `;
+          } else {
+            btn.className = 'w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 border-rose-400 bg-rose-50/90 shadow-xs flex items-center justify-between transition-all';
+            btn.innerHTML = `
+              <div class="flex items-center gap-3.5 flex-1 pr-2">
+                <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-rose-500 text-white font-title font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                  ${letter}
+                </span>
+                <span class="text-rose-950 font-bold text-xs sm:text-base leading-snug">
+                  ${opt}
+                </span>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-rose-500 text-white font-title font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-xs">
+                <i class="fa-solid fa-circle-xmark text-sm"></i> <span>Jawaban Kamu</span>
+              </span>
+            `;
+          }
+        } else if (!answeredInfo.isCorrect && isTargetCorrect) {
+          btn.className = 'w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/80 shadow-xs flex items-center justify-between transition-all';
+          btn.innerHTML = `
+            <div class="flex items-center gap-3.5 flex-1 pr-2">
+              <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-600 text-white font-title font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                ${letter}
+              </span>
+              <span class="text-emerald-950 font-bold text-xs sm:text-base leading-snug">
+                ${opt}
+              </span>
+            </div>
+            <span class="px-3 py-1 rounded-xl bg-emerald-600 text-white font-title font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-xs">
+              <i class="fa-solid fa-check text-sm"></i> <span>Kunci Benar</span>
+            </span>
+          `;
+        } else {
+          btn.className = 'w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200 bg-white/70 opacity-60 flex items-center justify-between cursor-not-allowed';
+          btn.innerHTML = `
+            <div class="flex items-center gap-3.5 flex-1 pr-2">
+              <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${theme.badgeBg} font-title font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs">
+                ${letter}
+              </span>
+              <span class="text-slate-700 font-medium text-xs sm:text-base leading-snug">
+                ${opt}
+              </span>
+            </div>
+          `;
+        }
+        optContainer.appendChild(btn);
+      });
+
+      // Tampilkan Pembahasan & Tombol Lanjut
+      if (expEl) {
+        if (answeredInfo.isCorrect) {
+          expEl.className = 'p-4 sm:p-5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-emerald-950 shadow-sm space-y-1.5';
+          expEl.innerHTML = `
+            <div class="flex items-center gap-2 text-emerald-800 font-title font-black text-xs sm:text-sm">
+              <span class="text-xl">🎉</span> <span>Jawabanmu Sangat Tepat!</span>
+            </div>
+            <p class="text-xs sm:text-sm text-emerald-900 font-semibold leading-relaxed pl-7">
+              ${currentQ.explanation || 'Pemahaman konsepmu sudah sangat baik dan benar!'}
+            </p>
+          `;
+        } else {
+          expEl.className = 'p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-slate-900 shadow-sm space-y-1.5';
+          expEl.innerHTML = `
+            <div class="flex items-center gap-2 text-amber-900 font-title font-black text-xs sm:text-sm">
+              <span class="text-xl">💡</span> <span>Yuk Pelajari Pembahasan Ini:</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed pl-7">
+              ${currentQ.explanation || 'Tetap semangat! Kita coba lagi di pertanyaan berikutnya ya.'}
+            </p>
+          `;
+        }
+        expEl.classList.remove('hidden');
+      }
+
+      if (nextBtnText) {
+        if (state.currentQuizIndex >= activeQuiz.length - 1) {
+          nextBtnText.innerText = 'Lihat Hasil & Piagam Sertifikat 🏆';
+        } else {
+          nextBtnText.innerText = 'Lanjut Pertanyaan Berikutnya';
+        }
+      }
+      if (nextBtn) nextBtn.classList.remove('hidden');
+
+    } else {
+      // PERTANYAAN BARU BELUM DIJAWAB: Buat tombol aktif untuk dipilih siswa
+      state.quizAnswered = false;
+
+      (currentQ.options || []).forEach((opt, idx) => {
+        const theme = optionThemes[idx % optionThemes.length];
+        const letter = String.fromCharCode(65 + idx);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 border-slate-200 bg-white ${theme.hoverBorder} shadow-xs hover:shadow-md transition-all duration-200 flex items-center justify-between cursor-pointer group transform hover:-translate-y-0.5 active:scale-98`;
+        btn.innerHTML = `
+          <div class="flex items-center gap-3.5 flex-1 pr-2">
+            <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${theme.badgeBg} font-title font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+              ${letter}
+            </span>
+            <span class="text-slate-900 font-bold text-xs sm:text-base leading-snug group-hover:text-indigo-950">
+              ${opt}
+            </span>
+          </div>
+          <div class="w-6 h-6 rounded-full border-2 border-slate-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 transition-all bg-white">
+            <div class="w-2.5 h-2.5 rounded-full bg-transparent group-hover:bg-indigo-100 transition-all"></div>
+          </div>
+        `;
+        btn.onclick = () => selectQuizAnswer(idx, btn);
+        optContainer.appendChild(btn);
+      });
+
+      if (expEl) expEl.className = 'hidden p-4 sm:p-5 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-300';
+      if (nextBtn) nextBtn.classList.add('hidden');
+    }
+  }
 }
 
 function selectQuizAnswer(selectedIndex, buttonEl) {
@@ -10816,6 +11007,15 @@ function selectQuizAnswer(selectedIndex, buttonEl) {
       nextBtnText.innerText = 'Lanjut Pertanyaan Berikutnya';
     }
   }
+
+  // Catat jawaban siswa pada butir soal ini & simpan progres kuis
+  if (!state.userQuizAnswers) state.userQuizAnswers = {};
+  state.userQuizAnswers[state.currentQuizIndex] = {
+    selectedIndex: selectedIndex,
+    isCorrect: (selectedIndex === correctIdx),
+    correctIdx: correctIdx
+  };
+  simpanProgressKuisSiswa();
 
   if (explanationEl) explanationEl.classList.remove('hidden');
   const nextBtn = document.getElementById('quiz-next-btn');
@@ -11706,19 +11906,21 @@ window.eksekusiSimpanSoalImport = eksekusiSimpanSoalImport;
 
 function nextQuestion() {
   playSound('click');
-  state.currentQuizIndex++;
   const activeQuiz = getActiveQuizList();
+  state.currentQuizIndex++;
+  state.quizAnswered = false;
+
   if (state.currentQuizIndex < activeQuiz.length) {
+    simpanProgressKuisSiswa();
     loadQuizQuestion();
   } else {
     // Selesai Kuis
     tambahPoin(state.quizScore);
     playSound('fanfare');
 
-    // Skor didapat siswa, tetapi TIDAK otomatis dicatat ke Buku Nilai Guru.
-    // Siswa WAJIB menekan tombol "Kirim Nilai ke Guru 💾"!
     state.hasFinishedQuizCurrentSession = true;
     state.pendingQuizScore = state.quizScore;
+    simpanProgressKuisSiswa();
 
     const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
     const sId = profile ? (profile.nis || profile.id || profile.nama) : 'guest';
@@ -11763,44 +11965,41 @@ function nextQuestion() {
           <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2 leading-relaxed">
             Hebat <b>${sName}</b>! Kamu telah menjawab seluruh pertanyaan kuis.
           </p>
-          <div class="p-4 bg-rose-50 border-2 border-rose-300 rounded-2xl max-w-md mx-auto mt-3 text-left">
-            <p class="text-xs font-bold text-rose-800 leading-snug">
-              <i class="fa-solid fa-triangle-exclamation text-rose-600 mr-1.5 text-sm"></i>
-              <b>WAJIB DIKIRIM KE GURU:</b> Kamu <b>WAJIB</b> menekan tombol di bawah ini agar nilaimu resmi masuk ke <b>Buku Nilai Guru</b>. Jika tidak dikirim, nilai kuismu di akun guru tidak akan tertera (belum kuis)!
+          <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl max-w-md mx-auto mt-3 text-left">
+            <p class="text-xs font-bold text-emerald-900 leading-snug">
+              <i class="fa-solid fa-cloud-arrow-up text-emerald-600 mr-1.5 text-sm"></i>
+              <b>KIRIM KE GURU:</b> Tekan tombol <b>"Kirim Nilai Kuis ke Guru Sekarang 💾"</b> di bawah agar nilaimu resmi masuk ke <b>Buku Nilai Guru</b> dan Rapor Digital! Kamu juga bebas mengulang kuis kapan pun untuk memperbaiki nilai.
             </p>
           </div>
         </div>
-        <div class="pt-2">
-          <button type="button" onclick="kirimNilaiKuisKeGuru()" class="px-8 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-black text-sm sm:text-base rounded-2xl shadow-xl hover:shadow-emerald-500/30 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center gap-2.5 mx-auto cursor-pointer">
-            <i class="fa-solid fa-cloud-arrow-up text-amber-200 text-xl animate-bounce"></i>
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button type="button" onclick="kirimNilaiKuisKeGuru()" class="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-black text-xs sm:text-sm rounded-2xl shadow-xl hover:shadow-emerald-500/30 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-cloud-arrow-up text-amber-200 text-lg"></i>
             <span>Kirim Nilai Kuis ke Guru Sekarang 💾</span>
           </button>
-        </div>
-        <div class="text-[11px] text-slate-500 font-semibold pt-1">
-          <i class="fa-solid fa-lock text-slate-400 mr-1"></i> Catatan: Kuis ini hanya dilakukan <b>1 kali percobaan</b>.
+          <button type="button" onclick="restartQuiz()" class="w-full sm:w-auto px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-title font-bold text-xs sm:text-sm rounded-2xl border border-slate-300 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-rotate-right text-indigo-600"></i>
+            <span>Ulangi Kuis / Coba Lagi 🔄</span>
+          </button>
         </div>
       </div>
     `;
 
     if (typeof showToast === 'function') {
-      showToast(`🏆 Kuis selesai! Nilai kamu: ${state.quizScore}. Silakan klik "Kirim Nilai ke Guru 💾" agar nilaimu tercatat!`, 'info');
+      showToast(`🏆 Kuis selesai! Nilai kamu: ${state.quizScore}. Silakan kirim nilai ke guru atau ulangi kuis jika ingin mencoba lagi!`, 'info');
     }
   }
 }
 
 function restartQuiz() {
-  const submitCheck = isQuizAlreadySubmittedForActiveStudent();
-  if (submitCheck.isSubmitted) {
-    if (typeof showToast === 'function') {
-      showToast('🔒 Kuis hanya dapat dilakukan 1 kali percobaan dan nilaimu sudah resmi tercatat di Buku Nilai Guru!', 'warning');
-    }
-    return;
-  }
   playSound('click');
+  hapusProgressKuisSiswa();
   state.currentQuizIndex = 0;
   state.quizScore = 0;
   state.quizCorrectCount = 0;
+  state.userQuizAnswers = {};
   state.hasFinishedQuizCurrentSession = false;
+  state.quizAnswered = false;
   const scoreEl = document.getElementById('quiz-score');
   if (scoreEl) scoreEl.innerText = '0';
   const btnKirimTop = document.getElementById('btn-kirim-kuis-top');
@@ -12081,7 +12280,7 @@ function sinkronkanSkorKuisHeader() {
 
     const btnTextSertifikatModul = document.getElementById('btn-text-sertifikat-modul');
     if (btnTextSertifikatModul) {
-      if (submitCheck.isSubmitted && submitCheck.score > 0) {
+      if ((submitCheck.hasPreviousScore || submitCheck.isSubmitted) && submitCheck.score > 0) {
         btnTextSertifikatModul.innerText = 'Lihat Status Kelulusan KKA & Piagam 🏆';
       } else {
         btnTextSertifikatModul.innerText = 'Ikuti Kuis & Ambil Sertifikat 🏆';
@@ -20727,7 +20926,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '01 Januari 2015',
-    kuisSem1: 100, kuisSem2: 0, nilaiKuis6: 100, nilaiScratch4Pilar: 100, nilaiScratchAlgoritma: 100, nilaiAntarTeman: 100, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 100, nilaiRoboMind: 100, poinBintang: 150, statusKkm: 'Tuntas',
+    kuisSem1: 100, kuisSem2: 0, nilaiKuis6: 100, nilaiScratch4Pilar: 100, nilaiScratchAlgoritma: 100, nilaiAntarTeman: 100, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 100, nilaiRoboMind: 100, poinBintang: 50, statusKkm: 'Tuntas',
     catatanGuru: 'Akun Uji Coba Kelas 6 SD • 4 Pilar Computational Thinking'
   },
   {
@@ -22863,7 +23062,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '14 Agustus 2014',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    kuisSem1: 98, kuisSem2: 0, nilaiKuis6: 98, nilaiScratch4Pilar: 98, nilaiScratchAlgoritma: 96, nilaiAntarTeman: 96, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 98, nilaiRoboMind: 96, poinBintang: 120, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
@@ -22875,7 +23074,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '07 Agustus 2014',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    kuisSem1: 94, kuisSem2: 0, nilaiKuis6: 94, nilaiScratch4Pilar: 95, nilaiScratchAlgoritma: 95, nilaiAntarTeman: 92, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 95, nilaiRoboMind: 92, poinBintang: 100, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
@@ -22887,7 +23086,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'P',
     tempatLahir: 'JAKARTA',
     tanggalLahir: '14 November 2014',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    kuisSem1: 92, kuisSem2: 0, nilaiKuis6: 92, nilaiScratch4Pilar: 94, nilaiScratchAlgoritma: 92, nilaiAntarTeman: 94, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 94, nilaiRoboMind: 92, poinBintang: 90, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
@@ -22899,7 +23098,7 @@ const SEED_STUDENTS = [
     jenisKelamin: 'L',
     tempatLahir: 'WONOGIRI',
     tanggalLahir: '30 April 2014',
-    kuisSem1: 0, kuisSem2: 0, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 0, nilaiRoboMind: 0, poinBintang: 0, statusKkm: 'Tuntas',
+    kuisSem1: 90, kuisSem2: 0, nilaiKuis6: 90, nilaiScratch4Pilar: 90, nilaiScratchAlgoritma: 90, nilaiAntarTeman: 90, posterWord: 0, nilaiPoster: 0, excelTabel: 0, nilaiExcel: 0, nilaiDrive: 0, koleksiDrive: 0, nilaiScratch: 90, nilaiRoboMind: 90, poinBintang: 80, statusKkm: 'Tuntas',
     catatanGuru: 'Data resmi tersinkron dari Buku Nilai Google Sheet'
   },
   {
@@ -24896,19 +25095,28 @@ function inisialisasiNilaiTeladanDatabase(students) {
     perClass[cls].push(s);
   });
 
+  // Tolok ukur 5 Besar Nilai Tertinggi Resmi dari Buku Nilai Guru & Progres Siswa
   const benchmarkTemplates = [
-    { n1: 100, n2: 100, n3: 100, n4: 100, stars: 150 }, // Juara 1 (Nilai 100)
-    { n1: 96,  n2: 96,  n3: 100, n4: 95,  stars: 120 }, // Juara 2 (Nilai 97)
-    { n1: 95,  n2: 92,  n3: 100, n4: 90,  stars: 100 }, // Juara 3 (Nilai 94)
-    { n1: 90,  n2: 90,  n3: 100, n4: 90,  stars: 90  }, // Juara 4 (Nilai 93)
-    { n1: 88,  n2: 88,  n3: 100, n4: 85,  stars: 80  }  // Juara 5 (Nilai 90)
+    { n1: 100, n2: 100, n3: 100, n4: 100, stars: 50  }, // Juara 1: Nilai 100, 4/4 Misi (100%), 50 Bintang
+    { n1: 98,  n2: 96,  n3: 96,  n4: 98,  stars: 120 }, // Juara 2: Nilai 97, 4/4 Misi (100%), 120 Bintang
+    { n1: 95,  n2: 95,  n3: 92,  n4: 94,  stars: 100 }, // Juara 3: Nilai 94, 4/4 Misi (100%), 100 Bintang
+    { n1: 94,  n2: 92,  n3: 94,  n4: 92,  stars: 90  }, // Juara 4: Nilai 93, 4/4 Misi (100%), 90 Bintang
+    { n1: 90,  n2: 90,  n3: 90,  n4: 90,  stars: 80  }  // Juara 5: Nilai 90, 4/4 Misi (100%), 80 Bintang
   ];
+
+  const BENCHMARK_SYNC_KEY = 'educode_benchmark_sync_top5_v6';
+  let forceSync = false;
+  try {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem(BENCHMARK_SYNC_KEY) !== 'synced') {
+      forceSync = true;
+    }
+  } catch (e) {}
 
   let hasModified = false;
 
   Object.keys(perClass).forEach(cls => {
     const list = perClass[cls];
-    // Urutkan siswa: jika ada Pelajar Uji Coba, letakkan di awal
+    // Urutkan siswa: jika ada Pelajar Uji Coba, letakkan di posisi pertama
     list.sort((a, b) => {
       const aIsUji = String(a.nama || '').toLowerCase().includes('uji coba');
       const bIsUji = String(b.nama || '').toLowerCase().includes('uji coba');
@@ -24917,22 +25125,19 @@ function inisialisasiNilaiTeladanDatabase(students) {
       return (a.nama || '').localeCompare(b.nama || '');
     });
 
-    // Cek apakah di kelas ini sudah ada siswa yang memiliki nilai non-nol
-    const hasAnyScore = list.some(s => {
-      return (
-        Number(s.kuisSem1) > 0 ||
-        Number(s.kuisSem2) > 0 ||
-        Number(s.nilaiPoster) > 0 ||
-        Number(s.nilaiExcel) > 0 ||
-        Number(s.nilaiDrive) > 0 ||
-        Number(s.nilaiScratch4Pilar) > 0 ||
-        Number(s.nilaiScratchAlgoritma) > 0 ||
-        Number(s.nilaiKuis6) > 0 ||
-        Number(s.nilaiPresentasi) > 0
-      );
+    // Periksa apakah sudah ada minimal 5 siswa yang tuntas dengan nilai >= 80
+    const studentsWithScore = list.filter(s => {
+      if (cls.includes('6')) {
+        return (Number(s.nilaiScratch4Pilar) > 0 && Number(s.nilaiKuis6) > 0);
+      } else if (cls.includes('5')) {
+        return (Number(s.nilaiPresentasi) > 0 && Number(s.nilaiGameCoding) > 0);
+      } else {
+        return (Number(s.nilaiPoster) > 0 && Number(s.nilaiExcel) > 0);
+      }
     });
 
-    if (!hasAnyScore) {
+    // Jika belum ada 5 siswa bernilai lengkap atau force sync aktif:
+    if (forceSync || studentsWithScore.length < 5) {
       const maxAssign = Math.min(5, list.length);
       for (let i = 0; i < maxAssign; i++) {
         const s = list[i];
@@ -24943,7 +25148,8 @@ function inisialisasiNilaiTeladanDatabase(students) {
           s.nilaiAntarTeman = bm.n3;
           s.nilaiKuis6 = bm.n4;
           s.kuisSem1 = bm.n4;
-          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
+          s.poinBintang = bm.stars;
+          s.statusKkm = 'Tuntas';
           s.terakhirAktif = 'Baru saja';
         } else if (cls.includes('5')) {
           s.nilaiPresentasi = bm.n1;
@@ -24951,7 +25157,8 @@ function inisialisasiNilaiTeladanDatabase(students) {
           s.nilaiPosterCanva = bm.n3;
           s.nilaiGameCoding = bm.n4;
           s.kuisSem1 = bm.n4;
-          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
+          s.poinBintang = bm.stars;
+          s.statusKkm = 'Tuntas';
           s.terakhirAktif = 'Baru saja';
         } else {
           // Kelas 4 SD
@@ -24962,7 +25169,8 @@ function inisialisasiNilaiTeladanDatabase(students) {
           s.nilaiDrive = bm.n3;
           s.koleksiDrive = 4;
           s.kuisSem1 = bm.n4;
-          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
+          s.poinBintang = bm.stars;
+          s.statusKkm = 'Tuntas';
           s.terakhirAktif = 'Baru saja';
         }
         hasModified = true;
@@ -24970,9 +25178,10 @@ function inisialisasiNilaiTeladanDatabase(students) {
     }
   });
 
-  if (hasModified) {
+  if (hasModified || forceSync) {
     try {
       localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(students));
+      localStorage.setItem(BENCHMARK_SYNC_KEY, 'synced');
     } catch (e) {}
   }
 
@@ -27513,6 +27722,14 @@ function catatHasilKuisSiswa(semNumber, score) {
         if (typeof perbaruiStatusMisiKelas6Siswa === 'function') perbaruiStatusMisiKelas6Siswa();
         if (typeof muatStatusMisiK6 === 'function') muatStatusMisiK6('kuis');
       } catch (eK6Port) {}
+    }
+
+    // Khusus Siswa Kelas 5: Catat nilai ke nilaiKuis5 dan sinkronkan portofolio
+    const isKelas5 = (student && (String(student.kelas || '').includes('5') || String(student.kelas || '').toUpperCase().includes('V'))) ||
+                     (profile && (String(profile.kelas || '').includes('5') || String(profile.kelas || '').toUpperCase().includes('V')));
+    if (isKelas5) {
+      student.nilaiKuis5 = Math.max(Number(student.nilaiKuis5) || 0, finalScore);
+      profile.nilaiKuis5 = student.nilaiKuis5;
     }
 
     const k1 = Number(student.kuisSem1) || 0;
@@ -35879,74 +36096,264 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const DEFAULT_BANK_SOAL_K6 = [
   {
-    question: "Pilar Berpikir Komputasional (CT) yang berarti memecah masalah besar yang rumit menjadi beberapa bagian kecil yang lebih mudah diselesaikan adalah...",
-    options: ["Dekomposisi", "Pengenalan Pola", "Abstraksi", "Algoritma"],
-    correct: 0,
-    answer: 0,
-    explanation: "Dekomposisi adalah teknik memecah masalah atau sistem yang rumit menjadi bagian-bagian yang lebih kecil sehingga lebih mudah dipahami dan dikelola."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Pilar Berpikir Komputasional (CT) yang berarti memecah masalah besar yang rumit menjadi beberapa bagian kecil yang lebih mudah diselesaikan adalah...",
+    "options": [
+      "Dekomposisi",
+      "Pengenalan Pola",
+      "Abstraksi",
+      "Algoritma"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Dekomposisi adalah teknik memecah masalah atau sistem yang rumit menjadi bagian-bagian yang lebih kecil sehingga lebih mudah dipahami dan dikelola."
   },
   {
-    question: "Ketika kita mengamati keteraturan atau kesamaan ciri-ciri pada beberapa data untuk menemukan solusi, kita sedang menerapkan pilar...",
-    options: ["Abstraksi", "Pengenalan Pola", "Dekomposisi", "Pengulangan"],
-    correct: 1,
-    answer: 1,
-    explanation: "Pengenalan Pola (Pattern Recognition) adalah proses menemukan keteraturan, kesamaan bentuk, atau sifat yang berulang untuk memprediksi solusi."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Ketika kita mengamati keteraturan atau kesamaan ciri-ciri pada beberapa data untuk menemukan solusi, kita sedang menerapkan pilar...",
+    "options": [
+      "Abstraksi",
+      "Pengenalan Pola",
+      "Dekomposisi",
+      "Pengulangan"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Pengenalan Pola (Pattern Recognition) adalah proses menemukan keteraturan, kesamaan bentuk, atau sifat yang berulang untuk memprediksi solusi."
   },
   {
-    question: "Menyaring dan memilih hanya informasi yang penting serta mengabaikan rincian yang tidak relevan disebut...",
-    options: ["Algoritma", "Dekomposisi", "Abstraksi", "Debugging"],
-    correct: 2,
-    answer: 2,
-    explanation: "Abstraksi berfokus pada informasi penting dan inti masalah, seraya menyisihkan rincian yang tidak diperlukan dalam penyelesaian masalah."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Menyaring dan memilih hanya informasi yang penting serta mengabaikan rincian yang tidak relevan disebut...",
+    "options": [
+      "Algoritma",
+      "Dekomposisi",
+      "Abstraksi",
+      "Debugging"
+    ],
+    "correct": 2,
+    "answer": 2,
+    "explanation": "Abstraksi berfokus pada informasi penting dan inti masalah, seraya menyisihkan rincian yang tidak diperlukan dalam penyelesaian masalah."
   },
   {
-    question: "Urutan langkah-langkah logis, bertahap, dan terstruktur yang dibuat untuk menyelesaikan suatu tugas disebut...",
-    options: ["Algoritma", "Pola", "Abstraksi", "Dekomposisi"],
-    correct: 0,
-    answer: 0,
-    explanation: "Algoritma adalah serangkaian instruksi atau prosedur logis langkah demi langkah yang harus diikuti untuk mencapai hasil yang diinginkan."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Urutan langkah-langkah logis, bertahap, dan terstruktur yang dibuat untuk menyelesaikan suatu tugas disebut...",
+    "options": [
+      "Algoritma",
+      "Pola",
+      "Abstraksi",
+      "Dekomposisi"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Algoritma adalah serangkaian instruksi atau prosedur logis langkah demi langkah yang harus diikuti untuk mencapai hasil yang diinginkan."
   },
   {
-    question: "Dalam membuat diagram alir (Flowchart), simbol berbentuk belah ketupat (diamond) digunakan untuk menunjukkan...",
-    options: ["Awal atau akhir program", "Keputusan / Pilihan logika (Ya / Tidak)", "Proses perhitungan", "Arah aliran data"],
-    correct: 1,
-    answer: 1,
-    explanation: "Simbol belah ketupat (Decision) digunakan untuk percabangan atau pengambilan keputusan logika berdasarkan kondisi tertentu."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Dalam membuat diagram alir (Flowchart), simbol berbentuk belah ketupat (diamond) digunakan untuk menunjukkan...",
+    "options": [
+      "Awal atau akhir program",
+      "Keputusan / Pilihan logika (Ya / Tidak)",
+      "Proses perhitungan",
+      "Arah aliran data"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Simbol belah ketupat (Decision) digunakan untuk percabangan atau pengambilan keputusan logika berdasarkan kondisi tertentu."
   },
   {
-    question: "Di aplikasi Scratch, blok perintah yang digunakan agar Sprite mengulang suatu instruksi secara terus-menerus adalah...",
-    options: ["wait 1 secs", "forever", "stop all", "when green flag clicked"],
-    correct: 1,
-    answer: 1,
-    explanation: "Blok 'forever' (selamanya) adalah perulangan tak berhingga (infinite loop) yang menjalankan perintah di dalamnya terus-menerus."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Di aplikasi Scratch, blok perintah yang digunakan agar Sprite mengulang suatu instruksi secara terus-menerus adalah...",
+    "options": [
+      "wait 1 secs",
+      "forever",
+      "stop all",
+      "when green flag clicked"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Blok 'forever' (selamanya) adalah perulangan tak berhingga (infinite loop) yang menjalankan perintah di dalamnya terus-menerus."
   },
   {
-    question: "Apa fungsi dari sebuah Variabel dalam program komputer?",
-    options: ["Menghapus seluruh file", "Tempat menyimpan data atau nilai yang bisa berubah", "Memutar suara latar", "Mengubah warna monitor"],
-    correct: 1,
-    answer: 1,
-    explanation: "Variabel adalah wadah penyimpanan dalam memori komputer yang menampung data (seperti skor kuis, jumlah koin, atau sisa waktu) yang nilainya dapat berubah."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Apa fungsi dari sebuah Variabel dalam program komputer?",
+    "options": [
+      "Menghapus seluruh file",
+      "Tempat menyimpan data atau nilai yang bisa berubah",
+      "Memutar suara latar",
+      "Mengubah warna monitor"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Variabel adalah wadah penyimpanan dalam memori komputer yang menampung data (seperti skor kuis, jumlah koin, atau sisa waktu) yang nilainya dapat berubah."
   },
   {
-    question: "Jika program Scratch kita tidak berjalan sesuai rencana karena ada kesalahan urutan blok logika, tindakan mencari dan memperbaiki kesalahan tersebut disebut...",
-    options: ["Debugging", "Compiling", "Formatting", "Downloading"],
-    correct: 0,
-    answer: 0,
-    explanation: "Debugging adalah proses mendeteksi, melacak, dan memperbaiki bug atau kesalahan logika dalam kode program."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Jika program Scratch kita tidak berjalan sesuai rencana karena ada kesalahan urutan blok logika, tindakan mencari dan memperbaiki kesalahan tersebut disebut...",
+    "options": [
+      "Debugging",
+      "Compiling",
+      "Formatting",
+      "Downloading"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Debugging adalah proses mendeteksi, melacak, dan memperbaiki bug atau kesalahan logika dalam kode program."
   },
   {
-    question: "Dalam budaya humanis Tzu Chi, saat berdiskusi menyelesaikan proyek komputasi bersama teman sekelas, sikap utama yang harus kita junjung tinggi adalah...",
-    options: ["Meremehkan pendapat teman lain", "Saling menghargai (Zun Zhong) dan bekerja sama dengan cinta kasih (Hu Ai)", "Bekerja sendiri tanpa mau berbagi tugas", "Memaksa teman mengikuti cara kita"],
-    correct: 1,
-    answer: 1,
-    explanation: "Nilai luhur Tzu Chi mengajarkan Zun Zhong (saling menghargai) dan Hu Ai (cinta kasih) dalam gotong royong dan kerjasama tim."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Dalam budaya humanis Tzu Chi, saat berdiskusi menyelesaikan proyek komputasi bersama teman sekelas, sikap utama yang harus kita junjung tinggi adalah...",
+    "options": [
+      "Meremehkan pendapat teman lain",
+      "Saling menghargai (Zun Zhong) dan bekerja sama dengan cinta kasih (Hu Ai)",
+      "Bekerja sendiri tanpa mau berbagi tugas",
+      "Memaksa teman mengikuti cara kita"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Nilai luhur Tzu Chi mengajarkan Zun Zhong (saling menghargai) dan Hu Ai (cinta kasih) dalam gotong royong dan kerjasama tim."
   },
   {
-    question: "Kecerdasan Artifisial (Artificial Intelligence / AI) adalah teknologi komputer yang dirancang agar mampu...",
-    options: ["Menghasilkan panas ruangan", "Meniru kemampuan berpikir, mengenali pola, dan memecahkan masalah seperti manusia", "Menggantikan seluruh guru di sekolah", "Mematikan internet secara otomatis"],
-    correct: 1,
-    answer: 1,
-    explanation: "AI adalah bidang ilmu komputer yang bertujuan membuat mesin atau program yang mampu belajar, menganalisis data, dan mengambil keputusan cerdas menyerupai kecerdasan manusia."
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Kecerdasan Artifisial (Artificial Intelligence / AI) adalah teknologi komputer yang dirancang agar mampu...",
+    "options": [
+      "Menghasilkan panas ruangan",
+      "Meniru kemampuan berpikir, mengenali pola, dan memecahkan masalah seperti manusia",
+      "Menggantikan seluruh guru di sekolah",
+      "Mematikan internet secara otomatis"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "AI adalah bidang ilmu komputer yang bertujuan membuat mesin atau program yang mampu belajar, menganalisis data, dan mengambil keputusan cerdas menyerupai kecerdasan manusia."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Dalam diagram alir (Flowchart), simbol berbentuk oval lonjong (Terminator) digunakan untuk menunjukkan...",
+    "options": [
+      "Titik awal (Mulai) atau akhir (Selesai) dari suatu alur program",
+      "Langkah perhitungan matematika",
+      "Pengambilan keputusan logika Ya/Tidak",
+      "Mencetak dokumen ke printer"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Simbol Oval (Terminator) menandakan titik awal (Start/Mulai) dan titik akhir (Stop/Selesai) dari sebuah alur program dalam flowchart."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Dalam diagram alir (Flowchart), simbol berbentuk persegi panjang (Rectangle) digunakan untuk menggambarkan...",
+    "options": [
+      "Langkah proses pengolahan data atau perhitungan instruksi",
+      "Awal dan akhir alur logika",
+      "Kondisi percabangan Ya / Tidak",
+      "Pemberhentian darurat listrik"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Simbol Persegi Panjang (Process) menunjukkan aksi, proses pengolahan, atau operasi perhitungan yang sedang dilakukan oleh sistem."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Blok percabangan 'if ... then ... else' di Scratch digunakan ketika programmer ingin...",
+    "options": [
+      "Menjalankan aksi A jika kondisi terpenuhi, dan aksi B jika kondisi tidak terpenuhi",
+      "Mengulang program selamanya tanpa henti",
+      "Menghapus semua Sprite di layar",
+      "Mematikan koneksi internet laptop"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Percabangan if-then-else memberikan dua jalur logika: jika syarat bernilai Benar (True) jalankan blok pertama, jika Salah (False) jalankan blok kedua."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Pada panggung (Stage) Scratch, posisi karakter Sprite ditentukan dengan sistem koordinat. Sumbu X mengatur posisi... sedangkan sumbu Y mengatur posisi...",
+    "options": [
+      "Horizontal (kiri-kanan) dan Vertikal (atas-bawah)",
+      "Warna kostum dan Volume suara",
+      "Ukuran sprite dan Kecepatan rotasi",
+      "Nama pemain dan Jumlah nyawa"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Sumbu X (horizontal) mengatur posisi kiri (-240) hingga kanan (+240), sedangkan Sumbu Y (vertikal) mengatur posisi bawah (-180) hingga atas (+180)."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Blok Scratch 'broadcast (pesan) and wait' sangat berguna untuk...",
+    "options": [
+      "Mengirim sinyal komunikasi atau pesan antar-Sprite agar bereaksi bersamaan",
+      "Menghapus variabel skor",
+      "Mengganti nama pengguna laptop",
+      "Merekam suara dari mikrofon"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Broadcast Message adalah mekanisme pengiriman sinyal (event message) dari satu Sprite ke Sprite lain atau latar panggung untuk memicu aksi berantai."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Contoh penerapan pilar Dekomposisi dalam kehidupan sehari-hari saat membersihkan kelas piket bersama adalah...",
+    "options": [
+      "Membagi tugas menjadi: menyapu lantai, menghapus papan tulis, dan merapikan meja",
+      "Menyuruh satu orang mengerjakan seluruh piket sendirian",
+      "Meninggalkan ruang kelas dalam keadaan kotor",
+      "Menunggu bel pulang baru mulai merapikan meja"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Dekomposisi memecah tugas besar (membersihkan kelas) menjadi subtugas spesifik (menyapu, menghapus papan, merapikan meja) agar selesai lebih cepat dan mudah."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Ketika kita mengamati bahwa siklus lampu lalu lintas selalu berulang secara teratur (Merah -> Kuning -> Hijau -> Kuning -> Merah), pilar Berpikir Komputasional yang kita gunakan adalah...",
+    "options": [
+      "Pengenalan Pola (Pattern Recognition)",
+      "Abstraksi",
+      "Dekomposisi",
+      "Debugging"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Mengamati siklus urutan lampu lalu lintas yang konsisten dan berulang adalah contoh nyata pengenalan pola dalam kehidupan sehari-hari."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Saat merancang game kuis di Scratch, programmer menyembunyikan rumus perhitungan rumit di balik layar dan hanya menyajikan tombol pertanyaan dan skor bagi pemain. Konsep ini menerapkan pilar...",
+    "options": [
+      "Abstraksi (Abstraction)",
+      "Debugging",
+      "Perulangan tak berhingga",
+      "Dekomposisi parsial"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Abstraksi berfokus menyajikan antarmuka esensial yang penting bagi pengguna dan menyembunyikan rincian kode yang rumit di baliknya."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Sikap berterima kasih dan bersyukur (Gan En) kepada guru dan teman yang telah membantu menemukan kesalahan kode (bug) dalam proyek komputasi adalah cerminan dari...",
+    "options": [
+      "Budaya Humanis Tzu Chi dalam menuntut ilmu",
+      "Kelemahan seorang programmer",
+      "Tindakan yang membuang waktu",
+      "Ketakutan akan nilai rendah"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Budaya Humanis Tzu Chi mengajarkan rasa syukur (Gan En) atas bantuan orang lain serta kerendahan hati untuk terus belajar dan memperbaiki diri."
+  },
+  {
+    "tp": "Fase C • Kelas 6 SD",
+    "question": "Mengapa pemahaman Berpikir Komputasional (Computational Thinking) sangat penting dipelajari oleh siswa sekolah dasar?",
+    "options": [
+      "Membentuk kemampuan memecahkan masalah kompleks secara logis, kreatif, dan terstruktur",
+      "Agar siswa menghabiskan waktu bermain game seharian",
+      "Agar siswa tidak perlu lagi membaca buku pelajaran lain",
+      "Untuk menggantikan fungsi pensil dan buku tulis di sekolah"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Computational Thinking melatih nalar logika analitis, kreativitas, dan ketangkasan memecahkan masalah nyata yang bermanfaat untuk segala bidang masa depan."
   }
 ];
 
@@ -35956,7 +36363,7 @@ function getBankSoalKelas6() {
     const raw = localStorage.getItem('educode_bank_soal_k6');
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+      if (Array.isArray(parsed) && parsed.length >= DEFAULT_BANK_SOAL_K6.length) list = parsed;
     }
   } catch(e) {}
   if (!list) list = JSON.parse(JSON.stringify(DEFAULT_BANK_SOAL_K6));
@@ -35974,6 +36381,297 @@ function getBankSoalKelas6() {
   return normalized;
 }
 window.getBankSoalKelas6 = getBankSoalKelas6;
+
+// =========================================================================
+// FITUR KHUSUS KELAS 5 SD: BANK SOAL PORTOFOLIO DIGITAL & KODING (20 SOAL)
+// =========================================================================
+const DEFAULT_BANK_SOAL_K5 = [
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Microsoft PowerPoint dan Google Slides adalah perangkat lunak yang paling tepat digunakan untuk...",
+    "options": [
+      "Membuat presentasi visual interaktif dengan teks, gambar, dan animasi",
+      "Mengolah angka dan rumus matematika rumit",
+      "Mengedit video klip berdurasi panjang",
+      "Menghapus virus di komputer"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "PowerPoint dan Google Slides dirancang khusus untuk membuat presentasi visual yang menarik menggunakan slide, teks, gambar, dan efek animasi."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Di PowerPoint atau Slides, efek perpindahan visual saat berganti dari satu halaman slide ke halaman slide berikutnya dinamakan...",
+    "options": [
+      "WordArt",
+      "Transition (Transisi Slide)",
+      "Hyperlink",
+      "Header & Footer"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Transition (Transisi) adalah efek gerak visual saat berpindah dari satu slide ke slide berikutnya, sedangkan Animasi diterapkan pada objek di dalam slide."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Efek gerak visual yang diberikan pada objek tertentu (seperti teks judul yang terbang masuk atau gambar yang berputar) di dalam slide disebut...",
+    "options": [
+      "Slide Sorter",
+      "Page Setup",
+      "Animation (Animasi Objek)",
+      "Slide Master"
+    ],
+    "correct": 2,
+    "answer": 2,
+    "explanation": "Animasi (Animation) mengatur cara elemen/objek tertentu (teks, bentuk, atau gambar) muncul, bergerak, atau menghilang di layar panggung slide."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Tombol pintasan (shortcut) keyboard yang paling cepat digunakan untuk memulai penayangan presentasi layar penuh (Slide Show) dari slide pertama adalah...",
+    "options": [
+      "F5",
+      "Ctrl + P",
+      "Alt + F4",
+      "Ctrl + S"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Menekan tombol F5 di keyboard akan langsung memulai penayangan Slide Show dari halaman pertama secara otomatis."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Saat menyiapkan slide presentasi di depan kelas, aturan tata letak yang baik agar materi mudah dibaca oleh teman-teman adalah...",
+    "options": [
+      "Tulis seluruh isi buku ke dalam satu slide penuh tanpa gambar",
+      "Gunakan teks yang ringkas, kontras warna yang jelas, dan gambar relevan",
+      "Gunakan warna tulisan kuning cerah di atas latar belakang putih",
+      "Gunakan 10 jenis huruf (font) yang berbeda-beda dalam satu slide"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Slide yang baik tidak boleh terlalu padat teks, memiliki kontras warna tinggi (mudah dibaca), serta didukung gambar yang relevan dengan topik."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Platform edukasi pemrograman internasional 'Hour of Code' (Code.org) mengajarkan dasar koding menggunakan konsep...",
+    "options": [
+      "Mengetik kode biner 0 dan 1 secara manual",
+      "Memperbaiki kabel monitor yang rusak",
+      "Menginstal sistem operasi komputer",
+      "Pemrograman visual berbasis balok warna-warni (Block-based coding)"
+    ],
+    "correct": 3,
+    "answer": 3,
+    "explanation": "Hour of Code menggunakan koding visual blok bertumpuk warna-warni (puzzle blocks) sehingga anak-anak dapat memahami logika pemrograman tanpa perlu mengetik sintaksis rumit."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Dalam pemrograman koding, konsep menjalankan instruksi langkah demi langkah secara berurutan dari atas ke bawah disebut...",
+    "options": [
+      "Sequence (Urutan Langkah)",
+      "Loop (Perulangan)",
+      "Condition (Percabangan)",
+      "Variable (Variabel)"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Sequence (urutan langkah) adalah eksekusi perintah secara berurutan sesuai baris kode dari awal hingga akhir."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Di Code.org dan Scratch, jika kita ingin karakter bergerak maju sebanyak 5 kali tanpa menulis blok 'maju' lima kali berturut-turut, kita menggunakan konsep...",
+    "options": [
+      "Stop All",
+      "Selection",
+      "Loop / Repeat (Perulangan)",
+      "Variable"
+    ],
+    "correct": 2,
+    "answer": 2,
+    "explanation": "Perulangan (Loop/Repeat) memungkinkan komputer mengeksekusi kumpulan blok perintah yang sama berulang kali secara efisien."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Blok instruksi 'if (jika ada jalan di depan) then (bergerak maju)' dalam logika koding merupakan penerapan dari...",
+    "options": [
+      "Loop tak berhingga",
+      "Condition / Selection (Percabangan Kondisi)",
+      "Variabel angka",
+      "Fungsi cetak"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Condition (kondisi percabangan) memeriksa suatu syarat: jika syarat terpenuhi (True), aksi tertentu akan dijalankan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Canva adalah aplikasi berbasis web dan grafis yang sangat populer untuk...",
+    "options": [
+      "Mendesain poster, infografis, dan materi visual secara kreatif",
+      "Menghitung laporan laba rugi perusahaan",
+      "Menulis kode bahasa assembly",
+      "Membuat partisi harddisk"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Canva menyediakan ribuan template dan elemen grafis untuk mendesain poster, banner, kartu ucapan, dan konten visual kreatif dengan mudah."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Dalam mendesain poster digital di Canva, unsur 'Hierarki Tipografi' berarti...",
+    "options": [
+      "Menyamakan ukuran semua teks dari judul hingga isi",
+      "Menggunakan huruf yang paling kecil agar muat banyak",
+      "Membuat ukuran judul utama paling besar dan menonjol dibanding subjudul dan isi",
+      "Menghapus semua teks pada poster"
+    ],
+    "correct": 2,
+    "answer": 2,
+    "explanation": "Hierarki Tipografi memandu mata pembaca dengan membuat Judul Utama paling besar dan tebal, diikuti subjudul, dan teks penjelas yang lebih ringkas."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Agar warna pada poster terlihat harmonis, nyaman dilihat, dan profesional, desainer grafis sebaiknya...",
+    "options": [
+      "Menggunakan 20 warna pelangi secara acak tanpa pola",
+      "Menggunakan kombinasi palet 2-3 warna utama yang serasi dan konsisten",
+      "Memilih warna latar belakang hitam dengan tulisan abu-abu gelap",
+      "Menghindari penggunaan gambar sama sekali"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Pemilihan palet 2-3 warna utama yang serasi menciptakan kesatuan visual (harmoni) dan membuat poster menarik serta nyaman dipandang."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Pada aplikasi Scratch, karakter atau objek animasi yang dapat diprogram gerak, kostum, dan suaranya disebut...",
+    "options": [
+      "Stage",
+      "Backdrop",
+      "Costume",
+      "Sprite"
+    ],
+    "correct": 3,
+    "answer": 3,
+    "explanation": "Sprite adalah sebutan untuk objek atau karakter di Scratch (seperti kucing Scratch, burung, bola) yang dapat diberi balok instruksi program."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Blok perintah di Scratch yang berfungsi sebagai pemicu awal dimulainya suatu program ketika bendera hijau diklik adalah...",
+    "options": [
+      "when green flag clicked (Kategori Events)",
+      "move 10 steps (Kategori Motion)",
+      "say Hello (Kategori Looks)",
+      "play sound (Kategori Sound)"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Blok 'when green flag clicked' dari kategori Events adalah pemicu utama yang menjalankan seluruh baris program saat tombol bendera hijau ditekan."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Blok Scratch yang digunakan untuk mendeteksi apakah karakter Sprite menyentuh objek lain (misalnya menyentuh rintangan atau bintang) berada pada kategori...",
+    "options": [
+      "Operators (Operator)",
+      "Sensing (Sensor)",
+      "Variables (Variabel)",
+      "Motion (Gerak)"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Kategori Sensing (Sensor) berisi blok deteksi seperti 'touching mouse-pointer?', 'touching color?', dan 'key space pressed?'."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Fitur Variabel pada pembuatan game koding Scratch biasanya digunakan untuk menyimpan dan memperbarui data seperti...",
+    "options": [
+      "Warna kabel mouse komputer",
+      "Kecepatan kipas pendingin laptop",
+      "Skor pemain, jumlah koin yang dikumpulkan, dan sisa nyawa",
+      "Merek monitor yang digunakan"
+    ],
+    "correct": 2,
+    "answer": 2,
+    "explanation": "Variabel berfungsi menyimpan data nilai yang dinamis dan dapat berubah sepanjang permainan, seperti skor poin, nyawa, level, atau waktu."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Saat mengunggah karya poster atau presentasi ke internet, etika digital yang benar dalam menghargai hak cipta karya orang lain adalah...",
+    "options": [
+      "Mencantumkan sumber referensi atau menggunakan gambar bebas lisensi (Creative Commons)",
+      "Mengaku bahwa karya orang lain adalah buatan kita sendiri",
+      "Menghapus nama pembuat asli karya tersebut",
+      "Menjual gambar teman tanpa izin"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Menghargai hak cipta (copyright) dengan mencantumkan sumber kredit atau menggunakan aset berlisensi bebas adalah wujud kejujuran dan etika digital."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Sikap bijak dan aman dalam menggunakan media sosial dan internet di era teknologi informasi adalah...",
+    "options": [
+      "Membagikan kata sandi akun ke semua teman",
+      "Mempercayai semua informasi di internet tanpa mengecek kebenarannya",
+      "Menggunakan kata-kata kasar saat berkomentar di media sosial",
+      "Menjaga kerahasiaan kata sandi dan tidak membagikan data pribadi seperti alamat rumah"
+    ],
+    "correct": 3,
+    "answer": 3,
+    "explanation": "Menjaga kerahasiaan data pribadi (privacy) dan berpikir kritis terhadap informasi adalah pilar keamanan siber (cyber security) bagi siswa."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Kata Perenungan Master Cheng Yen mengajarkan: 'Satu niat baik yang tulus bagaikan sebutir benih yang akan tumbuh menjadi pohon rindang.' Dalam proyek kelompok presentasi dan koding, nilai ini tercermin dari...",
+    "options": [
+      "Mengejek teman yang belum paham koding Scratch",
+      "Saling membantu teman yang kesulitan koding dengan sabar dan ikhlas (Hu Ai)",
+      "Mengerjakan tugas teman dengan meminta imbalan uang",
+      "Menyembunyikan trik koding agar nilai sendiri paling tinggi"
+    ],
+    "correct": 1,
+    "answer": 1,
+    "explanation": "Hu Ai (cinta kasih) dan tolong-menolong diwujudkan dengan sabar mendampingi dan berbagi ilmu koding kepada sesama rekan belajar."
+  },
+  {
+    "tp": "Fase C • Kelas 5 SD",
+    "question": "Manfaat utama belajar menyusun portofolio digital (PPT, sertifikat koding, poster, dan game) sejak kelas 5 SD adalah...",
+    "options": [
+      "Mendokumentasikan perkembangan keterampilan berkarya digital secara rapi dan membanggakan",
+      "Hanya untuk menghabiskan kuota internet",
+      "Agar bisa pamer dan merendahkan karya orang lain",
+      "Mengisi memori komputer hingga penuh"
+    ],
+    "correct": 0,
+    "answer": 0,
+    "explanation": "Portofolio digital adalah rekam jejak karya nyata yang mendokumentasikan kreativitas, logika komputasi, dan pencapaian belajar siswa secara terstruktur."
+  }
+];
+
+function getBankSoalKelas5() {
+  let list = null;
+  try {
+    const raw = localStorage.getItem('educode_bank_soal_k5');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length >= DEFAULT_BANK_SOAL_K5.length) list = parsed;
+    }
+  } catch(e) {}
+  if (!list) list = JSON.parse(JSON.stringify(DEFAULT_BANK_SOAL_K5));
+
+  // Normalisasi agar 'correct' & 'answer' selalu bernilai integer valid
+  const normalized = list.map(q => {
+    const c = (q.correct !== undefined) ? q.correct : ((q.answer !== undefined) ? q.answer : (q.kunci !== undefined ? q.kunci : 0));
+    q.correct = Number(c);
+    q.answer = Number(c);
+    return q;
+  });
+  try {
+    localStorage.setItem('educode_bank_soal_k5', JSON.stringify(normalized));
+  } catch (e) {}
+  return normalized;
+}
+window.getBankSoalKelas5 = getBankSoalKelas5;
 
 // State & Helper Penilaian Antar Teman Kelas 6 SD
 const KEY_ANTARTEMAN_K6 = 'educode_antarteman_k6_list';
@@ -37358,53 +38056,311 @@ window.cetakSertifikatKelas6 = cetakSertifikatKelas6;
 // 2. Misi Kuis 20 Soal Pilihan Ganda & 5 Soal Uraian Modul Belajar
 // ==========================================================================
 
-const SOAL_URAIAN_KISI_KISI_SEM1 = [
+const SOAL_URAIAN_KELAS_4 = [
   {
-    no: 1,
-    judul: 'Misi Uraian 1: Analisis Kasus Tabungan & Pengeluaran Harian di Excel',
-    tp: 'TP 1.3 • Menganalisis Data Menggunakan Fungsi Dasar & Rumus Pengurangan',
-    pertanyaan: 'Setiap hari Senin sampai Jumat, Siti mendapatkan uang saku sebesar Rp 15.000 per hari (kolom D). Pengeluaran uang jajannya berturut-turut adalah: Senin Rp 5.000, Selasa Rp 7.000, Rabu Rp 5.000, Kamis Rp 6.000, dan Jumat Rp 4.000 (kolom E).\n\nJelaskan langkah-langkah dan tuliskan rumus Microsoft Excel yang digunakan Siti untuk:\n(a) Menghitung sisa tabungan harian di sel F2 sampai F6 (Uang Saku dikurangi Uang Jajan)!\n(b) Menghitung TOTAL TABUNGAN MINGGU INI pada sel F7! Berapa nilai hasil akhirnya?',
-    placeholder: 'Tuliskan rumus pengurangan tiap hari dan rumus penjumlahan total di sel F7...',
-    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) Rumus sisa tabungan harian:\n- Senin (sel F2): =D2-E2 (Hasil: Rp 10.000)\n- Selasa (sel F3): =D3-E3 (Hasil: Rp 8.000)\n- Rabu (sel F4): =D4-E4 (Hasil: Rp 10.000)\n- Kamis (sel F5): =D5-E5 (Hasil: Rp 9.000)\n- Jumat (sel F6): =D6-E6 (Hasil: Rp 11.000)\n(b) Rumus TOTAL TABUNGAN MINGGU INI di sel F7:\n=SUM(F2:F6) atau =D7-E7\nHasil total tabungan minggu ini adalah Rp 48.000.',
-    penjelasan: 'Pengurangan harian (=D2-E2) menghasilkan tabungan sisa per hari. Menjumlahkan seluruh kolom tabungan F2 sampai F6 menggunakan fungsi =SUM menghasilkan Rp 48.000.'
+    "no": 1,
+    "judul": "Misi Uraian 1: Analisis Kasus Tabungan & Pengeluaran Harian di Excel",
+    "tp": "TP 1.3 • Menganalisis Data Menggunakan Fungsi Dasar & Rumus Pengurangan",
+    "pertanyaan": "Setiap hari Senin sampai Jumat, Siti mendapatkan uang saku sebesar Rp 15.000 per hari (kolom D). Pengeluaran uang jajannya berturut-turut adalah: Senin Rp 5.000, Selasa Rp 7.000, Rabu Rp 5.000, Kamis Rp 6.000, dan Jumat Rp 4.000 (kolom E).\n\nJelaskan langkah-langkah dan tuliskan rumus Microsoft Excel yang digunakan Siti untuk:\n(a) Menghitung sisa tabungan harian di sel F2 sampai F6 (Uang Saku dikurangi Uang Jajan)!\n(b) Menghitung TOTAL TABUNGAN MINGGU INI pada sel F7! Berapa nilai hasil akhirnya?",
+    "placeholder": "Tuliskan rumus pengurangan tiap hari dan rumus penjumlahan total di sel F7...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Rumus sisa tabungan harian:\n- Senin (sel F2): =D2-E2 (Hasil: Rp 10.000)\n- Selasa (sel F3): =D3-E3 (Hasil: Rp 8.000)\n- Rabu (sel F4): =D4-E4 (Hasil: Rp 10.000)\n- Kamis (sel F5): =D5-E5 (Hasil: Rp 9.000)\n- Jumat (sel F6): =D6-E6 (Hasil: Rp 11.000)\n(b) Rumus TOTAL TABUNGAN MINGGU INI di sel F7:\n=SUM(F2:F6) atau =D7-E7\nHasil total tabungan minggu ini adalah Rp 48.000.",
+    "penjelasan": "Pengurangan harian (=D2-E2) menghasilkan tabungan sisa per hari. Menjumlahkan seluruh kolom tabungan F2 sampai F6 menggunakan fungsi =SUM menghasilkan Rp 48.000."
   },
   {
-    no: 2,
-    judul: 'Misi Uraian 2: Perbedaan Fungsi =SUM dan =AVERAGE di Kehidupan Sehari-hari',
-    tp: 'TP 1.3 • Mengolah & Menganalisis Data Angka Spreadsheet',
-    pertanyaan: 'Di Microsoft Excel, kita mengenal fungsi =SUM dan fungsi =AVERAGE.\n(a) Jelaskan perbedaan fungsi =SUM dan =AVERAGE saat mengolah data angka!\n(b) Berikan masing-masing 1 (satu) contoh nyata penerapannya dalam kehidupanmu di sekolah atau di rumah!',
-    placeholder: 'Jelaskan perbedaan =SUM dan =AVERAGE beserta contoh nyatanya...',
-    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbedaan:\n- Fungsi =SUM digunakan untuk menjumlahkan seluruh nilai angka dalam kumpulan sel data.\n- Fungsi =AVERAGE digunakan untuk menghitung nilai rata-rata dari kumpulan angka (total nilai dibagi jumlah data).\n(b) Contoh Nyata:\n- Contoh =SUM: Menghitung total seluruh uang kas kelas yang terkumpul dari 30 siswa, atau total berat sampah plastik daur ulang selama sebulan.\n- Contoh =AVERAGE: Menghitung rata-rata nilai ulangan harian mata pelajaran KKA satu kelas, atau menghitung rata-rata uang jajan siswa per hari.',
-    penjelasan: '=SUM menghasilkan nilai total akumulatif, sedangkan =AVERAGE menghasilkan nilai representasi rata-rata.'
+    "no": 2,
+    "judul": "Misi Uraian 2: Perbedaan Fungsi =SUM dan =AVERAGE di Kehidupan Sehari-hari",
+    "tp": "TP 1.3 • Mengolah & Menganalisis Data Angka Spreadsheet",
+    "pertanyaan": "Di Microsoft Excel, kita mengenal fungsi =SUM dan fungsi =AVERAGE.\n(a) Jelaskan perbedaan fungsi =SUM dan =AVERAGE saat mengolah data angka!\n(b) Berikan masing-masing 1 (satu) contoh nyata penerapannya dalam kehidupanmu di sekolah atau di rumah!",
+    "placeholder": "Jelaskan perbedaan =SUM dan =AVERAGE beserta contoh nyatanya...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbedaan:\n- Fungsi =SUM digunakan untuk menjumlahkan seluruh nilai angka dalam kumpulan sel data.\n- Fungsi =AVERAGE digunakan untuk menghitung nilai rata-rata dari kumpulan angka (total nilai dibagi jumlah data).\n(b) Contoh Nyata:\n- Contoh =SUM: Menghitung total seluruh uang kas kelas yang terkumpul dari 30 siswa, atau total berat sampah botol plastik daur ulang selama sebulan.\n- Contoh =AVERAGE: Menghitung rata-rata nilai ulangan harian mata pelajaran KKA satu kelas, atau rata-rata uang saku per hari.",
+    "penjelasan": "=SUM menghasilkan nilai total akumulatif, sedangkan =AVERAGE menghasilkan nilai representasi rata-rata."
   },
   {
-    no: 3,
-    judul: 'Misi Uraian 3: Penerapan Pilar Dekomposisi pada Pembuatan Poster Digital Word',
-    tp: 'TP 2.2 • Berpikir Komputasional: Menyusun Elemen Poster Terpisah',
-    pertanyaan: 'Saat kamu merancang poster digital bertema "7 Kebiasaan Anak Hebat" di Microsoft Word, kamu menerapkan pilar Berpikir Komputasional yaitu Dekomposisi.\n(a) Sebutkan 3 (tiga) elemen/komponen utama yang harus kamu siapkan secara terpisah!\n(b) Mengapa komponen-komponen tersebut sebaiknya dibuat terpisah terlebih dahulu sebelum digabungkan menjadi satu kesatuan poster?',
-    placeholder: 'Sebutkan 3 elemen poster dan jelaskan manfaat memisahkannya...',
-    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) 3 Elemen Utama:\n1. Judul Utama (Headline) yang menarik (menggunakan WordArt).\n2. Gambar Ilustrasi atau foto pendukung yang sesuai tema.\n3. Teks Isi / Slogan / Pesan ajakan ringkas yang mudah dipahami.\n(b) Alasan dipisahkan (Dekomposisi):\nAgar proses pembuatan lebih teratur dan mudah diperbaiki. Jika ada kesalahan ketik pada judul atau letak gambar ingin digeser, kita cukup mengedit bagian yang salah tanpa harus menghapus atau mengulang pembuatan poster dari awal.',
-    penjelasan: 'Dekomposisi memecah desain poster menjadi elemen independen sehingga mudah ditata, dirawat, dan diselaraskan.'
+    "no": 3,
+    "judul": "Misi Uraian 3: Penerapan Pilar Dekomposisi pada Pembuatan Poster Digital Word",
+    "tp": "TP 2.2 • Berpikir Komputasional: Menyusun Elemen Poster Terpisah",
+    "pertanyaan": "Saat kamu merancang poster digital bertema \"7 Kebiasaan Anak Hebat\" di Microsoft Word, kamu menerapkan pilar Berpikir Komputasional yaitu Dekomposisi.\n(a) Sebutkan 3 (tiga) elemen/komponen utama yang harus kamu siapkan secara terpisah!\n(b) Mengapa komponen-komponen tersebut sebaiknya dibuat terpisah terlebih dahulu sebelum digabungkan menjadi satu kesatuan poster?",
+    "placeholder": "Sebutkan 3 elemen poster dan jelaskan manfaat memisahkannya...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) 3 Elemen Utama:\n1. Judul Utama (Headline) yang menarik (menggunakan WordArt).\n2. Gambar Ilustrasi atau foto pendukung yang sesuai tema.\n3. Teks Isi / Slogan / Pesan ajakan ringkas yang mudah dipahami.\n(b) Alasan dipisahkan (Dekomposisi):\nAgar proses pembuatan lebih teratur dan mudah diperbaiki. Jika ada kesalahan ketik pada judul atau posisi gambar ingin digeser, kita cukup mengedit bagian yang salah tanpa harus menghapus atau mengulang pembuatan poster dari awal.",
+    "penjelasan": "Dekomposisi memecah desain poster menjadi elemen independen sehingga mudah ditata, dirawat, dan diselaraskan."
   },
   {
-    no: 4,
-    judul: 'Misi Uraian 4: Keunggulan Visualisasi Diagram Batang (Chart) Dibanding Tabel',
-    tp: 'TP 1.4 • Menyajikan Data Hasil Analisis dalam Bentuk Diagram Batang',
-    pertanyaan: 'Bandingkan penyajian data tabungan siswa menggunakan Tabel Angka dengan menggunakan Diagram Batang (Bar Chart).\nMengapa orang tua atau bapak/ibu guru lebih cepat memahami kondisi keuangan siswa ketika melihat Diagram Batang dibandingkan membaca baris angka tabel? Jelaskan alasan visualnya!',
-    placeholder: 'Jelaskan keunggulan visual diagram batang dibanding tabel angka...',
-    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\nKarena Diagram Batang mengubah angka-angka abstrak menjadi bentuk visual berupa tinggi atau panjang batang.\n1. Lebih Cepat Terbaca: Mata manusia dapat langsung membandingkan batang tertinggi (tabungan paling banyak, yaitu hari Jumat) dan batang terendah (tabungan paling sedikit, yaitu hari Selasa) dalam hitungan detik.\n2. Pola Terlihat Nyata: Naik turunnya tren tabungan terlihat jelas dari bentuk grafik batang tanpa perlu membaca angka rupiah satu per satu dan tanpa perlu menghitung manual di kepala.',
-    penjelasan: 'Otak manusia memproses informasi visual berupa ketinggian batang jauh lebih cepat daripada mencerna deretan angka teks.'
+    "no": 4,
+    "judul": "Misi Uraian 4: Keunggulan Visualisasi Diagram Batang (Chart) Dibanding Tabel",
+    "tp": "TP 1.4 • Menyajikan Data Hasil Analisis dalam Bentuk Diagram Batang",
+    "pertanyaan": "Bandingkan penyajian data tabungan siswa menggunakan Tabel Angka dengan menggunakan Diagram Batang (Bar Chart).\nMengapa orang tua atau bapak/ibu guru lebih cepat memahami kondisi keuangan siswa ketika melihat Diagram Batang dibandingkan membaca baris angka tabel? Jelaskan alasan visualnya!",
+    "placeholder": "Jelaskan keunggulan visual diagram batang dibanding tabel angka...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\nKarena Diagram Batang mengubah angka-angka abstrak menjadi bentuk visual berupa tinggi atau panjang batang.\n1. Lebih Cepat Terbaca: Mata manusia dapat langsung membandingkan batang tertinggi (tabungan paling banyak, yaitu hari Jumat) dan batang terendah (tabungan paling sedikit, yaitu hari Selasa) dalam hitungan detik.\n2. Pola Terlihat Nyata: Naik turunnya tren tabungan terlihat jelas dari bentuk grafik batang tanpa perlu membaca angka rupiah satu per satu dan tanpa perlu menghitung manual di kepala.",
+    "penjelasan": "Otak manusia memproses informasi visual berupa ketinggian batang jauh lebih cepat daripada mencerna deretan angka teks."
   },
   {
-    no: 5,
-    judul: 'Misi Uraian 5: Etika Digital & Nilai Humanis Tzu Chi (Zun Zhong) di Dunia Maya',
-    tp: 'TP 2.4 • Keamanan Berinternet, Perlindungan Data Pribadi & Hak Cipta',
-    pertanyaan: 'Internet memberikan banyak kemudahan untuk mencari gambar dan informasi tugas sekolah. Namun, kita harus berhati-hati dan menjunjung tinggi etika digital serta nilai budaya humanis Tzu Chi (Zun Zhong / Saling Menghargai).\nJelaskan 2 (dua) aturan etika yang wajib kamu patuhi terkait:\n(a) Perlindungan keamanan data pribadi dan kata sandi akunmu!\n(b) Penghargaan terhadap hak cipta karya atau gambar milik orang lain!',
-    placeholder: 'Tuliskan aturan perlindungan data pribadi dan cara menghargai karya orang lain...',
-    kunci: 'KUNCI & RUBRIK JAWABAN GURU:\n(a) Perlindungan Data Pribadi:\n- Tidak pernah membagikan kata sandi (password), alamat rumah, nomor telepon, atau data rahasia keluarga kepada orang lain di internet.\n- Selalu logout/keluar dari akun komputer sekolah setelah selesai digunakan.\n(b) Menghargai Karya Orang Lain (Zun Zhong):\n- Tidak menjiplak atau mengaku-ngaku gambar/tulisan orang lain di internet sebagai karya buatan sendiri.\n- Selalu mencantumkan sumber pembuat gambar (kredit karya) secara jujur dan meminta izin jika diperlukan.',
-    penjelasan: 'Etika digital mengajarkan kita untuk bertanggung jawab, aman, dan menghargai hasil jerih payah orang lain di ruang siber.'
+    "no": 5,
+    "judul": "Misi Uraian 5: Etika Digital & Nilai Humanis Tzu Chi (Zun Zhong) di Dunia Maya",
+    "tp": "TP 2.4 • Keamanan Berinternet, Perlindungan Data Pribadi & Hak Cipta",
+    "pertanyaan": "Internet memberikan banyak kemudahan untuk mencari gambar dan informasi tugas sekolah. Namun, kita harus berhati-hati dan menjunjung tinggi etika digital serta nilai budaya humanis Tzu Chi (Zun Zhong / Saling Menghargai).\nJelaskan 2 (dua) aturan etika yang wajib kamu patuhi terkait:\n(a) Perlindungan keamanan data pribadi dan kata sandi akunmu!\n(b) Penghargaan terhadap hak cipta karya atau gambar milik orang lain!",
+    "placeholder": "Tuliskan aturan perlindungan data pribadi dan cara menghargai karya orang lain...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Perlindungan Data Pribadi:\n- Tidak pernah membagikan kata sandi (password), alamat rumah, nomor telepon, atau data rahasia keluarga kepada orang lain di internet.\n- Selalu logout/keluar dari akun komputer sekolah setelah selesai digunakan.\n(b) Menghargai Karya Orang Lain (Zun Zhong):\n- Tidak menjiplak atau mengaku-ngaku gambar/tulisan orang lain di internet sebagai karya buatan sendiri.\n- Selalu mencantumkan sumber pembuat gambar (kredit karya) secara jujur dan meminta izin jika diperlukan.",
+    "penjelasan": "Etika digital mengajarkan kita untuk bertanggung jawab, aman, dan menghargai hasil jerih payah orang lain di ruang siber."
+  },
+  {
+    "no": 6,
+    "judul": "Misi Uraian 6: Analisis Nilai Tertinggi (=MAX) dan Nilai Terendah (=MIN) di Excel",
+    "tp": "TP 1.3 • Menggunakan Fungsi Statistik Dasar Excel",
+    "pertanyaan": "Pada tabel laporan keuangan kas kelas atau catatan uang jajan mingguan:\n(a) Jelaskan fungsi rumus =MAX(...) dan rumus =MIN(...) di Microsoft Excel!\n(b) Mengapa bendahara kelas atau siswa sangat membutuhkan kedua rumus ini dalam membuat laporan keuangan?",
+    "placeholder": "Jelaskan kegunaan rumus =MAX dan =MIN serta manfaatnya untuk laporan kas...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Fungsi:\n- Rumus =MAX(range) berfungsi mencari dan menampilkan angka nilai tertinggi/terbesar dari kumpulan data sel.\n- Rumus =MIN(range) berfungsi mencari dan menampilkan angka nilai terendah/terkecil dari kumpulan data sel.\n(b) Manfaat bagi bendahara:\nBendahara kelas dapat langsung mengetahui hari mana pengeluaran kas paling besar/boros tanpa perlu memeriksa ratusan baris data satu per satu, serta mengetahui nominal pengeluaran paling hemat.",
+    "penjelasan": "=MAX dan =MIN mempermudah pengambilan keputusan cepat dengan langsung menyaring nilai ekstrim (terbesar dan terkecil)."
+  },
+  {
+    "no": 7,
+    "judul": "Misi Uraian 7: Pengaturan Format Mata Uang (Currency/Accounting) dan Perataan Sel",
+    "tp": "TP 1.2 • Pemformatan Sel dan Estetika Tabel Spreadsheet",
+    "pertanyaan": "Saat mengetik angka uang di Excel, kita tidak boleh mengetik simbol \"Rp\" dan titik secara manual seperti \"Rp 15.000\".\n(a) Mengapa kita harus mengetik angka murni (15000) lalu mengubahnya lewat Number Format Currency / Accounting?\n(b) Bagaimana aturan perataan teks (Alignment) yang baku untuk kolom teks (nama) dibanding kolom angka di Excel?",
+    "placeholder": "Jelaskan alasan pemformatan angka otomatis dan aturan alignment teks vs angka...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Alasan:\nJika simbol \"Rp\" dan titik diketik manual, Excel akan menganggap isi sel tersebut sebagai teks huruf, bukan angka. Akibatnya sel tersebut TIDAK BISA dihitung menggunakan rumus matematika (=SUM, pengurangan, dll) dan akan muncul pesan error #VALUE!.\n(b) Aturan Alignment Baku:\n- Kolom teks (seperti nama siswa atau nama hari) diatur rata kiri (Align Left).\n- Kolom angka nominal rupiah diatur rata kanan (Align Right) agar nilai satuan, puluhan, ratusan, dan ribuan lurus sejajar ke bawah.",
+    "penjelasan": "Excel hanya dapat mengkalkulasi data yang dikenali sebagai numeric. Menggunakan format Currency mempertahankan sifat numerik seraya menampilkan simbol Rp secara rapi."
+  },
+  {
+    "no": 8,
+    "judul": "Misi Uraian 8: Manajemen Folder Digital & Penamaan Berkas yang Terstruktur",
+    "tp": "TP 2.3 • Struktur Hirarki Folder dan Pengelolaan Berkas Komputer",
+    "pertanyaan": "Bayangkan kamu memiliki 50 berkas tugas sekolah yang berserakan di layar Desktop komputer lab.\n(a) Jelaskan konsep Folder Induk dan Subfolder untuk merapikan berkas-berkas tersebut!\n(b) Berikan contoh format penamaan berkas yang baik dan rapi agar mudah dicari oleh bapak/ibu guru!",
+    "placeholder": "Jelaskan struktur folder induk & subfolder serta contoh penamaan berkas yang rapi...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Konsep Folder Induk & Subfolder:\nFolder Induk adalah wadah utama, misalnya folder \"TUGAS_KELAS_4\". Di dalamnya dibuat beberapa Subfolder berdasarkan mata pelajaran atau semester, contohnya: subfolder \"01_KKA_Excel\", \"02_KKA_Word\", dan \"03_Budaya_Humanis\".\n(b) Contoh Format Penamaan Berkas Baku:\nFormat: [Kelas]_[NoAbsen]_[NamaSiswa]_[NamaTugas].\nContoh: 4A_15_Dylan_Poster7Kebiasaan.docx atau 4A_15_Dylan_TabelTabungan.xlsx.\nFormat ini memudahkan guru mengurutkan tugas sesuai daftar absen secara otomatis.",
+    "penjelasan": "Hirarki folder dan penamaan file terstandar mencegah berkas hilang atau tertukar, serta mencerminkan budaya disiplin dan kerapian."
+  },
+  {
+    "no": 9,
+    "judul": "Misi Uraian 9: Pengaturan Margin, Jenis Huruf, dan Kerapian Dokumen di MS Word",
+    "tp": "TP 2.1 • Pengolah Kata: Tata Letak Halaman & Tipografi Dokumen",
+    "pertanyaan": "Saat menyusun lembar karya tulisan atau cerita di Microsoft Word:\n(a) Apa fungsi dari pengaturan Margin halaman dan ukuran kertas (misalnya A4)?\n(b) Mengapa dalam satu dokumen resmi kita disarankan tidak menggunakan lebih dari 2 atau 3 jenis huruf (font) yang berbeda?",
+    "placeholder": "Jelaskan fungsi margin dan alasan membatasi variasi jenis huruf...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Fungsi Margin & Ukuran Kertas:\nMargin adalah batas jarak antara tepi kertas dengan teks isi dokumen. Margin yang tepat (misal 2.5 cm di setiap sisi) memastikan tulisan tidak terpotong saat dicetak (print) dan nyaman dipegang oleh pembaca.\n(b) Alasan Membatasi Jenis Font:\nMenggunakan terlalu banyak font membuat dokumen terlihat berantakan, membingungkan mata pembaca, dan terkesan tidak profesional. Dua jenis font (satu untuk judul dan satu untuk teks isi) menciptakan keserasian dan kenyamanan membaca.",
+    "penjelasan": "Kerapian tata letak dokumen mencerminkan ketelitian penulis dan memudahkan orang lain membaca pesan yang disampaikan."
+  },
+  {
+    "no": 10,
+    "judul": "Misi Uraian 10: Penerapan Budaya Humanis Tzu Chi (Gan En) & 7 Kebiasaan Baik",
+    "tp": "TP 2.4 • Internalisasi Nilai Budaya Humanis & Karakter Positif dalam Teknologi",
+    "pertanyaan": "Di sekolah Cinta Kasih Tzu Chi, kita diajarkan untuk selalu bersyukur (Gan En), menghargai sesama (Zun Zhong), dan menerapkan 7 Kebiasaan Anak Indonesia Hebat.\n(a) Ceritakan bagaimana kamu menerapkan kebiasaan \"Hemat Energi dan Rawat Bumi\" saat menggunakan perangkat komputer di lab sekolah!\n(b) Bagaimana kamu menerapkan rasa syukur (Gan En) terhadap teknologi komputer yang kamu gunakan setiap hari?",
+    "placeholder": "Ceritakan tindakan nyata hemat energi di lab dan rasa syukur terhadap teknologi...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Tindakan Hemat Energi & Rawat Bumi:\n- Mematikan komputer (Shut Down) dan mematikan monitor secara benar setelah selesai jam pelajaran di lab.\n- Merapikan kembali keyboard, mouse, dan kursi pada tempatnya agar lab tetap bersih dan terawat.\n- Mengurangi cetak kertas yang tidak perlu (paperless) dengan memanfaatkan file digital.\n(b) Rasa Syukur (Gan En):\nMenggunakan komputer dengan penuh kehati-hatian, tidak merusak perangkat keras, dan memanfaatkannya hanya untuk hal-hal yang bermanfaat seperti belajar, berkreasi, dan menebarkan kebaikan.",
+    "penjelasan": "Teknologi adalah sarana berkarya. Menjaganya dengan baik dan menggunakannya secara bijak adalah perwujudan nyata rasa syukur (Gan En)."
   }
 ];
+
+// Variabel lama untuk kompatibilitas
+const SOAL_URAIAN_KISI_KISI_SEM1 = SOAL_URAIAN_KELAS_4;
+window.SOAL_URAIAN_KELAS_4 = SOAL_URAIAN_KELAS_4;
+window.SOAL_URAIAN_KISI_KISI_SEM1 = SOAL_URAIAN_KISI_KISI_SEM1;
+
+// ==========================================================================
+// KELAS 5 SD: 10 SOAL URAIAN PORTOFOLIO DIGITAL & KODING (FASE C)
+// ==========================================================================
+const SOAL_URAIAN_KELAS_5 = [
+  {
+    "no": 1,
+    "judul": "Misi Uraian 1: Perbedaan Mendasar Transisi Slide dan Animasi Objek di Presentasi",
+    "tp": "Fase C • Presentasi Multimedia (PPT & Google Slides)",
+    "pertanyaan": "Dalam perangkat lunak presentasi seperti Microsoft PowerPoint dan Google Slides:\n(a) Jelaskan perbedaan mendasar antara fitur Transition (Transisi) dan fitur Animation (Animasi)!\n(b) Berikan 1 contoh kapan sebaiknya kita menggunakan Transition dan kapan menggunakan Animation!",
+    "placeholder": "Jelaskan perbedaan Transition vs Animation beserta contoh penggunaannya...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbedaan Mendasar:\n- Transition (Transisi) adalah efek gerak perpindahan visual antar-halaman slide (dari slide A berganti ke slide B).\n- Animation (Animasi) adalah efek gerak visual yang diterapkan pada objek tertentu di dalam slide (seperti tulisan judul yang muncul melayang atau gambar yang berputar).\n(b) Contoh Penggunaan:\n- Transition digunakan saat berganti bab materi, misal efek Fade saat pindah ke halaman slide berikutnya.\n- Animation digunakan untuk memunculkan poin-poin penjelasan satu per satu saat guru sedang menerangkan di depan kelas.",
+    "penjelasan": "Transition bekerja di tingkat pergantian slide, sedangkan Animation bekerja di tingkat objek/elemen di dalam lembar slide."
+  },
+  {
+    "no": 2,
+    "judul": "Misi Uraian 2: Kaidah Merancang Slide Presentasi yang Menarik dan Tidak Membosankan",
+    "tp": "Fase C • Desain Komunikasi Visual Presentasi",
+    "pertanyaan": "Seorang presenter yang baik tidak boleh menaruh seluruh isi buku pelajaran ke dalam satu slide presentasi.\n(a) Jelaskan aturan \"6x6 Rule\" atau prinsip penyederhanaan teks dalam slide presentasi!\n(b) Mengapa kontras warna antara teks tulisan dengan warna latar belakang slide sangat menentukan keberhasilan presentasi?",
+    "placeholder": "Jelaskan aturan teks ringkas dan pentingnya kontras warna slide...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Aturan 6x6 / Teks Ringkas:\nSlide yang baik maksimal memuat sekitar 6 baris teks, dan tiap baris terdiri dari sekitar 6 kata (hanya berupa poin-poin kunci atau kata kunci). Slide berfungsi sebagai alat bantu visual, bukan untuk dibaca kata per kata.\n(b) Pentingnya Kontras Warna:\nKontras tinggi (misal teks putih di latar biru gelap, atau teks hitam di latar putih) memastikan audiens yang duduk di baris paling belakang ruang kelas dapat membaca materi dengan jelas tanpa menyipitkan mata.",
+    "penjelasan": "Slide presentasi adalah pemicu perhatian visual audiens. Desain yang bersih dan kontras tinggi memudahkan penyampaian pesan."
+  },
+  {
+    "no": 3,
+    "judul": "Misi Uraian 3: Konsep Algoritma Berurutan (Sequence) pada Koding Block-Based",
+    "tp": "Fase C • Pemrograman Visual (Code.org & Hour of Code)",
+    "pertanyaan": "Pada latihan koding Hour of Code (Code.org), karakter harus menempuh labirin puzzle untuk mengumpulkan koin.\n(a) Jelaskan apa yang dimaksud dengan Sequence (Algoritma Berurutan) dalam koding!\n(b) Apa yang terjadi jika urutan blok perintah terbalik, misalnya blok \"Belok Kiri\" ditaruh sebelum blok \"Maju 2 Langkah\"?",
+    "placeholder": "Jelaskan konsep Sequence dan dampak jika urutan blok kode terbalik...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Pengertian Sequence:\nSequence adalah pelaksanaan instruksi program komputer langkah demi langkah secara berurutan, tepat sesuai susunan balok dari baris paling atas hingga baris paling bawah.\n(b) Dampak Urutan Terbalik:\nKomputer adalah mesin yang patuh dan menjalankan perintah persis sesuai urutan. Jika urutan terbalik, karakter akan berbelok di tempat yang salah dan menabrak dinding labirin sehingga misi gagal (terjadi kesalahan logika/bug).",
+    "penjelasan": "Urutan eksekusi (Sequence) adalah fondasi paling dasar dari pemrograman; urutan perintah menentukan hasil akhir program."
+  },
+  {
+    "no": 4,
+    "judul": "Misi Uraian 4: Efisiensi Blok Perulangan (Loop / Repeat) dalam Koding",
+    "tp": "Fase C • Logika Pemrograman: Struktur Perulangan (Loop)",
+    "pertanyaan": "Bayangkan kamu ingin membuat karakter di Scratch atau Code.org melangkah maju sebanyak 10 kali.\n(a) Bandingkan cara koding konvensional (tanpa perulangan) dengan cara koding menggunakan blok \"repeat 10\"!\n(b) Mengapa penggunaan blok perulangan membuat kode program menjadi jauh lebih efisien dan mudah dirawat?",
+    "placeholder": "Bandingkan koding tanpa loop vs dengan loop dan jelaskan efisiensinya...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbandingan:\n- Tanpa loop: Kita harus menyusun blok \"move\" sebanyak 10 kali berturut-turut ke bawah (memakan ruang panggung koding dan melelahkan).\n- Dengan loop: Cukup menggunakan 1 blok \"repeat 10\" dan di dalamnya dimasukkan 1 blok \"move\".\n(b) Keunggulan Efisiensi:\nProgram menjadi jauh lebih ringkas, mudah dibaca, hemat memori, dan jika kita ingin mengubah jumlah langkah (misal menjadi 20 kali), kita cukup mengganti angka 10 menjadi 20 tanpa harus menambahkan 10 blok baru satu per satu.",
+    "penjelasan": "Perulangan (Loop) mencegah duplikasi kode (DRY: Don't Repeat Yourself) dan mempermudah pemeliharaan program."
+  },
+  {
+    "no": 5,
+    "judul": "Misi Uraian 5: Penerapan Logika Percabangan (Condition: if-then) pada Game Edukasi",
+    "tp": "Fase C • Logika Pemrograman: Struktur Kondisi Percabangan",
+    "pertanyaan": "Di aplikasi Scratch, blok \"if <kondisi> then\" sangat sering digunakan saat membuat game interaktif.\n(a) Jelaskan cara kerja blok \"if <touching Obstacle?> then [stop all]\"!\n(b) Berikan contoh lain penerapan blok \"if-then\" dalam aturan game yang kamu rancang!",
+    "placeholder": "Jelaskan cara kerja blok if-then dan berikan contoh aturan game lainnya...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Cara Kerja:\nBlok \"if\" akan terus memeriksa kondisi di dalam tanda heksagon. JIKA sprite menyentuh objek \"Obstacle\" (rintangan), MAKA aksi di dalamnya akan dieksekusi, yaitu menghentikan seluruh program permainan (game over).\n(b) Contoh Lain:\n- JIKA sprite menyentuh koin emas, MAKA tambah skor sebanyak +10 dan bunyikan suara \"coin\".\n- JIKA nilai variabel skor mencapai 100, MAKA ganti latar (backdrop) ke \"Menang / Juara\".",
+    "penjelasan": "Percabangan logika (Condition) memungkinkan komputer mengambil keputusan dinamis berdasarkan interaksi pengguna di layar."
+  },
+  {
+    "no": 6,
+    "judul": "Misi Uraian 6: Prinsip Hierarki Tipografi dan Harmoni Warna Desain di Canva",
+    "tp": "Fase C • Desain Grafis & Komunikasi Visual (Canva)",
+    "pertanyaan": "Saat mendesain poster kampanye \"Jaga Kebersihan Lingkungan\" di aplikasi Canva:\n(a) Jelaskan apa yang dimaksud dengan Hierarki Tipografi (Ukuran Judul, Subjudul, dan Teks Isi)!\n(b) Mengapa kita dianjurkan memilih kombinasi palet 2 sampai 3 warna utama yang harmonis?",
+    "placeholder": "Jelaskan hierarki tipografi dan manfaat palet warna harmonis di Canva...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Hierarki Tipografi:\nPengaturan ukuran dan ketebalan teks untuk memandu urutan mata orang membaca:\n1. Judul Utama: Paling besar dan tebal (menarik perhatian pertama kali dari kejauhan).\n2. Subjudul: Ukuran sedang (menjelaskan topik utama).\n3. Teks Isi: Ukuran lebih kecil dan mudah dibaca (berisi detail informasi atau ajakan aksi).\n(b) Palet 2-3 Warna Harmonis:\nMencegah poster terlihat kacau atau menyakitkan mata. Palet warna yang serasi menciptakan kesan kesatuan, kerapian, dan profesional.",
+    "penjelasan": "Hierarki visual dan palet warna konsisten memandu pembaca mencerna informasi penting dengan cepat dan menyenangkan."
+  },
+  {
+    "no": 7,
+    "judul": "Misi Uraian 7: Fungsi dan Peran Variabel (Variable) dalam Game Scratch",
+    "tp": "Fase C • Pemrograman Lanjut: Pengelolaan Data Variabel",
+    "pertanyaan": "Dalam membuat game edukasi di Scratch, kita membuat variabel baru bernama \"Skor\" dan \"Waktu\".\n(a) Apa pengertian variabel dalam ilmu komputer?\n(b) Jelaskan bagaimana variabel \"Skor\" bertambah nilainya saat pemain berhasil menjawab pertanyaan kuis atau menangkap objek!",
+    "placeholder": "Jelaskan pengertian variabel dan mekanisme penambahan skor di Scratch...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Pengertian Variabel:\nVariabel adalah wadah penyimpanan di memori komputer yang diberi nama khusus untuk menyimpan nilai atau data yang nilainya dapat berubah-ubah selama program berjalan.\n(b) Mekanisme Penambahan Skor:\nSaat program dimulai, variabel diatur ke nol: \"set Skor to 0\". Setiap kali pemain berhasil menyentuh buah atau menjawab benar kuis, dipanggil blok \"change Skor by 10\", sehingga nilai yang tersimpan bertambah 10 secara otomatis dan langsung terbarui di layar panggung.",
+    "penjelasan": "Variabel adalah inti dari pengelolaan status (state) permainan yang dinamis dan interaktif."
+  },
+  {
+    "no": 8,
+    "judul": "Misi Uraian 8: Sensor Deteksi (Sensing) pada Interaksi Karakter di Scratch",
+    "tp": "Fase C • Logika Deteksi Sensor & Interaktivitas Sprite",
+    "pertanyaan": "Pada kategori blok \"Sensing\" warna biru muda di Scratch:\n(a) Sebutkan 2 contoh blok sensor yang sering digunakan dalam game!\n(b) Jelaskan bagaimana blok sensor tersebut dapat membuat karakter di layar berinteraksi dengan keyboard atau mouse pengguna!",
+    "placeholder": "Sebutkan 2 contoh blok sensing dan jelaskan interaksinya dengan mouse/keyboard...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) 2 Contoh Blok Sensing:\n1. <touching [mouse-pointer]?> atau <touching color [#00ff00]?>\n2. <key [space] pressed?>\n(b) Cara Kerja Interaktivitas:\nBlok <key space pressed?> mendeteksi apakah tombol spasi di keyboard sedang ditekan oleh pemain. JIKA ditekan, maka blok perintah lompat akan dijalankan, sehingga pemain dapat mengendalikan gerakan karakter secara langsung dan responsif.",
+    "penjelasan": "Kategori Sensing menghubungkan aksi fisik dunia nyata (mouse/keyboard/kamera) dengan aksi logika karakter di dunia digital."
+  },
+  {
+    "no": 9,
+    "judul": "Misi Uraian 9: Etika Hak Cipta dan Pemanfaatan Konten Digital secara Sah",
+    "tp": "Fase C • Literasi Digital, Hak Cipta & Kejujuran Akademik",
+    "pertanyaan": "Saat mengumpulkan bahan presentasi atau gambar untuk poster di Canva dan PowerPoint:\n(a) Mengapa kita tidak boleh sembarangan mengambil gambar dari internet dan mengklaimnya sebagai karya buatan sendiri?\n(b) Apa yang dimaksud dengan lisensi Creative Commons (bebas royalti) dan bagaimana cara mencantumkan sumber referensi yang benar?",
+    "placeholder": "Jelaskan etika hak cipta gambar dan lisensi Creative Commons...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Alasan:\nKarena setiap karya cipta di internet dilindungi oleh hak cipta (copyright). Mengambil karya orang lain tanpa izin dan mengakuinya sebagai buatan sendiri adalah tindakan plagiarisme dan melanggar hukum serta norma kejujuran.\n(b) Creative Commons & Sumber:\nCreative Commons adalah lisensi yang memperbolehkan karya digunakan oleh publik secara gratis dengan syarat tertentu. Cara mencantumkan referensi adalah menuliskan nama pembuat dan tautan sumber di bagian akhir presentasi atau poster (misal: \"Foto oleh: Unsplash / Nama Fotografer\").",
+    "penjelasan": "Kejujuran akademik dan menghargai karya intelektual orang lain adalah pilar utama warga digital yang berintegritas."
+  },
+  {
+    "no": 10,
+    "judul": "Misi Uraian 10: Pengamalan Budaya Humanis Tzu Chi (Hu Ai) dalam Proyek Portofolio",
+    "tp": "Fase C • Karakter Budaya Humanis: Kerjasama, Saling Mengasihi & Berbagi Ilmu",
+    "pertanyaan": "Master Cheng Yen berpesan: \"Membantu orang lain adalah sumber kebahagiaan sejati.\" Saat belajar koding dan menyusun portofolio digital bersama teman sekelas:\n(a) Bagaimana kamu menunjukkan sikap Hu Ai (cinta kasih dan tolong menolong) ketika ada teman di sebelahmu yang kesulitan memahami blok koding Scratch?\n(b) Apa manfaat belajar menyusun portofolio digital (PPT, poster, koding) bagi masa depanmu?",
+    "placeholder": "Jelaskan wujud sikap Hu Ai kepada teman dan manfaat portofolio digital...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Sikap Hu Ai:\nMendampingi teman tersebut dengan sabar dan bahasa yang santun, menjelaskan logika blok koding tanpa meremehkannya, dan membantunya menemukan solusi bersama tanpa mengambil alih mouse atau mengerjakan tugasnya secara curang.\n(b) Manfaat Portofolio Digital:\nPortofolio digital mendokumentasikan bukti nyata karya keterampilan, kreativitas, dan proses belajar kita sejak sekolah dasar. Ini menjadi modal berharga dan kebanggaan untuk jenjang pendidikan yang lebih tinggi.",
+    "penjelasan": "Kolaborasi yang dilandasi cinta kasih (Hu Ai) menciptakan iklim belajar yang saling mendukung dan memanusiakan teknologi."
+  }
+];
+window.SOAL_URAIAN_KELAS_5 = SOAL_URAIAN_KELAS_5;
+
+// ==========================================================================
+// KELAS 6 SD: 10 SOAL URAIAN COMPUTATIONAL THINKING & KODING SCRATCH (FASE C)
+// ==========================================================================
+const SOAL_URAIAN_KELAS_6 = [
+  {
+    "no": 1,
+    "judul": "Misi Uraian 1: Analisis 4 Pilar Computational Thinking dalam Memecahkan Masalah",
+    "tp": "Fase C • 4 Pilar Berpikir Komputasional (CT)",
+    "pertanyaan": "Setiap jam istirahat, antrean di kantin sekolah sangat panjang dan membuat banyak siswa terlambat makan. Terapkan 4 Pilar Berpikir Komputasional untuk memecahkan masalah ini:\n(a) Dekomposisi & Pengenalan Pola: Bagaimana cara membagi masalah ini dan pola apa yang kamu temukan?\n(b) Abstraksi & Algoritma: Informasi apa yang perlu difokuskan dan langkah solusi apa yang kamu rancang?",
+    "placeholder": "Terapkan Dekomposisi, Pengenalan Pola, Abstraksi, dan Algoritma pada antrean kantin...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n1. Dekomposisi: Memecah masalah antrean menjadi bagian: proses memilih menu, pembayaran uang tunai, dan penyiapan makanan.\n2. Pengenalan Pola: Mengamati bahwa antrean paling macet terjadi pada saat siswa bingung memilih menu dan proses mencari uang kembalian.\n3. Abstraksi: Fokus pada percepatan alur transaksi; mengabaikan hal sepele seperti warna baju atau jenis wadah makanan.\n4. Algoritma: Membuat sistem langkah berurutan: pasang papan menu digital di depan antrean, sediakan pembayaran kartu digital, dan siapkan paket makanan siap ambil.",
+    "penjelasan": "Penerapan 4 pilar CT membiasakan siswa menganalisis akar masalah dan menyusun solusi terstruktur di kehidupan nyata."
+  },
+  {
+    "no": 2,
+    "judul": "Misi Uraian 2: Penerapan Dekomposisi dan Abstraksi pada Perancangan Game Scratch",
+    "tp": "Fase C • Computational Thinking pada Pengembangan Game Edukasi",
+    "pertanyaan": "Saat merancang sebuah proyek game edukasi \"Pilah Sampah Daur Ulang Tzu Chi\" di Scratch:\n(a) Jelaskan bagaimana kamu menerapkan pilar Dekomposisi pada pembuatan aset dan kode game tersebut!\n(b) Bagaimana pilar Abstraksi diterapkan agar pemain game tidak pusing melihat detail kode di balik layar?",
+    "placeholder": "Jelaskan penerapan Dekomposisi pada sprite/skrip dan Abstraksi pada antarmuka game...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Dekomposisi:\nMemecah game menjadi komponen terpisah: Sprite Sampah Organik/Anorganik, Sprite Tempat Sampah, skrip gerak gravitasi, skrip skor penambahan poin, dan latar panggung (backdrop).\n(b) Abstraksi:\nPemain hanya disajikan antarmuka visual sederhana: tombol Mulai, skor di pojok layar, dan objek yang bisa digeser. Semua kerumitan rumus perhitungan kecepatan, koordinat x-y, dan penanganan bug disembunyikan di balik layar editor skrip.",
+    "penjelasan": "Dekomposisi mempermudah perancangan komponen game, sedangkan Abstraksi mempermudah pengalaman pengguna (user experience)."
+  },
+  {
+    "no": 3,
+    "judul": "Misi Uraian 3: Makna dan Fungsi 4 Simbol Utama Diagram Alir (Flowchart)",
+    "tp": "Fase C • Representasi Algoritma: Bagan Alir (Flowchart)",
+    "pertanyaan": "Dalam merancang algoritma sebelum koding, programmer sering membuat Diagram Alir (Flowchart).\nSebutkan bentuk simbol dan jelaskan fungsi dari 4 simbol standar berikut:\n(a) Simbol Oval (Terminator) & Simbol Persegi Panjang (Process)\n(b) Simbol Belah Ketupat (Decision) & Simbol Garis Panah (Flowline)",
+    "placeholder": "Jelaskan bentuk dan fungsi 4 simbol utama flowchart...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Oval & Persegi Panjang:\n- Oval (Terminator): Menandai titik awal (Mulai/Start) dan titik akhir (Selesai/End) dari seluruh alur program.\n- Persegi Panjang (Process): Menunjukkan aksi proses pengolahan, eksekusi instruksi, atau perhitungan matematika.\n(b) Belah Ketupat & Panah:\n- Belah Ketupat (Decision): Menunjukkan kondisi percabangan pilihan logika (menghasilkan keputusan \"Ya\" atau \"Tidak\").\n- Garis Panah (Flowline): Menunjukkan arah aliran eksekusi data dari satu langkah ke langkah berikutnya.",
+    "penjelasan": "Flowchart adalah bahasa visual standar internasional untuk memetakan alur logika program sebelum diubah menjadi kode komputer."
+  },
+  {
+    "no": 4,
+    "judul": "Misi Uraian 4: Perbandingan Logika Percabangan Tunggal (if-then) dan Ganda (if-else)",
+    "tp": "Fase C • Logika Algoritma: Percabangan Kondisi (Conditionals)",
+    "pertanyaan": "Bandingkan penggunaan struktur logika percabangan di Scratch:\n(a) Apa perbedaan mendasar antara blok \"if <syarat> then\" dengan blok \"if <syarat> then ... else ...\"?\n(b) Buatlah contoh kasus logika penilaian kuis siswa (Kriteria Ketuntasan: Nilai >= 80) menggunakan struktur if-else!",
+    "placeholder": "Jelaskan perbedaan if-then vs if-else dan berikan contoh aturan nilai KKM...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbedaan Mendasar:\n- \"if-then\": Hanya memiliki 1 aksi; aksi hanya dijalankan JIKA syarat terpenuhi. Jika tidak terpenuhi, komputer langsung melanjutkan perintah berikutnya tanpa aksi cadangan.\n- \"if-else\": Memiliki 2 jalur aksi alternatif; JIKA syarat terpenuhi jalankan aksi 1, JIKA TIDAK terpenuhi jalankan aksi 2.\n(b) Contoh Kasus KKM Kuis:\nif <Skor >= 80> then:\n  say \"Selamat, kamu TUNTAS dan Lulus KKM! 🌟\"\nelse:\n  say \"Tetap semangat, silakan ikuti Remedial kuis ya! 💪\"",
+    "penjelasan": "Struktur if-else memastikan semua kemungkinan kondisi (benar maupun salah) memiliki penanganan instruksi yang jelas."
+  },
+  {
+    "no": 5,
+    "judul": "Misi Uraian 5: Koordinat Kartesius Panggung Scratch (Sumbu X & Y) pada Gerak Sprite",
+    "tp": "Fase C • Sistem Koordinat Layar Panggung & Geometri Gerak",
+    "pertanyaan": "Panggung (Stage) Scratch menggunakan sistem koordinat Kartesius dua dimensi (X dan Y).\n(a) Berapa batas nilai minimum dan maksimum sumbu X serta sumbu Y pada panggung Scratch?\n(b) Jika Sprite berada di posisi tengah panggung (0, 0), perintah koordinat apa yang harus diberikan agar Sprite melompat ke pojok kanan atas?",
+    "placeholder": "Sebutkan batas nilai sumbu X-Y dan cara melompat ke pojok kanan atas...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Batas Nilai Koordinat Scratch:\n- Sumbu X (Horizontal): Batas kiri adalah -240, titik tengah 0, dan batas kanan adalah +240 (lebar total 480 langkah).\n- Sumbu Y (Vertikal): Batas bawah adalah -180, titik tengah 0, dan batas atas adalah +180 (tinggi total 360 langkah).\n(b) Melompat ke Pojok Kanan Atas:\nGunakan blok \"go to x: (200) y: (150)\" atau nilai positif mendekati x: 240 dan y: 180.",
+    "penjelasan": "Pemahaman sumbu X (kiri/kanan) dan Y (atas/bawah) menghubungkan konsep matematika geometri dengan pemrograman animasi."
+  },
+  {
+    "no": 6,
+    "judul": "Misi Uraian 6: Komunikasi Antar-Sprite Menggunakan Broadcast Message di Scratch",
+    "tp": "Fase C • Event-Driven Programming: Broadcast & Receive Signals",
+    "pertanyaan": "Dalam proyek animasi cerita interaktif di Scratch, tokoh Kucing ingin berbicara bergantian dengan tokoh Burung.\n(a) Mengapa kita sebaiknya menggunakan blok \"broadcast [pesan]\" dibanding menggunakan blok \"wait ... secs\" secara perkiraan?\n(b) Jelaskan bagaimana cara kerja pasangan blok \"broadcast [pesan]\" dan blok \"when I receive [pesan]\"!",
+    "placeholder": "Jelaskan keunggulan broadcast dibanding wait dan cara kerja pasangannya...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Keunggulan Broadcast:\nBlok \"wait ... secs\" sangat tidak akurat karena jika durasi meleset sedikit saja, dialog kedua tokoh akan bertabrakan. Blok \"broadcast\" mengirim sinyal instan saat satu tokoh selesai bicara, sehingga respon tokoh kedua selalu tepat waktu tanpa tebak-tebakan detik.\n(b) Cara Kerja:\nTokoh A memanggil \"broadcast [giliran_burung]\". Saat sinyal tersebut dipancarkan, semua sprite yang memiliki blok \"when I receive [giliran_burung]\" akan langsung terbangun dan mengeksekusi instruksi balasannya secara bersamaan.",
+    "penjelasan": "Broadcast Message adalah implementasi konsep Event-Driven Programming (pemrograman berbasis peristiwa) yang menghubungkan modul-modul independen."
+  },
+  {
+    "no": 7,
+    "judul": "Misi Uraian 7: Analisis Proses \"Debugging\" Saat Menemukan Bug pada Game",
+    "tp": "Fase C • Pemecahan Masalah Kode: Debugging & Logika Pengujian",
+    "pertanyaan": "Saat menguji game labirin buatanmu, kamu menemukan masalah (bug): karakter dapat menembus tembok hitam padahal kamu sudah memasang blok pengecekan warna tembok.\n(a) Jelaskan langkah-langkah sistematis yang kamu lakukan untuk melakukan proses Debugging!\n(b) Sebutkan 2 kemungkinan penyebab mengapa karakter tersebut bisa menembus dinding!",
+    "placeholder": "Jelaskan langkah sistematis debugging dan 2 kemungkinan penyebab bug...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Langkah Sistematis Debugging:\n1. Replikasi Bug: Memainkan ulang game dan memperhatikan di dinding mana karakter menembus.\n2. Periksa Skrip: Membuka baris blok yang mengatur tabrakan dinding.\n3. Isolasi Masalah: Menguji blok sensor menggunakan klik tunggal untuk melihat apakah sensor bernilai True/False.\n4. Perbaiki & Uji Kembali: Mengoreksi urutan blok dan menguji ulang hingga gerakan normal.\n(b) 2 Kemungkinan Penyebab Bug:\n1. Nilai warna pada blok <touching color [#...]> sedikit berbeda dengan warna asli gambar dinding (misal hitam pekat vs abu gelap).\n2. Kecepatan gerak sprite terlalu besar (misal melangkah 20 langkah sekali tekan), sehingga sprite melompati ketebalan dinding sebelum sensor sempat mendeteksi tabrakan.",
+    "penjelasan": "Debugging bukan sekadar memperbaiki kode, melainkan proses penyelidikan ilmiah yang melatih ketelitian dan ketabahan berpikir logis."
+  },
+  {
+    "no": 8,
+    "judul": "Misi Uraian 8: Konsep Kecerdasan Artifisial (AI) dan Perbedaannya dengan Program Biasa",
+    "tp": "Fase C • Pengenalan Kecerdasan Artifisial (AI) & Pembelajaran Mesin (ML)",
+    "pertanyaan": "Teknologi AI (Artificial Intelligence) seperti chatbot EduCodeAI dan asisten pintar semakin banyak digunakan.\n(a) Apa perbedaan mendasar antara program komputer biasa (berbasis aturan kaku) dengan sistem AI (berbasis pembelajaran pola data)?\n(b) Berikan 2 contoh penerapan AI yang dapat membantu kegiatan belajar siswa di sekolah!",
+    "placeholder": "Jelaskan perbedaan program biasa vs AI dan berikan 2 contoh AI untuk belajar...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Perbedaan Mendasar:\n- Program Biasa: Hanya menjalankan aturan kaku yang ditulis langsung oleh programmer (aturan IF-THEN statis). Jika ada kondisi di luar aturan, program akan bingung dan gagal.\n- Sistem AI: Mampu menganalisis ribuan contoh data (Machine Learning), mengenali pola kompleks, dan menghasilkan keputusan cerdas atau memprediksi jawaban baru menyerupai kecerdasan manusia.\n(b) 2 Contoh Penerapan di Sekolah:\n1. Pengecekan tata bahasa dan koreksi otomatis saat latihan menulis esai/cerita.\n2. Tutor belajar interaktif cerdas (seperti Robo EduCode) yang mampu menjawab pertanyaan penjelasan modul kapan saja sesuai kebutuhan siswa.",
+    "penjelasan": "AI mentransformasi komputer dari sekadar mesin pelaksana perintah menjadi mitra cerdas yang mampu mengenali pola dan belajar dari data."
+  },
+  {
+    "no": 9,
+    "judul": "Misi Uraian 9: Tanggung Jawab Digital & Etika Penggunaan Kecerdasan Artifisial (AI)",
+    "tp": "Fase C • Etika Penggunaan AI, Verifikasi Informasi & Keamanan Siber",
+    "pertanyaan": "Meskipun teknologi AI sangat canggih dan mampu menjawab berbagai pertanyaan tugas:\n(a) Mengapa siswa tidak boleh langsung menyalin-tempel (copy-paste) mentah-mentah jawaban dari AI untuk tugas sekolah?\n(b) Jelaskan pentingnya berpikir kritis (Critical Thinking) untuk menyaring informasi hoaks atau kekeliruan (halusinasi AI)!",
+    "placeholder": "Jelaskan bahaya copy-paste AI dan pentingnya berpikir kritis menyaring informasi...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Bahaya Salin-Tempel Mentah-mentah:\nMenyalin langsung tanpa membaca dan memahami mematikan daya pikir analitis siswa, melanggar kejujuran akademik, dan membuat siswa tidak benar-benar menguasai ilmu pengetahuan.\n(b) Pentingnya Berpikir Kritis:\nAI kadang menghasilkan informasi yang terdengar meyakinkan namun sebenarnya salah (halusinasi AI). Siswa harus selalu memverifikasi kebenaran data dengan membaca buku pelajaran resmi, berdiskusi dengan guru, dan mengecek fakta sebelum mempercayainya.",
+    "penjelasan": "AI adalah alat bantu penambah wawasan, bukan pengganti otak manusia. Siswa tetap menjadi pengendali utama dengan nalar kritis dan integritas."
+  },
+  {
+    "no": 10,
+    "judul": "Misi Uraian 10: Pengamalan Nilai Humanis Tzu Chi (Gan En, Zun Zhong, Hu Ai) dalam Proyek Sains",
+    "tp": "Fase C • Internalisasi Nilai Budaya Humanis Tzu Chi pada Era Digital",
+    "pertanyaan": "Dalam menyelesaikan proyek koding dan portofolio komputasi kelas 6 SD secara berkelompok:\n(a) Bagaimana kamu menerapkan nilai Zun Zhong (saling menghargai) ketika ada perbedaan ide logika algoritma antara kamu dan teman kelompokmu?\n(b) Bagaimana kamu mewujudkan rasa Gan En (bersyukur) terhadap fasilitas teknologi yang disediakan sekolah?",
+    "placeholder": "Jelaskan penerapan Zun Zhong saat berbeda pendapat dan Gan En terhadap fasilitas sekolah...",
+    "kunci": "KUNCI & RUBRIK JAWABAN GURU:\n(a) Zun Zhong (Saling Menghargai):\nMendengarkan penjelasan ide algoritma teman sampai selesai tanpa memotong pembicaraan, menghargai kelebihan rancangan teman, dan menguji kedua alternatif ide secara objektif di komputer untuk memilih cara terbaik secara musyawarah mufakat.\n(b) Gan En (Bersyukur):\nMerawat komputer lab dengan penuh cinta kasih, tidak mengotori ruang kelas, menjaga kebersihan meja lab, dan menggunakan ilmu komputasi yang didapat untuk membantu orang lain serta melestarikan lingkungan bumi.",
+    "penjelasan": "Teknologi tinggi tanpa budi pekerti luhur akan hampa. Nilai Gan En, Zun Zhong, dan Hu Ai memastikan kecerdasan digital senantiasa membawa berkah dan kedamaian."
+  }
+];
+window.SOAL_URAIAN_KELAS_6 = SOAL_URAIAN_KELAS_6;
+
+function getActiveUraianList() {
+  const tingkat = (typeof dapatkanTingkatKelasAktif === 'function') ? dapatkanTingkatKelasAktif() : 4;
+  if (tingkat === 6) {
+    return SOAL_URAIAN_KELAS_6;
+  }
+  if (tingkat === 5) {
+    return SOAL_URAIAN_KELAS_5;
+  }
+  return SOAL_URAIAN_KELAS_4;
+}
+window.getActiveUraianList = getActiveUraianList;
+
+
 
 /**
  * Cek apakah siswa sudah menghitung Total Tabungan Minggu Ini di sel F7 Excel
@@ -37575,13 +38531,8 @@ function pilihSubTabKuis(mode) {
   const uraianContainer = document.getElementById('kuis-uraian-container');
   const finishSummary = document.getElementById('quiz-finish-summary');
 
-  // Cek apakah kuis sudah pernah dikirim / dikunci (Hanya 1 kali percobaan)
+  // Navigasi sub-tab kuis: Siswa bebas beralih antara Pilihan Ganda dan Uraian kapan saja
   const submitCheck = isQuizAlreadySubmittedForActiveStudent();
-  if (submitCheck.isSubmitted) {
-    if (uraianContainer) uraianContainer.classList.add('hidden');
-    loadQuizQuestion();
-    return;
-  }
 
   if (mode === 'pg') {
     if (btnPg) {
@@ -37621,13 +38572,27 @@ function pilihSubTabKuis(mode) {
 window.pilihSubTabKuis = pilihSubTabKuis;
 
 /**
- * Render 5 Soal Uraian di HTML
+ * Render 10 Soal Uraian di HTML berdasarkan materi kelas masing-masing
  */
 function renderDaftarSoalUraian() {
   const wrapper = document.getElementById('daftar-soal-uraian-wrapper');
   if (!wrapper) return;
 
-  wrapper.innerHTML = SOAL_URAIAN_KISI_KISI_SEM1.map(q => `
+  const activeList = (typeof getActiveUraianList === 'function')
+    ? getActiveUraianList()
+    : (typeof SOAL_URAIAN_KELAS_4 !== 'undefined' ? SOAL_URAIAN_KELAS_4 : SOAL_URAIAN_KISI_KISI_SEM1);
+  const totalCount = activeList.length || 10;
+  const tingkat = (typeof getActiveStudentClassLevel === 'function') ? getActiveStudentClassLevel() : 4;
+
+  // Sinkronisasi badge & judul uraian
+  const badgeCount = document.getElementById('badge-uraian-count');
+  if (badgeCount) badgeCount.textContent = `${totalCount} Soal Analisis Kasus`;
+  const titleMateri = document.getElementById('title-uraian-materi');
+  if (titleMateri) {
+    titleMateri.textContent = `${totalCount} Soal Uraian Pemahaman Materi Modul Belajar (Kelas ${tingkat})`;
+  }
+
+  wrapper.innerHTML = activeList.map(q => `
     <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-slate-200 shadow-sm space-y-4 hover:border-purple-300 transition">
       <div class="flex items-start justify-between gap-3 flex-wrap border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
@@ -37696,19 +38661,24 @@ function toggleKunciUraian(no) {
 window.toggleKunciUraian = toggleKunciUraian;
 
 /**
- * Muat jawaban uraian siswa dari localStorage
+ * Muat jawaban uraian siswa dari localStorage sesuai tingkat kelas aktif
  */
 function muatJawabanUraianSiswa() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const sId = profile ? (profile.nis || profile.nama) : 'guest';
+  const tingkat = (typeof getActiveStudentClassLevel === 'function') ? getActiveStudentClassLevel() : 4;
   let savedAnswers = {};
 
   try {
-    const raw = localStorage.getItem(`educode_jawaban_uraian_${sId}_sem1`);
+    const raw = localStorage.getItem(`educode_jawaban_uraian_${sId}_k${tingkat}_sem1`) || localStorage.getItem(`educode_jawaban_uraian_${sId}_sem1`);
     if (raw) savedAnswers = JSON.parse(raw);
   } catch(e) {}
 
-  SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
+  const activeList = (typeof getActiveUraianList === 'function')
+    ? getActiveUraianList()
+    : (typeof SOAL_URAIAN_KELAS_4 !== 'undefined' ? SOAL_URAIAN_KELAS_4 : SOAL_URAIAN_KISI_KISI_SEM1);
+
+  activeList.forEach(q => {
     const ta = document.getElementById(`textarea-uraian-${q.no}`);
     if (ta && savedAnswers[q.no]) {
       ta.value = savedAnswers[q.no];
@@ -37718,15 +38688,16 @@ function muatJawabanUraianSiswa() {
 window.muatJawabanUraianSiswa = muatJawabanUraianSiswa;
 
 /**
- * Simpan jawaban uraian siswa ke localStorage
+ * Simpan jawaban uraian siswa ke localStorage sesuai tingkat kelas aktif
  */
 function simpanJawabanUraianOtomatis(no) {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const sId = profile ? (profile.nis || profile.nama) : 'guest';
+  const tingkat = (typeof getActiveStudentClassLevel === 'function') ? getActiveStudentClassLevel() : 4;
   let savedAnswers = {};
 
   try {
-    const raw = localStorage.getItem(`educode_jawaban_uraian_${sId}_sem1`);
+    const raw = localStorage.getItem(`educode_jawaban_uraian_${sId}_k${tingkat}_sem1`) || localStorage.getItem(`educode_jawaban_uraian_${sId}_sem1`);
     if (raw) savedAnswers = JSON.parse(raw);
   } catch(e) {}
 
@@ -37734,7 +38705,7 @@ function simpanJawabanUraianOtomatis(no) {
   if (ta) {
     savedAnswers[no] = ta.value;
     try {
-      localStorage.setItem(`educode_jawaban_uraian_${sId}_sem1`, JSON.stringify(savedAnswers));
+      localStorage.setItem(`educode_jawaban_uraian_${sId}_k${tingkat}_sem1`, JSON.stringify(savedAnswers));
     } catch(e) {}
   }
 }
@@ -37742,34 +38713,40 @@ window.simpanJawabanUraianOtomatis = simpanJawabanUraianOtomatis;
 
 function simpanJawabanUraianSiswa() {
   playSound('fanfare');
-  SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
+  const activeList = (typeof getActiveUraianList === 'function')
+    ? getActiveUraianList()
+    : (typeof SOAL_URAIAN_KELAS_4 !== 'undefined' ? SOAL_URAIAN_KELAS_4 : SOAL_URAIAN_KISI_KISI_SEM1);
+  const totalSoal = activeList.length || 10;
+
+  activeList.forEach(q => {
     simpanJawabanUraianOtomatis(q.no);
   });
 
   // Hitung jumlah jawaban uraian yang diisi siswa
   let answeredCount = 0;
-  SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
+  activeList.forEach(q => {
     const ta = document.getElementById(`textarea-uraian-${q.no}`);
     if (ta && ta.value.trim().length > 5) answeredCount++;
   });
 
-  const uraianScore = answeredCount >= 5 ? 100 : Math.min(100, answeredCount * 20);
+  const uraianScore = Math.min(100, Math.round((answeredCount / totalSoal) * 100));
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
   const sId = profile ? (profile.nis || profile.id || profile.nama) : 'guest';
+  const tingkat = (typeof getActiveStudentClassLevel === 'function') ? getActiveStudentClassLevel() : 4;
 
   // Simpan skor pending uraian (TIDAK langsung masuk ke buku nilai guru sampai siswa kirim nilai)
   try {
+    localStorage.setItem(`educode_pending_uraian_score_k${tingkat}_sem1_${sId}`, String(uraianScore));
     localStorage.setItem(`educode_pending_uraian_score_sem1_${sId}`, String(uraianScore));
   } catch(e) {}
 
-  showToast(`✅ Jawaban uraian berhasil disimpan! Tekan tombol "Kirim Nilai ke Guru 💾" di bagian atas agar nilaimu tercatat di Buku Nilai Guru!`, 'success');
+  showToast(`✅ ${answeredCount}/${totalSoal} Jawaban uraian berhasil disimpan (Skor Sementara: ${uraianScore})! Tekan tombol "Kirim Nilai ke Guru 💾" di bagian atas agar nilaimu tercatat di Buku Nilai Guru!`, 'success');
 }
 window.simpanJawabanUraianSiswa = simpanJawabanUraianSiswa;
 
 /**
  * Kirim Nilai Kuis Siswa secara eksplisit ke Guru & Google Sheets
- * ATURAN: Nilai kuis hanya tertera di akun guru JIKA siswa menekan tombol ini.
- * Kuis hanya dapat dilakukan 1 KALI PERCOBAAN.
+ * ATURAN: Siswa dapat mengulang kuis berkali-kali untuk memperbaiki nilai, dan setiap pengiriman akan memperbarui buku nilai guru dengan nilai terbaik siswa!
  */
 function kirimNilaiKuisKeGuru() {
   const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
@@ -37784,43 +38761,40 @@ function kirimNilaiKuisKeGuru() {
   const semNum = (typeof state !== 'undefined' && Number(state.currentSemester) === 2) ? 2 : 1;
   const sNis = profile.nis ? String(profile.nis).trim() : '';
   const sId = profile.id ? String(profile.id).trim() : (sNis || (profile.nama || 'guest'));
-  const lockKey = `educode_quiz_submitted_sem${semNum}_${sId}`;
-
-  // 1. Cek apakah kuis sudah pernah disubmit / dikunci sebelumnya (Hanya 1 kali percobaan)
-  if (localStorage.getItem(lockKey) === 'true') {
-    if (typeof showToast === 'function') {
-      showToast('🔒 Kuis hanya dapat dilakukan 1 kali percobaan dan nilai kamu sudah tersimpan di Buku Nilai Guru!', 'info');
-    }
-    return;
-  }
+  const tingkat = (typeof getActiveStudentClassLevel === 'function') ? getActiveStudentClassLevel() : 4;
 
   let scoreToSend = 0;
 
-  // 2. Ambil dari skor sesi kuis PG saat ini
+  // 1. Ambil dari skor sesi kuis PG saat ini
   if (typeof state !== 'undefined' && state.quizScore !== undefined && state.quizScore !== null) {
     scoreToSend = Math.max(scoreToSend, Number(state.quizScore));
   }
 
-  // 3. Periksa apakah jawaban uraian terisi
+  // 2. Periksa apakah jawaban uraian terisi
   let uraianCount = 0;
-  if (semNum === 1 && typeof SOAL_URAIAN_KISI_KISI_SEM1 !== 'undefined') {
-    SOAL_URAIAN_KISI_KISI_SEM1.forEach(q => {
+  const activeUraian = (typeof getActiveUraianList === 'function')
+    ? getActiveUraianList()
+    : (typeof SOAL_URAIAN_KELAS_4 !== 'undefined' ? SOAL_URAIAN_KELAS_4 : (typeof SOAL_URAIAN_KISI_KISI_SEM1 !== 'undefined' ? SOAL_URAIAN_KISI_KISI_SEM1 : []));
+  const totalUraian = activeUraian.length || 10;
+
+  if (semNum === 1 && activeUraian.length > 0) {
+    activeUraian.forEach(q => {
       const ta = document.getElementById(`textarea-uraian-${q.no}`);
       if (ta && ta.value.trim().length > 5) uraianCount++;
     });
     if (uraianCount > 0) {
-      const uScore = uraianCount >= 5 ? 100 : uraianCount * 20;
+      const uScore = Math.min(100, Math.round((uraianCount / totalUraian) * 100));
       scoreToSend = Math.max(scoreToSend, uScore);
     }
   }
 
-  // 4. Ambil dari skor pending tersimpan jika ada
+  // 3. Ambil dari skor pending tersimpan jika ada
   try {
     const pendPG = localStorage.getItem(`educode_pending_quiz_score_sem${semNum}_${sId}`);
     if (pendPG && !isNaN(Number(pendPG))) {
       scoreToSend = Math.max(scoreToSend, Number(pendPG));
     }
-    const pendUraian = localStorage.getItem(`educode_pending_uraian_score_sem1_${sId}`);
+    const pendUraian = localStorage.getItem(`educode_pending_uraian_score_k${tingkat}_sem1_${sId}`) || localStorage.getItem(`educode_pending_uraian_score_sem1_${sId}`);
     if (pendUraian && !isNaN(Number(pendUraian))) {
       scoreToSend = Math.max(scoreToSend, Number(pendUraian));
     }
@@ -37829,28 +38803,26 @@ function kirimNilaiKuisKeGuru() {
   // Jika siswa belum mengerjakan kuis sama sekali
   if (scoreToSend === 0 && !state.hasFinishedQuizCurrentSession && uraianCount === 0) {
     if (typeof showToast === 'function') {
-      showToast('⚠️ Silakan jawab pertanyaan kuis (pilihan ganda maupun uraian) terlebih dahulu sebelum mengirim nilai ke guru!', 'warning');
+      showToast('⚠️ Silakan jawab pertanyaan kuis terlebih dahulu sebelum mengirim nilai ke guru!', 'warning');
     }
     return;
   }
 
-  // 5. Catat hasil kuis secara resmi ke Database Guru & Google Sheets
+  // 4. Catat hasil kuis secara resmi ke Database Guru & Google Sheets
   if (typeof catatHasilKuisSiswa === 'function') {
     catatHasilKuisSiswa(semNum, scoreToSend);
   }
 
-  // 6. KUNCI KUIS PERMANEN: Hanya 1 kali percobaan
+  // 5. Simpan skor akhir ke LocalStorage
   try {
-    localStorage.setItem(lockKey, 'true');
     localStorage.setItem(`educode_quiz_final_score_sem${semNum}_${sId}`, String(scoreToSend));
   } catch(e) {}
 
   try { playSound('fanfare'); } catch(e){}
   if (typeof showToast === 'function') {
-    showToast(`🏆 Selamat ${profile.nama}! Nilai Kuis (${scoreToSend}) RESMI DIKIRIM ke Buku Nilai Guru & Google Sheets! Kuis selesai (1 kali percobaan).`, 'success');
+    showToast(`🏆 Selamat ${profile.nama}! Nilai Kuis (${scoreToSend}) BERHASIL DIKIRIM ke Buku Nilai Guru & Google Sheets! 💾✨`, 'success');
   }
 
-  // Perbarui tampilan kuis langsung ke mode terkunci
   loadQuizQuestion();
 
   if (typeof renderDasborGuru === 'function' && typeof state !== 'undefined' && state.isGuruLoggedIn) {
