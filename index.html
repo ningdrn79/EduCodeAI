@@ -5659,6 +5659,10 @@
           // Simpan ke local
           try {
             localStorage.setItem(KEY_P6, JSON.stringify(window._p6Data));
+            if (student && typeof window.simpanPortofolioKelas6Siswa === 'function') {
+              var currPort = (typeof window.dapatkanPortofolioKelas6Siswa === 'function') ? window.dapatkanPortofolioKelas6Siswa(student) : {};
+              window.simpanPortofolioKelas6Siswa(student, currPort);
+            }
           } catch(e){}
 
           // Tambah Poin Bintang
@@ -23380,7 +23384,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261119_nilai_k4_fixed_v209"></script>
+  <script charset="UTF-8" src="app.js?v=20261119_nilai_k6_realtime_v210"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

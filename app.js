@@ -27090,7 +27090,13 @@ async function loginDenganNis() {
       kuisSem2: student.kuisSem2 || 0,
       nilaiPoster: student.nilaiPoster || 0,
       posterWord: student.posterWord || 0,
-      poinBintang: student.poinBintang || 0
+      poinBintang: student.poinBintang || 0,
+      nilaiScratch4Pilar: (student.nilaiScratch4Pilar !== undefined && student.nilaiScratch4Pilar !== null) ? Number(student.nilaiScratch4Pilar) : 0,
+      nilaiScratchAlgoritma: (student.nilaiScratchAlgoritma !== undefined && student.nilaiScratchAlgoritma !== null) ? Number(student.nilaiScratchAlgoritma) : 0,
+      nilaiAntarTeman: (student.nilaiAntarTeman !== undefined && student.nilaiAntarTeman !== null) ? Number(student.nilaiAntarTeman) : 0,
+      nilaiKuis6: (student.nilaiKuis6 !== undefined && student.nilaiKuis6 !== null) ? Number(student.nilaiKuis6) : 0,
+      nilaiAkhir: (student.nilaiAkhir !== undefined && student.nilaiAkhir !== null) ? Number(student.nilaiAkhir) : 0,
+      portofolioK6: student.portofolioK6 || null
     };
     const isKelas6 = String(profile.kelas || '').includes('6');
     const isKelas5 = String(profile.kelas || '').includes('5');
@@ -27410,7 +27416,20 @@ function pilihSiswaDariDropdown(studentId) {
     nama: student.nama,
     kelas: student.kelas,
     absen: student.absen,
-    jenisKelamin: student.jenisKelamin || student.jk || student.gender || ''
+    jenisKelamin: student.jenisKelamin || student.jk || student.gender || '',
+    nilaiExcel: (student.nilaiExcel !== undefined && student.nilaiExcel !== null) ? Number(student.nilaiExcel) : 0,
+    excelTabel: (student.excelTabel !== undefined && student.excelTabel !== null) ? Number(student.excelTabel) : 0,
+    kuisSem1: student.kuisSem1 || 0,
+    kuisSem2: student.kuisSem2 || 0,
+    nilaiPoster: student.nilaiPoster || 0,
+    posterWord: student.posterWord || 0,
+    poinBintang: student.poinBintang || 0,
+    nilaiScratch4Pilar: (student.nilaiScratch4Pilar !== undefined && student.nilaiScratch4Pilar !== null) ? Number(student.nilaiScratch4Pilar) : 0,
+    nilaiScratchAlgoritma: (student.nilaiScratchAlgoritma !== undefined && student.nilaiScratchAlgoritma !== null) ? Number(student.nilaiScratchAlgoritma) : 0,
+    nilaiAntarTeman: (student.nilaiAntarTeman !== undefined && student.nilaiAntarTeman !== null) ? Number(student.nilaiAntarTeman) : 0,
+    nilaiKuis6: (student.nilaiKuis6 !== undefined && student.nilaiKuis6 !== null) ? Number(student.nilaiKuis6) : 0,
+    nilaiAkhir: (student.nilaiAkhir !== undefined && student.nilaiAkhir !== null) ? Number(student.nilaiAkhir) : 0,
+    portofolioK6: student.portofolioK6 || null
   };
   const isKelas6 = String(profile.kelas || '').includes('6');
   const isKelas5 = String(profile.kelas || '').includes('5');
@@ -38323,15 +38342,17 @@ function dapatkanPortofolioKelas6Siswa(student) {
     };
   }
 
-  const sId = student.id;
-  const sNis = student.nis;
+  const sId = student.id ? String(student.id).trim() : '';
+  const sNis = student.nis ? String(student.nis).trim() : '';
+  const sNama = (student.nama || '').trim().toLowerCase();
+  const sKelas = (student.kelas || '').trim().toUpperCase();
 
   // 1. Cek dari Cloud Cache Realtime
-  if (sNis && _p6CloudCache.has(String(sNis))) {
-    return _p6CloudCache.get(String(sNis));
+  if (sNis && _p6CloudCache.has(sNis)) {
+    return _p6CloudCache.get(sNis);
   }
-  if (sId && _p6CloudCache.has(String(sId))) {
-    return _p6CloudCache.get(String(sId));
+  if (sId && _p6CloudCache.has(sId)) {
+    return _p6CloudCache.get(sId);
   }
 
   // 2. Coba dari properti student langsung
@@ -38354,18 +38375,80 @@ function dapatkanPortofolioKelas6Siswa(student) {
   // 4. Fallback: Siswa aktif saat ini
   try {
     const activeProfile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-    if (activeProfile && (activeProfile.id === sId || activeProfile.nis === sNis)) {
-      const rawGlobal = localStorage.getItem('educode_kelas6_karya_v1');
-      if (rawGlobal) return JSON.parse(rawGlobal);
+    if (activeProfile) {
+      const aNis = activeProfile.nis ? String(activeProfile.nis).trim() : '';
+      const aId = activeProfile.id ? String(activeProfile.id).trim() : '';
+      const aNama = (activeProfile.nama || '').trim().toLowerCase();
+      if ((sNis && aNis === sNis) || (sId && aId === sId) || (sNama && aNama === sNama)) {
+        if (activeProfile.portofolioK6 && typeof activeProfile.portofolioK6 === 'object') {
+          return activeProfile.portofolioK6;
+        }
+        const rawGlobal = localStorage.getItem('educode_kelas6_karya_v1');
+        if (rawGlobal) return JSON.parse(rawGlobal);
+      }
     }
   } catch(e) {}
 
-  return {
+  // 5. Fallback ke database siswa jika objek student yang dipass adalah shallow / partial
+  try {
+    const db = getStudentDatabase();
+    const match = db.find(s => {
+      const mNis = s.nis ? String(s.nis).trim() : '';
+      const mId = s.id ? String(s.id).trim() : '';
+      const mNama = (s.nama || '').trim().toLowerCase();
+      const mKelas = (s.kelas || '').trim().toUpperCase();
+      if (sNis && mNis && sNis === mNis) return true;
+      if (sId && mId && sId === mId) return true;
+      if (sNama && mNama && sNama === mNama) {
+        if (!sKelas || !mKelas || sKelas === mKelas) return true;
+      }
+      return false;
+    });
+    if (match && match.portofolioK6 && typeof match.portofolioK6 === 'object') {
+      return match.portofolioK6;
+    }
+  } catch (eDb) {}
+
+  // Buat objek portofolio baru dan periksa nilai tercatat siswa
+  const res = {
     scratch4Pilar: { link: '', judul: '', catatan: '', tgl: '' },
     scratchAlgoritma: { link: '', judul: '', catatan: '', tgl: '' },
     antarTeman: { selesai: false, tgl: '' },
     kuis6: { selesai: false, skor: 0, tgl: '' }
   };
+
+  if (student.nilaiScratch4Pilar && Number(student.nilaiScratch4Pilar) > 0) {
+    res.scratch4Pilar = {
+      link: 'https://scratch.mit.edu/projects/',
+      judul: 'Game Scratch: Detektif Sampah (4 Pilar CT)',
+      catatan: 'Tersinkronisasi dari buku nilai',
+      tgl: 'Tersimpan'
+    };
+  }
+  if (student.nilaiScratchAlgoritma && Number(student.nilaiScratchAlgoritma) > 0) {
+    res.scratchAlgoritma = {
+      link: 'https://scratch.mit.edu/projects/',
+      judul: 'Kerja Kelompok Scratch: Pelestarian Lingkungan',
+      catatan: 'Tersinkronisasi dari buku nilai',
+      tgl: 'Tersimpan'
+    };
+  }
+  if (student.nilaiAntarTeman && Number(student.nilaiAntarTeman) > 0) {
+    res.antarTeman = {
+      selesai: true,
+      tgl: 'Tersimpan'
+    };
+  }
+  if ((student.nilaiKuis6 && Number(student.nilaiKuis6) > 0) || (student.kuisSem1 && Number(student.kuisSem1) > 0)) {
+    const skor = Number(student.nilaiKuis6) || Number(student.kuisSem1) || 100;
+    res.kuis6 = {
+      selesai: true,
+      skor: skor,
+      tgl: 'Tersimpan'
+    };
+  }
+
+  return res;
 }
 window.dapatkanPortofolioKelas6Siswa = dapatkanPortofolioKelas6Siswa;
 
@@ -38374,11 +38457,13 @@ window.dapatkanPortofolioKelas6Siswa = dapatkanPortofolioKelas6Siswa;
  */
 function simpanPortofolioKelas6Siswa(student, data) {
   if (!student) return;
-  const sId = student.id;
-  const sNis = student.nis;
+  const sId = student.id ? String(student.id).trim() : '';
+  const sNis = student.nis ? String(student.nis).trim() : '';
+  const sNama = (student.nama || '').trim();
+  const sKelas = (student.kelas || '6A').trim().toUpperCase();
 
-  if (sNis) _p6CloudCache.set(String(sNis), data);
-  if (sId) _p6CloudCache.set(String(sId), data);
+  if (sNis) _p6CloudCache.set(sNis, data);
+  if (sId) _p6CloudCache.set(sId, data);
 
   student.portofolioK6 = data;
 
@@ -38386,6 +38471,14 @@ function simpanPortofolioKelas6Siswa(student, data) {
     if (sNis) localStorage.setItem('educode_p6_data_' + sNis, JSON.stringify(data));
     if (sId) localStorage.setItem('educode_p6_data_' + sId, JSON.stringify(data));
     localStorage.setItem('educode_kelas6_karya_v1', JSON.stringify(data));
+    localStorage.setItem('educode_portofolio_k6_v1', JSON.stringify({
+      nis: sNis,
+      id: sId,
+      nama: sNama,
+      kelas: sKelas,
+      time: Date.now(),
+      data: data
+    }));
   } catch(e) {}
 
   // Hitung rubrik penilaian otomatis untuk tugas portofolio Kelas 6
@@ -38407,7 +38500,20 @@ function simpanPortofolioKelas6Siswa(student, data) {
   // Update di state student database jika ada
   try {
     const db = getStudentDatabase();
-    const idx = db.findIndex(s => (s.id && s.id === sId) || (s.nis && s.nis === sNis));
+    let idx = db.findIndex(s => {
+      const dbNis = s.nis ? String(s.nis).trim() : '';
+      const dbId = s.id ? String(s.id).trim() : '';
+      const dbNama = (s.nama || '').trim().toLowerCase();
+      const dbKelas = (s.kelas || '').trim().toUpperCase();
+
+      if (sNis && dbNis && sNis === dbNis) return true;
+      if (sId && dbId && sId === dbId) return true;
+      if (sNama && dbNama && sNama.toLowerCase() === dbNama) {
+        if (!sKelas || !dbKelas || sKelas === dbKelas) return true;
+      }
+      return false;
+    });
+
     if (idx !== -1) {
       db[idx].portofolioK6 = data;
       if (rubrik) {
@@ -38417,7 +38523,26 @@ function simpanPortofolioKelas6Siswa(student, data) {
         db[idx].nilaiKuis6 = rubrik.nilaiKuis6;
         db[idx].nilaiAkhir = rubrik.nilaiAkhir;
         db[idx].statusKkm = rubrik.isTuntas ? 'Tuntas' : 'Remedial';
+        db[idx].terakhirAktif = 'Baru saja';
       }
+      saveStudentDatabase(db);
+    } else {
+      const newStd = {
+        id: sId || `STD-${sKelas}-${sNis || '6000'}`,
+        nis: sNis || '6000',
+        nama: sNama || 'Siswa Kelas 6',
+        kelas: sKelas,
+        absen: student.absen || '01',
+        portofolioK6: data,
+        nilaiScratch4Pilar: rubrik ? rubrik.nilaiScratch4Pilar : 0,
+        nilaiScratchAlgoritma: rubrik ? rubrik.nilaiScratchAlgoritma : 0,
+        nilaiAntarTeman: rubrik ? rubrik.nilaiAntarTeman : 0,
+        nilaiKuis6: rubrik ? rubrik.nilaiKuis6 : 0,
+        nilaiAkhir: rubrik ? rubrik.nilaiAkhir : 0,
+        statusKkm: rubrik && rubrik.isTuntas ? 'Tuntas' : 'Remedial',
+        terakhirAktif: 'Baru saja'
+      };
+      db.push(newStd);
       saveStudentDatabase(db);
     }
   } catch(eDb) {}
@@ -38432,6 +38557,14 @@ function simpanPortofolioKelas6Siswa(student, data) {
       window.simpanPortofolioK6KeCloud(student, data);
     }
   } catch(eCloud) {}
+
+  // Segarkan seluruh tampilan UI Buku Nilai Guru, Progres Siswa, dan Papan Peringkat Realtime
+  try {
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') perbaruiPeringkatKelasRealtimeOtomatis(true);
+    if (typeof renderTop5SiswaLeaderboard === 'function') renderTop5SiswaLeaderboard();
+  } catch (eUi) {}
 }
 window.simpanPortofolioKelas6Siswa = simpanPortofolioKelas6Siswa;
 
@@ -38534,34 +38667,34 @@ function hitungRubrikPenilaianKelas6(student, customData) {
   const pilar = k6.scratch4Pilar || {};
   let nScratch4Pilar = (student && student.nilaiScratch4Pilar !== undefined && student.nilaiScratch4Pilar !== null && student.nilaiScratch4Pilar !== '') ? Number(student.nilaiScratch4Pilar) : null;
   const hasScratch4Pilar = !!((pilar.link && pilar.link.trim().length > 7) || (nScratch4Pilar !== null && nScratch4Pilar > 0));
-  if (nScratch4Pilar === null) {
-    nScratch4Pilar = hasScratch4Pilar ? (pilar.catatan && pilar.catatan.trim().length > 5 ? 100 : 90) : 0;
+  if (nScratch4Pilar === null || nScratch4Pilar <= 0) {
+    nScratch4Pilar = hasScratch4Pilar ? 100 : 0;
   }
 
   // 2. Menu 2: Scratch Algoritma (Bobot 25%)
   const algo = k6.scratchAlgoritma || {};
   let nScratchAlgoritma = (student && student.nilaiScratchAlgoritma !== undefined && student.nilaiScratchAlgoritma !== null && student.nilaiScratchAlgoritma !== '') ? Number(student.nilaiScratchAlgoritma) : null;
   const hasScratchAlgoritma = !!((algo.link && algo.link.trim().length > 7) || (nScratchAlgoritma !== null && nScratchAlgoritma > 0));
-  if (nScratchAlgoritma === null) {
-    nScratchAlgoritma = hasScratchAlgoritma ? (algo.catatan && algo.catatan.trim().length > 5 ? 100 : 90) : 0;
+  if (nScratchAlgoritma === null || nScratchAlgoritma <= 0) {
+    nScratchAlgoritma = hasScratchAlgoritma ? 100 : 0;
   }
 
   // 3. Menu 3: Penilaian Antar Teman (Bobot 25%)
   const antar = k6.antarTeman || {};
   let nAntarTeman = (student && student.nilaiAntarTeman !== undefined && student.nilaiAntarTeman !== null && student.nilaiAntarTeman !== '') ? Number(student.nilaiAntarTeman) : null;
   const hasAntarTeman = !!(antar.selesai || (nAntarTeman !== null && nAntarTeman > 0));
-  if (nAntarTeman === null) {
+  if (nAntarTeman === null || nAntarTeman <= 0) {
     nAntarTeman = hasAntarTeman ? 100 : 0;
   }
 
   // 4. Menu 4: Kuis6 Komputasi (Bobot 25%)
   const kuis = k6.kuis6 || {};
   let nKuis6 = (student && student.nilaiKuis6 !== undefined && student.nilaiKuis6 !== null && student.nilaiKuis6 !== '') ? Number(student.nilaiKuis6) : null;
-  if (nKuis6 === null && student && Number(student.kuisSem1) > 0) {
+  if ((nKuis6 === null || nKuis6 <= 0) && student && Number(student.kuisSem1) > 0) {
     nKuis6 = Number(student.kuisSem1);
   }
   const hasKuis6 = !!(kuis.selesai || Number(kuis.skor) > 0 || (nKuis6 !== null && nKuis6 > 0));
-  if (nKuis6 === null) {
+  if (nKuis6 === null || nKuis6 <= 0) {
     nKuis6 = (kuis.skor && Number(kuis.skor) > 0) ? Number(kuis.skor) : (hasKuis6 ? 100 : 0);
   }
 
@@ -38660,6 +38793,11 @@ function kirimTugasScratchK6(type) {
   muatStatusTugasScratchK6(type);
   perbaruiStatusMisiKelas6Siswa();
 
+  if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+  if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+  if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') { try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {} }
+  if (typeof renderTop5SiswaLeaderboard === 'function') { try { renderTop5SiswaLeaderboard(); } catch(e) {} }
+
   playSound('fanfare');
   showToast(is4Pilar ? 'Karya Game "Detektif Sampah" Berhasil Dikumpulkan! 🎮✨' : 'Tugas Kelompok "Pelestarian Lingkungan" Berhasil Dikumpulkan! 🌿🚀', 'success');
 }
@@ -38745,6 +38883,11 @@ function tandaiMisiK6Selesai(misi) {
     muatStatusMisiK6('antarteman');
     perbaruiStatusMisiKelas6Siswa();
 
+    if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+    if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') { try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {} }
+    if (typeof renderTop5SiswaLeaderboard === 'function') { try { renderTop5SiswaLeaderboard(); } catch(e) {} }
+
     if (k6.antarTeman.selesai) {
       playSound('fanfare');
       showToast('Penilaian Antar Teman (EvalScore) Ditandai Selesai! 🌟🤝', 'success');
@@ -38762,6 +38905,11 @@ function tandaiMisiK6Selesai(misi) {
     simpanPortofolioKelas6Siswa(student, k6);
     muatStatusMisiK6('kuis');
     perbaruiStatusMisiKelas6Siswa();
+
+    if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+    if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') { try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {} }
+    if (typeof renderTop5SiswaLeaderboard === 'function') { try { renderTop5SiswaLeaderboard(); } catch(e) {} }
 
     if (k6.kuis6.selesai) {
       playSound('fanfare');
@@ -40707,6 +40855,11 @@ function perbaruiPeringkatKelasRealtimeOtomatis(force = false) {
     if (force || currentKey !== _leaderboardCacheKey) {
       _leaderboardCacheKey = currentKey;
       renderTop5SiswaLeaderboard(activeCls);
+      if (typeof state !== 'undefined' && state.currentTab === 'guru') {
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+        if (typeof renderDasborGuru === 'function') renderDasborGuru();
+      }
+      if (typeof perbaruiStatusMisiKelas6Siswa === 'function') perbaruiStatusMisiKelas6Siswa();
     }
   } catch (e) {
     renderTop5SiswaLeaderboard();
@@ -40717,8 +40870,11 @@ window.perbaruiPeringkatKelasRealtimeOtomatis = perbaruiPeringkatKelasRealtimeOt
 // Listener Otomatis Realtime: Event Storage Antar-Tab & Multi-Komputer
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
-    if (e.key && (e.key.includes('student') || e.key.includes('portofolio') || e.key.includes('nilai') || e.key.includes('kuis') || e.key.includes('drive'))) {
+    if (e.key && (e.key.includes('student') || e.key.includes('portofolio') || e.key.includes('nilai') || e.key.includes('kuis') || e.key.includes('drive') || e.key.includes('p6'))) {
       perbaruiPeringkatKelasRealtimeOtomatis(true);
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      if (typeof renderDasborGuru === 'function') renderDasborGuru();
+      if (typeof perbaruiStatusMisiKelas6Siswa === 'function') perbaruiStatusMisiKelas6Siswa();
     }
   });
 
