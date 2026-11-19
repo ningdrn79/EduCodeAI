@@ -25439,136 +25439,149 @@ window.catatSiswaTerhapus = catatSiswaTerhapus;
  * Memastikan setiap kelas (6A..6E, 5A..5E, 4A..4E) memiliki peringkat 5 besar
  * dengan capaian nilai tertinggi dari Buku Nilai Guru dan Progres Tugas.
  */
+let _isSanitizingTeladan = false;
+let _hasSanitizedTeladanSession = false;
+
 function inisialisasiNilaiTeladanDatabase(students) {
   if (!Array.isArray(students)) return students;
+  if (_isSanitizingTeladan) return students;
+  if (_hasSanitizedTeladanSession) return students;
 
+  _isSanitizingTeladan = true;
   let hasModified = false;
 
-  // 1. Sanitasi & Perbaikan Korupsi Data Warisan:
-  // Jangan biarkan kolom jumlah (posterWord / excelTabel) berisi nilai skor (misal 98 Poster, 96 Latihan)
-  students.forEach(s => {
-    if (!s) return;
-    if (Number(s.posterWord) >= 10) {
-      s.nilaiPoster = Math.max(Number(s.nilaiPoster) || 0, Number(s.posterWord));
-      s.posterWord = 1;
-      hasModified = true;
-    }
-    if (Number(s.excelTabel) >= 10) {
-      s.nilaiExcel = Math.max(Number(s.nilaiExcel) || 0, Number(s.excelTabel));
-      s.excelTabel = 1;
-      hasModified = true;
-    }
-  });
-
-  // 2. Sanitasi & Pembersihan Nilai Tiruan Tanpa Tugas Nyata:
-  // Siswa HANYA boleh memiliki nilai jika mereka mengunggah berkas nyata atau jika dinilai manual oleh Guru
-  students.forEach(s => {
-    if (!s) return;
-    const isTestAccount = String(s.nama || '').toLowerCase().includes('uji coba');
-    if (isTestAccount) return; // Akun Pelajar Uji Coba dibiarkan sebagai akun demo
-
-    const cls = String(s.kelas || '').trim().toUpperCase();
-    if (cls.includes('5')) {
-      const p5 = (typeof dapatkanPortofolioKelas5Siswa === 'function') ? dapatkanPortofolioKelas5Siswa(s) : (s.portofolioP5 || {});
-      const hasPpt = !!(p5.ppt1 && (p5.ppt1.dataUrl || p5.ppt1.gdriveLink || p5.ppt1.name)) || !!(p5.ppt2 && (p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.name || p5.ppt2.prompt));
-      const hasHoc = !!(p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name || p5.sertifikat.aktivitas));
-      const hasPoster = !!(p5.poster && (p5.poster.dataUrl || p5.poster.name || p5.poster.judul));
-      const hasGame = !!(p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain || p5.scratch.skor || p5.scratch.selesai)) || (Number(s.nilaiKuis5) > 0);
-
-      // Jika berkas belum ada dan bukan nilai manual dari guru, reset ke 0
-      if (!hasPpt && !s.isManualNilaiPpt && Number(s.nilaiPresentasi) > 0) {
-        s.nilaiPresentasi = 0;
-        hasModified = true;
-      }
-      if (!hasHoc && !s.isManualNilaiSertifikat && Number(s.nilaiSertifikat) > 0) {
-        s.nilaiSertifikat = 0;
-        hasModified = true;
-      }
-      if (!hasPoster && !s.isManualNilaiPoster && Number(s.nilaiPosterCanva) > 0) {
-        s.nilaiPosterCanva = 0;
-        hasModified = true;
-      }
-      if (!hasGame && !s.isManualNilaiGame && Number(s.nilaiGameCoding) > 0) {
-        s.nilaiGameCoding = 0;
-        hasModified = true;
-      }
-      
-      const rubrik = (typeof hitungRubrikPenilaianKelas5 === 'function') ? hitungRubrikPenilaianKelas5(s, p5) : null;
-      if (rubrik) {
-        if (s.nilaiAkhir !== rubrik.nilaiAkhir || s.nilaiAkhirKelas5 !== rubrik.nilaiAkhir || s.statusKkm !== rubrik.statusKkm) {
-          s.nilaiAkhir = rubrik.nilaiAkhir;
-          s.nilaiAkhirKelas5 = rubrik.nilaiAkhir;
-          s.statusKkm = rubrik.statusKkm;
-          hasModified = true;
-        }
-      }
-    } else if (cls.includes('6')) {
-      const isValidLink = (lnk) => {
-        if (!lnk || typeof lnk !== 'string') return false;
-        const l = lnk.trim().toLowerCase();
-        if (!l.startsWith('http')) return false;
-        if (l === 'https://scratch.mit.edu/projects/' || l === 'https://scratch.mit.edu/projects' || l === 'http://scratch.mit.edu/projects/' || l === 'http://scratch.mit.edu/projects') return false;
-        return l.length > 15;
-      };
-
-      if (s.portofolioK6) {
-        if (s.portofolioK6.scratch4Pilar && !isValidLink(s.portofolioK6.scratch4Pilar.link)) {
-          s.portofolioK6.scratch4Pilar = { link: '', judul: '', catatan: '', tgl: '' };
-          hasModified = true;
-        }
-        if (s.portofolioK6.scratchAlgoritma && !isValidLink(s.portofolioK6.scratchAlgoritma.link)) {
-          s.portofolioK6.scratchAlgoritma = { link: '', judul: '', catatan: '', tgl: '' };
-          hasModified = true;
-        }
-        if (s.portofolioK6.antarTeman && s.portofolioK6.antarTeman.tgl === 'Tersimpan') {
-          s.portofolioK6.antarTeman = { selesai: false, tgl: '' };
-          hasModified = true;
-        }
-        if (s.portofolioK6.kuis6 && s.portofolioK6.kuis6.tgl === 'Tersimpan') {
-          s.portofolioK6.kuis6 = { selesai: false, skor: 0, tgl: '' };
-          hasModified = true;
-        }
-      }
-
-      const k6 = (typeof dapatkanPortofolioKelas6Siswa === 'function') ? dapatkanPortofolioKelas6Siswa(s) : (s.portofolioK6 || {});
-      const has4P = !!(k6.scratch4Pilar && isValidLink(k6.scratch4Pilar.link));
-      const hasAlgo = !!(k6.scratchAlgoritma && isValidLink(k6.scratchAlgoritma.link));
-      const hasAntar = !!(k6.antarTeman && k6.antarTeman.selesai && k6.antarTeman.tgl && k6.antarTeman.tgl !== 'Tersimpan');
-      const hasKuis = !!((k6.kuis6 && k6.kuis6.selesai && k6.kuis6.tgl && k6.kuis6.tgl !== 'Tersimpan') || (s.riwayatKuis6 && s.riwayatKuis6.length > 0));
-
-      if (!has4P && !s.isManualNilai4Pilar && Number(s.nilaiScratch4Pilar) > 0) {
-        s.nilaiScratch4Pilar = 0;
-        hasModified = true;
-      }
-      if (!hasAlgo && !s.isManualNilaiAlgoritma && Number(s.nilaiScratchAlgoritma) > 0) {
-        s.nilaiScratchAlgoritma = 0;
-        hasModified = true;
-      }
-      if (!hasAntar && !s.isManualNilaiAntarTeman && Number(s.nilaiAntarTeman) > 0) {
-        s.nilaiAntarTeman = 0;
-        hasModified = true;
-      }
-      if (!hasKuis && !s.isManualNilaiKuis6 && Number(s.nilaiKuis6) > 0) {
-        s.nilaiKuis6 = 0;
-        hasModified = true;
-      }
-
-      const rubrik6 = (typeof hitungRubrikPenilaianKelas6 === 'function') ? hitungRubrikPenilaianKelas6(s, k6) : null;
-      if (rubrik6) {
-        if (s.nilaiAkhir !== rubrik6.nilaiAkhir || s.statusKkm !== (rubrik6.isTuntas ? 'Tuntas' : 'Remedial')) {
-          s.nilaiAkhir = rubrik6.nilaiAkhir;
-          s.statusKkm = rubrik6.isTuntas ? 'Tuntas' : 'Remedial';
-          hasModified = true;
-        }
-      }
-    }
-  });
-
   try {
+    // 1. Sanitasi & Perbaikan Korupsi Data Warisan:
+    // Jangan biarkan kolom jumlah (posterWord / excelTabel) berisi nilai skor (misal 98 Poster, 96 Latihan)
+    students.forEach(s => {
+      if (!s) return;
+      if (Number(s.posterWord) >= 10) {
+        s.nilaiPoster = Math.max(Number(s.nilaiPoster) || 0, Number(s.posterWord));
+        s.posterWord = 1;
+        hasModified = true;
+      }
+      if (Number(s.excelTabel) >= 10) {
+        s.nilaiExcel = Math.max(Number(s.nilaiExcel) || 0, Number(s.excelTabel));
+        s.excelTabel = 1;
+        hasModified = true;
+      }
+    });
+
+    // 2. Sanitasi & Pembersihan Nilai Tiruan Tanpa Tugas Nyata:
+    // Siswa HANYA boleh memiliki nilai jika mereka mengunggah berkas nyata atau jika dinilai manual oleh Guru
+    students.forEach(s => {
+      if (!s) return;
+      const isTestAccount = String(s.nama || '').toLowerCase().includes('uji coba');
+      if (isTestAccount) return; // Akun Pelajar Uji Coba dibiarkan sebagai akun demo
+
+      const cls = String(s.kelas || '').trim().toUpperCase();
+      if (cls.includes('5')) {
+        const p5 = (typeof dapatkanPortofolioKelas5Siswa === 'function') ? dapatkanPortofolioKelas5Siswa(s) : (s.portofolioP5 || {});
+        const hasPpt = !!(p5.ppt1 && (p5.ppt1.dataUrl || p5.ppt1.gdriveLink || p5.ppt1.name)) || !!(p5.ppt2 && (p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.name || p5.ppt2.prompt));
+        const hasHoc = !!(p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name || p5.sertifikat.aktivitas));
+        const hasPoster = !!(p5.poster && (p5.poster.dataUrl || p5.poster.name || p5.poster.judul));
+        const hasGame = !!(p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain || p5.scratch.skor || p5.scratch.selesai)) || (Number(s.nilaiKuis5) > 0);
+
+        // Jika berkas belum ada dan bukan nilai manual dari guru, reset ke 0
+        if (!hasPpt && !s.isManualNilaiPpt && Number(s.nilaiPresentasi) > 0) {
+          s.nilaiPresentasi = 0;
+          hasModified = true;
+        }
+        if (!hasHoc && !s.isManualNilaiSertifikat && Number(s.nilaiSertifikat) > 0) {
+          s.nilaiSertifikat = 0;
+          hasModified = true;
+        }
+        if (!hasPoster && !s.isManualNilaiPoster && Number(s.nilaiPosterCanva) > 0) {
+          s.nilaiPosterCanva = 0;
+          hasModified = true;
+        }
+        if (!hasGame && !s.isManualNilaiGame && Number(s.nilaiGameCoding) > 0) {
+          s.nilaiGameCoding = 0;
+          hasModified = true;
+        }
+        
+        const rubrik = (typeof hitungRubrikPenilaianKelas5 === 'function') ? hitungRubrikPenilaianKelas5(s, p5) : null;
+        if (rubrik) {
+          if (s.nilaiAkhir !== rubrik.nilaiAkhir || s.nilaiAkhirKelas5 !== rubrik.nilaiAkhir || s.statusKkm !== rubrik.statusKkm) {
+            s.nilaiAkhir = rubrik.nilaiAkhir;
+            s.nilaiAkhirKelas5 = rubrik.nilaiAkhir;
+            s.statusKkm = rubrik.statusKkm;
+            hasModified = true;
+          }
+        }
+      } else if (cls.includes('6')) {
+        const isValidLink = (lnk) => {
+          if (!lnk || typeof lnk !== 'string') return false;
+          const l = lnk.trim().toLowerCase();
+          if (!l.startsWith('http')) return false;
+          if (l === 'https://scratch.mit.edu/projects/' || l === 'https://scratch.mit.edu/projects' || l === 'http://scratch.mit.edu/projects/' || l === 'http://scratch.mit.edu/projects') return false;
+          return l.length > 15;
+        };
+
+        if (s.portofolioK6) {
+          if (s.portofolioK6.scratch4Pilar && !isValidLink(s.portofolioK6.scratch4Pilar.link)) {
+            s.portofolioK6.scratch4Pilar = { link: '', judul: '', catatan: '', tgl: '' };
+            hasModified = true;
+          }
+          if (s.portofolioK6.scratchAlgoritma && !isValidLink(s.portofolioK6.scratchAlgoritma.link)) {
+            s.portofolioK6.scratchAlgoritma = { link: '', judul: '', catatan: '', tgl: '' };
+            hasModified = true;
+          }
+          if (s.portofolioK6.antarTeman && s.portofolioK6.antarTeman.tgl === 'Tersimpan') {
+            s.portofolioK6.antarTeman = { selesai: false, tgl: '' };
+            hasModified = true;
+          }
+          if (s.portofolioK6.kuis6 && s.portofolioK6.kuis6.tgl === 'Tersimpan') {
+            s.portofolioK6.kuis6 = { selesai: false, skor: 0, tgl: '' };
+            hasModified = true;
+          }
+        }
+
+        const k6 = (typeof dapatkanPortofolioKelas6Siswa === 'function') ? dapatkanPortofolioKelas6Siswa(s) : (s.portofolioK6 || {});
+        const has4P = !!(k6.scratch4Pilar && isValidLink(k6.scratch4Pilar.link));
+        const hasAlgo = !!(k6.scratchAlgoritma && isValidLink(k6.scratchAlgoritma.link));
+        const hasAntar = !!(k6.antarTeman && k6.antarTeman.selesai && k6.antarTeman.tgl && k6.antarTeman.tgl !== 'Tersimpan');
+        const hasKuis = !!((k6.kuis6 && k6.kuis6.selesai && k6.kuis6.tgl && k6.kuis6.tgl !== 'Tersimpan') || (s.riwayatKuis6 && s.riwayatKuis6.length > 0));
+
+        if (!has4P && !s.isManualNilai4Pilar && Number(s.nilaiScratch4Pilar) > 0) {
+          s.nilaiScratch4Pilar = 0;
+          hasModified = true;
+        }
+        if (!hasAlgo && !s.isManualNilaiAlgoritma && Number(s.nilaiScratchAlgoritma) > 0) {
+          s.nilaiScratchAlgoritma = 0;
+          hasModified = true;
+        }
+        if (!hasAntar && !s.isManualNilaiAntarTeman && Number(s.nilaiAntarTeman) > 0) {
+          s.nilaiAntarTeman = 0;
+          hasModified = true;
+        }
+        if (!hasKuis && !s.isManualNilaiKuis6 && Number(s.nilaiKuis6) > 0) {
+          s.nilaiKuis6 = 0;
+          hasModified = true;
+        }
+
+        const rubrik6 = (typeof hitungRubrikPenilaianKelas6 === 'function') ? hitungRubrikPenilaianKelas6(s, k6) : null;
+        if (rubrik6) {
+          if (s.nilaiAkhir !== rubrik6.nilaiAkhir || s.statusKkm !== (rubrik6.isTuntas ? 'Tuntas' : 'Remedial')) {
+            s.nilaiAkhir = rubrik6.nilaiAkhir;
+            s.statusKkm = rubrik6.isTuntas ? 'Tuntas' : 'Remedial';
+            hasModified = true;
+          }
+        }
+      }
+    });
+
     if (hasModified) {
-      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(students));
+      try {
+        localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(students));
+      } catch (e) {}
     }
-  } catch (e) {}
+    _hasSanitizedTeladanSession = true;
+  } catch (err) {
+    console.error('Error saat inisialisasiNilaiTeladanDatabase:', err);
+  } finally {
+    _isSanitizingTeladan = false;
+  }
 
   return students;
 }
@@ -25576,10 +25589,16 @@ window.inisialisasiNilaiTeladanDatabase = inisialisasiNilaiTeladanDatabase;
 
 // Helper: Ambil Database Siswa dari localStorage (Hanya Data Resmi Tanpa Siswa Contoh)
 let _cachedStudentDatabase = null;
+let _isGettingStudentDatabase = false;
+
 function getStudentDatabase(forceRefresh = false) {
   if (_cachedStudentDatabase && !forceRefresh) {
     return _cachedStudentDatabase;
   }
+  if (_isGettingStudentDatabase) {
+    return _cachedStudentDatabase || (Array.isArray(SEED_STUDENTS) ? SEED_STUDENTS : []);
+  }
+  _isGettingStudentDatabase = true;
   try {
     const raw = localStorage.getItem(DB_STORAGE_KEY);
     let parsed = null;
@@ -25667,13 +25686,17 @@ function getStudentDatabase(forceRefresh = false) {
         existing.nilaiGameCoding = Math.max(existing.nilaiGameCoding || 0, s.nilaiGameCoding || 0);
       }
     });
-    parsed = inisialisasiNilaiTeladanDatabase(deduped);
 
+    // Simpan ke cache terlebih dahulu sebelum pemanggilan rubrik agar downstream calls langsung mengenai cache
+    _cachedStudentDatabase = deduped;
+    parsed = inisialisasiNilaiTeladanDatabase(deduped);
     _cachedStudentDatabase = parsed;
     return _cachedStudentDatabase;
   } catch (err) {
     console.error('Error saat membaca database siswa:', err);
     return Array.isArray(SEED_STUDENTS) ? SEED_STUDENTS : [];
+  } finally {
+    _isGettingStudentDatabase = false;
   }
 }
 
@@ -38507,26 +38530,6 @@ function dapatkanPortofolioKelas6Siswa(student) {
       }
     }
   } catch(e) {}
-
-  // 5. Fallback ke database siswa jika objek student yang dipass adalah shallow / partial
-  try {
-    const db = getStudentDatabase();
-    const match = db.find(s => {
-      const mNis = s.nis ? String(s.nis).trim() : '';
-      const mId = s.id ? String(s.id).trim() : '';
-      const mNama = (s.nama || '').trim().toLowerCase();
-      const mKelas = (s.kelas || '').trim().toUpperCase();
-      if (sNis && mNis && sNis === mNis) return true;
-      if (sId && mId && sId === mId) return true;
-      if (sNama && mNama && sNama === mNama) {
-        if (!sKelas || !mKelas || sKelas === mKelas) return true;
-      }
-      return false;
-    });
-    if (match && match.portofolioK6 && typeof match.portofolioK6 === 'object') {
-      return match.portofolioK6;
-    }
-  } catch (eDb) {}
 
   // Default jika belum ada berkas nyata yang dikumpulkan siswa
   return {
