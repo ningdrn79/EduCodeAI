@@ -530,6 +530,27 @@
           }
         }
 
+        // Sinkronkan styling tombol aktif navigasi Kelas 5 SD
+        var allK5Btns = ['nav-p5-beranda', 'nav-p5-presentasi', 'nav-p5-sertifikat', 'nav-p5-poster', 'nav-p5-kuis'];
+        for (var k5 = 0; k5 < allK5Btns.length; k5++) {
+          var bK5 = document.getElementById(allK5Btns[k5]);
+          if (bK5) {
+            bK5.classList.remove('active-tab', 'text-white');
+            bK5.classList.add('text-slate-300');
+          }
+        }
+        var navK5Map = {
+          'beranda': 'nav-p5-beranda',
+          'kuis': 'nav-p5-kuis'
+        };
+        if (navK5Map[tabId]) {
+          var activeK5 = document.getElementById(navK5Map[tabId]);
+          if (activeK5) {
+            activeK5.classList.add('active-tab', 'text-white');
+            activeK5.classList.remove('text-slate-300');
+          }
+        }
+
         // Sinkronkan styling tombol aktif navigasi Kelas 6 SD
         var allK6Btns = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis'];
         for (var k = 0; k < allK6Btns.length; k++) {
@@ -558,11 +579,15 @@
         // Kuis Interaktif EduCode AI (Kelas 4, 5, dan 6)
         if (tabId === 'kuis') {
           var isK6Tab = false;
+          var isK5Tab = false;
           try {
             var rawK6Std = localStorage.getItem('educode_active_student_v1');
             if (rawK6Std && rawK6Std !== 'LOGGED_OUT') {
               var sObj = JSON.parse(rawK6Std);
-              if (sObj && (String(sObj.kelas || '').indexOf('6') !== -1 || String(sObj.kelas || '').toUpperCase().indexOf('VI') !== -1)) isK6Tab = true;
+              if (sObj) {
+                if (String(sObj.kelas || '').indexOf('6') !== -1 || String(sObj.kelas || '').toUpperCase().indexOf('VI') !== -1) isK6Tab = true;
+                if (String(sObj.kelas || '').indexOf('5') !== -1 || String(sObj.kelas || '').toUpperCase().indexOf('V') !== -1) isK5Tab = true;
+              }
             }
           } catch(eK6Check){}
           var k6BoxEl = document.getElementById('kuis-kelas6-container');
@@ -571,6 +596,8 @@
           if (k4BoxEl) { k4BoxEl.classList.remove('hidden'); k4BoxEl.style.removeProperty('display'); }
           if (isK6Tab && typeof window.setHeaderNavMode === 'function') {
             window.setHeaderNavMode('kelas6');
+          } else if (isK5Tab && typeof window.setHeaderNavMode === 'function') {
+            window.setHeaderNavMode('kelas5');
           }
         }
         // Sinkronkan status kartu sambutan siswa jika tab beranda dibuka
@@ -1625,34 +1652,29 @@
       <!-- ======================================================== -->
       <div id="navbar-tampilan-kelas5" class="hidden flex items-center justify-end">
         <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
-          <!-- 1. Tombol Kembali ke Beranda -->
-          <button type="button" onclick="switchTab('beranda')" id="nav-p5-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kembali ke Beranda LMS">
-            <i class="fa-solid fa-arrow-left text-[#38bdf8] icon-3d-glow"></i> <span>Beranda</span>
+          <!-- 1. Beranda -->
+          <button type="button" onclick="switchTab('beranda')" id="nav-p5-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Beranda">
+            <i class="fa-solid fa-house text-[#38bdf8] icon-3d-glow"></i> <span>Beranda</span>
           </button>
 
-          <!-- Label Kelas 5 SD -->
-          <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-200 font-title font-black text-[11px] uppercase border border-cyan-400/40 shrink-0 hidden md:inline-flex items-center gap-1">
-            <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kelas 5 SD
-          </span>
-
-          <!-- Menu 1: Presentasi -->
-          <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" id="nav-p5-presentasi" class="nav-btn nav-btn-3d active-tab px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-white shrink-0 cursor-pointer" title="Menu 1: Presentasi (PPT Manual & Gemini AI)">
-            <i class="fa-solid fa-file-powerpoint text-amber-300 icon-3d-glow"></i> <span>1. Presentasi</span>
+          <!-- 2. Presentasi -->
+          <button type="button" onclick="switchTab('petualangan5'); if(typeof bukaPetualanganZona==='function') bukaPetualanganZona('zona-presentasi');" id="nav-p5-presentasi" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Presentasi">
+            <i class="fa-solid fa-file-powerpoint text-amber-300 icon-3d-glow"></i> <span>Presentasi</span>
           </button>
 
-          <!-- Menu 2: Sertifikat Hour of Code -->
-          <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" id="nav-p5-sertifikat" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 2: Sertifikat Hour of Code">
-            <i class="fa-solid fa-award text-yellow-300 icon-3d-glow"></i> <span>2. Sertifikat</span>
+          <!-- 3. Sertifikat -->
+          <button type="button" onclick="switchTab('petualangan5'); if(typeof bukaPetualanganZona==='function') bukaPetualanganZona('zona-sertifikat');" id="nav-p5-sertifikat" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Sertifikat">
+            <i class="fa-solid fa-award text-yellow-300 icon-3d-glow"></i> <span>Sertifikat</span>
           </button>
 
-          <!-- Menu 3: Poster Lingkungan Canva -->
-          <button type="button" onclick="bukaPetualanganZona('zona-poster')" id="nav-p5-poster" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 3: Poster Pelestarian Lingkungan (Canva .PNG)">
-            <i class="fa-solid fa-image text-emerald-300 icon-3d-glow"></i> <span>3. Poster</span>
+          <!-- 4. Poster -->
+          <button type="button" onclick="switchTab('petualangan5'); if(typeof bukaPetualanganZona==='function') bukaPetualanganZona('zona-poster');" id="nav-p5-poster" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Poster">
+            <i class="fa-solid fa-image text-emerald-300 icon-3d-glow"></i> <span>Poster</span>
           </button>
 
-          <!-- Menu 4: Game & Coding (Pulau Tekno / Scratch) -->
-          <button type="button" onclick="bukaPetualanganZona('zona-scratch')" id="nav-p5-scratch" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Menu 4: Game & Coding (Pulau Tekno / Scratch)">
-            <i class="fa-solid fa-gamepad text-purple-300 icon-3d-glow"></i> <span>4. Game & Coding</span>
+          <!-- 5. Kuis -->
+          <button type="button" onclick="switchTab('kuis')" id="nav-p5-kuis" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kuis">
+            <i class="fa-solid fa-circle-question text-purple-300 icon-3d-glow"></i> <span>Kuis</span>
           </button>
 
           <!-- Sound Orb -->
@@ -1666,7 +1688,7 @@
             <span id="user-points-kelas5">0</span>
           </div>
 
-  <!-- Tombol Keluar Siswa Kelas 5 -->
+          <!-- Tombol Keluar Siswa Kelas 5 -->
           <button type="button" onclick="konfirmasiKeluarSiswa()" id="nav-p5-keluar" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-rose-300 hover:text-white shrink-0 cursor-pointer" title="Keluar dari Akun Siswa">
             <i class="fa-solid fa-arrow-right-from-bracket text-rose-400"></i> <span class="hidden sm:inline">Keluar</span>
           </button>
@@ -5784,20 +5806,69 @@
             if (!profile) {
               try {
                 var raw = localStorage.getItem('educode_active_student_v1');
-                if (raw) profile = JSON.parse(raw);
+                if (raw && raw !== 'LOGGED_OUT' && raw.indexOf('{') !== -1) profile = JSON.parse(raw);
               } catch(e) {}
             }
-            if (profile && (profile.nis || profile.id)) {
-              var sKey = profile.nis || profile.id;
+            if (!profile) {
+              try {
+                var raw2 = localStorage.getItem('active_student_profile');
+                if (raw2 && raw2 !== 'LOGGED_OUT' && raw2.indexOf('{') !== -1) profile = JSON.parse(raw2);
+              } catch(e) {}
+            }
+            if (profile && (profile.nis || profile.id || profile.nama)) {
+              var sKey = profile.nis || profile.id || profile.nama;
               try {
                 localStorage.setItem('educode_p5_data_' + sKey, JSON.stringify(window._p5Data));
+                if (profile.nis) localStorage.setItem('educode_p5_data_' + profile.nis, JSON.stringify(window._p5Data));
+                if (profile.id) localStorage.setItem('educode_p5_data_' + profile.id, JSON.stringify(window._p5Data));
               } catch(e) {}
               if (typeof window.simpanPortofolioKelas5Siswa === 'function') {
                 window.simpanPortofolioKelas5Siswa(profile, window._p5Data);
               }
             }
           } catch(e) {}
+          if (typeof window.perbaruiRingkasanStatusP5 === 'function') {
+            try { window.perbaruiRingkasanStatusP5(); } catch(e) {}
+          }
         }
+
+        window.perbaruiRingkasanStatusP5 = function() {
+          try {
+            var profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+            if (!profile) {
+              try {
+                var raw = localStorage.getItem('educode_active_student_v1');
+                if (raw && raw !== 'LOGGED_OUT' && raw.indexOf('{') !== -1) profile = JSON.parse(raw);
+              } catch(e) {}
+            }
+            var p5 = window._p5Data || {};
+            var rubrik = (typeof hitungRubrikPenilaianKelas5 === 'function') ? hitungRubrikPenilaianKelas5(profile, p5) : null;
+            var selesaiCount = rubrik ? rubrik.totalMenuSelesai : 0;
+            var skorEl = document.getElementById('p5-skor-total');
+            if (skorEl) skorEl.innerText = selesaiCount;
+            var barEl = document.getElementById('p5-progress-bar');
+            if (barEl) {
+              var pct = Math.min(100, Math.round((selesaiCount / 4) * 100));
+              barEl.style.width = pct + '%';
+            }
+            var lvlEl = document.getElementById('p5-level-label');
+            if (lvlEl) {
+              if (selesaiCount >= 4) {
+                lvlEl.innerText = 'Master Kreator Digital Tzu Chi 🌟 (Lengkap 4/4)';
+                lvlEl.className = 'text-[10px] text-yellow-300 font-bold mt-2';
+              } else if (selesaiCount >= 3) {
+                lvlEl.innerText = 'Kreator Digital Handal Tzu Chi ✨ (3/4 Selesai)';
+                lvlEl.className = 'text-[10px] text-emerald-400 font-bold mt-2';
+              } else if (selesaiCount >= 1) {
+                lvlEl.innerText = 'Kreator Digital Cilik Tzu Chi ✨ (' + selesaiCount + '/4 Selesai)';
+                lvlEl.className = 'text-[10px] text-cyan-300 font-bold mt-2';
+              } else {
+                lvlEl.innerText = 'Mulai Petualangan Misi Kelas 5 🚀 (0/4)';
+                lvlEl.className = 'text-[10px] text-slate-400 font-bold mt-2';
+              }
+            }
+          } catch(e) {}
+        };
 
         window.muatPortofolioKelas5Aktif = function() {
           try {
@@ -5845,6 +5916,7 @@
             if (typeof window.renderPosterPreview === 'function') window.renderPosterPreview();
             if (typeof window.renderScratchView === 'function') window.renderScratchView();
             if (typeof window.renderSertifikatView === 'function') window.renderSertifikatView();
+            if (typeof window.perbaruiRingkasanStatusP5 === 'function') window.perbaruiRingkasanStatusP5();
           } catch(e) {}
         };
 
@@ -5891,6 +5963,16 @@
               }
             }
           });
+          var bBeranda = document.getElementById('nav-p5-beranda');
+          if (bBeranda) {
+            bBeranda.classList.remove('active-tab', 'text-white');
+            bBeranda.classList.add('text-slate-300');
+          }
+          var bKuis = document.getElementById('nav-p5-kuis');
+          if (bKuis) {
+            bKuis.classList.remove('active-tab', 'text-white');
+            bKuis.classList.add('text-slate-300');
+          }
           // Gulir halus ke zona konten yang dipilih
           try {
             var targetEl = document.getElementById('p5-' + zonaKey);
@@ -6533,8 +6615,10 @@
             if (typeof saveActiveStudentSession === 'function') {
               try { saveActiveStudentSession(profile); } catch(e) {}
             }
+            if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
             if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
             if (typeof renderKPI === 'function') { try { renderKPI(); } catch(e) {} }
+            if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') { try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {} }
             if (typeof kirimKeWebhookSheets === 'function') {
               try {
                 kirimKeWebhookSheets({
@@ -23384,7 +23468,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261119_nilai_k6_realtime_v210"></script>
+  <script charset="UTF-8" src="app.js?v=20261119_menu_k5_realtime_v212"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================

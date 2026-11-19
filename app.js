@@ -28362,6 +28362,19 @@ function catatHasilKuisSiswa(semNumber, score) {
     if (isKelas5) {
       student.nilaiKuis5 = Math.max(Number(student.nilaiKuis5) || 0, finalScore);
       profile.nilaiKuis5 = student.nilaiKuis5;
+      student.nilaiGameCoding = Math.max(Number(student.nilaiGameCoding) || 0, finalScore);
+      profile.nilaiGameCoding = student.nilaiGameCoding;
+      try {
+        if (typeof dapatkanPortofolioKelas5Siswa === 'function' && typeof simpanPortofolioKelas5Siswa === 'function') {
+          const p5 = dapatkanPortofolioKelas5Siswa(student) || {};
+          if (!p5.scratch) p5.scratch = {};
+          p5.scratch.jalur = 'kuis';
+          p5.scratch.selesai = true;
+          p5.scratch.skor = Math.max(Number(p5.scratch.skor) || 0, finalScore);
+          p5.scratch.time = new Date().toLocaleString('id-ID');
+          simpanPortofolioKelas5Siswa(student, p5);
+        }
+      } catch (eP5Port) {}
     }
 
     const k1 = Number(student.kuisSem1) || 0;
@@ -30819,29 +30832,104 @@ window.dapatkanPortofolioKelas5Siswa = dapatkanPortofolioKelas5Siswa;
 
 function simpanPortofolioKelas5Siswa(student, p5Data) {
   if (!student || !p5Data) return;
-  const sId = student.id;
-  const sNis = student.nis;
+  const sId = student.id ? String(student.id).trim() : '';
+  const sNis = student.nis ? String(student.nis).trim() : '';
+  const sNama = student.nama ? String(student.nama).trim().toLowerCase() : '';
+  const sKelas = student.kelas ? String(student.kelas).trim().toUpperCase() : '5A';
 
   student.portofolioP5 = JSON.parse(JSON.stringify(p5Data));
 
   try {
     if (sNis) localStorage.setItem('educode_p5_data_' + sNis, JSON.stringify(p5Data));
     if (sId) localStorage.setItem('educode_p5_data_' + sId, JSON.stringify(p5Data));
+    localStorage.setItem('educode_kelas5_karya_v1', JSON.stringify(p5Data));
   } catch(e) {}
 
   const rubrik = hitungRubrikPenilaianKelas5(student, p5Data);
-  if (student.nilaiPresentasi === undefined) student.nilaiPresentasi = rubrik.nilaiPresentasi;
-  if (student.nilaiSertifikat === undefined) student.nilaiSertifikat = rubrik.nilaiSertifikat;
-  if (student.nilaiPosterCanva === undefined) student.nilaiPosterCanva = rubrik.nilaiPosterCanva;
-  if (student.nilaiGameCoding === undefined) student.nilaiGameCoding = rubrik.nilaiGameCoding;
+  student.nilaiPresentasi = rubrik.nilaiPresentasi;
+  student.nilaiSertifikat = rubrik.nilaiSertifikat;
+  student.nilaiPosterCanva = rubrik.nilaiPosterCanva;
+  student.nilaiGameCoding = rubrik.nilaiGameCoding;
+  student.nilaiAkhir = rubrik.nilaiAkhir;
   student.nilaiAkhirKelas5 = rubrik.nilaiAkhir;
+  student.statusKkm = rubrik.statusKkm;
+  student.terakhirAktif = 'Baru saja';
 
   const db = getStudentDatabase();
-  const idx = db.findIndex(s => (sId && s.id === sId) || (sNis && s.nis === sNis));
+  let idx = -1;
+  if (sNis) {
+    idx = db.findIndex(s => s.nis && String(s.nis).trim() === sNis);
+  }
+  if (idx === -1 && sId) {
+    idx = db.findIndex(s => s.id && String(s.id).trim() === sId);
+  }
+  if (idx === -1 && sNama) {
+    idx = db.findIndex(s => s.nama && String(s.nama).trim().toLowerCase() === sNama && (!sKelas || !s.kelas || String(s.kelas).trim().toUpperCase() === sKelas));
+  }
+
+  const payloadUpdate = {
+    nilaiPresentasi: rubrik.nilaiPresentasi,
+    nilaiSertifikat: rubrik.nilaiSertifikat,
+    nilaiPosterCanva: rubrik.nilaiPosterCanva,
+    nilaiGameCoding: rubrik.nilaiGameCoding,
+    nilaiAkhir: rubrik.nilaiAkhir,
+    nilaiAkhirKelas5: rubrik.nilaiAkhir,
+    statusKkm: rubrik.statusKkm,
+    portofolioP5: student.portofolioP5,
+    terakhirAktif: 'Baru saja'
+  };
+
   if (idx !== -1) {
-    db[idx] = Object.assign(db[idx], student);
+    db[idx] = Object.assign(db[idx], student, payloadUpdate);
+    saveStudentDatabase(db);
+  } else {
+    const newEntry = Object.assign({}, student, payloadUpdate);
+    if (!newEntry.id) newEntry.id = sId || `STD-${sKelas}-${sNis || '3000'}`;
+    if (!newEntry.nis) newEntry.nis = sNis || '3000';
+    if (!newEntry.nama) newEntry.nama = student.nama || 'Siswa Kelas 5';
+    if (!newEntry.kelas) newEntry.kelas = sKelas;
+    db.push(newEntry);
     saveStudentDatabase(db);
   }
+
+  // Update profil sesi siswa aktif jika relevan
+  try {
+    const rawActive = localStorage.getItem('educode_active_student_v1');
+    if (rawActive && rawActive !== 'LOGGED_OUT') {
+      const actObj = JSON.parse(rawActive);
+      if ((actObj.nis && String(actObj.nis).trim() === sNis) || (actObj.id && String(actObj.id).trim() === sId) || (actObj.nama && actObj.nama.trim().toLowerCase() === sNama)) {
+        Object.assign(actObj, payloadUpdate);
+        localStorage.setItem('educode_active_student_v1', JSON.stringify(actObj));
+        if (window.__ACTIVE_STUDENT_PROFILE__) {
+          Object.assign(window.__ACTIVE_STUDENT_PROFILE__, actObj);
+        }
+      }
+    }
+    const rawActive2 = localStorage.getItem('active_student_profile');
+    if (rawActive2 && rawActive2 !== 'LOGGED_OUT') {
+      const actObj2 = JSON.parse(rawActive2);
+      if ((actObj2.nis && String(actObj2.nis).trim() === sNis) || (actObj2.id && String(actObj2.id).trim() === sId) || (actObj2.nama && actObj2.nama.trim().toLowerCase() === sNama)) {
+        Object.assign(actObj2, payloadUpdate);
+        localStorage.setItem('active_student_profile', JSON.stringify(actObj2));
+      }
+    }
+  } catch(e) {}
+
+  // Segarkan UI Buku Nilai Guru & Leaderboard secara realtime
+  try {
+    if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+    if (typeof renderDasborGuru === 'function') renderDasborGuru();
+    if (typeof renderKPI === 'function') renderKPI();
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') perbaruiPeringkatKelasRealtimeOtomatis(true);
+    if (typeof renderTop5SiswaLeaderboard === 'function') renderTop5SiswaLeaderboard();
+  } catch(e) {}
+
+  // Perbarui indikator kartu progres di petualangan siswa
+  try {
+    if (typeof window.perbaruiRingkasanStatusP5 === 'function') {
+      window.perbaruiRingkasanStatusP5();
+    }
+  } catch(e) {}
 }
 window.simpanPortofolioKelas5Siswa = simpanPortofolioKelas5Siswa;
 
@@ -30849,49 +30937,47 @@ function hitungRubrikPenilaianKelas5(student, customData) {
   const p5 = customData || dapatkanPortofolioKelas5Siswa(student) || {};
 
   // 1. Menu 1: Presentasi Digital (Bobot 25%)
-  let nPresentasi = (student && student.nilaiPresentasi !== undefined && student.nilaiPresentasi !== null) ? Number(student.nilaiPresentasi) : null;
+  let nPresentasi = (student && student.nilaiPresentasi !== undefined && student.nilaiPresentasi !== null && student.nilaiPresentasi !== '') ? Number(student.nilaiPresentasi) : null;
   let berkasPptCount = 0;
   if (p5.ppt1 && (p5.ppt1.dataUrl || p5.ppt1.gdriveLink || p5.ppt1.name)) berkasPptCount++;
   if (p5.ppt2 && (p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.name || p5.ppt2.prompt)) berkasPptCount++;
-  if (nPresentasi === null) {
-    if (berkasPptCount >= 2) nPresentasi = 100;
-    else if (berkasPptCount === 1) nPresentasi = 85;
+  if (nPresentasi === null || nPresentasi <= 0) {
+    if (berkasPptCount >= 1) nPresentasi = 100;
     else nPresentasi = 0;
   }
 
   // 2. Menu 2: Sertifikat Hour of Code (Bobot 25%)
-  let nSertifikat = (student && student.nilaiSertifikat !== undefined && student.nilaiSertifikat !== null) ? Number(student.nilaiSertifikat) : null;
-  let hasSertifikat = !!(p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name));
-  if (nSertifikat === null) {
-    if (hasSertifikat) {
-      nSertifikat = (p5.sertifikat.aktivitas || p5.sertifikat.kesan) ? 100 : 90;
-    } else {
-      nSertifikat = 0;
-    }
+  let nSertifikat = (student && student.nilaiSertifikat !== undefined && student.nilaiSertifikat !== null && student.nilaiSertifikat !== '') ? Number(student.nilaiSertifikat) : null;
+  let hasSertifikat = !!(p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name || p5.sertifikat.aktivitas));
+  if (nSertifikat === null || nSertifikat <= 0) {
+    nSertifikat = hasSertifikat ? 100 : 0;
   }
 
   // 3. Menu 3: Poster Canva (Bobot 25%)
-  let nPoster = (student && student.nilaiPosterCanva !== undefined && student.nilaiPosterCanva !== null) ? Number(student.nilaiPosterCanva) : null;
-  let hasPoster = !!(p5.poster && (p5.poster.dataUrl || p5.poster.name));
-  if (nPoster === null) {
-    if (hasPoster) {
-      nPoster = (p5.poster.judul && p5.poster.pesan) ? 100 : 90;
-    } else {
-      nPoster = 0;
-    }
+  let nPoster = (student && student.nilaiPosterCanva !== undefined && student.nilaiPosterCanva !== null && student.nilaiPosterCanva !== '') ? Number(student.nilaiPosterCanva) : null;
+  let hasPoster = !!(p5.poster && (p5.poster.dataUrl || p5.poster.name || p5.poster.judul));
+  if (nPoster === null || nPoster <= 0) {
+    nPoster = hasPoster ? 100 : 0;
   }
 
   // 4. Menu 4: Game & Coding (Bobot 25%)
-  let nGame = (student && student.nilaiGameCoding !== undefined && student.nilaiGameCoding !== null) ? Number(student.nilaiGameCoding) : null;
-  let hasGame = !!(p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain));
-  if (nGame === null) {
+  let nGame = (student && student.nilaiGameCoding !== undefined && student.nilaiGameCoding !== null && student.nilaiGameCoding !== '') ? Number(student.nilaiGameCoding) : null;
+  let hasGame = !!(p5.scratch && (p5.scratch.buktiGame || p5.scratch.dataUrl || p5.scratch.link || p5.scratch.namaPemain || p5.scratch.skor || p5.scratch.selesai));
+  let nKuis5 = (student && (student.nilaiKuis5 || student.kuisKelas5 || student.kuisSem1 || student.nilaiKuis)) ? Number(student.nilaiKuis5 || student.kuisKelas5 || student.kuisSem1 || student.nilaiKuis) : 0;
+  if (nGame === null || nGame <= 0) {
     if (hasGame) {
       nGame = 100;
+    } else if (nKuis5 > 0) {
+      nGame = nKuis5;
+      hasGame = true;
     } else if (student && (student.projekScratch > 0 || student.nilaiScratch > 0)) {
       nGame = student.nilaiScratch || 100;
+      hasGame = true;
     } else {
       nGame = 0;
     }
+  } else {
+    hasGame = true;
   }
 
   const totalMenuSelesai = (berkasPptCount > 0 ? 1 : 0) + (hasSertifikat ? 1 : 0) + (hasPoster ? 1 : 0) + (hasGame ? 1 : 0);
