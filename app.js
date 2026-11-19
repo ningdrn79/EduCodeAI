@@ -606,6 +606,7 @@ function showToast(pesan, tipe = 'info') {
   const toast = document.getElementById('toast');
   const toastMsg = document.getElementById('toast-msg');
   const toastIcon = document.getElementById('toast-icon');
+  if (!toast || !toastMsg) return;
 
   toastMsg.innerText = pesan;
   if (tipe === 'success') {
@@ -7228,8 +7229,13 @@ function simpanDrive7Kebiasaan(data) {
         db[sIdx].terakhirAktif = 'Baru saja';
         db[sIdx].driveData = data;
         saveStudentDatabase(db);
-        if (typeof renderDasborGuru === 'function' && state.isGuruLoggedIn) {
-          renderDasborGuru();
+        if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+        if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+        if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+          try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {}
+        }
+        if (typeof renderTop5SiswaLeaderboard === 'function') {
+          try { renderTop5SiswaLeaderboard(); } catch(e) {}
         }
       }
     }
@@ -10470,7 +10476,19 @@ function checkQuizAccessForActiveStudent() {
   // Cek apakah siswa sudah menyelesaikan latihan soal Tabungan di Lab Excel
   let isTabunganExcelDone = false;
   try {
-    isTabunganExcelDone = profile.nis ? (localStorage.getItem(`educode_excel_tabungan_done_${profile.nis}`) === 'true') : false;
+    const sId = profile.nis || profile.id || profile.nama;
+    const isLocalDone = sId ? (localStorage.getItem(`educode_excel_tabungan_done_${sId}`) === 'true') : false;
+    const isScoreSaved = sId ? (Number(localStorage.getItem(`educode_excel_score_${sId}`)) >= 70) : false;
+    const hasProfileScore = Number(profile.nilaiExcel || 0) >= 70;
+    
+    let hasDbScore = false;
+    const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+    const sInDb = db.find(rec => (profile.nis && String(rec.nis).trim() === String(profile.nis).trim()) || rec.id === profile.id);
+    if (sInDb && Number(sInDb.nilaiExcel || 0) >= 70) {
+      hasDbScore = true;
+    }
+
+    isTabunganExcelDone = isLocalDone || isScoreSaved || hasProfileScore || hasDbScore;
   } catch(e) {}
 
   const isCompleted = isStudentTaskCompleted(profile, sem) || isTabunganExcelDone;
@@ -12727,6 +12745,7 @@ const WORD_IMAGES = {
 };
 
 let wordElements = [];
+window.wordElements = wordElements;
 let activeWordElementId = null;
 let wordPageBgColor = '#ffffff';
 let wordPageBorderStyle = 'solid';
@@ -16608,6 +16627,7 @@ let excelState = {
   resizeRowStartY: 0,
   resizeRowStartHeight: 0
 };
+window.excelState = excelState;
 
 // 4 Template Pembelajaran Karakter & Data Kelas 4
 const EXCEL_TEMPLATES = {
@@ -16957,8 +16977,39 @@ function muatTemplateExcel(tplKey, notify = true) {
 
   excelState.activeTemplate = tplKey;
   excelState.rowCount = 25; // 25 baris lembar dokumen penuh Excel
-  excelState.cells = JSON.parse(JSON.stringify(tpl.cells));
-  excelState.formats = JSON.parse(JSON.stringify(tpl.formats || {}));
+
+  // Cek apakah siswa memiliki draft tersimpan untuk template ini
+  let savedDraft = null;
+  try {
+    let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (!profile) {
+      try {
+        const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+        if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+      } catch (eLs) {}
+    }
+    const sId = profile ? (profile.nis || profile.id || profile.nama) : null;
+    if (sId) {
+      const rawDraft = localStorage.getItem(`educode_excel_draft_${tplKey}_${sId}`);
+      if (rawDraft) savedDraft = JSON.parse(rawDraft);
+    }
+    if (!savedDraft && profile) {
+      const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+      const s = db.find(rec => (profile.nis && String(rec.nis).trim() === String(profile.nis).trim()) || rec.id === profile.id);
+      if (s && s.excelDrafts && s.excelDrafts[tplKey]) {
+        savedDraft = s.excelDrafts[tplKey];
+      }
+    }
+  } catch (eDraft) {}
+
+  if (savedDraft && savedDraft.cells && Object.keys(savedDraft.cells).length > 0) {
+    excelState.cells = Object.assign(JSON.parse(JSON.stringify(tpl.cells)), savedDraft.cells);
+    excelState.formats = Object.assign(JSON.parse(JSON.stringify(tpl.formats || {})), savedDraft.formats || {});
+  } else {
+    excelState.cells = JSON.parse(JSON.stringify(tpl.cells));
+    excelState.formats = JSON.parse(JSON.stringify(tpl.formats || {}));
+  }
+
   excelState.activeCell = 'B2';
 
   // Update header text
@@ -16983,6 +17034,10 @@ function muatTemplateExcel(tplKey, notify = true) {
   pilihSelExcel('B2');
   renderExcelMiniChart();
   updateExcelStats();
+
+  if (tplKey === 'tabungan' && typeof cekJawabanTabunganDanBukaKuis === 'function') {
+    cekJawabanTabunganDanBukaKuis(true);
+  }
 
   if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
     sinkronkanStatusTombolKirimExcel();
@@ -18109,6 +18164,18 @@ function handleInlineInputChange(val) {
     formulaInput.value = val;
   }
   highlightFormulaReferences(val);
+
+  // Auto-simpan permanen ke draft siswa setiap kali mengetik di sel
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
+
+  // Jika sedang membuka template Tabungan dan mengedit sel F7, periksa jawaban secara realtime
+  if (excelState.activeTemplate === 'tabungan' && excelState.activeCell === 'F7') {
+    if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
+      cekJawabanTabunganDanBukaKuis(true);
+    }
+  }
 }
 
 function handleInlineInputKey(event) {
@@ -18161,6 +18228,18 @@ function handleFormulaInputChange(val) {
   highlightFormulaReferences(val);
   renderExcelMiniChart();
   updateExcelStats();
+
+  // Auto-simpan permanen ke draft siswa setiap kali mengetik rumus
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
+
+  // Jika sedang membuka template Tabungan dan mengedit sel F7, periksa jawaban secara realtime
+  if (excelState.activeTemplate === 'tabungan' && excelState.activeCell === 'F7') {
+    if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
+      cekJawabanTabunganDanBukaKuis(true);
+    }
+  }
 }
 
 function handleFormulaInputKey(event) {
@@ -18471,6 +18550,9 @@ function formatExcelSel(type) {
 
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
 
   const msgMap = {
     'bold': `Format Tebal (Bold) diterapkan (${cells.length} sel)`,
@@ -18516,6 +18598,9 @@ function tambahFontSizeDelta(delta) {
   if (sizeSelect) sizeSelect.value = String(firstSize);
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
   showToast(`Ukuran font diubah ke: ${firstSize}pt (${cells.length} sel)`);
 }
 
@@ -18546,6 +18631,9 @@ function ubahFontFamilyExcel(font) {
   });
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
   showToast(`Jenis huruf diubah ke: ${font.split(',')[0]} (${cells.length} sel)`, 'success');
 }
 
@@ -18558,6 +18646,9 @@ function ubahFontSizeExcel(size) {
   });
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
   showToast(`Ukuran font diubah ke: ${numSize}pt (${cells.length} sel)`, 'success');
 }
 
@@ -18587,6 +18678,9 @@ function beriWarnaLatarSelExcel(color) {
   document.getElementById('excel-fill-picker')?.classList.add('hidden');
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
   showToast(color ? `Warna latar diterapkan (${cells.length} sel)! 🎨` : `Warna latar dihapus (${cells.length} sel)`, 'success');
 }
 
@@ -18607,6 +18701,9 @@ function beriWarnaHurufExcel(color) {
   document.getElementById('excel-font-picker')?.classList.add('hidden');
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
   showToast(color ? `Warna teks diterapkan (${cells.length} sel)!` : `Warna teks otomatis (${cells.length} sel)`, 'success');
 }
 
@@ -18635,6 +18732,9 @@ function formatAngkaExcel(type) {
   }
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
 }
 
 function masukkanAutoSumExcel(funcName = 'SUM') {
@@ -18926,6 +19026,9 @@ function salinSelExcel() {
 
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
 
   const label = cells.length === 1 ? `Sel ${cells[0]}` : `${cells.length} sel`;
   showToast(`Teks ${label} berhasil disalin (Copy) ke Clipboard! 📋`, 'success');
@@ -18988,6 +19091,9 @@ async function tempelSelExcel() {
 
   playSound('click');
   renderExcelGrid();
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
   renderExcelMiniChart();
   updateExcelStats();
 
@@ -25336,6 +25442,40 @@ window.catatSiswaTerhapus = catatSiswaTerhapus;
 function inisialisasiNilaiTeladanDatabase(students) {
   if (!Array.isArray(students)) return students;
 
+  let hasModified = false;
+
+  // 1. Sanitasi & Perbaikan Korupsi Data Warisan:
+  // Jangan biarkan kolom jumlah (posterWord / excelTabel) berisi nilai skor (misal 98 Poster, 96 Latihan)
+  students.forEach(s => {
+    if (!s) return;
+    if (Number(s.posterWord) >= 10) {
+      s.nilaiPoster = Math.max(Number(s.nilaiPoster) || 0, Number(s.posterWord));
+      s.posterWord = 1;
+      hasModified = true;
+    }
+    if (Number(s.excelTabel) >= 10) {
+      s.nilaiExcel = Math.max(Number(s.nilaiExcel) || 0, Number(s.excelTabel));
+      s.excelTabel = 1;
+      hasModified = true;
+    }
+  });
+
+  const BENCHMARK_SYNC_KEY = 'educode_benchmark_sync_top5_v7_safe';
+  let isAlreadySynced = false;
+  try {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem(BENCHMARK_SYNC_KEY) === 'synced') {
+      isAlreadySynced = true;
+    }
+  } catch (e) {}
+
+  // Jika sudah pernah disinkronkan, JANGAN PERNAH menimpa data siswa dengan template lagi!
+  if (isAlreadySynced) {
+    if (hasModified) {
+      try { localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(students)); } catch (e) {}
+    }
+    return students;
+  }
+
   const perClass = {};
   students.forEach(s => {
     const cls = String(s.kelas || '').trim().toUpperCase();
@@ -25353,16 +25493,6 @@ function inisialisasiNilaiTeladanDatabase(students) {
     { n1: 90,  n2: 90,  n3: 90,  n4: 90,  stars: 80  }  // Juara 5: Nilai 90, 4/4 Misi (100%), 80 Bintang
   ];
 
-  const BENCHMARK_SYNC_KEY = 'educode_benchmark_sync_top5_v6';
-  let forceSync = false;
-  try {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem(BENCHMARK_SYNC_KEY) !== 'synced') {
-      forceSync = true;
-    }
-  } catch (e) {}
-
-  let hasModified = false;
-
   Object.keys(perClass).forEach(cls => {
     const list = perClass[cls];
     // Urutkan siswa: jika ada Pelajar Uji Coba, letakkan di posisi pertama
@@ -25374,51 +25504,56 @@ function inisialisasiNilaiTeladanDatabase(students) {
       return (a.nama || '').localeCompare(b.nama || '');
     });
 
-    // Periksa apakah sudah ada minimal 5 siswa yang tuntas dengan nilai >= 80
+    // Periksa apakah sudah ada siswa yang tuntas dengan nilai >= 80
     const studentsWithScore = list.filter(s => {
       if (cls.includes('6')) {
-        return (Number(s.nilaiScratch4Pilar) > 0 && Number(s.nilaiKuis6) > 0);
+        return (Number(s.nilaiScratch4Pilar) > 0 || Number(s.nilaiKuis6) > 0);
       } else if (cls.includes('5')) {
-        return (Number(s.nilaiPresentasi) > 0 && Number(s.nilaiGameCoding) > 0);
+        return (Number(s.nilaiPresentasi) > 0 || Number(s.nilaiGameCoding) > 0);
       } else {
-        return (Number(s.nilaiPoster) > 0 && Number(s.nilaiExcel) > 0);
+        return (Number(s.nilaiPoster) > 0 || Number(s.nilaiExcel) > 0 || Number(s.kuisSem1) > 0);
       }
     });
 
-    // Jika belum ada 5 siswa bernilai lengkap atau force sync aktif:
-    if (forceSync || studentsWithScore.length < 5) {
+    // Inisialisasi awal hanya jika kelas benar-benar masih kosong (belum ada pengerjaan tugas)
+    if (studentsWithScore.length === 0) {
       const maxAssign = Math.min(5, list.length);
       for (let i = 0; i < maxAssign; i++) {
         const s = list[i];
         const bm = benchmarkTemplates[i];
+
+        // Pastikan tidak menimpa jika siswa sudah punya tugas
+        const hasRealScore = (Number(s.nilaiPoster) > 0 || Number(s.nilaiExcel) > 0 || Number(s.kuisSem1) > 0 || Number(s.nilaiDrive) > 0);
+        if (hasRealScore) continue;
+
         if (cls.includes('6')) {
-          s.nilaiScratch4Pilar = bm.n1;
-          s.nilaiScratchAlgoritma = bm.n2;
-          s.nilaiAntarTeman = bm.n3;
-          s.nilaiKuis6 = bm.n4;
-          s.kuisSem1 = bm.n4;
-          s.poinBintang = bm.stars;
+          s.nilaiScratch4Pilar = s.nilaiScratch4Pilar || bm.n1;
+          s.nilaiScratchAlgoritma = s.nilaiScratchAlgoritma || bm.n2;
+          s.nilaiAntarTeman = s.nilaiAntarTeman || bm.n3;
+          s.nilaiKuis6 = s.nilaiKuis6 || bm.n4;
+          s.kuisSem1 = s.kuisSem1 || bm.n4;
+          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
           s.statusKkm = 'Tuntas';
           s.terakhirAktif = 'Baru saja';
         } else if (cls.includes('5')) {
-          s.nilaiPresentasi = bm.n1;
-          s.nilaiSertifikat = bm.n2;
-          s.nilaiPosterCanva = bm.n3;
-          s.nilaiGameCoding = bm.n4;
-          s.kuisSem1 = bm.n4;
-          s.poinBintang = bm.stars;
+          s.nilaiPresentasi = s.nilaiPresentasi || bm.n1;
+          s.nilaiSertifikat = s.nilaiSertifikat || bm.n2;
+          s.nilaiPosterCanva = s.nilaiPosterCanva || bm.n3;
+          s.nilaiGameCoding = s.nilaiGameCoding || bm.n4;
+          s.kuisSem1 = s.kuisSem1 || bm.n4;
+          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
           s.statusKkm = 'Tuntas';
           s.terakhirAktif = 'Baru saja';
         } else {
           // Kelas 4 SD
-          s.nilaiPoster = bm.n1;
-          s.posterWord = bm.n1;
-          s.nilaiExcel = bm.n2;
-          s.excelTabel = bm.n2;
-          s.nilaiDrive = bm.n3;
-          s.koleksiDrive = 4;
-          s.kuisSem1 = bm.n4;
-          s.poinBintang = bm.stars;
+          s.nilaiPoster = s.nilaiPoster || bm.n1;
+          s.posterWord = 1; // Jumlah poster adalah 1, BUKAN skor nilai 98!
+          s.nilaiExcel = s.nilaiExcel || bm.n2;
+          s.excelTabel = 1; // Jumlah latihan adalah 1, BUKAN skor nilai 96!
+          s.nilaiDrive = s.nilaiDrive || bm.n3;
+          s.koleksiDrive = Math.max(1, Number(s.koleksiDrive) || 4);
+          s.kuisSem1 = s.kuisSem1 || bm.n4;
+          s.poinBintang = Math.max(Number(s.poinBintang) || 0, bm.stars);
           s.statusKkm = 'Tuntas';
           s.terakhirAktif = 'Baru saja';
         }
@@ -25427,12 +25562,12 @@ function inisialisasiNilaiTeladanDatabase(students) {
     }
   });
 
-  if (hasModified || forceSync) {
-    try {
+  try {
+    if (hasModified) {
       localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(students));
-      localStorage.setItem(BENCHMARK_SYNC_KEY, 'synced');
-    } catch (e) {}
-  }
+    }
+    localStorage.setItem(BENCHMARK_SYNC_KEY, 'synced');
+  } catch (e) {}
 
   return students;
 }
@@ -25496,6 +25631,16 @@ function getStudentDatabase(forceRefresh = false) {
     const seenMap = new Map();
     const deduped = [];
     parsed.forEach(s => {
+      // Sanitasi angka warisan lama yang korup jika posterWord >= 10 atau excelTabel >= 10
+      if (Number(s.posterWord) >= 10) {
+        s.nilaiPoster = Math.max(Number(s.nilaiPoster) || 0, Number(s.posterWord));
+        s.posterWord = 1;
+      }
+      if (Number(s.excelTabel) >= 10) {
+        s.nilaiExcel = Math.max(Number(s.nilaiExcel) || 0, Number(s.excelTabel));
+        s.excelTabel = 1;
+      }
+
       const key = (s.id || '') + '___' + String(s.nis || '').trim() + '___' + String(s.nama || '').trim().toLowerCase();
       if (!seenMap.has(key)) {
         seenMap.set(key, s);
@@ -25522,9 +25667,6 @@ function getStudentDatabase(forceRefresh = false) {
       }
     });
     parsed = inisialisasiNilaiTeladanDatabase(deduped);
-
-    _cachedStudentDatabase = parsed;
-    return _cachedStudentDatabase;
 
     _cachedStudentDatabase = parsed;
     return _cachedStudentDatabase;
@@ -26941,52 +27083,40 @@ async function loginDenganNis() {
       nis: student.nis,
       nama: student.nama,
       kelas: student.kelas || '4A',
-      absen: student.absen || '01'
+      absen: student.absen || '01',
+      nilaiExcel: (student.nilaiExcel !== undefined && student.nilaiExcel !== null) ? Number(student.nilaiExcel) : 0,
+      excelTabel: (student.excelTabel !== undefined && student.excelTabel !== null) ? Number(student.excelTabel) : 0,
+      kuisSem1: student.kuisSem1 || 0,
+      kuisSem2: student.kuisSem2 || 0,
+      nilaiPoster: student.nilaiPoster || 0,
+      posterWord: student.posterWord || 0,
+      poinBintang: student.poinBintang || 0
     };
     const isKelas6 = String(profile.kelas || '').includes('6');
     const isKelas5 = String(profile.kelas || '').includes('5');
     const targetTab = isKelas6 ? 'petualangan6' : (isKelas5 ? 'petualangan5' : ((typeof state !== 'undefined' && state.currentTab && state.currentTab !== 'petualangan5' && state.currentTab !== 'petualangan6') ? state.currentTab : 'beranda'));
 
-    // Auto-recovery jika siswa sudah mengerjakan latihan Excel di perangkat ini
+    // Auto-recovery jika siswa sudah mengerjakan atau memiliki nilai latihan Excel
     try {
-      const isTaskDone = (student.nis && localStorage.getItem(`educode_excel_tabungan_done_${student.nis}`) === 'true') || 
-                         (student.nis && localStorage.getItem(`educode_task_done_${student.nis}_sem1`) === 'true');
-      if (isTaskDone) {
-        // Verifikasi apakah siswa benar-benar menyelesaikan sel F7 pada draft aktif
-        const activeCellsKey = student.nis ? `educode_excel_active_cells_${student.nis}` : null;
-        let isF7Answered = true;
-        if (activeCellsKey) {
-          try {
-            const savedCells = localStorage.getItem(activeCellsKey);
-            if (savedCells && savedCells.includes('"cells"')) {
-              const parsed = JSON.parse(savedCells);
-              if (parsed && parsed.cells && (parsed.activeTemplate === 'tabungan' || !parsed.activeTemplate)) {
-                const f7Val = String(parsed.cells['F7'] || '').trim().replace(/\s+/g, '').toUpperCase();
-                if (!f7Val || (f7Val !== '48000' && f7Val !== '=SUM(F2:F6)' && f7Val !== '=D7-E7')) {
-                  isF7Answered = false;
-                }
-              }
-            }
-          } catch (eF7) {}
+      let recoveredExcel = profile.nilaiExcel;
+      if (recoveredExcel <= 0 && student.nis) {
+        const savedScore = localStorage.getItem(`educode_excel_score_${student.nis}`);
+        if (savedScore && Number(savedScore) > 0) {
+          recoveredExcel = Number(savedScore);
+        } else if (localStorage.getItem(`educode_excel_tabungan_done_${student.nis}`) === 'true') {
+          recoveredExcel = 100;
         }
-        if (isF7Answered) {
-          profile.nilaiExcel = 100;
-          profile.excelTabel = 1;
-          const db = getStudentDatabase();
-          const stdInDb = db.find(s => String(s.nis).trim() === String(student.nis).trim() || s.id === student.id);
-          if (stdInDb) {
-            stdInDb.nilaiExcel = 100;
-            stdInDb.excelTabel = Math.max(stdInDb.excelTabel || 0, 1);
-            stdInDb.statusKkm = 'Tuntas';
-            saveStudentDatabase(db);
-          }
-        } else {
-          profile.nilaiExcel = 0;
-          profile.excelTabel = 0;
-          if (student.nis) {
-            localStorage.removeItem(`educode_excel_tabungan_done_${student.nis}`);
-            localStorage.removeItem(`educode_task_done_${student.nis}_sem1`);
-          }
+      }
+      if (recoveredExcel > 0) {
+        profile.nilaiExcel = recoveredExcel;
+        profile.excelTabel = Math.max(1, Number(profile.excelTabel || 1));
+        const db = getStudentDatabase();
+        const stdInDb = db.find(s => String(s.nis).trim() === String(student.nis).trim() || s.id === student.id);
+        if (stdInDb) {
+          stdInDb.nilaiExcel = recoveredExcel;
+          stdInDb.excelTabel = Math.max(stdInDb.excelTabel || 0, 1);
+          if (recoveredExcel >= 70) stdInDb.statusKkm = 'Tuntas';
+          saveStudentDatabase(db);
         }
       }
     } catch(eRec) {}
@@ -27586,14 +27716,54 @@ window.resetWordKanvasKosong = resetWordKanvasKosong;
 function simpanExcelDraftSiswa() {
   try {
     if (typeof excelState === 'undefined' || !excelState.cells) return;
-    const key = getActiveStudentStorageKey('educode_excel_active_cells');
+    const curTemplate = excelState.activeTemplate || 'tabungan';
     const draft = {
-      template: excelState.activeTemplate || 'checklist_karakter',
+      template: curTemplate,
       cells: JSON.parse(JSON.stringify(excelState.cells)),
       formats: JSON.parse(JSON.stringify(excelState.formats || {})),
+      colWidths: JSON.parse(JSON.stringify(excelState.colWidths || {})),
+      rowHeights: JSON.parse(JSON.stringify(excelState.rowHeights || {})),
       timestamp: Date.now()
     };
+
+    // 1. Simpan ke active cells key per-siswa
+    const key = (typeof getActiveStudentStorageKey === 'function') 
+      ? getActiveStudentStorageKey('educode_excel_active_cells') 
+      : 'educode_excel_active_cells_guest';
     localStorage.setItem(key, JSON.stringify(draft));
+
+    // 2. Simpan per-template khusus profil siswa
+    let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (!profile) {
+      try {
+        const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+        if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+      } catch (eLs) {}
+    }
+    const sId = profile ? (profile.nis || profile.id || profile.nama) : null;
+    if (sId) {
+      localStorage.setItem(`educode_excel_draft_${curTemplate}_${sId}`, JSON.stringify(draft));
+      localStorage.setItem(`educode_excel_active_cells_${sId}`, JSON.stringify(draft));
+    }
+
+    // 3. Simpan permanen ke database siswa di localStorage
+    if (profile) {
+      const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+      let found = false;
+      db.forEach(s => {
+        if ((profile.nis && String(s.nis).trim() === String(profile.nis).trim()) || 
+            (profile.id && s.id === profile.id) || 
+            (profile.nama && s.nama && s.nama.toLowerCase().trim() === profile.nama.toLowerCase().trim() && (!profile.kelas || s.kelas === profile.kelas))) {
+          if (!s.excelDrafts) s.excelDrafts = {};
+          s.excelDrafts[curTemplate] = draft;
+          s.excelDraft = draft;
+          found = true;
+        }
+      });
+      if (found && typeof saveStudentDatabase === 'function') {
+        saveStudentDatabase(db);
+      }
+    }
   } catch (e) {}
 }
 window.simpanExcelDraftSiswa = simpanExcelDraftSiswa;
@@ -27601,25 +27771,111 @@ window.simpanExcelDraftSiswa = simpanExcelDraftSiswa;
 function muatExcelDraftSiswa() {
   try {
     if (typeof excelState === 'undefined') return;
-    const key = getActiveStudentStorageKey('educode_excel_active_cells');
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const draft = JSON.parse(raw);
-      if (draft && draft.cells && Object.keys(draft.cells).length > 0) {
-        excelState.activeTemplate = draft.template || 'checklist_karakter';
-        excelState.cells = draft.cells;
-        if (draft.formats) excelState.formats = draft.formats;
-        renderExcelGrid();
-        renderExcelMiniChart();
-        updateExcelStats();
-        return;
+
+    let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (!profile) {
+      try {
+        const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+        if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+      } catch (eLs) {}
+    }
+
+    const isKelas4 = !profile || !profile.kelas || String(profile.kelas).startsWith('4');
+    const defaultTpl = isKelas4 ? 'tabungan' : 'checklist_karakter';
+    const sId = profile ? (profile.nis || profile.id || profile.nama) : null;
+
+    let draft = null;
+
+    // 1. Coba muat dari storage per-template (utamakan tabungan untuk Kelas 4)
+    if (sId) {
+      const rawDraftTpl = localStorage.getItem(`educode_excel_draft_${defaultTpl}_${sId}`);
+      if (rawDraftTpl) {
+        try { draft = JSON.parse(rawDraftTpl); } catch (e) {}
       }
     }
+
+    // 2. Cek dari active cells
+    if (!draft) {
+      const key = (typeof getActiveStudentStorageKey === 'function') 
+        ? getActiveStudentStorageKey('educode_excel_active_cells') 
+        : 'educode_excel_active_cells_guest';
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        try { draft = JSON.parse(raw); } catch (e) {}
+      }
+    }
+
+    // 3. Cek dari database siswa
+    if (!draft && profile) {
+      const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+      const s = db.find(rec => (profile.nis && String(rec.nis).trim() === String(profile.nis).trim()) || rec.id === profile.id);
+      if (s) {
+        if (s.excelDrafts && s.excelDrafts[defaultTpl]) {
+          draft = s.excelDrafts[defaultTpl];
+        } else if (s.excelDraft) {
+          draft = s.excelDraft;
+        }
+      }
+    }
+
+    const tplKey = (draft && draft.template) ? draft.template : defaultTpl;
+    const baseTpl = (typeof EXCEL_TEMPLATES !== 'undefined' && EXCEL_TEMPLATES[tplKey]) 
+      ? EXCEL_TEMPLATES[tplKey] 
+      : ((typeof EXCEL_TEMPLATES !== 'undefined' && EXCEL_TEMPLATES['tabungan']) ? EXCEL_TEMPLATES['tabungan'] : { cells: {}, formats: {}, fileName: 'Catatan_Keuangan_Siswa.xlsx', sheetTitle: 'Spreadsheet - Tabungan Mingguan' });
+
+    excelState.activeTemplate = tplKey;
+    excelState.rowCount = 25;
+
+    if (draft && draft.cells && Object.keys(draft.cells).length > 0) {
+      excelState.cells = Object.assign(JSON.parse(JSON.stringify(baseTpl.cells || {})), draft.cells);
+      if (draft.formats) {
+        excelState.formats = Object.assign(JSON.parse(JSON.stringify(baseTpl.formats || {})), draft.formats);
+      } else {
+        excelState.formats = JSON.parse(JSON.stringify(baseTpl.formats || {}));
+      }
+      if (draft.colWidths) excelState.colWidths = Object.assign({}, excelState.colWidths, draft.colWidths);
+      if (draft.rowHeights) excelState.rowHeights = Object.assign({}, excelState.rowHeights, draft.rowHeights);
+    } else {
+      excelState.cells = JSON.parse(JSON.stringify(baseTpl.cells || {}));
+      excelState.formats = JSON.parse(JSON.stringify(baseTpl.formats || {}));
+    }
+
+    excelState.activeCell = 'B2';
+
+    // Update header filename dan sheet title
+    const fnEl = document.getElementById('excel-active-filename');
+    if (fnEl && baseTpl.fileName) fnEl.innerText = baseTpl.fileName;
+    const sheetEl = document.getElementById('excel-active-sheet-label');
+    if (sheetEl && baseTpl.sheetTitle) sheetEl.innerText = baseTpl.sheetTitle;
+
+    // Update highlight tombol template tab
+    ['checklist_karakter', 'tabungan', 'nilai_siswa', 'daur_ulang'].forEach(k => {
+      const btn = document.getElementById(`tpl-btn-${k}`);
+      if (btn) {
+        if (k === tplKey) {
+          btn.className = 'excel-tpl-btn active-excel-tpl p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50/80 hover:bg-emerald-100/80 text-left transition flex flex-col justify-between shadow-sm';
+        } else {
+          btn.className = 'excel-tpl-btn p-3 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 text-left transition flex flex-col justify-between';
+        }
+      }
+    });
+
+    renderExcelGrid();
+    renderExcelMiniChart();
+    updateExcelStats();
+
+    if (tplKey === 'tabungan' && typeof cekJawabanTabunganDanBukaKuis === 'function') {
+      cekJawabanTabunganDanBukaKuis(true);
+    }
+    if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
+      sinkronkanStatusTombolKirimExcel();
+    }
+    return;
   } catch (e) {}
 
-  // Template default baru jika siswa belum pernah mengisi
+  // Fallback jika terjadi error
   if (typeof muatTemplateExcel === 'function') {
-    muatTemplateExcel('checklist_karakter', false);
+    muatTemplateExcel('tabungan', false);
   }
 }
 window.muatExcelDraftSiswa = muatExcelDraftSiswa;
@@ -27831,9 +28087,18 @@ function muatProfilSiswa() {
     let activePoints = (typeof state !== 'undefined' && state.userPoints) ? state.userPoints : 0;
     try {
       const db = getStudentDatabase();
-      student = (Array.isArray(db)) ? db.find(s => s.id === profile.id || (String(s.nama || '').toLowerCase() === String(profile.nama || '').toLowerCase() && s.kelas === profile.kelas)) : null;
-      if (student && student.poinBintang !== undefined) {
-        activePoints = student.poinBintang;
+      student = (Array.isArray(db)) ? db.find(s => 
+        (profile.nis && s.nis && String(s.nis).trim() === String(profile.nis).trim()) || 
+        s.id === profile.id || 
+        (String(s.nama || '').toLowerCase() === String(profile.nama || '').toLowerCase() && (!profile.kelas || s.kelas === profile.kelas))
+      ) : null;
+      if (student) {
+        if (student.poinBintang !== undefined) activePoints = student.poinBintang;
+        if (student.nilaiPoster !== undefined) profile.nilaiPoster = student.nilaiPoster;
+        if (student.nilaiExcel !== undefined) profile.nilaiExcel = student.nilaiExcel;
+        if (student.posterWord !== undefined) profile.posterWord = student.posterWord;
+        if (student.excelTabel !== undefined) profile.excelTabel = student.excelTabel;
+        if (student.kuisSem1 !== undefined) profile.kuisSem1 = student.kuisSem1;
       }
     } catch (eDb) {}
 
@@ -28089,10 +28354,14 @@ function catatHasilKuisSiswa(semNumber, score) {
     saveStudentDatabase(db);
 
     // Simpan ke sesi & storage akun siswa aktif
-    try {
-      sessionStorage.setItem('educode_student_profile', JSON.stringify(profile));
-      localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(profile));
-    } catch (eProf) {}
+    if (typeof saveActiveStudentSession === 'function') {
+      try { saveActiveStudentSession(profile); } catch (eProf) {}
+    } else {
+      try {
+        sessionStorage.setItem('educode_student_profile', JSON.stringify(profile));
+        localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(profile));
+      } catch (eProf) {}
+    }
 
     // Sinkronkan ke header kuis
     if (typeof sinkronkanSkorKuisHeader === 'function') {
@@ -28115,12 +28384,20 @@ function catatHasilKuisSiswa(semNumber, score) {
       if (student.nis) {
         localStorage.setItem(`educode_quiz_record_sem${sem}_${student.nis}`, recordStr);
         localStorage.setItem(`educode_quiz_score_sem${sem}_${student.nis}`, String(finalScore));
+        localStorage.setItem(`educode_quiz_submitted_sem${sem}_${student.nis}`, 'true');
+        localStorage.setItem(`educode_quiz_final_score_sem${sem}_${student.nis}`, String(finalScore));
       }
       if (student.id) {
         localStorage.setItem(`educode_quiz_record_sem${sem}_${student.id}`, recordStr);
+        localStorage.setItem(`educode_quiz_submitted_sem${sem}_${student.id}`, 'true');
+        localStorage.setItem(`educode_quiz_final_score_sem${sem}_${student.id}`, String(finalScore));
+      }
+      if (profile.nama) {
+        localStorage.setItem(`educode_quiz_submitted_sem${sem}_${profile.nama.replace(/\s+/g, '_')}`, 'true');
       }
       localStorage.setItem(`educode_quiz_score_sem${sem}`, String(finalScore));
       localStorage.setItem('educode_quiz_score', String(finalScore));
+      localStorage.setItem(`educode_quiz_submitted_sem${sem}`, 'true');
 
       if (typeof getActiveStudentStorageKey === 'function') {
         const quizKey = getActiveStudentStorageKey('educode_quiz_record_sem' + sem);
@@ -28148,14 +28425,16 @@ function catatHasilKuisSiswa(semNumber, score) {
       });
     }
 
-    // Refresh UI jika Dasbor Guru sedang terbuka
-    if (typeof renderDasborGuru === 'function' && state.isGuruLoggedIn) {
-      renderDasborGuru();
-    }
+    // Refresh Dasbor Guru & Gradebook jika sedang terbuka
+    if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+    if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
 
     // Segarkan Papan Peringkat Realtime di Beranda
     if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
-      perbaruiPeringkatKelasRealtimeOtomatis(true);
+      try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {}
+    }
+    if (typeof renderTop5SiswaLeaderboard === 'function') {
+      try { renderTop5SiswaLeaderboard(); } catch(e) {}
     }
   } catch (e) {
     console.warn('Gagal mencatat kuis siswa ke database:', e);
@@ -28258,28 +28537,68 @@ function hitungRubrikOtomatisExcel() {
   const rowCount = (typeof excelState !== 'undefined' && excelState.rowCount) ? excelState.rowCount : 7;
   const formats = (typeof excelState !== 'undefined' && excelState.formats) || tpl.formats || {};
 
-  // Khusus template tabungan: jika sel F7 masih kosong atau belum dihitung, jangan beri nilai tuntas!
+  // Khusus template tabungan (Latihan Utama Kelas 4 SD):
+  // Penilaian berbasis pengisian menggunakan rumus yang benar
   if (typeof excelState !== 'undefined' && (!excelState.activeTemplate || excelState.activeTemplate === 'tabungan')) {
-    const valF7 = cells['F7'] || '';
-    const hasilF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(valF7) : '';
-    const isF7Valid = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
-    if (!isF7Valid) {
+    const rawF7 = cells['F7'] !== undefined && cells['F7'] !== null ? String(cells['F7']).trim() : '';
+    const cleanFormula = rawF7.replace(/\s+/g, '').toUpperCase();
+    const hasilF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(rawF7) : '';
+    const numericHasil = Number(hasilF7);
+    const isFormula = rawF7.startsWith('=');
+    const isHasil48000 = (numericHasil === 48000);
+
+    // Kriteria 1 (Sempurna - 100 A+):
+    // Menggunakan rumus formula Excel baku diawali '=' dan hasil perhitungan tepat Rp 48.000
+    // Contoh: =SUM(F2:F6), =D7-E7, =F2+F3+F4+F5+F6, =SUM(F2:F5)+F6, dll.
+    if (isFormula && isHasil48000) {
       return {
-        totalSkor: 0,
-        aspek1: 0,
-        aspek2: 0,
-        aspek3: 0,
-        aspek4: 0,
-        grade: 'Sel F7 Belum Dihitung (0/100)'
+        totalSkor: 100,
+        aspek1: 25, // Struktur Kolom & Header Tabel Lengkap
+        aspek2: 25, // Penggunaan Rumus Formula Excel Baku (=) Sangat Tepat
+        aspek3: 25, // Format Sel & Kerapian Tabel
+        aspek4: 25, // Ketepatan Hasil Perhitungan (Rp 48.000)
+        grade: 'Sempurna (A+)',
+        keterangan: `Luar biasa! Pengisian menggunakan rumus formula Excel baku '${rawF7}' sangat benar dan hasil perhitungan tepat Rp 48.000!`
       };
     }
+
+    // Kriteria 2 (Baik - 75 B):
+    // Hasil angka tepat Rp 48.000, tetapi BELUM menggunakan rumus formula Excel diawali '=' (hanya mengetik angka langsung)
+    if (!isFormula && (rawF7 === '48000' || numericHasil === 48000 || cleanFormula === 'RP48.000' || cleanFormula === '48.000')) {
+      return {
+        totalSkor: 75,
+        aspek1: 25, // Struktur Kolom & Header
+        aspek2: 0,  // Belum menggunakan rumus formula Excel diawali '='
+        aspek3: 25, // Format Sel
+        aspek4: 25, // Hasil angka tepat Rp 48.000
+        grade: 'Baik (B)',
+        keterangan: 'Hasil angka tepat Rp 48.000, namun belum menggunakan rumus formula Excel. Gunakan rumus diawali tanda = (seperti =SUM(F2:F6) atau =D7-E7) untuk meraih nilai 100 (Sempurna)!'
+      };
+    }
+
+    // Kriteria 3 (Cukup - 65 C):
+    // Sudah menggunakan rumus diawali '=', namun jangkauan sel atau hasil perhitungannya belum tepat Rp 48.000
+    if (isFormula && !isHasil48000) {
+      return {
+        totalSkor: 65,
+        aspek1: 25,
+        aspek2: 20, // Sudah mencoba membuat rumus formula =
+        aspek3: 10,
+        aspek4: 10, // Hasil belum sesuai Rp 48.000
+        grade: 'Cukup (C)',
+        keterangan: `Sudah menggunakan rumus Excel '${rawF7}', namun hasil perhitungannya (${hasilF7}) belum tepat Rp 48.000. Periksa kembali rentang sel rumusmu!`
+      };
+    }
+
+    // Kriteria 4 (Belum Diisi / Salah Total - 0):
     return {
-      totalSkor: 100,
-      aspek1: 25,
-      aspek2: 25,
-      aspek3: 25,
-      aspek4: 25,
-      grade: 'Sempurna (A+)'
+      totalSkor: 0,
+      aspek1: 0,
+      aspek2: 0,
+      aspek3: 0,
+      aspek4: 0,
+      grade: 'Sel F7 Belum Dihitung (0/100)',
+      keterangan: 'Sel F7 TOTAL TABUNGAN MINGGU INI masih kosong atau belum dihitung menggunakan rumus yang benar.'
     };
   }
 
@@ -28366,6 +28685,7 @@ function tampilkanHasilPenilaianOtomatis(tipe, evaluasi, judul) {
         <div class="min-w-0">
           <div class="text-xs text-slate-400 truncate max-w-[200px]" title="${safeJudul}">${safeJudul}</div>
           <div class="text-sm font-bold text-emerald-400 mt-0.5">${evaluasi.grade || 'Sangat Baik (A)'}</div>
+          ${evaluasi.keterangan ? `<div class="text-[11px] text-amber-200/95 mt-1 leading-snug">${evaluasi.keterangan}</div>` : ''}
         </div>
         <div class="text-right shrink-0">
           <span class="text-3xl font-black font-mono text-amber-300">${evaluasi.totalSkor || 95}</span>
@@ -28578,16 +28898,38 @@ function catatLatihanExcelSiswa(namaLatihan = 'Praktik Spreadsheet Excel') {
     const evaluasi = hitungRubrikOtomatisExcel();
 
     matches.forEach(student => {
-      student.excelTabel = (student.excelTabel || 0) + 1;
-      student.nilaiExcel = Math.max(student.nilaiExcel || 0, evaluasi.totalSkor);
+      // Perbaiki jumlah latihan: jika sebelumnya ada nilai korup >= 10, reset ke basis 0
+      const curCount = (Number(student.excelTabel) >= 10) ? 0 : (Number(student.excelTabel) || 0);
+      student.excelTabel = curCount + 1;
+      student.nilaiExcel = Math.max(Number(student.nilaiExcel) || 0, evaluasi.totalSkor);
       if (!Array.isArray(student.tpSelesai)) student.tpSelesai = ['TP 1.1'];
       if (!student.tpSelesai.includes('TP 1.2')) student.tpSelesai.push('TP 1.2');
       if (!student.tpSelesai.includes('TP 1.3')) student.tpSelesai.push('TP 1.3');
-      student.poinBintang = (student.poinBintang || 0) + 25;
+      student.poinBintang = (Number(student.poinBintang) || 0) + 25;
       student.terakhirAktif = 'Baru saja';
+
+      // Hitung dan perbarui status KKM
+      const nK = Number(student.kuisSem1) || 0;
+      const nD = Number(student.nilaiDrive) || 0;
+      const nP = Number(student.nilaiPoster) || 0;
+      const nE = Number(student.nilaiExcel) || 0;
+      const sem1 = Math.round((nK * 0.25) + (nD * 0.25) + (nP * 0.25) + (nE * 0.25));
+      if (sem1 >= 80 || nE >= 80) student.statusKkm = 'Tuntas';
     });
 
     saveStudentDatabase(db);
+
+    // Simpan permanen ke localStorage siswa multi-kunci agar tidak pernah hilang
+    const sNis = profile.nis ? String(profile.nis).trim() : '';
+    const sId = profile.id ? String(profile.id).trim() : '';
+    const keysToSave = Array.from(new Set([sNis, sId, profile.nama, matches[0].nis, matches[0].id].filter(Boolean)));
+    keysToSave.forEach(k => {
+      localStorage.setItem(`educode_excel_score_${k}`, String(matches[0].nilaiExcel));
+      if (evaluasi.totalSkor >= 70) {
+        localStorage.setItem(`educode_excel_tabungan_done_${k}`, 'true');
+        localStorage.setItem(`educode_task_done_${k}_sem1`, 'true');
+      }
+    });
 
     // Sinkronkan sesi siswa aktif
     profile.excelTabel = matches[0].excelTabel;
@@ -28596,10 +28938,17 @@ function catatLatihanExcelSiswa(namaLatihan = 'Praktik Spreadsheet Excel') {
       try { saveActiveStudentSession(profile); } catch (e) {}
     }
 
-    // Segarkan tampilan dasbor guru seketika jika sedang terbuka
+    // Segarkan seluruh tampilan dasbor guru & papan peringkat seketika
+    if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
     if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
     if (typeof renderKPI === 'function') { try { renderKPI(); } catch(e) {} }
     if (typeof renderMonitoringDrive7KGuru === 'function') { try { renderMonitoringDrive7KGuru(); } catch(e) {} }
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+      try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {}
+    }
+    if (typeof renderTop5SiswaLeaderboard === 'function') {
+      try { renderTop5SiswaLeaderboard(); } catch(e) {}
+    }
 
     // Sinkronkan ke Google Sheets via Webhook
     if (typeof kirimKeWebhookSheets === 'function') {
@@ -28627,6 +28976,7 @@ function catatLatihanExcelSiswa(namaLatihan = 'Praktik Spreadsheet Excel') {
     console.warn('Gagal mencatat excel siswa:', e);
   }
 }
+window.catatLatihanExcelSiswa = catatLatihanExcelSiswa;
 
 // 6. Action Triggers untuk Tombol Cepat di UI: Kirim Hasil Lab Word ke Poster Siswa & Akun Guru
 async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
@@ -28644,7 +28994,11 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
     const title = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : (currentWordDocTitle || 'Poster 7 Kebiasaan Anak Indonesia Hebat');
 
     // Jika belum ada elemen di lembar kerja, beritahu siswa dan jangan simpan poster kosong
-    if (!wordElements || wordElements.length === 0) {
+    const activeElements = (Array.isArray(wordElements) && wordElements.length > 0)
+      ? wordElements
+      : ((typeof window !== 'undefined' && Array.isArray(window.wordElements) && window.wordElements.length > 0) ? window.wordElements : []);
+
+    if (!activeElements || activeElements.length === 0) {
       if (tampilkanNotif && typeof showToast === 'function') {
         showToast('⚠️ Lembar kerja Word masih kosong! Sisipkan elemen dari Bank Bahan di sebelah kiri terlebih dahulu.', 'warning');
       }
@@ -28660,7 +29014,7 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
     } catch (eGen) {}
 
     // Hitung rubrik otomatis (0 - 100)
-    const evaluasi = hitungRubrikOtomatisPosterWord(wordElements, title, wordPageBgColor, wordPageBorderStyle);
+    const evaluasi = hitungRubrikOtomatisPosterWord(activeElements, title, wordPageBgColor, wordPageBorderStyle);
 
     const sNis = profile.nis ? String(profile.nis).trim() : '';
     const sId = profile.id ? String(profile.id).trim() : '';
@@ -28770,7 +29124,8 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
       db.push(student);
     }
 
-    student.posterWord = Math.max(Number(student.posterWord) || 0, 1);
+    const curPCount = (Number(student.posterWord) >= 10) ? 0 : (Number(student.posterWord) || 0);
+    student.posterWord = Math.max(1, curPCount + 1);
     student.nilaiPoster = Math.max(Number(student.nilaiPoster) || 0, evaluasi.totalSkor);
     if (!Array.isArray(student.tpSelesai)) student.tpSelesai = ['TP 1.1'];
     if (!student.tpSelesai.includes('TP 2.1')) student.tpSelesai.push('TP 2.1');
@@ -28778,17 +29133,16 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
 
     // Hitung status KKM
     const nilaiSem1 = Math.round(((student.kuisSem1 || 0) * 0.25) + ((student.nilaiDrive || 0) * 0.25) + (student.nilaiPoster * 0.25) + ((student.nilaiExcel || 0) * 0.25));
-    if (nilaiSem1 >= 80) student.statusKkm = 'Tuntas';
+    if (nilaiSem1 >= 80 || evaluasi.totalSkor >= 80) student.statusKkm = 'Tuntas';
 
     saveStudentDatabase(db);
 
-    // Sinkronkan ke akun aktif
+    // Sinkronkan ke akun aktif & seluruh lapisan session
     profile.posterWord = student.posterWord;
     profile.nilaiPoster = student.nilaiPoster;
-    try {
-      sessionStorage.setItem('educode_student_profile', JSON.stringify(profile));
-      localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(profile));
-    } catch(eProf) {}
+    if (typeof saveActiveStudentSession === 'function') {
+      try { saveActiveStudentSession(profile); } catch(eProf) {}
+    }
 
     // Kirim sinkronisasi ke Google Sheets Webhook
     if (typeof kirimKeWebhookSheets === 'function') {
@@ -28818,12 +29172,15 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
       try { renderGaleriPosterWord(); } catch(e) {}
     }
 
-    // Perbarui Dasbor Guru jika terbuka
-    if (typeof renderDasborGuru === 'function' && typeof state !== 'undefined' && state.isGuruLoggedIn) {
-      try { renderDasborGuru(); } catch(e) {}
+    // Segarkan Dasbor Guru & Papan Peringkat Kelas Realtime
+    if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+    if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+    if (typeof renderGaleriGuru === 'function') { try { renderGaleriGuru(); } catch(e) {} }
+    if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+      try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {}
     }
-    if (typeof renderGaleriGuru === 'function') {
-      try { renderGaleriGuru(); } catch(e) {}
+    if (typeof renderTop5SiswaLeaderboard === 'function') {
+      try { renderTop5SiswaLeaderboard(); } catch(e) {}
     }
 
     // Notifikasi dan feedback visual
@@ -28947,17 +29304,14 @@ async function simpanDanNilaiExcel() {
 
   if (isTabungan) {
     const valF7 = (excelState && excelState.cells) ? (excelState.cells['F7'] || '') : '';
-    const hasilF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(valF7) : '';
-    const isF7Valid = (Number(hasilF7) === 48000) || 
-                      (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || 
-                      (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
+    const cleanF7 = String(valF7).trim();
 
-    if (!isF7Valid) {
+    if (!cleanF7) {
       playSound('error');
       if (btnKirim) {
         btnKirim.disabled = false;
         btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer animate-pulse';
-        btnKirim.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-200"></i> <span>Isi Sel F7 Dulu (Rp 48.000) ⚠️</span>';
+        btnKirim.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-200"></i> <span>Isi Sel F7 Dulu (Gunakan Rumus) ⚠️</span>';
         setTimeout(() => {
           if (btnKirim) sinkronkanStatusTombolKirimExcel();
         }, 3500);
@@ -28968,24 +29322,34 @@ async function simpanDanNilaiExcel() {
       return;
     }
 
-    // Jika sel F7 sudah valid: catat dan buka kuis secara silent
+    // Jika sel F7 sudah diisi: periksa dan buka kuis secara silent
     if (typeof cekJawabanTabunganDanBukaKuis === 'function') {
       cekJawabanTabunganDanBukaKuis(true);
     }
   }
 
+  // Simpan draft sebelum kirim ke guru
+  if (typeof simpanExcelDraftSiswa === 'function') {
+    simpanExcelDraftSiswa();
+  }
+
   // 5. Catat latihan siswa ke database guru, sinkronkan ke Google Sheets Webhook, dan tampilkan modal rubrik AI
   catatLatihanExcelSiswa(namaLatihan);
+
+  // Ambil nilai terbaru yang sudah tersimpan
+  const latestGrade = (typeof dapatkanStatusDanNilaiExcelSiswa === 'function') 
+    ? dapatkanStatusDanNilaiExcelSiswa(profile).nilaiExcel 
+    : (profile.nilaiExcel || 100);
 
   // 6. Ubah tombol menjadi status SUKSES (Hijau Zamrud & Centang)
   if (btnKirim) {
     btnKirim.disabled = false;
     btnKirim.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/40 transition flex items-center gap-1.5 cursor-pointer active:scale-95 animate-fadeIn';
-    btnKirim.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-200 text-sm"></i> <span>Terkirim ke Guru! ✅</span>';
-    btnKirim.title = 'Nilai Excel (100) resmi tersimpan di Buku Nilai Guru & Google Sheets!';
+    btnKirim.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-200 text-sm"></i> <span>Terkirim ke Guru! (${latestGrade}) ✅</span>`;
+    btnKirim.title = `Nilai Excel (${latestGrade}) resmi tersimpan permanen di Buku Nilai Guru & Google Sheets!`;
   }
 
-  showToast(`🎉 Luar biasa ${profile.nama || ''}! Nilai ${namaLatihan} RESMI TERKIRIM ke Buku Nilai Guru & Google Sheets! 📊✨`, 'success');
+  showToast(`🎉 Luar biasa ${profile.nama || ''}! Nilai ${namaLatihan} (Skor: ${latestGrade}) RESMI TERKIRIM ke Buku Nilai Guru & Google Sheets! 📊✨`, 'success');
 }
 window.simpanDanNilaiExcel = simpanDanNilaiExcel;
 
@@ -31661,6 +32025,12 @@ function dapatkanStatusDanNilaiPosterSiswa(student) {
   let nilaiPoster = (student.nilaiPoster !== undefined && student.nilaiPoster !== null && Number(student.nilaiPoster) > 0) ? Number(student.nilaiPoster) : 0;
   let posterWord = (student.posterWord !== undefined && student.posterWord !== null && Number(student.posterWord) > 0) ? Number(student.posterWord) : 0;
 
+  // Sanitasi data warisan korup jika kolom jumlah poster berisi skor nilai (misal 98 Poster)
+  if (posterWord >= 10) {
+    nilaiPoster = Math.max(nilaiPoster, posterWord);
+    posterWord = 1;
+  }
+
   // 1. Cek posters di galeri
   const posters = (typeof dapatkanPostersSiswa === 'function') ? dapatkanPostersSiswa(student) : [];
   if (posters.length > 0) {
@@ -31742,7 +32112,7 @@ window.dapatkanDriveSiswa = dapatkanDriveSiswa;
 function dapatkanStatusDanNilaiExcelSiswa(student) {
   if (!student) return { nilaiExcel: 0, excelTabel: 0 };
 
-  // Bersihkan key kontaminasi global lama
+  // Bersihkan key kontaminasi global lama jika ada
   try {
     if (localStorage.getItem('educode_excel_tabungan_done') !== null) {
       localStorage.removeItem('educode_excel_tabungan_done');
@@ -31752,108 +32122,71 @@ function dapatkanStatusDanNilaiExcelSiswa(student) {
   let nilaiExcel = (student.nilaiExcel !== undefined && student.nilaiExcel !== null && Number(student.nilaiExcel) > 0) ? Number(student.nilaiExcel) : 0;
   let excelTabel = (student.excelTabel !== undefined && student.excelTabel !== null && Number(student.excelTabel) > 0) ? Number(student.excelTabel) : 0;
 
-  // 1. Perbaiki data warisan lama jika nilai skor 100 sempat tersimpan di kolom excelTabel
-  if (excelTabel >= 100) {
-    nilaiExcel = Math.max(nilaiExcel, 100);
+  // 1. Perbaiki data warisan lama jika nilai skor tersimpan di kolom excelTabel (misal excelTabel = 96 atau 100)
+  if (excelTabel >= 10) {
+    nilaiExcel = Math.max(nilaiExcel, excelTabel);
     excelTabel = 1;
   }
 
-  // 2. Cek apakah ada bukti pengerjaan tersimpan di localStorage browser ini
-  const activeStudent = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-  const isCurrentlyActive = activeStudent && (
-    (activeStudent.nis && student.nis && String(activeStudent.nis).trim() === String(student.nis).trim()) ||
-    (activeStudent.id && student.id && activeStudent.id === student.id) ||
-    (activeStudent.nama && student.nama && activeStudent.nama.toLowerCase().trim() === student.nama.toLowerCase().trim())
-  );
-
-  // 3. Validasi Ketat: Jika sedang aktif membuka template tabungan di editor saat ini,
-  // sel F7 WAJIB terisi benar (=SUM(F2:F6), =D7-E7, atau 48000).
-  // Jika sel F7 masih kosong/salah, MAKA DIJAMIN BELUM TUNTAS (skor 0)!
-  let isF7CurrentlyInvalid = false;
-  if (isCurrentlyActive && typeof excelState !== 'undefined' && excelState.cells) {
-    const activeTpl = excelState.activeTemplate || 'tabungan';
-    if (activeTpl === 'tabungan') {
-      const liveF7 = excelState.cells['F7'] || '';
-      const evalLive = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(liveF7) : '';
-      const isLiveF7Valid = (Number(evalLive) === 48000) || 
-        (String(liveF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || 
-        (String(liveF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
-      if (!isLiveF7Valid) {
-        isF7CurrentlyInvalid = true;
-      }
-    }
+  // 2. Jika nilai sudah ada di record siswa (> 0), itu adalah kebenaran utama (source of truth).
+  // JANGAN PERNAH menghapus atau me-reset nilai siswa yang sah!
+  if (nilaiExcel > 0) {
+    student.nilaiExcel = nilaiExcel;
+    student.excelTabel = Math.max(1, excelTabel);
+    return {
+      nilaiExcel: nilaiExcel,
+      excelTabel: Math.max(1, excelTabel)
+    };
   }
 
-  // Cek juga draft sel tersimpan di localStorage khusus untuk siswa ini
-  const activeCellsKey = student.nis ? `educode_excel_active_cells_${student.nis}` : (student.id ? `educode_excel_active_cells_${student.id}` : null);
-  if (activeCellsKey) {
-    try {
-      const savedCells = localStorage.getItem(activeCellsKey);
-      if (savedCells && savedCells.includes('"cells"')) {
-        const parsed = JSON.parse(savedCells);
-        if (parsed && parsed.cells && (parsed.activeTemplate === 'tabungan' || !parsed.activeTemplate)) {
-          const f7Draft = String(parsed.cells['F7'] || '').trim().replace(/\s+/g, '').toUpperCase();
-          const evalDraft = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(f7Draft) : '';
-          const isDraftValid = (Number(evalDraft) === 48000) || f7Draft === '48000' || f7Draft === '=SUM(F2:F6)' || f7Draft === '=D7-E7';
-          if (!isDraftValid && isCurrentlyActive) {
-            isF7CurrentlyInvalid = true;
-          }
-        }
-      }
-    } catch (eDraft) {}
-  }
-
-  // Jika terbukti sel F7 masih kosong/salah di lembar kerja aktif:
-  if (isF7CurrentlyInvalid) {
-    nilaiExcel = 0;
-    excelTabel = 0;
-    student.nilaiExcel = 0;
-    student.excelTabel = 0;
-    if (student.nis) {
-      try {
-        localStorage.removeItem(`educode_excel_tabungan_done_${student.nis}`);
-        localStorage.removeItem(`educode_task_done_${student.nis}_sem1`);
-      } catch(e) {}
-    }
-    return { nilaiExcel: 0, excelTabel: 0 };
-  }
-
-  // 4. Cek flag pengerjaan resmi spesifik siswa
-  const keysToCheck = [
+  // 3. Auto-recovery: Jika student.nilaiExcel masih 0/undefined, periksa riwayat tersimpan di localStorage browser
+  const sKeys = [
+    student.nis ? `educode_excel_score_${student.nis}` : null,
+    student.id ? `educode_excel_score_${student.id}` : null,
     student.nis ? `educode_excel_tabungan_done_${student.nis}` : null,
     student.id ? `educode_excel_tabungan_done_${student.id}` : null,
     student.nis ? `educode_task_done_${student.nis}_sem1` : null,
     student.id ? `educode_task_done_${student.id}_sem1` : null
   ].filter(Boolean);
 
-  let hasDoneExcel = false;
-  for (const k of keysToCheck) {
+  let recoveredScore = 0;
+  for (const k of sKeys) {
     try {
       const val = localStorage.getItem(k);
-      if (val === 'true') {
-        hasDoneExcel = true;
-        break;
+      if (val !== null && val !== undefined) {
+        if (!isNaN(val) && Number(val) > 0) {
+          recoveredScore = Math.max(recoveredScore, Number(val));
+        } else if (val === 'true') {
+          recoveredScore = Math.max(recoveredScore, 100);
+        }
       }
     } catch (e) {}
   }
 
-  if (nilaiExcel >= 70 && excelTabel >= 1) {
-    hasDoneExcel = true;
+  // Cek juga dari draft sel tersimpan di database siswa jika ada
+  if (!recoveredScore && student.excelDrafts) {
+    try {
+      const tabDraft = student.excelDrafts['tabungan'] || student.excelDraft;
+      if (tabDraft && tabDraft.cells && tabDraft.cells['F7']) {
+        const valF7 = tabDraft.cells['F7'];
+        const evalF7 = typeof evaluasiRumusExcel === 'function' ? evaluasiRumusExcel(valF7) : '';
+        if (Number(evalF7) === 48000) {
+          recoveredScore = String(valF7).startsWith('=') ? 100 : 75;
+        }
+      }
+    } catch (e) {}
   }
 
-  if (hasDoneExcel) {
-    nilaiExcel = Math.max(nilaiExcel, 100);
-    excelTabel = Math.max(excelTabel, 1);
-  } else {
-    nilaiExcel = 0;
-    excelTabel = 0;
+  if (recoveredScore > 0) {
+    student.nilaiExcel = recoveredScore;
+    student.excelTabel = Math.max(1, excelTabel);
+    return {
+      nilaiExcel: recoveredScore,
+      excelTabel: Math.max(1, excelTabel)
+    };
   }
 
-  // Sinkronkan kembali properti pada objek siswa
-  student.nilaiExcel = nilaiExcel;
-  student.excelTabel = excelTabel;
-
-  return { nilaiExcel, excelTabel };
+  return { nilaiExcel: 0, excelTabel: 0 };
 }
 window.dapatkanStatusDanNilaiExcelSiswa = dapatkanStatusDanNilaiExcelSiswa;
 
@@ -39271,145 +39604,157 @@ window.getActiveUraianList = getActiveUraianList;
 /**
  * Cek apakah siswa sudah menghitung Total Tabungan Minggu Ini di sel F7 Excel
  */
+let __isCheckingTabunganLock__ = false;
 function cekJawabanTabunganDanBukaKuis(silent = false) {
-  const valF7 = excelState.cells['F7'] || '';
-  const hasilF7 = evaluasiRumusExcel(valF7);
+  if (__isCheckingTabunganLock__) return false;
+  __isCheckingTabunganLock__ = true;
+  try {
+    const valF7 = excelState.cells['F7'] || '';
+    const hasilF7 = evaluasiRumusExcel(valF7);
 
-  const previewEl = document.getElementById('val-sel-f7-preview');
-  if (previewEl) {
-    if (!valF7) {
-      previewEl.innerText = 'Kosong (Belum Diisi)';
-      previewEl.className = 'text-amber-400 font-bold';
-    } else {
-      previewEl.innerText = typeof formatExcelNumber === 'function' ? formatExcelNumber(hasilF7, 'rupiah') : hasilF7;
-      previewEl.className = (Number(hasilF7) === 48000) ? 'text-emerald-400 font-bold' : 'text-amber-300 font-bold';
-    }
-  }
-
-  const badgeEl = document.getElementById('badge-status-misi-tabungan');
-  const btnPeriksa = document.getElementById('btn-periksa-tabungan');
-
-  // Nilai total yang benar adalah 48000
-  // Rumus bisa =SUM(F2:F6) atau =D7-E7 atau nilai 48000
-  const isCorrect = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
-
-  if (isCorrect) {
-    // Simpan status tuntas khusus profil siswa yang sedang aktif
-    try {
-      let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-      if (!profile) {
-        try {
-          const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
-          if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
-        } catch (eLs) {}
-      }
-
-      if (profile) {
-        const sId = profile.nis || profile.id || profile.nama || 'anoname';
-        localStorage.setItem(`educode_task_done_${sId}_sem1`, 'true');
-        localStorage.setItem(`educode_excel_tabungan_done_${sId}`, 'true');
-      }
-
-      // Simpan nilai excel 100 dan latihan 1 di database guru
-      const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
-      let targetRecords = [];
-      if (profile) {
-        targetRecords = db.filter(s => (profile.nis && String(s.nis).trim() === String(profile.nis).trim()) || s.id === profile.id || (s.nama && profile.nama && s.nama.toLowerCase().trim() === profile.nama.toLowerCase().trim() && (!profile.kelas || s.kelas === profile.kelas)));
-        if (targetRecords.length === 0 && profile.nis) {
-          const recByNis = db.find(s => String(s.nis).trim() === String(profile.nis).trim());
-          if (recByNis) targetRecords.push(recByNis);
-        }
-      }
-
-      targetRecords.forEach(record => {
-        record.nilaiExcel = 100;
-        record.excelTabel = Math.max(record.excelTabel || 0, 1);
-        record.statusKkm = 'Tuntas';
-        if (!Array.isArray(record.tpSelesai)) record.tpSelesai = ['TP 1.1'];
-        if (!record.tpSelesai.includes('TP 1.2')) record.tpSelesai.push('TP 1.2');
-        if (!record.tpSelesai.includes('TP 1.3')) record.tpSelesai.push('TP 1.3');
-        record.poinBintang = Math.max(record.poinBintang || 0, (record.poinBintang || 0) + 25);
-        record.terakhirAktif = 'Baru saja';
-      });
-
-      if (targetRecords.length > 0) {
-        if (typeof saveStudentDatabase === 'function') saveStudentDatabase(db);
-      }
-
-      if (profile) {
-        profile.nilaiExcel = 100;
-        profile.excelTabel = Math.max(profile.excelTabel || 0, 1);
-        if (typeof saveActiveStudentSession === 'function') saveActiveStudentSession(profile);
-
-        // Sinkronkan ke Google Sheets via Webhook
-        if (typeof kirimKeWebhookSheets === 'function') {
-          try {
-            kirimKeWebhookSheets({
-              event: 'latihan_excel',
-              type: 'Tabel Excel',
-              nis: profile.nis || (targetRecords[0] ? targetRecords[0].nis : '-'),
-              nama: profile.nama || (targetRecords[0] ? targetRecords[0].nama : '-'),
-              kelas: profile.kelas || (targetRecords[0] ? targetRecords[0].kelas : '4A'),
-              absen: profile.absen || (targetRecords[0] ? targetRecords[0].absen : '-'),
-              title: 'Latihan Tabungan & Uang Saku (Sel F7)',
-              nilai: 100,
-              statusKkm: 'Tuntas',
-              summary: 'Misi Total Tabungan Selesai Benar (=SUM(F2:F6) = Rp 48.000)'
-            });
-          } catch (eHook) {}
-        }
-      }
-
-      // Segarkan dasbor guru jika sedang dibuka
-      if (typeof renderDasborGuru === 'function' && typeof state !== 'undefined' && state.isGuruLoggedIn) {
-        try { renderDasborGuru(); } catch(eDg) {}
-      }
-    } catch(e) {}
-
-    if (badgeEl) {
-      badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold animate-pulse';
-      badgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> Tuntas! Kuis Terbuka 🔓';
-    }
-
-    if (btnPeriksa) {
-      btnPeriksa.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition flex items-center gap-1.5 cursor-pointer animate-bounce';
-      btnPeriksa.innerHTML = '<i class="fa-solid fa-arrow-right"></i> <span>Buka Menu Kuis Sekarang 📝</span>';
-      btnPeriksa.onclick = function() {
-        switchTab('kuis');
-      };
-    }
-
-    if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
-      sinkronkanStatusTombolKirimExcel();
-    }
-
-    if (!silent) {
-      playSound('fanfare');
-      showToast('Luar biasa! Perhitungan Total Tabungan Benar (Rp 48.000)! Nilai 100 tersimpan ke Buku Nilai Guru & Menu Kuis TERBUKA! 🔓🎉', 'success');
-    }
-    return true;
-  } else {
-    if (badgeEl) {
-      badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold';
-      badgeEl.innerText = '⏳ Belum Dihitung';
-    }
-    if (btnPeriksa) {
-      btnPeriksa.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95';
-      btnPeriksa.innerHTML = '<i class="fa-solid fa-calculator"></i> <span>Periksa &amp; Buka Kuis 🚀</span>';
-      btnPeriksa.onclick = function() {
-        cekJawabanTabunganDanBukaKuis(false);
-      };
-    }
-
-    if (!silent) {
-      playSound('click');
+    const previewEl = document.getElementById('val-sel-f7-preview');
+    if (previewEl) {
       if (!valF7) {
-        showToast('Sel F7 masih kosong! Klik sel F7 lalu ketik rumus =SUM(F2:F6) atau =D7-E7 untuk menjumlahkan tabungan ya! 💡', 'warning');
+        previewEl.innerText = 'Kosong (Belum Diisi)';
+        previewEl.className = 'text-amber-400 font-bold';
       } else {
-        showToast(`Nilai sel F7 saat ini adalah ${hasilF7}. Hasil yang benar adalah Rp 48.000 (Gunakan rumus =SUM(F2:F6) atau =D7-E7). Coba lagi ya!`, 'warning');
+        previewEl.innerText = typeof formatExcelNumber === 'function' ? formatExcelNumber(hasilF7, 'rupiah') : hasilF7;
+        previewEl.className = (Number(hasilF7) === 48000) ? 'text-emerald-400 font-bold' : 'text-amber-300 font-bold';
       }
     }
-    return false;
+
+    const badgeEl = document.getElementById('badge-status-misi-tabungan');
+    const btnPeriksa = document.getElementById('btn-periksa-tabungan');
+
+    // Nilai total yang benar adalah 48000
+    // Rumus bisa =SUM(F2:F6) atau =D7-E7 atau nilai 48000
+    const isCorrect = (Number(hasilF7) === 48000) || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=SUM(F2:F6)') || (String(valF7).trim().replace(/\s+/g, '').toUpperCase() === '=D7-E7');
+    const isFormula = String(valF7).trim().startsWith('=');
+    const evaluatedScore = isFormula ? 100 : 75;
+
+    if (isCorrect) {
+      // Simpan status tuntas khusus profil siswa yang sedang aktif
+      try {
+        let profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+        if (!profile) {
+          try {
+            const raw = localStorage.getItem(ACTIVE_STUDENT_KEY);
+            if (raw && raw !== 'LOGGED_OUT' && raw.includes('{')) profile = JSON.parse(raw);
+          } catch (eLs) {}
+        }
+
+        if (profile) {
+          const sId = profile.nis || profile.id || profile.nama || 'anoname';
+          localStorage.setItem(`educode_task_done_${sId}_sem1`, 'true');
+          localStorage.setItem(`educode_excel_tabungan_done_${sId}`, 'true');
+          localStorage.setItem(`educode_excel_score_${sId}`, String(evaluatedScore));
+        }
+
+        // Simpan nilai excel dan latihan 1 di database guru
+        const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+        let targetRecords = [];
+        if (profile) {
+          targetRecords = db.filter(s => (profile.nis && String(s.nis).trim() === String(profile.nis).trim()) || s.id === profile.id || (s.nama && profile.nama && s.nama.toLowerCase().trim() === profile.nama.toLowerCase().trim() && (!profile.kelas || s.kelas === profile.kelas)));
+          if (targetRecords.length === 0 && profile.nis) {
+            const recByNis = db.find(s => String(s.nis).trim() === String(profile.nis).trim());
+            if (recByNis) targetRecords.push(recByNis);
+          }
+        }
+
+        targetRecords.forEach(record => {
+          record.nilaiExcel = Math.max(record.nilaiExcel || 0, evaluatedScore);
+          record.excelTabel = Math.max(record.excelTabel || 0, 1);
+          record.statusKkm = 'Tuntas';
+          if (!Array.isArray(record.tpSelesai)) record.tpSelesai = ['TP 1.1'];
+          if (!record.tpSelesai.includes('TP 1.2')) record.tpSelesai.push('TP 1.2');
+          if (!record.tpSelesai.includes('TP 1.3')) record.tpSelesai.push('TP 1.3');
+          record.poinBintang = Math.max(record.poinBintang || 0, (record.poinBintang || 0) + 25);
+          record.terakhirAktif = 'Baru saja';
+        });
+
+        if (targetRecords.length > 0) {
+          if (typeof saveStudentDatabase === 'function') saveStudentDatabase(db);
+        }
+
+        if (profile) {
+          profile.nilaiExcel = Math.max(profile.nilaiExcel || 0, evaluatedScore);
+          profile.excelTabel = Math.max(profile.excelTabel || 0, 1);
+          if (!silent && typeof saveActiveStudentSession === 'function') {
+            saveActiveStudentSession(profile);
+          }
+
+          // Sinkronkan ke Google Sheets via Webhook
+          if (typeof kirimKeWebhookSheets === 'function') {
+            try {
+              kirimKeWebhookSheets({
+                event: 'latihan_excel',
+                type: 'Tabel Excel',
+                nis: profile.nis || (targetRecords[0] ? targetRecords[0].nis : '-'),
+                nama: profile.nama || (targetRecords[0] ? targetRecords[0].nama : '-'),
+                kelas: profile.kelas || (targetRecords[0] ? targetRecords[0].kelas : '4A'),
+                absen: profile.absen || (targetRecords[0] ? targetRecords[0].absen : '-'),
+                title: 'Latihan Tabungan & Uang Saku (Sel F7)',
+                nilai: evaluatedScore,
+                statusKkm: 'Tuntas',
+                summary: `Misi Total Tabungan Selesai Benar (=SUM(F2:F6) = Rp 48.000, Skor: ${evaluatedScore})`
+              });
+            } catch (eHook) {}
+          }
+        }
+
+        // Segarkan dasbor guru jika sedang dibuka
+        if (typeof renderDasborGuru === 'function' && typeof state !== 'undefined' && state.isGuruLoggedIn) {
+          try { renderDasborGuru(); } catch(eDg) {}
+        }
+      } catch(e) {}
+
+      if (badgeEl) {
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold animate-pulse';
+        badgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i> Tuntas! Kuis Terbuka 🔓';
+      }
+
+      if (btnPeriksa) {
+        btnPeriksa.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition flex items-center gap-1.5 cursor-pointer animate-bounce';
+        btnPeriksa.innerHTML = '<i class="fa-solid fa-arrow-right"></i> <span>Buka Menu Kuis Sekarang 📝</span>';
+        btnPeriksa.onclick = function() {
+          switchTab('kuis');
+        };
+      }
+
+      if (typeof sinkronkanStatusTombolKirimExcel === 'function') {
+        sinkronkanStatusTombolKirimExcel();
+      }
+
+      if (!silent) {
+        playSound('fanfare');
+        showToast(`Luar biasa! Perhitungan Total Tabungan Benar (Rp 48.000)! Nilai ${evaluatedScore} tersimpan ke Buku Nilai Guru & Menu Kuis TERBUKA! 🔓🎉`, 'success');
+      }
+      return true;
+    } else {
+      if (badgeEl) {
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[10px] font-bold';
+        badgeEl.innerText = '⏳ Belum Dihitung';
+      }
+      if (btnPeriksa) {
+        btnPeriksa.className = 'px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer active:scale-95';
+        btnPeriksa.innerHTML = '<i class="fa-solid fa-calculator"></i> <span>Periksa &amp; Buka Kuis 🚀</span>';
+        btnPeriksa.onclick = function() {
+          cekJawabanTabunganDanBukaKuis(false);
+        };
+      }
+
+      if (!silent) {
+        playSound('click');
+        if (!valF7) {
+          showToast('Sel F7 masih kosong! Klik sel F7 lalu ketik rumus =SUM(F2:F6) atau =D7-E7 untuk menjumlahkan tabungan ya! 💡', 'warning');
+        } else {
+          showToast(`Nilai sel F7 saat ini adalah ${hasilF7}. Hasil yang benar adalah Rp 48.000 (Gunakan rumus =SUM(F2:F6) atau =D7-E7). Coba lagi ya!`, 'warning');
+        }
+      }
+      return false;
+    }
+  } finally {
+    __isCheckingTabunganLock__ = false;
   }
 }
 window.cekJawabanTabunganDanBukaKuis = cekJawabanTabunganDanBukaKuis;
@@ -39719,9 +40064,14 @@ function kirimNilaiKuisKeGuru() {
     catatHasilKuisSiswa(semNum, scoreToSend);
   }
 
-  // 5. Simpan skor akhir ke LocalStorage
+  // 5. Simpan skor akhir ke LocalStorage multi-kunci
   try {
     localStorage.setItem(`educode_quiz_final_score_sem${semNum}_${sId}`, String(scoreToSend));
+    localStorage.setItem(`educode_quiz_submitted_sem${semNum}_${sId}`, 'true');
+    if (sNis) {
+      localStorage.setItem(`educode_quiz_final_score_sem${semNum}_${sNis}`, String(scoreToSend));
+      localStorage.setItem(`educode_quiz_submitted_sem${semNum}_${sNis}`, 'true');
+    }
   } catch(e) {}
 
   try { playSound('fanfare'); } catch(e){}
@@ -39731,8 +40081,14 @@ function kirimNilaiKuisKeGuru() {
 
   loadQuizQuestion();
 
-  if (typeof renderDasborGuru === 'function' && typeof state !== 'undefined' && state.isGuruLoggedIn) {
-    renderDasborGuru();
+  // Segarkan seluruh tampilan Dasbor Guru & Papan Peringkat Realtime
+  if (typeof filterDanCariSiswa === 'function') { try { filterDanCariSiswa(); } catch(e) {} }
+  if (typeof renderDasborGuru === 'function') { try { renderDasborGuru(); } catch(e) {} }
+  if (typeof perbaruiPeringkatKelasRealtimeOtomatis === 'function') {
+    try { perbaruiPeringkatKelasRealtimeOtomatis(true); } catch(e) {}
+  }
+  if (typeof renderTop5SiswaLeaderboard === 'function') {
+    try { renderTop5SiswaLeaderboard(); } catch(e) {}
   }
 }
 window.kirimNilaiKuisKeGuru = kirimNilaiKuisKeGuru;
