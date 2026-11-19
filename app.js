@@ -2260,6 +2260,20 @@ function switchTab(tabId) {
     }, 50);
   }
 
+  // Inisialisasi Portofolio Kelas 5 jika tab petualangan5 dibuka
+  if (tabId === 'petualangan5') {
+    if (typeof window.muatPortofolioKelas5Aktif === 'function') {
+      setTimeout(window.muatPortofolioKelas5Aktif, 50);
+    }
+  }
+
+  // Sinkronkan status Misi Kelas 6 jika tab petualangan6 dibuka
+  if (tabId === 'petualangan6') {
+    if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') {
+      setTimeout(window.perbaruiStatusMisiKelas6Siswa, 50);
+    }
+  }
+
   // Inisialisasi Game Antariksa jika tab antariksa dibuka
   if (tabId === 'antariksa') {
     setTimeout(initGameAntariksa, 50);
@@ -7132,31 +7146,11 @@ function hitungNilaiDrive7Kebiasaan(driveData) {
 }
 window.hitungNilaiDrive7Kebiasaan = hitungNilaiDrive7Kebiasaan;
 
-// Pembersih otomatis cache gambar siswa lain di PC Lab agar kuota 5 MB localStorage tidak pernah penuh
+// Pembersih otomatis cache (dinonaktifkan agar seluruh tugas & karya siswa Kelas 4, 5, dan 6 tersimpan permanen)
 function bersihkanCacheLokalSiswaLain(keepKey = null) {
-  try {
-    const bulkyPrefixes = [
-      'educode_drive_7kebiasaan_',
-      'educode_poster_galeri_',
-      'educode_word_posters_',
-      'educode_presentasi_',
-      'educode_paint_'
-    ];
-    const keysToEvict = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (!k || k === keepKey) continue;
-      if (bulkyPrefixes.some(p => k.startsWith(p))) {
-        keysToEvict.push(k);
-      }
-    }
-    keysToEvict.forEach(k => {
-      try { localStorage.removeItem(k); } catch (eRem) {}
-    });
-    return keysToEvict.length;
-  } catch (e) {
-    return 0;
-  }
+  // Pengaman: Semua karya dan tugas siswa Kelas 4, 5, dan 6 WAJIB tersimpan permanen
+  // Tidak ada penghapusan data karya siswa secara sepihak
+  return 0;
 }
 window.bersihkanCacheLokalSiswaLain = bersihkanCacheLokalSiswaLain;
 
@@ -10409,7 +10403,7 @@ function isStudentTaskCompleted(profile, sem = 1) {
     const db = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
     const record = db.find(s => (profile.nis && s.nis === profile.nis) || s.id === profile.id || (s.nama && profile.nama && s.nama.toLowerCase() === profile.nama.toLowerCase()));
     if (record) {
-      if ((record.posterWord && record.posterWord > 0) || (record.excelTabel && record.excelTabel > 0)) {
+      if ((record.posterWord && record.posterWord > 0) || (record.excelTabel && record.excelTabel > 0) || (record.nilaiExcel && record.nilaiExcel > 0) || (record.nilaiPoster && record.nilaiPoster > 0)) {
         return true;
       }
       if (Array.isArray(record.tpSelesai) && record.tpSelesai.length >= 2) {
@@ -16941,6 +16935,9 @@ function ubahSampelDataGrafik() {
 function initExcelSpreadsheet() {
   attachExcelKeyboardListener();
   setExcelViewMode(excelState.viewMode || 'full');
+  if (typeof muatExcelDraftSiswa === 'function') {
+    muatExcelDraftSiswa();
+  }
   if (Object.keys(excelState.cells).length === 0) {
     muatTemplateExcel('checklist_karakter', false);
   } else {
@@ -25646,10 +25643,12 @@ function initTeacherDatabase() {
       let targetTab = 'beranda';
 
       if (isKelas6) {
-        targetTab = (savedTab === 'beranda') ? 'beranda' : 'petualangan6';
+        const validK6Tabs = ['beranda', 'modul', 'petualangan6', 'algoritma', 'antarteman', 'kuis'];
+        targetTab = (savedTab && validK6Tabs.includes(savedTab)) ? savedTab : 'beranda';
         setHeaderNavMode('kelas6');
       } else if (isKelas5) {
-        targetTab = (savedTab === 'beranda') ? 'beranda' : 'petualangan5';
+        const validK5Tabs = ['beranda', 'modul', 'petualangan5', 'kuis'];
+        targetTab = (savedTab && validK5Tabs.includes(savedTab)) ? savedTab : 'beranda';
         setHeaderNavMode('kelas5');
       } else {
         const validTabs = ['beranda', 'modul', 'msword', 'msexcel', 'demo', 'praktik', 'kuis', 'antariksa'];
@@ -25661,6 +25660,34 @@ function initTeacherDatabase() {
 
       switchTab(targetTab);
       muatProfilSiswa();
+
+      // Pulihkan semua progres tugas, kuis, dan draf kerja siswa sesuai tingkat kelasnya
+      try {
+        if (typeof muatProgressKuisSiswa === 'function') muatProgressKuisSiswa();
+        if (typeof muatJawabanUraianSiswa === 'function') muatJawabanUraianSiswa();
+        if (isKelas6) {
+          if (typeof window.muatStatusTugasScratchK6 === 'function') {
+            window.muatStatusTugasScratchK6('4pilar');
+            window.muatStatusTugasScratchK6('algoritma');
+          }
+          if (typeof window.muatStatusMisiK6 === 'function') {
+            window.muatStatusMisiK6('antarteman');
+            window.muatStatusMisiK6('kuis');
+          }
+          if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') {
+            window.perbaruiStatusMisiKelas6Siswa();
+          }
+        } else if (isKelas5) {
+          if (typeof window.muatPortofolioKelas5Aktif === 'function') {
+            window.muatPortofolioKelas5Aktif();
+          }
+        } else {
+          if (typeof muatWordDraftSiswa === 'function') muatWordDraftSiswa();
+          if (typeof muatExcelDraftSiswa === 'function') muatExcelDraftSiswa();
+        }
+      } catch (eRestoreTasks) {
+        console.warn('Gagal memulihkan tugas siswa saat reload/F5:', eRestoreTasks);
+      }
     } else {
       // Mode Guest / Sudah Keluar: Tampilkan beranda utama dengan menu tamu
       const isTeacher = (typeof isTeacherSessionActive === 'function' && isTeacherSessionActive()) || 
@@ -26972,23 +26999,39 @@ async function loginDenganNis() {
     // Tutup modal profil siswa langsung setelah verifikasi berhasil
     tutupModalProfilSiswa();
 
-    // Bersihkan cache gambar siswa lama di PC Lab secara proaktif jika kuota browser mulai terisi > 2 MB
-    try {
-      let approxBytes = 0;
-      for (let i = 0; i < localStorage.length; i++) {
-        const lk = localStorage.key(i);
-        if (lk) approxBytes += (localStorage.getItem(lk) || '').length;
-      }
-      if (approxBytes > 2000000 && typeof bersihkanCacheLokalSiswaLain === 'function') {
-        bersihkanCacheLokalSiswaLain('educode_drive_7kebiasaan_' + (student.nis || student.id || ''));
-      }
-    } catch (eQuota) {}
-
     // Jalankan pembaruan UI secara aman
     try { muatProfilSiswa(); } catch (eUI) { console.warn('UI update muatProfilSiswa:', eUI); }
     try { setHeaderNavMode(isKelas6 ? 'kelas6' : (isKelas5 ? 'kelas5' : 'sem1')); } catch (eUI) { console.warn('UI update setHeaderNavMode:', eUI); }
     try { if (typeof renderGaleriPosterWord === 'function') renderGaleriPosterWord(); } catch (eUI) {}
     try { switchTab(targetTab); } catch (eUI) { console.warn('UI update switchTab:', eUI); }
+
+    // Pulihkan seluruh pekerjaan, draf, dan progres tugas siswa seketika setelah login berhasil
+    try {
+      if (typeof muatProgressKuisSiswa === 'function') muatProgressKuisSiswa();
+      if (typeof muatJawabanUraianSiswa === 'function') muatJawabanUraianSiswa();
+      if (isKelas6) {
+        if (typeof window.muatStatusTugasScratchK6 === 'function') {
+          window.muatStatusTugasScratchK6('4pilar');
+          window.muatStatusTugasScratchK6('algoritma');
+        }
+        if (typeof window.muatStatusMisiK6 === 'function') {
+          window.muatStatusMisiK6('antarteman');
+          window.muatStatusMisiK6('kuis');
+        }
+        if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') {
+          window.perbaruiStatusMisiKelas6Siswa();
+        }
+      } else if (isKelas5) {
+        if (typeof window.muatPortofolioKelas5Aktif === 'function') {
+          window.muatPortofolioKelas5Aktif();
+        }
+      } else {
+        if (typeof muatWordDraftSiswa === 'function') muatWordDraftSiswa();
+        if (typeof muatExcelDraftSiswa === 'function') muatExcelDraftSiswa();
+      }
+    } catch (eRestoreLogin) {
+      console.warn('Gagal memulihkan tugas saat login:', eRestoreLogin);
+    }
 
     showToast(`Selamat datang, ${student.nama}! (Kelas ${student.kelas} • NIS: ${student.nis}) 🎉`, 'success');
   } catch (err) {
@@ -27048,24 +27091,16 @@ function eksekusiLogoutSiswa() {
   const elWelcomeNama = document.getElementById('welcome-siswa-nama');
   const nama = profile ? profile.nama : (elWelcomeNama ? elWelcomeNama.innerText.trim() : 'Siswa');
 
-  // Simpan pekerjaan Word, Excel & cadangan IndexedDB siswa yang sedang keluar terlebih dahulu
+  // Simpan pekerjaan Word, Excel, Kuis & cadangan IndexedDB siswa yang sedang keluar terlebih dahulu
   try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
   try { if (typeof simpanExcelDraftSiswa === 'function') simpanExcelDraftSiswa(); } catch (e) {}
+  try { if (typeof simpanProgressKuisSiswa === 'function') simpanProgressKuisSiswa(); } catch (e) {}
   try {
     if (profile && typeof muatDrive7Kebiasaan === 'function' && typeof simpanDriveKeIndexedDB === 'function') {
       const drv = muatDrive7Kebiasaan(profile);
       if (drv && Object.keys(drv).length > 0) {
         simpanDriveKeIndexedDB(getDriveStorageKey(profile), drv);
       }
-    }
-    // Jaga agar PC Lab tetap lega (< 2 MB) untuk siswa sesi berikutnya
-    let approxBytes = 0;
-    for (let i = 0; i < localStorage.length; i++) {
-      const lk = localStorage.key(i);
-      if (lk) approxBytes += (localStorage.getItem(lk) || '').length;
-    }
-    if (approxBytes > 2000000 && typeof bersihkanCacheLokalSiswaLain === 'function') {
-      bersihkanCacheLokalSiswaLain(null);
     }
   } catch (eClean) {}
 
@@ -27095,9 +27130,30 @@ function eksekusiLogoutSiswa() {
   state.userPoints = 0;
   updateAllUserPointsUI(0);
 
-  // 5. Bersihkan kanvas Paint & kuis agar karya/sertifikat siswa tidak tertinggal untuk siswa berikutnya
+  // 5. Bersihkan tampilan kanvas Paint & kuis di layar untuk sesi berikutnya (Progres & nilai siswa tetap tersimpan aman di database & storage!)
   try { if (typeof resetPaintCanvasUntukSiswa === 'function') resetPaintCanvasUntukSiswa(); } catch (e) {}
-  try { if (typeof restartQuiz === 'function') restartQuiz(); } catch (e) {}
+  try {
+    state.currentQuizIndex = 0;
+    state.quizScore = 0;
+    state.quizCorrectCount = 0;
+    state.userQuizAnswers = {};
+    state.hasFinishedQuizCurrentSession = false;
+    state.quizAnswered = false;
+    const scoreEl = document.getElementById('quiz-score');
+    if (scoreEl) scoreEl.innerText = '0';
+    const btnKirimTop = document.getElementById('btn-kirim-kuis-top');
+    if (btnKirimTop) btnKirimTop.classList.add('hidden');
+    const finishSummary = document.getElementById('quiz-finish-summary');
+    if (finishSummary) finishSummary.classList.add('hidden');
+    const certBox = document.getElementById('certificate-box');
+    const checklistBox = document.getElementById('certificate-locked-checklist');
+    const quizBox = document.getElementById('quiz-box');
+    if (certBox) certBox.classList.add('hidden');
+    if (checklistBox) checklistBox.classList.add('hidden');
+    if (quizBox) quizBox.classList.remove('hidden');
+    if (typeof sinkronkanSkorKuisHeader === 'function') sinkronkanSkorKuisHeader();
+    if (typeof loadQuizQuestion === 'function') loadQuizQuestion();
+  } catch (eQuizReset) {}
 
   // 6. Perbarui elemen bar sambutan siswa secara eksplisit seketika ke status Belum Masuk
   const elAvatar = document.getElementById('welcome-siswa-avatar');
@@ -27244,6 +27300,29 @@ function pilihSiswaDariDropdown(studentId) {
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTab);
+
+  // Pulihkan seluruh draf & tugas siswa seketika
+  try {
+    if (typeof muatProgressKuisSiswa === 'function') muatProgressKuisSiswa();
+    if (typeof muatJawabanUraianSiswa === 'function') muatJawabanUraianSiswa();
+    if (isKelas6) {
+      if (typeof window.muatStatusTugasScratchK6 === 'function') {
+        window.muatStatusTugasScratchK6('4pilar');
+        window.muatStatusTugasScratchK6('algoritma');
+      }
+      if (typeof window.muatStatusMisiK6 === 'function') {
+        window.muatStatusMisiK6('antarteman');
+        window.muatStatusMisiK6('kuis');
+      }
+      if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') window.perbaruiStatusMisiKelas6Siswa();
+    } else if (isKelas5) {
+      if (typeof window.muatPortofolioKelas5Aktif === 'function') window.muatPortofolioKelas5Aktif();
+    } else {
+      if (typeof muatWordDraftSiswa === 'function') muatWordDraftSiswa();
+      if (typeof muatExcelDraftSiswa === 'function') muatExcelDraftSiswa();
+    }
+  } catch (eRest) {}
+
   showToast(`Berhasil masuk sebagai ${student.nama} (${student.kelas} • NIS: ${student.nis})! 🎉`, 'success');
 }
 
@@ -27320,6 +27399,29 @@ function simpanProfilSiswa() {
   renderGaleriPosterWord();
   tutupModalProfilSiswa();
   switchTab(targetTabSimpan);
+
+  // Pulihkan draf dan tugas siswa seketika
+  try {
+    if (typeof muatProgressKuisSiswa === 'function') muatProgressKuisSiswa();
+    if (typeof muatJawabanUraianSiswa === 'function') muatJawabanUraianSiswa();
+    if (isKelas6) {
+      if (typeof window.muatStatusTugasScratchK6 === 'function') {
+        window.muatStatusTugasScratchK6('4pilar');
+        window.muatStatusTugasScratchK6('algoritma');
+      }
+      if (typeof window.muatStatusMisiK6 === 'function') {
+        window.muatStatusMisiK6('antarteman');
+        window.muatStatusMisiK6('kuis');
+      }
+      if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') window.perbaruiStatusMisiKelas6Siswa();
+    } else if (isKelas5) {
+      if (typeof window.muatPortofolioKelas5Aktif === 'function') window.muatPortofolioKelas5Aktif();
+    } else {
+      if (typeof muatWordDraftSiswa === 'function') muatWordDraftSiswa();
+      if (typeof muatExcelDraftSiswa === 'function') muatExcelDraftSiswa();
+    }
+  } catch (eRest) {}
+
   showToast(`Halo ${nama}! Profilmu (${kelas} • NIS: ${nis}) berhasil disimpan & aktif 🎉`, 'success');
 }
 
@@ -27344,6 +27446,17 @@ function simpanWordDraftSiswa() {
 window.simpanWordDraftSiswa = simpanWordDraftSiswa;
 window.addEventListener('beforeunload', () => {
   try { if (typeof simpanWordDraftSiswa === 'function') simpanWordDraftSiswa(); } catch (e) {}
+  try { if (typeof simpanExcelDraftSiswa === 'function') simpanExcelDraftSiswa(); } catch (e) {}
+  try { if (typeof simpanProgressKuisSiswa === 'function') simpanProgressKuisSiswa(); } catch (e) {}
+  try {
+    const profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+    if (profile) {
+      const isKelas5 = String(profile.kelas || '').includes('5');
+      if (isKelas5 && typeof window.simpanPortofolioKelas5Siswa === 'function' && typeof window._p5Data === 'object') {
+        window.simpanPortofolioKelas5Siswa(profile, window._p5Data);
+      }
+    }
+  } catch (e) {}
 });
 
 function muatWordDraftSiswa() {
@@ -27520,7 +27633,7 @@ function resetPaintCanvasUntukSiswa() {
       paintApp.redoList = [];
       paintApp.activeObject = null;
       if (typeof updatePaintCommitButton === 'function') updatePaintCommitButton();
-      if (typeof savePaintState === 'function') savePaintState();
+      // JANGAN simpan kanvas kosong ke storage agar karya siswa sebelumnya tidak tertimpa
     }
   } catch (e) {}
 }
@@ -37650,9 +37763,22 @@ function kirimPenilaianAntarTemanK6() {
       }
       const totalNilaiAT = targetStudent.penilaianAntarTeman.reduce((acc, curr) => acc + (curr.nilaiAkhir || 0), 0);
       targetStudent.nilaiAntarTeman = Math.round(totalNilaiAT / targetStudent.penilaianAntarTeman.length);
-      localStorage.setItem('educode_student_db_v1', JSON.stringify(db));
+      saveStudentDatabase(db);
     }
   } catch(eDb) {}
+
+  // Tandai tugas Antar Teman penilai selesai dan tersimpan di portofolionya
+  try {
+    if (activeStudent && typeof dapatkanPortofolioKelas6Siswa === 'function' && typeof simpanPortofolioKelas6Siswa === 'function') {
+      const k6 = dapatkanPortofolioKelas6Siswa(activeStudent);
+      if (!k6.antarTeman) k6.antarTeman = {};
+      k6.antarTeman.selesai = true;
+      k6.antarTeman.tgl = entry.tanggal;
+      simpanPortofolioKelas6Siswa(activeStudent, k6);
+      if (typeof muatStatusMisiK6 === 'function') muatStatusMisiK6('antarteman');
+      if (typeof perbaruiStatusMisiKelas6Siswa === 'function') perbaruiStatusMisiKelas6Siswa();
+    }
+  } catch(eAntarTemanSave) {}
 
   try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
   if (typeof showToast === 'function') {
@@ -37929,15 +38055,43 @@ function simpanPortofolioKelas6Siswa(student, data) {
     localStorage.setItem('educode_kelas6_karya_v1', JSON.stringify(data));
   } catch(e) {}
 
+  // Hitung rubrik penilaian otomatis untuk tugas portofolio Kelas 6
+  let rubrik = null;
+  try {
+    if (typeof hitungRubrikPenilaianKelas6 === 'function') {
+      rubrik = hitungRubrikPenilaianKelas6(student, data);
+      if (rubrik) {
+        student.nilaiScratch4Pilar = rubrik.nilaiScratch4Pilar;
+        student.nilaiScratchAlgoritma = rubrik.nilaiScratchAlgoritma;
+        student.nilaiAntarTeman = rubrik.nilaiAntarTeman;
+        student.nilaiKuis6 = rubrik.nilaiKuis6;
+        student.nilaiAkhir = rubrik.nilaiAkhir;
+        student.statusKkm = rubrik.isTuntas ? 'Tuntas' : 'Remedial';
+      }
+    }
+  } catch(eRubrik) {}
+
   // Update di state student database jika ada
   try {
     const db = getStudentDatabase();
     const idx = db.findIndex(s => (s.id && s.id === sId) || (s.nis && s.nis === sNis));
     if (idx !== -1) {
       db[idx].portofolioK6 = data;
+      if (rubrik) {
+        db[idx].nilaiScratch4Pilar = rubrik.nilaiScratch4Pilar;
+        db[idx].nilaiScratchAlgoritma = rubrik.nilaiScratchAlgoritma;
+        db[idx].nilaiAntarTeman = rubrik.nilaiAntarTeman;
+        db[idx].nilaiKuis6 = rubrik.nilaiKuis6;
+        db[idx].nilaiAkhir = rubrik.nilaiAkhir;
+        db[idx].statusKkm = rubrik.isTuntas ? 'Tuntas' : 'Remedial';
+      }
       saveStudentDatabase(db);
     }
   } catch(eDb) {}
+
+  if (typeof saveActiveStudentSession === 'function') {
+    try { saveActiveStudentSession(student); } catch (eSess) {}
+  }
 
   // Trigger sinkronisasi cloud Firebase jika terhubung
   try {

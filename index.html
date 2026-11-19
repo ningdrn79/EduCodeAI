@@ -5804,6 +5804,14 @@
                 if (raw) profile = JSON.parse(raw);
               } catch(e) {}
             }
+            // Bersihkan struktur data in-memory terlebih dahulu agar karya siswa sebelumnya tidak tertinggal
+            window._p5Data = {
+              ppt1: null,
+              ppt2: null,
+              sertifikat: null,
+              poster: null,
+              scratch: null
+            };
             if (profile && (profile.nis || profile.id)) {
               var sKey = profile.nis || profile.id;
               var rawSaved = localStorage.getItem('educode_p5_data_' + sKey);
@@ -5812,11 +5820,27 @@
                 if (parsed && typeof parsed === 'object') {
                   window._p5Data = Object.assign(window._p5Data, parsed);
                 }
+              } else if (profile.portofolioP5 && typeof profile.portofolioP5 === 'object') {
+                window._p5Data = Object.assign(window._p5Data, profile.portofolioP5);
+              } else {
+                // Cadangan: Cek langsung dari database siswa
+                try {
+                  if (typeof getStudentDatabase === 'function') {
+                    var db = getStudentDatabase();
+                    var std = db.find(function(s) {
+                      return (s.nis && String(s.nis) === String(sKey)) || (s.id && String(s.id) === String(sKey));
+                    });
+                    if (std && std.portofolioP5 && typeof std.portofolioP5 === 'object') {
+                      window._p5Data = Object.assign(window._p5Data, std.portofolioP5);
+                    }
+                  }
+                } catch(eDb) {}
               }
             }
             if (typeof window.renderStatusPpt === 'function') window.renderStatusPpt();
             if (typeof window.renderPosterPreview === 'function') window.renderPosterPreview();
             if (typeof window.renderScratchView === 'function') window.renderScratchView();
+            if (typeof window.renderSertifikatView === 'function') window.renderSertifikatView();
           } catch(e) {}
         };
 
@@ -23356,7 +23380,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261118_quiz_40pg_10uraian_v206"></script>
+  <script charset="UTF-8" src="app.js?v=20261119_persistence_k456_v207"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
