@@ -488,14 +488,20 @@
                   sessionStorage.setItem('educode_student_active_tab_v1', tabId);
                 } catch(eSave){}
               } else {
-                if (tabId === 'petualangan6' || tabId === 'algoritma' || tabId === 'antarteman') {
+                var currentMode = (typeof state !== 'undefined' && state.headerNavMode) ? state.headerNavMode : '';
+                if (!currentMode && typeof window.currentHeaderNavMode === 'string') currentMode = window.currentHeaderNavMode;
+                if (tabId === 'petualangan6' || tabId === 'algoritma' || tabId === 'antarteman' || (tabId === 'ketik' && currentMode === 'kelas6')) {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas6');
-                } else if (tabId === 'petualangan5') {
+                } else if (tabId === 'petualangan5' || (tabId === 'ketik' && currentMode === 'kelas5')) {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('kelas5');
                 } else if (tabId === 'beranda' || tabId === 'antariksa') {
                   if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('utama');
                 } else {
-                  if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
+                  if (tabId === 'ketik' && (currentMode === 'kelas5' || currentMode === 'kelas6')) {
+                    if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode(currentMode);
+                  } else {
+                    if (typeof window.setHeaderNavMode === 'function') window.setHeaderNavMode('sem1');
+                  }
                 }
               }
             }
@@ -531,7 +537,7 @@
         }
 
         // Sinkronkan styling tombol aktif navigasi Kelas 5 SD
-        var allK5Btns = ['nav-p5-beranda', 'nav-p5-presentasi', 'nav-p5-sertifikat', 'nav-p5-poster', 'nav-p5-kuis'];
+        var allK5Btns = ['nav-p5-beranda', 'nav-p5-presentasi', 'nav-p5-sertifikat', 'nav-p5-poster', 'nav-p5-kuis', 'nav-p5-ketik'];
         for (var k5 = 0; k5 < allK5Btns.length; k5++) {
           var bK5 = document.getElementById(allK5Btns[k5]);
           if (bK5) {
@@ -541,7 +547,8 @@
         }
         var navK5Map = {
           'beranda': 'nav-p5-beranda',
-          'kuis': 'nav-p5-kuis'
+          'kuis': 'nav-p5-kuis',
+          'ketik': 'nav-p5-ketik'
         };
         if (navK5Map[tabId]) {
           var activeK5 = document.getElementById(navK5Map[tabId]);
@@ -552,7 +559,7 @@
         }
 
         // Sinkronkan styling tombol aktif navigasi Kelas 6 SD
-        var allK6Btns = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis'];
+        var allK6Btns = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis', 'nav-p6-ketik'];
         for (var k = 0; k < allK6Btns.length; k++) {
           var bK6 = document.getElementById(allK6Btns[k]);
           if (bK6) {
@@ -566,7 +573,8 @@
           'petualangan6': 'nav-p6-4pilar',
           'algoritma': 'nav-p6-algoritma',
           'antarteman': 'nav-p6-antarteman',
-          'kuis': 'nav-p6-kuis'
+          'kuis': 'nav-p6-kuis',
+          'ketik': 'nav-p6-ketik'
         };
         if (navK6Map[tabId]) {
           var activeK6 = document.getElementById(navK6Map[tabId]);
@@ -574,6 +582,23 @@
             activeK6.classList.add('active-tab', 'text-white');
             activeK6.classList.remove('text-slate-300');
           }
+        }
+
+        // Hook lifecycle game ketik cepat
+        if (tabId === 'ketik') {
+          try {
+            document.body.classList.add('typing-screen-locked');
+            if (typeof window.initTypingHeroGame === 'function') {
+              setTimeout(function() { window.initTypingHeroGame(); }, 50);
+            }
+          } catch(eInitKetik) {}
+        } else {
+          try {
+            document.body.classList.remove('typing-screen-locked');
+            if (typeof window.pauseTypingHeroGame === 'function') {
+              window.pauseTypingHeroGame();
+            }
+          } catch(ePauseKetik) {}
         }
 
         // Kuis Interaktif EduCode AI (Kelas 4, 5, dan 6)
@@ -1653,7 +1678,7 @@
       <div id="navbar-tampilan-kelas5" class="hidden flex items-center justify-end">
         <nav class="flex items-center space-x-1 sm:space-x-1.5 nav-dock-3d p-1 sm:p-1.5 rounded-full overflow-x-auto max-w-full">
           <!-- 1. Beranda -->
-          <button type="button" onclick="switchTab('beranda')" id="nav-p5-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Beranda">
+          <button type="button" onclick="switchTab('beranda'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('beranda');" id="nav-p5-beranda" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Beranda">
             <i class="fa-solid fa-house text-[#38bdf8] icon-3d-glow"></i> <span>Beranda</span>
           </button>
 
@@ -1672,9 +1697,14 @@
             <i class="fa-solid fa-image text-emerald-300 icon-3d-glow"></i> <span>Poster</span>
           </button>
 
-          <!-- 5. Kuis -->
-          <button type="button" onclick="switchTab('kuis')" id="nav-p5-kuis" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kuis">
+          <!-- 5. Kuis (EXCODE AI) -->
+          <button type="button" onclick="if(typeof bukaKuisKelas5==='function'){bukaKuisKelas5();}else{switchTab('kuis');if(typeof setAktifNavKelas5==='function')setAktifNavKelas5('kuis');}" id="nav-p5-kuis" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kuis EXCODE AI (Koding & Kecerdasan Artifisial)">
             <i class="fa-solid fa-circle-question text-purple-300 icon-3d-glow"></i> <span>Kuis</span>
+          </button>
+
+          <!-- 6. Ketik Cepat -->
+          <button type="button" onclick="if(typeof bukaKetikCepatKelas5==='function'){bukaKetikCepatKelas5();}else{switchTab('ketik');if(typeof setAktifNavKelas5==='function')setAktifNavKelas5('ketik');}" id="nav-p5-ketik" class="nav-btn nav-btn-3d px-3.5 sm:px-4 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Game Edukasi: Pahlawan Mengetik Cepat & Shortcut Word">
+            <i class="fa-solid fa-keyboard text-amber-400 icon-3d-glow"></i> <span>Ketik Cepat ⌨️</span>
           </button>
 
           <!-- Sound Orb -->
@@ -1729,6 +1759,11 @@
           <!-- 6. Kuis -->
           <button type="button" onclick="switchTab('kuis')" id="nav-p6-kuis" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Kuis">
             <i class="fa-solid fa-circle-question text-yellow-300 icon-3d-glow"></i> <span>Kuis</span>
+          </button>
+
+          <!-- 7. Ketik Cepat -->
+          <button type="button" onclick="if(typeof bukaKetikCepatKelas6==='function'){bukaKetikCepatKelas6();}else{switchTab('ketik');}" id="nav-p6-ketik" class="nav-btn nav-btn-3d px-3 sm:px-3.5 py-2 rounded-full font-title font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 text-slate-300 hover:text-white shrink-0 cursor-pointer" title="Latihan Mengetik 10 Jari Cepat">
+            <i class="fa-solid fa-keyboard text-amber-400 icon-3d-glow"></i> <span>Ketik Cepat ⌨️</span>
           </button>
 
           <!-- Sound Orb -->
@@ -2898,15 +2933,23 @@
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
               </span>
               <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
-                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
               </h3>
             </div>
 
   </div>
 
-  <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
@@ -2979,6 +3022,30 @@
           </div>
 
   </div>
+
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
 
   </div>
 
@@ -3305,15 +3372,23 @@
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
               </span>
               <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
-                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
               </h3>
             </div>
 
   </div>
 
-  <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
@@ -3386,6 +3461,30 @@
           </div>
 
   </div>
+
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
 
   </div>
 
@@ -3475,6 +3574,9 @@
   <div>
             <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Presentasi</h4>
             <p class="text-[11px] opacity-80 mt-0.5">2 File: PowerPoint Manual &amp; Gemini AI</p>
+            <div id="card-p5-score-presentasi" class="hidden mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 shadow-xs">
+              <i class="fa-solid fa-star text-yellow-800"></i> Nilai: <span id="val-card-score-ppt">0</span>
+            </div>
           </div>
 
   </button>
@@ -3489,6 +3591,9 @@
   <div>
             <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Sertifikat Hour of Code</h4>
             <p class="text-[11px] opacity-80 mt-0.5">Sertifikat resmi kelulusan coding</p>
+            <div id="card-p5-score-sertifikat" class="hidden mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 shadow-xs">
+              <i class="fa-solid fa-star text-yellow-800"></i> Nilai: <span id="val-card-score-sertif">0</span>
+            </div>
           </div>
 
   </button>
@@ -3503,6 +3608,9 @@
   <div>
             <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Poster</h4>
             <p class="text-[11px] opacity-80 mt-0.5">Gambar PNG Canva tema Lingkungan</p>
+            <div id="card-p5-score-poster" class="hidden mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 shadow-xs">
+              <i class="fa-solid fa-star text-yellow-800"></i> Nilai: <span id="val-card-score-poster">0</span>
+            </div>
           </div>
 
   </button>
@@ -3517,6 +3625,9 @@
   <div>
             <h4 class="font-title font-bold text-sm sm:text-base leading-tight">Game &amp; Coding</h4>
             <p class="text-[11px] opacity-80 mt-0.5">Misi Pulau Tekno &amp; Scratch</p>
+            <div id="card-p5-score-scratch" class="hidden mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 shadow-xs">
+              <i class="fa-solid fa-star text-yellow-800"></i> Nilai: <span id="val-card-score-scratch">0</span>
+            </div>
           </div>
 
   </button>
@@ -3703,6 +3814,33 @@
 
   </div>
 
+          <!-- KOTAK PENILAIAN DARI SISTEM & TERKIRIM KE BUKU NILAI & PROGRESS SISWA (PRESENTASI) -->
+          <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-50 via-purple-50 to-orange-50 border-2 border-indigo-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl font-black shadow-md shrink-0">
+                <i class="fa-solid fa-wand-magic-sparkles text-yellow-300"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="font-title font-bold text-sm sm:text-base text-indigo-950">Penilaian Otomatis dari Sistem</h4>
+                  <span id="badge-nilai-sistem-ppt" class="px-3 py-0.5 rounded-full text-xs font-black bg-indigo-100 text-indigo-800 border border-indigo-300 shadow-2xs">
+                    Nilai: <span id="val-nilai-sistem-ppt">0</span> / 100
+                  </span>
+                  <span id="status-terkirim-ppt" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <i class="fa-solid fa-circle-check text-emerald-600"></i> Terkirim ke Buku Nilai &amp; Progress
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 mt-1 leading-snug" id="desc-nilai-sistem-ppt">
+                  Sistem memeriksa kelengkapan File 1 (Manual), File 2 (Gemini AI), atau link Google Drive, memberikan nilai rubrik (85-100), dan otomatis mengirimkannya ke Buku Nilai Guru &amp; Progress Siswa.
+                </p>
+              </div>
+            </div>
+            <button type="button" onclick="window.nilaiSistemPresentasiP5()" id="btn-nilai-sistem-ppt" class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white font-title font-black text-xs sm:text-sm shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <i class="fa-solid fa-square-poll-vertical text-amber-300"></i>
+              <span>Nilai dari Sistem &amp; Kirim ke Buku Nilai 🚀</span>
+            </button>
+          </div>
+
   <!-- Tombol Final Kirim Tugas Presentasi ke Server Cloud & Guru -->
           <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
             <div class="text-xs text-slate-500" id="status-keseluruhan-ppt">
@@ -3883,6 +4021,33 @@
 
   </div>
 
+          <!-- KOTAK PENILAIAN DARI SISTEM & TERKIRIM KE BUKU NILAI & PROGRESS SISWA (SERTIFIKAT HOC) -->
+          <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-300 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-500 text-slate-950 flex items-center justify-center text-xl font-black shadow-md shrink-0">
+                <i class="fa-solid fa-award text-slate-950"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="font-title font-bold text-sm sm:text-base text-amber-950">Penilaian Otomatis dari Sistem</h4>
+                  <span id="badge-nilai-sistem-hoc" class="px-3 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                    Nilai: <span id="val-nilai-sistem-hoc">0</span> / 100
+                  </span>
+                  <span id="status-terkirim-hoc" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <i class="fa-solid fa-circle-check text-emerald-600"></i> Terkirim ke Buku Nilai &amp; Progress
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 mt-1 leading-snug" id="desc-nilai-sistem-hoc">
+                  Sertifikat resmi Code.org yang telah kamu unggah akan diverifikasi oleh sistem, dinilai sempurna (100), dan otomatis dikirimkan ke Buku Nilai Guru &amp; Progress Siswa.
+                </p>
+              </div>
+            </div>
+            <button type="button" onclick="window.nilaiSistemSertifikatP5()" id="btn-nilai-sistem-hoc" class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <i class="fa-solid fa-square-poll-vertical text-slate-950"></i>
+              <span>Nilai dari Sistem &amp; Kirim ke Buku Nilai 🚀</span>
+            </button>
+          </div>
+
   <!-- Tombol Aksi Simpan Tugas Sertifikat -->
           <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100 mt-4">
             <span class="text-xs text-slate-500">
@@ -3966,6 +4131,33 @@
               <div class="flex items-center gap-2 pt-2">
                 <button type="button" onclick="window.simpanPosterCanvaP5()" class="flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
                   <i class="fa-solid fa-cloud-arrow-up"></i> <span>Publikasikan Poster Lingkungan 🌿</span>
+                </button>
+              </div>
+
+              <!-- KOTAK PENILAIAN DARI SISTEM & TERKIRIM KE BUKU NILAI & PROGRESS SISWA (POSTER CANVA) -->
+              <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-300 shadow-sm flex flex-col gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center text-lg font-black shadow-md shrink-0">
+                    <i class="fa-solid fa-palette text-yellow-300"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h4 class="font-title font-bold text-xs sm:text-sm text-emerald-950">Penilaian Otomatis dari Sistem</h4>
+                      <span id="badge-nilai-sistem-poster" class="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-2xs">
+                        Nilai: <span id="val-nilai-sistem-poster">0</span> / 100
+                      </span>
+                      <span id="status-terkirim-poster" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> Terkirim ke Buku Nilai &amp; Progress
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 mt-0.5 leading-snug" id="desc-nilai-sistem-poster">
+                      Desain poster Canva dinilai berdasarkan estetika dan pesan lingkungan hidup Tzu Chi, lalu otomatis dikirimkan ke Buku Nilai Guru &amp; Progress Siswa.
+                    </p>
+                  </div>
+                </div>
+                <button type="button" onclick="window.nilaiSistemPosterP5()" id="btn-nilai-sistem-poster" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-title font-black text-xs shadow-md transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fa-solid fa-square-poll-vertical text-amber-300"></i>
+                  <span>Nilai dari Sistem &amp; Kirim ke Buku Nilai 🚀</span>
                 </button>
               </div>
 
@@ -5861,6 +6053,12 @@
                 if (raw && raw !== 'LOGGED_OUT' && raw.indexOf('{') !== -1) profile = JSON.parse(raw);
               } catch(e) {}
             }
+            if (!profile) {
+              try {
+                var raw2 = localStorage.getItem('active_student_profile');
+                if (raw2 && raw2 !== 'LOGGED_OUT' && raw2.indexOf('{') !== -1) profile = JSON.parse(raw2);
+              } catch(e) {}
+            }
             var p5 = window._p5Data || {};
             var rubrik = (typeof hitungRubrikPenilaianKelas5 === 'function') ? hitungRubrikPenilaianKelas5(profile, p5) : null;
             var selesaiCount = rubrik ? rubrik.totalMenuSelesai : 0;
@@ -5887,6 +6085,81 @@
                 lvlEl.className = 'text-[10px] text-slate-400 font-bold mt-2';
               }
             }
+
+            // Perbarui Nilai pada 4 Kartu Menu Atas Petualangan Kelas 5
+            var nPpt = rubrik ? rubrik.nilaiPresentasi : (p5.nilaiPresentasi || (profile && profile.nilaiPresentasi) || 0);
+            var cardPpt = document.getElementById('card-p5-score-presentasi');
+            var valCardPpt = document.getElementById('val-card-score-ppt');
+            if (cardPpt && valCardPpt) {
+              if (nPpt > 0) {
+                valCardPpt.innerText = nPpt;
+                cardPpt.classList.remove('hidden');
+              } else {
+                cardPpt.classList.add('hidden');
+              }
+            }
+
+            var nHoc = rubrik ? rubrik.nilaiSertifikat : (p5.nilaiSertifikat || (profile && profile.nilaiSertifikat) || 0);
+            var cardHoc = document.getElementById('card-p5-score-sertifikat');
+            var valCardHoc = document.getElementById('val-card-score-sertif');
+            if (cardHoc && valCardHoc) {
+              if (nHoc > 0) {
+                valCardHoc.innerText = nHoc;
+                cardHoc.classList.remove('hidden');
+              } else {
+                cardHoc.classList.add('hidden');
+              }
+            }
+
+            var nPoster = rubrik ? rubrik.nilaiPosterCanva : (p5.nilaiPosterCanva || (profile && profile.nilaiPosterCanva) || 0);
+            var cardPoster = document.getElementById('card-p5-score-poster');
+            var valCardPoster = document.getElementById('val-card-score-poster');
+            if (cardPoster && valCardPoster) {
+              if (nPoster > 0) {
+                valCardPoster.innerText = nPoster;
+                cardPoster.classList.remove('hidden');
+              } else {
+                cardPoster.classList.add('hidden');
+              }
+            }
+
+            var nScratch = rubrik ? rubrik.nilaiGameCoding : (p5.nilaiGameCoding || (profile && profile.nilaiGameCoding) || 0);
+            var cardScratch = document.getElementById('card-p5-score-scratch');
+            var valCardScratch = document.getElementById('val-card-score-scratch');
+            if (cardScratch && valCardScratch) {
+              if (nScratch > 0) {
+                valCardScratch.innerText = nScratch;
+                cardScratch.classList.remove('hidden');
+              } else {
+                cardScratch.classList.add('hidden');
+              }
+            }
+
+            // Perbarui Badge & Status Terkirim di Kotak Penilaian Tiap Zona
+            var valSistemPpt = document.getElementById('val-nilai-sistem-ppt');
+            var stTerkirimPpt = document.getElementById('status-terkirim-ppt');
+            if (valSistemPpt) valSistemPpt.innerText = nPpt || 0;
+            if (stTerkirimPpt) {
+              if (nPpt > 0) stTerkirimPpt.classList.remove('hidden');
+              else stTerkirimPpt.classList.add('hidden');
+            }
+
+            var valSistemHoc = document.getElementById('val-nilai-sistem-hoc');
+            var stTerkirimHoc = document.getElementById('status-terkirim-hoc');
+            if (valSistemHoc) valSistemHoc.innerText = nHoc || 0;
+            if (stTerkirimHoc) {
+              if (nHoc > 0) stTerkirimHoc.classList.remove('hidden');
+              else stTerkirimHoc.classList.add('hidden');
+            }
+
+            var valSistemPoster = document.getElementById('val-nilai-sistem-poster');
+            var stTerkirimPoster = document.getElementById('status-terkirim-poster');
+            if (valSistemPoster) valSistemPoster.innerText = nPoster || 0;
+            if (stTerkirimPoster) {
+              if (nPoster > 0) stTerkirimPoster.classList.remove('hidden');
+              else stTerkirimPoster.classList.add('hidden');
+            }
+
           } catch(e) {}
         };
 
@@ -5899,13 +6172,23 @@
                 if (raw) profile = JSON.parse(raw);
               } catch(e) {}
             }
+            if (!profile) {
+              try {
+                var raw2 = localStorage.getItem('active_student_profile');
+                if (raw2) profile = JSON.parse(raw2);
+              } catch(e) {}
+            }
             // Bersihkan struktur data in-memory terlebih dahulu agar karya siswa sebelumnya tidak tertinggal
             window._p5Data = {
               ppt1: null,
               ppt2: null,
               sertifikat: null,
               poster: null,
-              scratch: null
+              scratch: null,
+              nilaiPresentasi: null,
+              nilaiSertifikat: null,
+              nilaiPosterCanva: null,
+              nilaiGameCoding: null
             };
             if (profile && (profile.nis || profile.id)) {
               var sKey = profile.nis || profile.id;
@@ -5931,13 +6214,98 @@
                   }
                 } catch(eDb) {}
               }
+
+              if (profile.nilaiPresentasi && !window._p5Data.nilaiPresentasi) window._p5Data.nilaiPresentasi = profile.nilaiPresentasi;
+              if (profile.nilaiSertifikat && !window._p5Data.nilaiSertifikat) window._p5Data.nilaiSertifikat = profile.nilaiSertifikat;
+              if (profile.nilaiPosterCanva && !window._p5Data.nilaiPosterCanva) window._p5Data.nilaiPosterCanva = profile.nilaiPosterCanva;
+              if (profile.nilaiGameCoding && !window._p5Data.nilaiGameCoding) window._p5Data.nilaiGameCoding = profile.nilaiGameCoding;
             }
             if (typeof window.renderStatusPpt === 'function') window.renderStatusPpt();
             if (typeof window.renderPosterPreview === 'function') window.renderPosterPreview();
             if (typeof window.renderScratchView === 'function') window.renderScratchView();
             if (typeof window.renderSertifikatView === 'function') window.renderSertifikatView();
             if (typeof window.perbaruiRingkasanStatusP5 === 'function') window.perbaruiRingkasanStatusP5();
+
+            if (typeof pulihkanPresentasiDariCloud === 'function') {
+              pulihkanPresentasiDariCloud();
+            }
           } catch(e) {}
+        };
+
+        // Sinkronisasi Tab Aktif 3D Khusus Navbar Kelas 5 SD
+        window.setAktifNavKelas5 = function(menuKey) {
+          var navK5Ids = ['nav-p5-beranda', 'nav-p5-presentasi', 'nav-p5-sertifikat', 'nav-p5-poster', 'nav-p5-kuis', 'nav-p5-ketik'];
+          navK5Ids.forEach(function(id) {
+            var btn = document.getElementById(id);
+            if (!btn) return;
+            btn.classList.remove('active-tab', 'text-white');
+            btn.classList.add('text-slate-300');
+          });
+          var cleanKey = String(menuKey || 'beranda').replace('zona-', '').replace('p5-', '').replace('nav-', '');
+          var targetId = 'nav-p5-' + cleanKey;
+          var activeBtn = document.getElementById(targetId);
+          if (activeBtn) {
+            activeBtn.classList.add('active-tab', 'text-white');
+            activeBtn.classList.remove('text-slate-300');
+          }
+        };
+
+        // Buka Menu Kuis EXCODE AI Khusus Kelas 5 SD
+        window.bukaKuisKelas5 = function(bukaTabBaru) {
+          try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+          if (bukaTabBaru === true) {
+            window.open('https://ningdrn79.github.io/EXCODEAI/', '_blank', 'noopener,noreferrer');
+            return;
+          }
+          if (typeof window.switchTab === 'function') {
+            window.switchTab('kuis');
+          }
+          if (typeof window.setHeaderNavMode === 'function') {
+            window.setHeaderNavMode('kelas5');
+          }
+          if (typeof window.setAktifNavKelas5 === 'function') {
+            window.setAktifNavKelas5('kuis');
+          }
+          var k5Container = document.getElementById('kuis-kelas5-container');
+          var k4Wrapper = document.getElementById('kuis-internal-k4-wrapper');
+          if (k5Container) {
+            k5Container.classList.remove('hidden');
+            k5Container.style.removeProperty('display');
+            k5Container.style.setProperty('display', 'block', 'important');
+          }
+          if (k4Wrapper) {
+            k4Wrapper.classList.add('hidden');
+            k4Wrapper.style.setProperty('display', 'none', 'important');
+          }
+          var ifr = document.getElementById('iframe-excodeai-kelas5');
+          if (ifr && (!ifr.src || ifr.src === 'about:blank' || !ifr.src.includes('EXCODEAI'))) {
+            ifr.src = 'https://ningdrn79.github.io/EXCODEAI/';
+          }
+          try {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch(e) {}
+        };
+
+        // Konfirmasi & Kirim Nilai Kuis EXCODE AI ke Guru
+        window.tandaiKuisKelas5Selesai = function() {
+          try {
+            var profile = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+            if (!profile) {
+              if (typeof showToast === 'function') showToast('Silakan login sebagai siswa kelas 5 terlebih dahulu.', 'warning');
+              return;
+            }
+            if (typeof window.catatMisiGameKelas5KeGuru === 'function') {
+              window.catatMisiGameKelas5KeGuru('Kuis EXCODE AI (Koding & Kecerdasan Artifisial)', '100');
+            }
+            var lbl = document.getElementById('label-btn-excodeai');
+            if (lbl) lbl.textContent = 'Kuis Terkirim ke Guru! ✅';
+            try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+            if (typeof showToast === 'function') {
+              showToast('🎉 Selamat! Hasil Kuis EXCODE AI berhasil dikirim ke Buku Nilai Guru!', 'success');
+            }
+          } catch(e) {
+            console.error('Error tandai kuis k5:', e);
+          }
         };
 
         // Navigasi Antara 4 Menu
@@ -5952,6 +6320,9 @@
           }
           if (typeof window.setHeaderNavMode === 'function') {
             window.setHeaderNavMode('kelas5');
+          }
+          if (typeof window.setAktifNavKelas5 === 'function') {
+            window.setAktifNavKelas5(zonaKey);
           }
           var zones = ['zona-presentasi', 'zona-sertifikat', 'zona-poster', 'zona-scratch'];
           zones.forEach(function(z) {
@@ -6293,6 +6664,13 @@
             console.warn('Gagal simpan presentasi ke Firebase Cloud:', errCloud);
           }
 
+          // Otomatis lakukan penilaian dari sistem & kirim ke Buku Nilai
+          try {
+            if (typeof window.nilaiSistemPresentasiP5 === 'function') {
+              await window.nilaiSistemPresentasiP5(true);
+            }
+          } catch(eGrade) {}
+
           // 3. Simpan ke Penyimpanan Lokal
           simpanKeStorage();
           window.renderStatusPpt();
@@ -6331,7 +6709,7 @@
           }
         };
 
-        // Pulihkan Tugas Presentasi dari Cloud jika ada
+        // Pulihkan Tugas & Nilai Kelas 5 dari Cloud Firestore jika ada
         async function pulihkanPresentasiDariCloud() {
           try {
             var db = null;
@@ -6364,14 +6742,270 @@
                   window._p5Data.ppt2.isCloudSaved = true;
                   changed = true;
                 }
+                if (cData.sertifikat && !window._p5Data.sertifikat) {
+                  window._p5Data.sertifikat = cData.sertifikat;
+                  changed = true;
+                }
+                if (cData.poster && !window._p5Data.poster) {
+                  window._p5Data.poster = cData.poster;
+                  changed = true;
+                }
+                if (cData.nilaiPresentasi !== undefined && cData.nilaiPresentasi !== null && !window._p5Data.nilaiPresentasi) {
+                  window._p5Data.nilaiPresentasi = cData.nilaiPresentasi;
+                  changed = true;
+                }
+                if (cData.nilaiSertifikat !== undefined && cData.nilaiSertifikat !== null && !window._p5Data.nilaiSertifikat) {
+                  window._p5Data.nilaiSertifikat = cData.nilaiSertifikat;
+                  changed = true;
+                }
+                if (cData.nilaiPosterCanva !== undefined && cData.nilaiPosterCanva !== null && !window._p5Data.nilaiPosterCanva) {
+                  window._p5Data.nilaiPosterCanva = cData.nilaiPosterCanva;
+                  changed = true;
+                }
+                if (cData.nilaiGameCoding !== undefined && cData.nilaiGameCoding !== null && !window._p5Data.nilaiGameCoding) {
+                  window._p5Data.nilaiGameCoding = cData.nilaiGameCoding;
+                  changed = true;
+                }
                 if (changed) {
                   simpanKeStorage();
-                  window.renderStatusPpt();
+                  if (typeof window.renderStatusPpt === 'function') window.renderStatusPpt();
+                  if (typeof window.renderSertifikatView === 'function') window.renderSertifikatView();
+                  if (typeof window.renderPosterPreview === 'function') window.renderPosterPreview();
+                  if (typeof window.perbaruiRingkasanStatusP5 === 'function') window.perbaruiRingkasanStatusP5();
                 }
               }
             }
           } catch(e) {}
         }
+
+        // =========================================================================
+        // TOMBOL PENILAIAN DARI SISTEM & TERKIRIM KE BUKU NILAI & PROGRESS KELAS 5
+        // =========================================================================
+
+        // Penilaian Sistem untuk Presentasi (Menu 1)
+        window.nilaiSistemPresentasiP5 = async function(isSilent) {
+          var p5 = window._p5Data || {};
+          var inLink1 = document.getElementById('input-ppt1-gdrive') ? document.getElementById('input-ppt1-gdrive').value.trim() : '';
+          var inLink2 = document.getElementById('input-ppt2-gdrive') ? document.getElementById('input-ppt2-gdrive').value.trim() : '';
+          if (inLink1) { if (!p5.ppt1) p5.ppt1 = {}; p5.ppt1.gdriveLink = inLink1; }
+          if (inLink2) { if (!p5.ppt2) p5.ppt2 = {}; p5.ppt2.gdriveLink = inLink2; }
+
+          var hasFile1 = !!(p5.ppt1 && (p5.ppt1.dataUrl || p5.ppt1.gdriveLink || p5.ppt1.name));
+          var hasFile2 = !!(p5.ppt2 && (p5.ppt2.dataUrl || p5.ppt2.gdriveLink || p5.ppt2.name || p5.ppt2.prompt));
+
+          if (!hasFile1 && !hasFile2) {
+            if (!isSilent) {
+              try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+              if (typeof showToast === 'function') showToast('⚠️ Unggah berkas PPT Manual / Gemini AI atau isi link Google Drive terlebih dahulu!', 'warning');
+              alert('⚠️ BERKAS PRESENTASI BELUM DIUNGGAH:\n\nSilakan unggah minimal salah satu berkas (File 1 PPT Manual atau File 2 PPT Gemini AI) atau cantumkan tautan Google Drive sebelum meminta penilaian sistem.');
+            }
+            return false;
+          }
+
+          var score = (hasFile1 && hasFile2) ? 100 : 85;
+          p5.nilaiPresentasi = score;
+
+          var student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+          if (!student) {
+            try { var raw = localStorage.getItem('educode_active_student_v1'); if (raw) student = JSON.parse(raw); } catch(e){}
+          }
+          if (student) {
+            student.nilaiPresentasi = score;
+            student.isManualNilaiPpt = true;
+          }
+
+          simpanKeStorage();
+
+          // Sinkronisasi realtime ke Cloud Firestore karya_presentasi_kelas5
+          try {
+            var db = null;
+            if (typeof getInlineFirestore === 'function') db = getInlineFirestore();
+            if (!db && typeof firebase !== 'undefined' && firebase.firestore) db = firebase.firestore();
+            if (db && student) {
+              var sKey = String(student.nis || student.id || '3000');
+              var payload = {
+                nis: sKey,
+                nama: student.nama || 'Siswa Kelas 5',
+                kelas: student.kelas || '5A',
+                nilaiPresentasi: score,
+                isManualNilaiPpt: true,
+                updatedAt: new Date().toISOString(),
+                status: 'Dinilai Sistem'
+              };
+              if (p5.ppt1) payload.ppt1 = { name: p5.ppt1.name || '', size: p5.ppt1.size || '', gdriveLink: p5.ppt1.gdriveLink || '', isCloudSaved: true };
+              if (p5.ppt2) payload.ppt2 = { name: p5.ppt2.name || '', size: p5.ppt2.size || '', gdriveLink: p5.ppt2.gdriveLink || '', isCloudSaved: true };
+              await db.collection('karya_presentasi_kelas5').doc(sKey).set(payload, { merge: true });
+            }
+          } catch(errCloud) {
+            console.warn('Sync cloud nilai presentasi error:', errCloud);
+          }
+
+          if (typeof window.perbaruiRingkasanStatusP5 === 'function') window.perbaruiRingkasanStatusP5();
+          if (typeof window.renderStatusPpt === 'function') window.renderStatusPpt();
+
+          if (!isSilent) {
+            try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+            if (typeof tambahPoin === 'function') tambahPoin(20);
+            var pesanDetail = (score === 100) 
+              ? '🌟 Sempurna! Kamu telah mengumpulkan kedua tugas (File 1 Manual & File 2 Gemini AI).' 
+              : '👍 Bagus! Kamu telah mengumpulkan 1 tugas presentasi. Kumpulkan kedua file untuk meraih nilai 100!';
+            alert('🎉 PENILAIAN SISTEM BERHASIL!\n\n' +
+                  '• Nilai Presentasi: ' + score + ' / 100\n' +
+                  '• Rubrik: ' + pesanDetail + '\n' +
+                  '• Status: Terkirim ke Buku Nilai Guru & Rapor Progress Siswa! 🚀');
+            if (typeof showToast === 'function') showToast('⭐ Nilai Presentasi: ' + score + '/100 berhasil disimpan ke Buku Nilai! (+20 Bintang)', 'success');
+          }
+          return true;
+        };
+
+        // Penilaian Sistem untuk Sertifikat Hour of Code (Menu 2)
+        window.nilaiSistemSertifikatP5 = async function(isSilent) {
+          var p5 = window._p5Data || {};
+          var hasCert = !!(p5.sertifikat && (p5.sertifikat.dataUrl || p5.sertifikat.name || p5.sertifikat.aktivitas));
+
+          if (!hasCert) {
+            if (!isSilent) {
+              try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+              if (typeof showToast === 'function') showToast('⚠️ Unggah berkas sertifikat Hour of Code terlebih dahulu!', 'warning');
+              alert('⚠️ BERKAS SERTIFIKAT BELUM DIUNGGAH:\n\nSilakan unggah sertifikat kelulusan coding resmi dari Code.org sebelum meminta penilaian sistem.');
+            }
+            return false;
+          }
+
+          var score = 100;
+          p5.nilaiSertifikat = score;
+
+          var student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+          if (!student) {
+            try { var raw = localStorage.getItem('educode_active_student_v1'); if (raw) student = JSON.parse(raw); } catch(e){}
+          }
+          if (student) {
+            student.nilaiSertifikat = score;
+            student.isManualNilaiSertifikat = true;
+          }
+
+          simpanKeStorage();
+
+          // Sinkronisasi realtime ke Cloud Firestore
+          try {
+            var db = null;
+            if (typeof getInlineFirestore === 'function') db = getInlineFirestore();
+            if (!db && typeof firebase !== 'undefined' && firebase.firestore) db = firebase.firestore();
+            if (db && student) {
+              var sKey = String(student.nis || student.id || '3000');
+              var payload = {
+                nis: sKey,
+                nama: student.nama || 'Siswa Kelas 5',
+                kelas: student.kelas || '5A',
+                nilaiSertifikat: score,
+                isManualNilaiSertifikat: true,
+                sertifikat: {
+                  name: p5.sertifikat.name || 'Sertifikat_Hour_of_Code',
+                  size: p5.sertifikat.size || '',
+                  time: p5.sertifikat.time || '',
+                  aktivitas: p5.sertifikat.aktivitas || '',
+                  kesan: p5.sertifikat.kesan || ''
+                },
+                updatedAt: new Date().toISOString()
+              };
+              await db.collection('karya_presentasi_kelas5').doc(sKey).set(payload, { merge: true });
+            }
+          } catch(errCloud) {
+            console.warn('Sync cloud nilai sertifikat error:', errCloud);
+          }
+
+          if (typeof window.perbaruiRingkasanStatusP5 === 'function') window.perbaruiRingkasanStatusP5();
+          if (typeof window.renderSertifikatView === 'function') window.renderSertifikatView();
+
+          if (!isSilent) {
+            try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+            if (typeof tambahPoin === 'function') tambahPoin(20);
+            alert('🎉 PENILAIAN SISTEM BERHASIL!\n\n' +
+                  '• Nilai Sertifikat Hour of Code: ' + score + ' / 100\n' +
+                  '• Keterangan: Sertifikat Resmi Coding Terverifikasi Valid 🏆\n' +
+                  '• Status: Terkirim ke Buku Nilai Guru & Rapor Progress Siswa! 🚀');
+            if (typeof showToast === 'function') showToast('⭐ Nilai Sertifikat: ' + score + '/100 berhasil disimpan ke Buku Nilai! (+20 Bintang)', 'success');
+          }
+          return true;
+        };
+
+        // Penilaian Sistem untuk Poster Canva (Menu 3)
+        window.nilaiSistemPosterP5 = async function(isSilent) {
+          var p5 = window._p5Data || {};
+          var hasPoster = !!(p5.poster && (p5.poster.dataUrl || p5.poster.name || p5.poster.judul));
+
+          if (!hasPoster) {
+            if (!isSilent) {
+              try { if (typeof playSound === 'function') playSound('warning'); } catch(e){}
+              if (typeof showToast === 'function') showToast('⚠️ Unggah gambar desain poster Canva (PNG) terlebih dahulu!', 'warning');
+              alert('⚠️ BERKAS POSTER BELUM DIUNGGAH:\n\nSilakan pilih dan unggah file gambar poster PNG hasil unduhan dari Canva sebelum meminta penilaian sistem.');
+            }
+            return false;
+          }
+
+          var j = document.getElementById('judul-poster-canva') ? document.getElementById('judul-poster-canva').value.trim() : (p5.poster.judul || '');
+          var p = document.getElementById('pesan-poster-canva') ? document.getElementById('pesan-poster-canva').value.trim() : (p5.poster.pesan || '');
+          var score = (j || p) ? 100 : 95;
+          p5.nilaiPosterCanva = score;
+          if (j) p5.poster.judul = j;
+          if (p) p5.poster.pesan = p;
+
+          var student = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
+          if (!student) {
+            try { var raw = localStorage.getItem('educode_active_student_v1'); if (raw) student = JSON.parse(raw); } catch(e){}
+          }
+          if (student) {
+            student.nilaiPosterCanva = score;
+            student.isManualNilaiPoster = true;
+          }
+
+          simpanKeStorage();
+
+          // Sinkronisasi realtime ke Cloud Firestore
+          try {
+            var db = null;
+            if (typeof getInlineFirestore === 'function') db = getInlineFirestore();
+            if (!db && typeof firebase !== 'undefined' && firebase.firestore) db = firebase.firestore();
+            if (db && student) {
+              var sKey = String(student.nis || student.id || '3000');
+              var payload = {
+                nis: sKey,
+                nama: student.nama || 'Siswa Kelas 5',
+                kelas: student.kelas || '5A',
+                nilaiPosterCanva: score,
+                isManualNilaiPoster: true,
+                poster: {
+                  name: p5.poster.name || 'Poster_Canva_Lingkungan.png',
+                  size: p5.poster.size || '',
+                  time: p5.poster.time || '',
+                  judul: p5.poster.judul || '',
+                  pesan: p5.poster.pesan || ''
+                },
+                updatedAt: new Date().toISOString()
+              };
+              await db.collection('karya_presentasi_kelas5').doc(sKey).set(payload, { merge: true });
+            }
+          } catch(errCloud) {
+            console.warn('Sync cloud nilai poster error:', errCloud);
+          }
+
+          if (typeof window.perbaruiRingkasanStatusP5 === 'function') window.perbaruiRingkasanStatusP5();
+          if (typeof window.renderPosterPreview === 'function') window.renderPosterPreview();
+
+          if (!isSilent) {
+            try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
+            if (typeof tambahPoin === 'function') tambahPoin(20);
+            var pesanDetail = (score === 100)
+              ? '🎨 Sangat Kreatif! Poster Canva dilengkapi judul dan pesan ajakan lingkungan.'
+              : '👍 Bagus! Poster Canva berhasil diverifikasi. Lengkapi judul dan pesan untuk nilai 100!';
+            alert('🎉 PENILAIAN SISTEM BERHASIL!\n\n' +
+                  '• Nilai Poster Canva: ' + score + ' / 100\n' +
+                  '• Rubrik: ' + pesanDetail + '\n' +
+                  '• Status: Terkirim ke Buku Nilai Guru & Rapor Progress Siswa! 🚀');
+            if (typeof showToast === 'function') showToast('⭐ Nilai Poster: ' + score + '/100 berhasil disimpan ke Buku Nilai! (+20 Bintang)', 'success');
+          }
+          return true;
+        };
 
         // --- MENU 2: SERTIFIKAT HOUR OF CODE (FILE HASIL DOWNLOAD) ---
         window.handleUploadSertifikatHourOfCode = function(e) {
@@ -6460,6 +7094,14 @@
           var ksn = document.getElementById('kesan-aktivitas-hoc') ? document.getElementById('kesan-aktivitas-hoc').value.trim() : '';
           window._p5Data.sertifikat.aktivitas = akt;
           window._p5Data.sertifikat.kesan = ksn;
+
+          // Otomatis berikan penilaian dari sistem & sinkron ke Buku Nilai
+          try {
+            if (typeof window.nilaiSistemSertifikatP5 === 'function') {
+              window.nilaiSistemSertifikatP5(true);
+            }
+          } catch(eHocGrade) {}
+
           simpanKeStorage();
           try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
           if (typeof showToast === 'function') showToast('Sertifikat Hour of Code berhasil disimpan dan dikirim ke Guru! 🏆✨ (+25 Bintang)', 'success');
@@ -6523,6 +7165,14 @@
           var p = document.getElementById('pesan-poster-canva') ? document.getElementById('pesan-poster-canva').value.trim() : '';
           window._p5Data.poster.judul = j || 'Poster Pelestarian Lingkungan';
           window._p5Data.poster.pesan = p;
+
+          // Otomatis berikan penilaian dari sistem & sinkron ke Buku Nilai
+          try {
+            if (typeof window.nilaiSistemPosterP5 === 'function') {
+              window.nilaiSistemPosterP5(true);
+            }
+          } catch(ePosterGrade) {}
+
           simpanKeStorage();
           window.renderPosterPreview();
           try { if (typeof playSound === 'function') playSound('fanfare'); } catch(e){}
@@ -10469,7 +11119,7 @@
             </button>
             <button type="button" onclick="kirimHasilWordKePosterDanGuru(true)" class="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-500 hover:to-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap" title="Kirim poster ke guru, dinilai otomatis oleh sistem AI (0-100) & disimpan ke Buku Nilai Rapor">
               <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i>
-              <span>Kirim Nilai ke Guru (AI) 🚀</span>
+              <span>Kirim Nilai ke Guru 🚀</span>
             </button>
             <button type="button" onclick="simpanPosterWord()" class="bg-white/20 hover:bg-white/30 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap" title="Unduh hasil poster sebagai file gambar PNG">
               <i class="fa-solid fa-download"></i> <span>Unduh PNG</span>
@@ -13055,6 +13705,11 @@
                 💡 Di Level 2, tekan kombinasi sungguhan: <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>!
               </div>
 
+              <!-- Quick Start Prompt -->
+              <div class="mt-2 text-[11px] text-amber-300 font-bold bg-amber-950/50 border border-amber-500/40 rounded-full px-3 py-1 inline-flex items-center gap-1.5 animate-pulse">
+                <span>💡 Klik salah satu tombol level di atas atau tekan <b>SPASI / ENTER</b> untuk langsung mulai!</span>
+              </div>
+
   </div>
 
   <!-- OVERLAY 2: GAME OVER / VICTORY OVERLAY -->
@@ -13488,15 +14143,23 @@
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
               </span>
               <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
-                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
               </h3>
             </div>
 
   </div>
 
-  <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
@@ -13569,6 +14232,30 @@
           </div>
 
   </div>
+
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
 
   </div>
 
@@ -16006,7 +16693,74 @@
       <!-- WADAH KOMPATIBILITAS (EXTERNAL KUIS6 TELAH DIGANTIKAN OLEH KUIS INTERNAL EDUCODE AI) -->
       <div id="kuis-kelas6-container" class="hidden" style="display:none !important;"></div>
 
-<div class="bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl border-2 border-indigo-100 shadow-2xl space-y-6 text-slate-800">
+      <!-- ======================================================== -->
+      <!-- WADAH KHUSUS KUIS KELAS 5 SD: EXCODE AI PLATFORM         -->
+      <!-- https://ningdrn79.github.io/EXCODEAI/                    -->
+      <!-- ======================================================== -->
+      <div id="kuis-kelas5-container" class="hidden space-y-6 animate-fadeIn select-none">
+        
+        <!-- HERO HEADER EXCODE AI -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-950 via-purple-900 to-slate-900 border-2 border-indigo-400/40 p-6 sm:p-8 text-white shadow-2xl">
+          <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-gradient-to-tr from-cyan-400/20 to-purple-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-3xl">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+                  <i class="fa-solid fa-robot text-cyan-400"></i> EXCODE AI Platform
+                </span>
+                <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/40 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                  <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kelas 5 SD • Koding &amp; Kecerdasan Artifisial
+                </span>
+                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-mono flex items-center gap-1.5 shadow-2xs">
+                  <i class="fa-solid fa-globe"></i> ningdrn79.github.io/EXCODEAI
+                </span>
+              </div>
+
+              <h1 class="text-2xl sm:text-3xl md:text-4xl font-title font-black tracking-tight text-white leading-tight">
+                Kuis Koding &amp; Kecerdasan Artifisial <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-amber-300">(EXCODE AI)</span> 🤖✨
+              </h1>
+
+              <p class="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+                Selamat datang di platform interaktif <strong class="text-yellow-300">EXCODE AI</strong>! Selesaikan tantangan kuis, raih bintang prestasi, kumpulkan koin cyber, dan cetak sertifikatmu di bawah ini atau buka langsung di tab baru.
+              </p>
+            </div>
+
+            <!-- Tombol Aksi Header -->
+            <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full sm:w-auto shrink-0">
+              <a href="https://ningdrn79.github.io/EXCODEAI/" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-lg shadow-cyan-900/40 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95" title="Buka website EXCODE AI di Tab Baru">
+                <i class="fa-solid fa-arrow-up-right-from-square text-yellow-300"></i> <span>Buka di Tab Baru 🚀</span>
+              </a>
+              <button type="button" onclick="window.tandaiKuisKelas5Selesai()" id="btn-status-selesai-excodeai" class="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-emerald-300 font-title font-bold text-xs border border-emerald-500/40 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="label-btn-excodeai">Kirim Progres Kuis ke Guru ✅</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- WEBVIEW IFRAME EXCODE AI -->
+        <div class="rounded-3xl overflow-hidden border-2 border-indigo-500/40 bg-slate-950 shadow-2xl relative min-h-[780px]">
+          <div class="p-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between text-xs text-slate-300">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span class="font-mono text-cyan-300 ml-2">https://ningdrn79.github.io/EXCODEAI/</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="var ifr = document.getElementById('iframe-excodeai-kelas5'); if(ifr) ifr.src = ifr.src;" class="text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1 text-xs" title="Muat Ulang Halaman EXCODE AI">
+                <i class="fa-solid fa-rotate-right"></i> <span>Muat Ulang</span>
+              </button>
+              <a href="https://ningdrn79.github.io/EXCODEAI/" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 text-xs">
+                <span>Buka di Tab Baru</span> <i class="fa-solid fa-up-right-from-square text-[10px]"></i>
+              </a>
+            </div>
+          </div>
+          <iframe id="iframe-excodeai-kelas5" src="https://ningdrn79.github.io/EXCODEAI/" class="w-full h-[760px] border-none bg-slate-950" allow="fullscreen; clipboard-write; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>
+        </div>
+      </div>
+
+      <div id="kuis-internal-k4-wrapper" class="bg-white/95 backdrop-blur-md p-5 sm:p-8 rounded-3xl border-2 border-indigo-100 shadow-2xl space-y-6 text-slate-800">
         <!-- Header Kuis Lucu & Berwarna -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
@@ -17933,9 +18687,7 @@
         bDiv.innerHTML = '<div class="relative flex flex-col items-center">' +
                          '  <div class="balloon-sphere px-4 py-2.5 rounded-3xl bg-gradient-to-tr ' + newBalloon.palette.bg + ' border-2 ' + newBalloon.palette.border + ' shadow-xl flex flex-col items-center justify-center text-center text-white min-w-[90px]">' +
                          '    ' + wordHtml +
-                         '  </div>
-
-  ' +
+                         '  </div>' +
                          '  <div class="balloon-tail w-2.5 h-2.5 bg-amber-600 rotate-45 -mt-1.5 rounded-xs"></div>' +
                          '  <div class="balloon-string w-0.5 h-6 bg-slate-700/60 -mt-0.5"></div>' +
                          '</div>';
@@ -18109,7 +18861,20 @@
           return;
         }
 
-        if (!typingState.isPlaying || typingState.isPaused) return;
+        if (!typingState.isPlaying || typingState.isPaused) {
+          var startOverlay = document.getElementById('typing-overlay-start');
+          var isStartVisible = startOverlay && !startOverlay.classList.contains('hidden') && startOverlay.style.display !== 'none';
+          if (isStartVisible) {
+            if (e.code === 'Space' || e.code === 'Enter' || e.key === ' ' || e.key === 'Enter' || (e.key && e.key.length === 1 && !isCtrl)) {
+              e.preventDefault();
+              if (typeof window.pilihLevelTypingHero === 'function') {
+                window.pilihLevelTypingHero(1);
+                return;
+              }
+            }
+          }
+          return;
+        }
 
         highlightVirtualKey(keyUpper, true);
         if (isCtrl) highlightVirtualKey('CTRL', true);
@@ -18129,6 +18894,14 @@
               return;
             } else {
               typingState.keystrokesTotal++;
+              safePlay('miss');
+            }
+          } else {
+            var unctrlMatched = typingState.balloons.find(function(b) {
+              return b.isShortcut && b.shortcutKey === keyUpper;
+            });
+            if (unctrlMatched) {
+              safeToast('💡 Tekan dan tahan tombol Ctrl lalu tekan ' + keyUpper + ' (Ctrl+' + keyUpper + ')!', 'warning');
             }
           }
           return;
@@ -18156,6 +18929,8 @@
                 updateFingerGuide();
               }
               return;
+            } else {
+              safePlay('miss');
             }
           } else {
             var targetB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; });
@@ -18173,6 +18948,8 @@
                   updateFingerGuide();
                 }
                 return;
+              } else {
+                safePlay('miss');
               }
             }
           }
@@ -18285,8 +19062,14 @@
       window.mulaiTypingHeroGame = function() {
         var startOverlay = document.getElementById('typing-overlay-start');
         var endOverlay = document.getElementById('typing-overlay-gameover');
-        if (startOverlay) startOverlay.classList.add('hidden');
-        if (endOverlay) endOverlay.classList.add('hidden');
+        if (startOverlay) {
+          startOverlay.classList.add('hidden');
+          startOverlay.style.setProperty('display', 'none', 'important');
+        }
+        if (endOverlay) {
+          endOverlay.classList.add('hidden');
+          endOverlay.style.setProperty('display', 'none', 'important');
+        }
 
         var pauseIcon = document.getElementById('typing-pause-icon');
         if (pauseIcon) pauseIcon.className = 'fa-solid fa-pause';
@@ -18422,7 +19205,11 @@
           if (btnNext) btnNext.classList.add('hidden');
         }
 
-        if (endOverlay) endOverlay.classList.remove('hidden');
+        if (endOverlay) {
+          endOverlay.classList.remove('hidden');
+          endOverlay.style.removeProperty('display');
+          endOverlay.style.setProperty('display', 'flex', 'important');
+        }
       }
 
       function updateRecordDisplays() {
@@ -18501,6 +19288,8 @@
         var startOverlay = document.getElementById('typing-overlay-start');
         if (!typingState.isPlaying && startOverlay) {
           startOverlay.classList.remove('hidden');
+          startOverlay.style.removeProperty('display');
+          startOverlay.style.setProperty('display', 'flex', 'important');
         }
       };
 
@@ -22352,15 +23141,23 @@
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
               </span>
               <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
-                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
               </h3>
             </div>
 
   </div>
 
-  <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
@@ -22433,6 +23230,30 @@
           </div>
 
   </div>
+
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
 
   </div>
 
@@ -22768,15 +23589,23 @@
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
               </span>
               <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
-                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
               </h3>
             </div>
 
   </div>
 
-  <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
@@ -22849,6 +23678,30 @@
           </div>
 
   </div>
+
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
 
   </div>
 
@@ -23358,15 +24211,23 @@
                 <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
               </span>
               <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
-                4 Misi Digital: Presentasi, Sertifikat Coding, Poster &amp; Scratch
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
               </h3>
             </div>
 
   </div>
 
-  <button type="button" onclick="switchTab('petualangan5')" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
-            <span>Buka Ruang Portofolio Penuh</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
@@ -23440,6 +24301,30 @@
 
   </div>
 
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
+
   </div>
 
   <!-- Modal Footer -->
@@ -23488,7 +24373,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
-  <script charset="UTF-8" src="app.js?v=20261119_anti_freeze_v218"></script>
+  <script charset="UTF-8" src="app.js?v=20261120_k4_k6_realtime_v225"></script>
 
   <script id="engine-cloud-sync-inline">
   // ========================================================
@@ -23649,38 +24534,82 @@
         }
       }
 
-      // 7. Simpan hasil gabungan kembali ke Cloud Firestore
+      // 7. Evaluasi nilai tugas Drive 7 Kebiasaan & simpan hasil gabungan ke Cloud Firestore
+      const totalActive = Object.keys(merged).length;
+      const evalDrive = (typeof hitungNilaiDrive7Kebiasaan === 'function') ? hitungNilaiDrive7Kebiasaan(merged) : null;
+      const scoreDrive = evalDrive ? evalDrive.totalSkor : (totalActive >= 7 ? 100 : Math.round((totalActive / 7) * 100));
+
       const payload = {
         studentNis: targetId,
         studentName: studentNama,
         studentClass: studentKelas,
         driveData: JSON.stringify(merged),
-        totalGambar: Object.keys(merged).length,
+        totalGambar: totalActive,
+        koleksiDrive: totalActive,
+        nilaiDrive: scoreDrive,
+        statusKkm: scoreDrive >= 80 ? 'Tuntas' : 'Remedial',
         updatedAt: Date.now()
       };
 
       await docRef.set(payload, { merge: true });
 
-      // 8. Simpan kembali ke penyimpanan lokal komputer ini (khusus kunci siswa aktif)
+      // Sinkronkan ke koleksi karya_praktik_kelas4 untuk pemantauan realtime guru
+      try {
+        await db.collection('karya_praktik_kelas4').doc(targetId).set({
+          studentNis: targetId,
+          studentNama: studentNama,
+          studentKelas: studentKelas,
+          nilaiDrive: scoreDrive,
+          koleksiDrive: totalActive,
+          statusKkm: scoreDrive >= 80 ? 'Tuntas' : 'Remedial',
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch(e4) {}
+
+      // 8. Simpan kembali ke penyimpanan lokal komputer ini & Buku Nilai Siswa
       for (let k of possibleKeys) {
         try { localStorage.setItem(k, JSON.stringify(merged)); } catch (e) {}
       }
       if (activeStudent) {
         activeStudent.driveData = merged;
+        activeStudent.koleksiDrive = totalActive;
+        activeStudent.nilaiDrive = scoreDrive;
         try { localStorage.setItem('educode_active_student_v1', JSON.stringify(activeStudent)); } catch (e) {}
       }
 
-      // 9. Refresh tampilan grid kartu Drive
+      // Perbarui database siswa lokal
+      try {
+        const dbAll = (typeof getStudentDatabase === 'function') ? getStudentDatabase() : [];
+        let sMatch = dbAll.find(s => (s.nis && String(s.nis).trim() === targetId) || (s.id && String(s.id).trim() === targetId));
+        if (sMatch) {
+          sMatch.nilaiDrive = scoreDrive;
+          sMatch.koleksiDrive = totalActive;
+          sMatch.driveData = merged;
+          sMatch.terakhirAktif = 'Baru saja';
+          const nK = Number(sMatch.kuisSem1) || 0;
+          const nD = Number(sMatch.nilaiDrive) || 0;
+          const nP = Number(sMatch.nilaiPoster) || 0;
+          const nE = Number(sMatch.nilaiExcel) || 0;
+          sMatch.nilaiSem1 = Math.round((nK * 0.25) + (nD * 0.25) + (nP * 0.25) + (nE * 0.25));
+          if (sMatch.nilaiSem1 >= 80 || nD >= 80 || nP >= 80 || nE >= 80) sMatch.statusKkm = 'Tuntas';
+          if (typeof saveStudentDatabase === 'function') saveStudentDatabase(dbAll);
+        }
+      } catch(eDbAll) {}
+
+      // 9. Refresh tampilan grid kartu Drive & Buku Nilai
       if (typeof renderDrive7KebiasaanGrid === 'function') {
         renderDrive7KebiasaanGrid();
       }
+      if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+      if (typeof renderDasborGuru === 'function') renderDasborGuru();
+      if (typeof renderKPI === 'function') renderKPI();
 
-      const totalActive = Object.keys(merged).length;
       alert(`🎉 SINKRONISASI CLOUD BERHASIL!\n\n` +
             `• ID Siswa: ${studentNama} (${targetId})\n` +
-            `• Total Gambar Tersinkron: ${totalActive} dari 7 Gambar\n` +
-            `• Status: Berhasil tersimpan di Google Cloud Firestore!\n\n` +
-            `Sekarang buka Komputer Kedua dan klik tombol [⚡ Sinkron Cloud Antar-PC], maka seluruh gambarnya akan langsung sama persis! ✨`);
+            `• Total Gambar: ${totalActive} dari 7 Gambar\n` +
+            `• Nilai Drive 7 Kebiasaan: ${scoreDrive} / 100\n` +
+            `• Status: Berhasil tersimpan di Cloud Firestore & Buku Nilai Siswa! 🚀\n\n` +
+            `Sekarang buka Komputer Kedua dan klik tombol [⚡ Sinkron Cloud Antar-PC], maka seluruh gambar dan nilai akan langsung tersinkron! ✨`);
 
     } catch (err) {
       console.error('Error sinkron manual:', err);

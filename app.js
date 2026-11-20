@@ -955,6 +955,10 @@ function setHeaderNavMode(mode) {
     if (mNavUtama) { mNavUtama.classList.add('hidden'); mNavUtama.style.setProperty('display', 'none', 'important'); }
     if (mNavSem1) { mNavSem1.classList.add('hidden'); mNavSem1.style.setProperty('display', 'none', 'important'); }
     if (mNavGuru) { mNavGuru.classList.add('hidden'); mNavGuru.style.setProperty('display', 'none', 'important'); }
+    if (typeof window.setAktifNavKelas5 === 'function') {
+      const curTab = (state && state.currentTab) || 'beranda';
+      window.setAktifNavKelas5(curTab === 'petualangan5' ? 'presentasi' : curTab);
+    }
   } else if (mode === 'sem1') {
     // Mode Siswa Kelas 4 SD
     if (navUtama) { navUtama.classList.add('hidden'); navUtama.style.setProperty('display', 'none', 'important'); }
@@ -1956,16 +1960,19 @@ function switchTab(tabId) {
     setHeaderNavMode('kelas5');
   } else {
     const student = getActiveStudentProfile();
-    if (student) {
-      const isKelas6 = String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI');
-      const isKelas5 = String(student.kelas || '').includes('5') || String(student.kelas || '').toUpperCase().includes('V');
-      if (isKelas6) {
-        setHeaderNavMode('kelas6');
-      } else if (isKelas5) {
-        setHeaderNavMode('kelas5');
-      } else {
-        setHeaderNavMode('sem1');
-      }
+    const isK5Context = (student && (String(student.kelas || '').includes('5') || String(student.kelas || '').toUpperCase().includes('V'))) ||
+                        (state.headerNavMode === 'kelas5') ||
+                        (state.tingkatKelasGuru === '5');
+    const isK6Context = !isK5Context && ((student && (String(student.kelas || '').includes('6') || String(student.kelas || '').toUpperCase().includes('VI'))) ||
+                        (state.headerNavMode === 'kelas6') ||
+                        (state.tingkatKelasGuru === '6'));
+
+    if (isK6Context) {
+      setHeaderNavMode('kelas6');
+    } else if (isK5Context) {
+      setHeaderNavMode('kelas5');
+    } else if (student) {
+      setHeaderNavMode('sem1');
     } else {
       if (state.headerNavMode === 'kelas6' || state.tingkatKelasGuru === '6') {
         setHeaderNavMode('kelas6');
@@ -2028,8 +2035,78 @@ function switchTab(tabId) {
   });
 
   // Update visual tab aktif khusus Navbar Siswa Kelas 6 SD
-  const navK6Ids = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis'];
+  const navK6Ids = ['nav-p6-beranda', 'nav-p6-modul', 'nav-p6-4pilar', 'nav-p6-algoritma', 'nav-p6-antarteman', 'nav-p6-kuis', 'nav-p6-ketik'];
   navK6Ids.forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.remove('active-tab', 'text-white');
+    btn.classList.add('text-slate-300');
+  });
+
+  // Update visual tab aktif khusus Navbar Siswa Kelas 5 SD (3D Tactile Active Blue)
+  function setAktifNavKelas5(menuKey) {
+    const navK5Ids = ['nav-p5-beranda', 'nav-p5-presentasi', 'nav-p5-sertifikat', 'nav-p5-poster', 'nav-p5-kuis', 'nav-p5-ketik'];
+    navK5Ids.forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.classList.remove('active-tab', 'text-white');
+      btn.classList.add('text-slate-300');
+    });
+    const cleanKey = String(menuKey || 'beranda').replace('zona-', '').replace('p5-', '').replace('nav-', '');
+    const targetId = 'nav-p5-' + cleanKey;
+    const activeBtn = document.getElementById(targetId);
+    if (activeBtn) {
+      activeBtn.classList.add('active-tab', 'text-white');
+      activeBtn.classList.remove('text-slate-300');
+    }
+  }
+  window.setAktifNavKelas5 = setAktifNavKelas5;
+
+  function bukaKuisKelas5(bukaTabBaru) {
+    try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+    if (bukaTabBaru === true) {
+      window.open('https://ningdrn79.github.io/EXCODEAI/', '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (typeof switchTab === 'function') {
+      switchTab('kuis');
+    }
+    if (typeof setHeaderNavMode === 'function') {
+      setHeaderNavMode('kelas5');
+    }
+    if (typeof setAktifNavKelas5 === 'function') {
+      setAktifNavKelas5('kuis');
+    }
+  }
+  window.bukaKuisKelas5 = bukaKuisKelas5;
+
+  function bukaKetikCepatKelas5() {
+    try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+    if (typeof switchTab === 'function') {
+      switchTab('ketik');
+    }
+    if (typeof setHeaderNavMode === 'function') {
+      setHeaderNavMode('kelas5');
+    }
+    if (typeof setAktifNavKelas5 === 'function') {
+      setAktifNavKelas5('ketik');
+    }
+  }
+  window.bukaKetikCepatKelas5 = bukaKetikCepatKelas5;
+
+  function bukaKetikCepatKelas6() {
+    try { if (typeof playSound === 'function') playSound('click'); } catch(e){}
+    if (typeof switchTab === 'function') {
+      switchTab('ketik');
+    }
+    if (typeof setHeaderNavMode === 'function') {
+      setHeaderNavMode('kelas6');
+    }
+  }
+  window.bukaKetikCepatKelas6 = bukaKetikCepatKelas6;
+
+  const navK5Ids = ['nav-p5-beranda', 'nav-p5-presentasi', 'nav-p5-sertifikat', 'nav-p5-poster', 'nav-p5-kuis', 'nav-p5-ketik'];
+  navK5Ids.forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.classList.remove('active-tab', 'text-white');
@@ -2039,6 +2116,8 @@ function switchTab(tabId) {
   if (tabId === 'beranda') {
     const b = document.getElementById('nav-p6-beranda');
     if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    const b5 = document.getElementById('nav-p5-beranda');
+    if (b5) { b5.classList.add('active-tab', 'text-white'); b5.classList.remove('text-slate-300'); }
     if (typeof window.perbaruiStatusMisiKelas6Siswa === 'function') {
       setTimeout(window.perbaruiStatusMisiKelas6Siswa, 30);
     }
@@ -2073,61 +2152,121 @@ function switchTab(tabId) {
     if (typeof window.muatPenilaianAntarTemanK6 === 'function') {
       setTimeout(window.muatPenilaianAntarTemanK6, 50);
     }
+  } else if (tabId === 'petualangan5') {
+    const zCert = document.getElementById('p5-zona-sertifikat');
+    const zPost = document.getElementById('p5-zona-poster');
+    if (zCert && !zCert.classList.contains('hidden') && zCert.style.display !== 'none') {
+      const b = document.getElementById('nav-p5-sertifikat');
+      if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    } else if (zPost && !zPost.classList.contains('hidden') && zPost.style.display !== 'none') {
+      const b = document.getElementById('nav-p5-poster');
+      if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    } else {
+      const b = document.getElementById('nav-p5-presentasi');
+      if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    }
   } else if (tabId === 'kuis') {
     const b = document.getElementById('nav-p6-kuis');
     if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    const b5 = document.getElementById('nav-p5-kuis');
+    if (b5) { b5.classList.add('active-tab', 'text-white'); b5.classList.remove('text-slate-300'); }
 
-    // Kuis Interaktif EduCode AI (Kelas 4, 5, dan Kelas 6 terintegrasi lokal)
+    // Kuis Interaktif EduCode AI (Kelas 4 lokal, Kelas 5 EXCODE AI, dan Kelas 6 terintegrasi)
     try {
       const activeStd = (typeof getActiveStudentProfile === 'function') ? getActiveStudentProfile() : null;
-      const isK6Kuis = (activeStd && (String(activeStd.kelas || '').includes('6') || String(activeStd.kelas || '').toUpperCase().includes('VI'))) || 
+      const isK5Kuis = (activeStd && (String(activeStd.kelas || '').includes('5') || String(activeStd.kelas || '').toUpperCase().includes('V'))) || 
+                       (state.tingkatKelasGuru === '5') || 
+                       (state.headerNavMode === 'kelas5');
+      const isK6Kuis = !isK5Kuis && ((activeStd && (String(activeStd.kelas || '').includes('6') || String(activeStd.kelas || '').toUpperCase().includes('VI'))) || 
                        (state.tingkatKelasGuru === '6') || 
-                       (state.headerNavMode === 'kelas6');
+                       (state.headerNavMode === 'kelas6'));
+
+      const k5Container = document.getElementById('kuis-kelas5-container');
       const k6Container = document.getElementById('kuis-kelas6-container');
+      const k4QuizWrapper = document.getElementById('kuis-internal-k4-wrapper');
       const k4QuizBox = document.getElementById('quiz-box');
       const k4LockedBox = document.getElementById('quiz-locked-box');
       const k4CertBox = document.getElementById('certificate-box');
       const k4Checklist = document.getElementById('certificate-locked-checklist');
 
-      if (k6Container) {
-        k6Container.classList.add('hidden');
-        k6Container.style.setProperty('display', 'none', 'important');
-      }
-      if (k4CertBox) {
-        k4CertBox.classList.add('hidden');
-        k4CertBox.style.setProperty('display', 'none', 'important');
-      }
-      if (k4Checklist) {
-        k4Checklist.classList.add('hidden');
-        k4Checklist.style.setProperty('display', 'none', 'important');
-      }
-      if (k4QuizBox) {
-        k4QuizBox.classList.remove('hidden');
-        k4QuizBox.style.removeProperty('display');
-      }
-
-      if (isK6Kuis) {
-        setHeaderNavMode('kelas6');
-        if (typeof window.muatStatusMisiK6 === 'function') {
-          setTimeout(function() { window.muatStatusMisiK6('kuis'); }, 30);
+      if (isK5Kuis) {
+        setHeaderNavMode('kelas5');
+        if (typeof window.setAktifNavKelas5 === 'function') {
+          window.setAktifNavKelas5('kuis');
         }
-      }
+        if (k5Container) {
+          k5Container.classList.remove('hidden');
+          k5Container.style.removeProperty('display');
+          k5Container.style.setProperty('display', 'block', 'important');
+        }
+        if (k4QuizWrapper) {
+          k4QuizWrapper.classList.add('hidden');
+          k4QuizWrapper.style.setProperty('display', 'none', 'important');
+        }
+        if (k6Container) {
+          k6Container.classList.add('hidden');
+          k6Container.style.setProperty('display', 'none', 'important');
+        }
+        const ifr = document.getElementById('iframe-excodeai-kelas5');
+        if (ifr && (!ifr.src || ifr.src === 'about:blank' || !ifr.src.includes('EXCODEAI'))) {
+          ifr.src = 'https://ningdrn79.github.io/EXCODEAI/';
+        }
+      } else {
+        if (k5Container) {
+          k5Container.classList.add('hidden');
+          k5Container.style.setProperty('display', 'none', 'important');
+        }
+        if (k4QuizWrapper) {
+          k4QuizWrapper.classList.remove('hidden');
+          k4QuizWrapper.style.removeProperty('display');
+        }
+        if (k6Container) {
+          k6Container.classList.add('hidden');
+          k6Container.style.setProperty('display', 'none', 'important');
+        }
+        if (k4CertBox) {
+          k4CertBox.classList.add('hidden');
+          k4CertBox.style.setProperty('display', 'none', 'important');
+        }
+        if (k4Checklist) {
+          k4Checklist.classList.add('hidden');
+          k4Checklist.style.setProperty('display', 'none', 'important');
+        }
+        if (k4QuizBox) {
+          k4QuizBox.classList.remove('hidden');
+          k4QuizBox.style.removeProperty('display');
+        }
 
-      // Muat progres kuis terakhir siswa jika ada (agar posisi pertanyaan tidak pernah ter-reset saat pindah menu)
-      if (typeof muatProgressKuisSiswa === 'function') {
-        muatProgressKuisSiswa();
-      }
+        if (isK6Kuis) {
+          setHeaderNavMode('kelas6');
+          if (typeof window.muatStatusMisiK6 === 'function') {
+            setTimeout(function() { window.muatStatusMisiK6('kuis'); }, 30);
+          }
+        }
 
-      // Muat soal sesuai bank soal aktif (Kelas 6 memuat DEFAULT_BANK_SOAL_K6)
-      if (typeof loadQuizQuestion === 'function') {
-        loadQuizQuestion();
-      }
-      if (typeof sinkronkanSkorKuisHeader === 'function') {
-        sinkronkanSkorKuisHeader();
+        // Muat progres kuis terakhir siswa jika ada (agar posisi pertanyaan tidak pernah ter-reset saat pindah menu)
+        if (typeof muatProgressKuisSiswa === 'function') {
+          muatProgressKuisSiswa();
+        }
+
+        // Muat soal sesuai bank soal aktif (Kelas 6 memuat DEFAULT_BANK_SOAL_K6)
+        if (typeof loadQuizQuestion === 'function') {
+          loadQuizQuestion();
+        }
+        if (typeof sinkronkanSkorKuisHeader === 'function') {
+          sinkronkanSkorKuisHeader();
+        }
       }
     } catch(eKuis6) {
       console.error('Error in switchTab kuis:', eKuis6);
     }
+  } else if (tabId === 'ketik') {
+    const b = document.getElementById('nav-ketik');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    const b5 = document.getElementById('nav-p5-ketik');
+    if (b5) { b5.classList.add('active-tab', 'text-white'); b5.classList.remove('text-slate-300'); }
+    const b6 = document.getElementById('nav-p6-ketik');
+    if (b6) { b6.classList.add('active-tab', 'text-white'); b6.classList.remove('text-slate-300'); }
   }
 
   if (tabId === 'guru') {
@@ -2158,6 +2297,12 @@ function switchTab(tabId) {
   if (tabId === 'ketik') {
     document.body.classList.add('typing-screen-locked');
     window.scrollTo({ top: 0, behavior: 'instant' });
+    const b = document.getElementById('nav-ketik');
+    if (b) { b.classList.add('active-tab', 'text-white'); b.classList.remove('text-slate-300'); }
+    const b5 = document.getElementById('nav-p5-ketik');
+    if (b5) { b5.classList.add('active-tab', 'text-white'); b5.classList.remove('text-slate-300'); }
+    const b6 = document.getElementById('nav-p6-ketik');
+    if (b6) { b6.classList.add('active-tab', 'text-white'); b6.classList.remove('text-slate-300'); }
     if (typeof window.initTypingHeroGame === 'function') {
       setTimeout(function() { window.initTypingHeroGame(); }, 50);
     }
@@ -28975,6 +29120,17 @@ function catatLatihanExcelSiswa(namaLatihan = 'Praktik Spreadsheet Excel') {
 
     saveStudentDatabase(db);
 
+    // Sinkronkan ke Firestore karya_praktik_kelas4 untuk monitoring realtime guru
+    try {
+      if (typeof sinkronKaryaPraktikKelas4KeCloud === 'function') {
+        sinkronKaryaPraktikKelas4KeCloud(matches[0] || profile, {
+          nilaiExcel: (matches[0] || profile).nilaiExcel,
+          excelTabel: (matches[0] || profile).excelTabel,
+          latestExcelTitle: namaLatihan
+        });
+      }
+    } catch(eExcSync) {}
+
     // Simpan permanen ke localStorage siswa multi-kunci agar tidak pernah hilang
     const sNis = profile.nis ? String(profile.nis).trim() : '';
     const sId = profile.id ? String(profile.id).trim() : '';
@@ -29221,6 +29377,13 @@ async function kirimHasilWordKePosterDanGuru(tampilkanNotif = true) {
     // Unggah ke Firebase Cloud jika aktif
     if (typeof unggahPosterKeCloud === 'function') {
       unggahPosterKeCloud(posterItem);
+    }
+    if (typeof sinkronKaryaPraktikKelas4KeCloud === 'function') {
+      sinkronKaryaPraktikKelas4KeCloud(student, {
+        nilaiPoster: student.nilaiPoster,
+        posterWord: student.posterWord,
+        latestPosterTitle: title
+      });
     }
 
     // Perbarui galeri poster siswa
@@ -29743,6 +29906,7 @@ function filterDanCariSiswa() {
   const mode = state.modePenilaianGuru || 1;
 
   
+  if (typeof mulaiRealtimeMonitoringKelas4Guru === 'function') mulaiRealtimeMonitoringKelas4Guru();
   if (typeof mulaiRealtimeMonitoringKelas5Guru === 'function') mulaiRealtimeMonitoringKelas5Guru();
   if (typeof mulaiRealtimeMonitoringKelas6Guru === 'function') mulaiRealtimeMonitoringKelas6Guru();
 const filtered = db.filter(s => {
@@ -30782,19 +30946,32 @@ function mulaiRealtimeMonitoringKelas5Guru() {
           student.portofolioP5 = student.portofolioP5 || {};
           if (data.ppt1) student.portofolioP5.ppt1 = data.ppt1;
           if (data.ppt2) student.portofolioP5.ppt2 = data.ppt2;
+          if (data.sertifikat) student.portofolioP5.sertifikat = data.sertifikat;
+          if (data.poster) student.portofolioP5.poster = data.poster;
+          if (data.scratch) student.portofolioP5.scratch = data.scratch;
+          if (data.nilaiPresentasi !== undefined && data.nilaiPresentasi !== null) student.nilaiPresentasi = Number(data.nilaiPresentasi);
+          if (data.nilaiSertifikat !== undefined && data.nilaiSertifikat !== null) student.nilaiSertifikat = Number(data.nilaiSertifikat);
+          if (data.nilaiPosterCanva !== undefined && data.nilaiPosterCanva !== null) student.nilaiPosterCanva = Number(data.nilaiPosterCanva);
+          if (data.nilaiGameCoding !== undefined && data.nilaiGameCoding !== null) student.nilaiGameCoding = Number(data.nilaiGameCoding);
 
           _p5CloudCache.set(targetNis, student.portofolioP5);
           if (student.id) _p5CloudCache.set(student.id, student.portofolioP5);
 
           const rubrik = hitungRubrikPenilaianKelas5(student, student.portofolioP5);
-          student.nilaiPresentasi = rubrik.nilaiPresentasi;
+          student.nilaiPresentasi = (data.nilaiPresentasi !== undefined && data.nilaiPresentasi !== null) ? Number(data.nilaiPresentasi) : rubrik.nilaiPresentasi;
+          student.nilaiSertifikat = (data.nilaiSertifikat !== undefined && data.nilaiSertifikat !== null) ? Number(data.nilaiSertifikat) : rubrik.nilaiSertifikat;
+          student.nilaiPosterCanva = (data.nilaiPosterCanva !== undefined && data.nilaiPosterCanva !== null) ? Number(data.nilaiPosterCanva) : rubrik.nilaiPosterCanva;
+          student.nilaiGameCoding = (data.nilaiGameCoding !== undefined && data.nilaiGameCoding !== null) ? Number(data.nilaiGameCoding) : rubrik.nilaiGameCoding;
+          student.nilaiAkhir = rubrik.nilaiAkhir;
           student.nilaiAkhirKelas5 = rubrik.nilaiAkhir;
+          student.statusKkm = rubrik.statusKkm;
           student.terakhirAktif = 'Baru saja';
           hasChange = true;
 
           if (change.type === 'added' || change.type === 'modified') {
+            const taskLabel = data.kategori === 'sertifikat_kelas5' ? 'Sertifikat Hour of Code' : (data.kategori === 'poster_kelas5' ? 'Poster Canva' : 'Tugas Presentasi');
             if (typeof showToast === 'function') {
-              showToast(`🚀 [Tugas Masuk] ${student.nama} (${student.kelas}) baru saja mengirimkan Tugas Presentasi ke Cloud! ☁️`, 'success');
+              showToast(`🚀 [Tugas Masuk] ${student.nama} (${student.kelas}) baru saja mengirimkan ${taskLabel} ke Cloud! ☁️`, 'success');
             }
             try { playSound('fanfare'); } catch(e){}
           }
@@ -30979,6 +31156,8 @@ function hitungRubrikPenilaianKelas5(student, customData) {
   let nPresentasi = 0;
   if (hasManualPpt) {
     nPresentasi = Number(student.nilaiPresentasi);
+  } else if (p5.nilaiPresentasi !== undefined && p5.nilaiPresentasi !== null && Number(p5.nilaiPresentasi) > 0) {
+    nPresentasi = Number(p5.nilaiPresentasi);
   } else if (berkasPptCount >= 1) {
     nPresentasi = (student && Number(student.nilaiPresentasi) > 0) ? Number(student.nilaiPresentasi) : (berkasPptCount >= 2 ? 100 : 85);
   } else {
@@ -30991,6 +31170,8 @@ function hitungRubrikPenilaianKelas5(student, customData) {
   let nSertifikat = 0;
   if (hasManualSertifikat) {
     nSertifikat = Number(student.nilaiSertifikat);
+  } else if (p5.nilaiSertifikat !== undefined && p5.nilaiSertifikat !== null && Number(p5.nilaiSertifikat) > 0) {
+    nSertifikat = Number(p5.nilaiSertifikat);
   } else if (hasSertifikat) {
     nSertifikat = (student && Number(student.nilaiSertifikat) > 0) ? Number(student.nilaiSertifikat) : 100;
   } else {
@@ -31003,6 +31184,8 @@ function hitungRubrikPenilaianKelas5(student, customData) {
   let nPoster = 0;
   if (hasManualPoster) {
     nPoster = Number(student.nilaiPosterCanva);
+  } else if (p5.nilaiPosterCanva !== undefined && p5.nilaiPosterCanva !== null && Number(p5.nilaiPosterCanva) > 0) {
+    nPoster = Number(p5.nilaiPosterCanva);
   } else if (hasPoster) {
     nPoster = (student && Number(student.nilaiPosterCanva) > 0) ? Number(student.nilaiPosterCanva) : 100;
   } else {
@@ -31016,6 +31199,8 @@ function hitungRubrikPenilaianKelas5(student, customData) {
   let nGame = 0;
   if (hasManualGame) {
     nGame = Number(student.nilaiGameCoding);
+  } else if (p5.nilaiGameCoding !== undefined && p5.nilaiGameCoding !== null && Number(p5.nilaiGameCoding) > 0) {
+    nGame = Number(p5.nilaiGameCoding);
   } else if (hasGame) {
     nGame = (student && Number(student.nilaiGameCoding) > 0) ? Number(student.nilaiGameCoding) : 100;
   } else if (nKuis5 > 0) {
@@ -36253,6 +36438,100 @@ async function unggahDriveKeCloud(data) {
 }
 window.unggahDriveKeCloud = unggahDriveKeCloud;
 
+// 2A-0A. Pemantauan Realtime Portofolio Praktik Kelas 4 (Drive, Poster Word, Tabel Excel)
+let _guruKelas4RealtimeUnsubscribe = null;
+function mulaiRealtimeMonitoringKelas4Guru() {
+  let db = (typeof firebaseFirestoreInstance !== 'undefined' && firebaseFirestoreInstance) 
+           ? firebaseFirestoreInstance 
+           : (typeof getInlineFirestore === 'function' ? getInlineFirestore() : null);
+  if (!db && typeof firebase !== 'undefined' && firebase.firestore) {
+    try { db = firebase.firestore(); } catch(e){}
+  }
+  if (!db || _guruKelas4RealtimeUnsubscribe) return;
+
+  try {
+    _guruKelas4RealtimeUnsubscribe = db.collection('karya_praktik_kelas4').onSnapshot((snapshot) => {
+      if (!snapshot) return;
+      const currentDb = getStudentDatabase();
+      let hasChange = false;
+
+      snapshot.docChanges().forEach((change) => {
+        const docData = change.doc.data();
+        if (!docData) return;
+        const targetNis = String(docData.studentNis || change.doc.id).trim();
+        const sIdx = currentDb.findIndex(s => String(s.nis || '').trim() === targetNis || String(s.id || '').trim() === targetNis);
+
+        if (sIdx >= 0) {
+          const student = currentDb[sIdx];
+          if (docData.nilaiDrive !== undefined && Number(docData.nilaiDrive) > 0) student.nilaiDrive = Number(docData.nilaiDrive);
+          if (docData.koleksiDrive !== undefined) student.koleksiDrive = Number(docData.koleksiDrive);
+          if (docData.nilaiPoster !== undefined && Number(docData.nilaiPoster) > 0) student.nilaiPoster = Number(docData.nilaiPoster);
+          if (docData.posterWord !== undefined) student.posterWord = Number(docData.posterWord);
+          if (docData.nilaiExcel !== undefined && Number(docData.nilaiExcel) > 0) student.nilaiExcel = Number(docData.nilaiExcel);
+          if (docData.excelTabel !== undefined) student.excelTabel = Number(docData.excelTabel);
+
+          const nK = Number(student.kuisSem1) || 0;
+          const nD = Number(student.nilaiDrive) || 0;
+          const nP = Number(student.nilaiPoster) || 0;
+          const nE = Number(student.nilaiExcel) || 0;
+          student.nilaiSem1 = Math.round((nK * 0.25) + (nD * 0.25) + (nP * 0.25) + (nE * 0.25));
+          if (student.nilaiSem1 >= 80 || nD >= 80 || nP >= 80 || nE >= 80) student.statusKkm = 'Tuntas';
+          student.terakhirAktif = 'Baru saja';
+          hasChange = true;
+
+          if (change.type === 'added' || change.type === 'modified') {
+            if (typeof showToast === 'function') {
+              showToast(`🚀 [Tugas Kelas 4 Masuk] ${student.nama} (${student.kelas}) baru saja mengirim nilai tugas ke Cloud! ☁️`, 'success');
+            }
+            try { playSound('fanfare'); } catch(e){}
+          }
+        }
+      });
+
+      if (hasChange) {
+        saveStudentDatabase(currentDb);
+        if (typeof renderDasborGuru === 'function') renderDasborGuru();
+        if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+        if (typeof renderKPI === 'function') renderKPI();
+      }
+    }, (err) => {
+      console.warn('Realtime listener Kelas 4 error:', err);
+      _guruKelas4RealtimeUnsubscribe = null;
+    });
+  } catch(e) {
+    console.warn('Gagal pasang realtime listener Kelas 4:', e);
+  }
+}
+window.mulaiRealtimeMonitoringKelas4Guru = mulaiRealtimeMonitoringKelas4Guru;
+
+async function sinkronKaryaPraktikKelas4KeCloud(student, dataUpdate) {
+  if (!student) return;
+  const sNis = student.nis || student.id;
+  if (!sNis) return;
+
+  let db = (typeof firebaseFirestoreInstance !== 'undefined' && firebaseFirestoreInstance) 
+           ? firebaseFirestoreInstance 
+           : (typeof getInlineFirestore === 'function' ? getInlineFirestore() : null);
+  if (!db && typeof firebase !== 'undefined' && firebase.firestore) {
+    try { db = firebase.firestore(); } catch(e){}
+  }
+  if (!db) return;
+
+  try {
+    const payload = Object.assign({
+      studentNis: String(sNis).trim(),
+      studentNama: student.nama || '',
+      studentKelas: student.kelas || '4A',
+      updatedAt: new Date().toISOString()
+    }, dataUpdate);
+
+    await db.collection('karya_praktik_kelas4').doc(String(sNis).trim()).set(payload, { merge: true });
+  } catch(err) {
+    console.warn('Gagal sinkron karya praktik kelas 4 ke cloud:', err);
+  }
+}
+window.sinkronKaryaPraktikKelas4KeCloud = sinkronKaryaPraktikKelas4KeCloud;
+
 // 2A-0. Pemantauan Realtime Firestore Tanpa Perlu Menekan Tombol (Live Antar-Komputer)
 let _guruDriveRealtimeUnsubscribe = null;
 
@@ -38735,6 +39014,8 @@ function mulaiRealtimeMonitoringKelas6Guru() {
       if (hasChange) {
         saveStudentDatabase(currentDb);
         if (typeof filterDanCariSiswa === 'function') filterDanCariSiswa();
+        if (typeof renderDasborGuru === 'function') renderDasborGuru();
+        if (typeof renderKPI === 'function') renderKPI();
       }
     }, (err) => {
       console.warn('Realtime listener Kelas 6 error:', err);
@@ -38896,15 +39177,21 @@ function kirimTugasScratchK6(type) {
       link: link,
       judul: judul || 'Game Scratch: Detektif Sampah (4 Pilar CT)',
       catatan: catatan,
+      nilai: 100,
       tgl: now
     };
+    student.nilaiScratch4Pilar = 100;
+    student.isManualNilai4Pilar = true;
   } else {
     k6.scratchAlgoritma = {
       link: link,
       judul: judul || 'Kerja Kelompok Scratch: Pelestarian Lingkungan',
       catatan: catatan,
+      nilai: 100,
       tgl: now
     };
+    student.nilaiScratchAlgoritma = 100;
+    student.isManualNilaiAlgoritma = true;
   }
 
   simpanPortofolioKelas6Siswa(student, k6);
