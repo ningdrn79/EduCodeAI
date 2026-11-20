@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<section id="tab-ketik" class="tab-content hidden space-y-3 animate-fadeIn overscroll-contain">
+      
+      <!-- 1. Header Top Bar & Level Selector (Compact Layar Statis Bar) -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-slate-950 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl border-2 border-amber-300 shadow-lg relative overflow-hidden">
+        <!-- Background Decorative Icon -->
+        <div class="absolute -right-6 -bottom-6 opacity-15 text-white text-[110px] pointer-events-none select-none">
+          <i class="fa-solid fa-keyboard"></i>
+        </div>
+
+  <div class="flex items-center gap-2.5 relative z-10">
+          <button onclick="switchTab('beranda')" class="inline-flex items-center gap-1.5 text-xs font-black text-slate-900 bg-white/95 hover:bg-white px-3 py-1.5 rounded-full border border-white/60 shadow-xs transition cursor-pointer active:scale-95">
+            <i class="fa-solid fa-arrow-left"></i> <span>Beranda</span>
+          </button>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1 bg-slate-950/20 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase border border-slate-950/20">
+                <i class="fa-solid fa-star text-yellow-300"></i> Latihan 10 Jari &amp; TP 2.2
+              </span>
+              <!-- Status Layar Statis (Anti-Geser) -->
+              <span class="inline-flex items-center gap-1 bg-emerald-950/30 text-emerald-100 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-300/40 shadow-2xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Layar Statis (Terkunci)</span>
+              </span>
+            </div>
+
+  <h2 class="font-title text-lg sm:text-xl font-black text-white drop-shadow flex items-center gap-1.5">
+              <span>Pahlawan Mengetik Cepat</span> ⌨️🎈
+            </h2>
+          </div>
+
+  </div>
+
+  <!-- Level Selector & Mode Button -->
+        <div class="flex items-center gap-1.5 flex-wrap relative z-10">
+          <div class="flex items-center gap-1 bg-black/25 backdrop-blur-sm p-1 rounded-xl border border-white/20 text-xs">
+            <button onclick="pilihLevelTypingHero(1)" id="btn-typing-lvl-1" class="typing-lvl-btn px-2.5 py-1 rounded-lg text-xs font-bold transition bg-yellow-300 text-slate-950 shadow-xs scale-105" title="Level 1: Pemula (Kata Pendek 3-5 Huruf)">
+              Lv 1: Pemula 🌱
+            </button>
+            <button onclick="pilihLevelTypingHero(2)" id="btn-typing-lvl-2" class="typing-lvl-btn px-2.5 py-1 rounded-lg text-xs font-bold transition text-white hover:text-yellow-200" title="Level 2: Tantangan Shortcut MS Word">
+              Lv 2: Shortcut ⚡
+            </button>
+            <button onclick="pilihLevelTypingHero(3)" id="btn-typing-lvl-3" class="typing-lvl-btn px-2.5 py-1 rounded-lg text-xs font-bold transition text-white hover:text-yellow-200" title="Level 3: Juara 10 Jari Cepat">
+              Lv 3: Juara 🏆
+            </button>
+          </div>
+
+  <button onclick="bukaModalPanduanTypingHero()" class="px-2.5 py-1.5 bg-white/95 hover:bg-white text-slate-900 rounded-xl font-bold text-xs shadow-xs transition flex items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-circle-question text-amber-600"></i>
+            <span>Cara Main</span>
+          </button>
+
+          <!-- Tombol Mode Layar Penuh / Arcade Statis -->
+          <button onclick="toggleTypingFullscreen()" id="btn-typing-fullscreen" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-950 text-amber-300 rounded-xl font-bold text-xs shadow-xs transition flex items-center gap-1.5 cursor-pointer border border-amber-300/40 active:scale-95" title="Kunci Tampilan Penuh (Layar Statis Bebas Gangguan)">
+            <i id="icon-typing-fullscreen" class="fa-solid fa-expand"></i>
+            <span id="text-typing-fullscreen">Layar Penuh ⛶</span>
+          </button>
+        </div>
+
+  </div>
+
+  <!-- 2. Main Game Workspace Grid (Arena & Sidebar) -->
+      <div id="typing-main-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+        
+        <!-- KOLOM UTAMA (ARENA BALON & KEYBOARD 10 JARI) - 8 KOLOM -->
+        <div class="lg:col-span-8 space-y-2.5">
+          
+          <!-- ARENA GAME MENGETIK (LANGIT & BALON MELAYANG) -->
+          <div id="typing-arena-container" class="relative w-full h-[330px] sm:h-[360px] rounded-2xl overflow-hidden border-3 border-amber-400/70 shadow-xl bg-gradient-to-b from-sky-300 via-sky-200 to-emerald-100 select-none flex flex-col justify-between">
+            
+            <!-- Animated Background Clouds -->
+            <div class="absolute inset-0 pointer-events-none opacity-45 overflow-hidden">
+              <div class="cloud-bubble absolute -top-4 left-10 w-36 h-20 bg-white rounded-full blur-xs"></div>
+              <div class="cloud-bubble absolute top-12 right-16 w-44 h-24 bg-white rounded-full blur-xs"></div>
+              <div class="cloud-bubble absolute top-28 left-1/3 w-32 h-16 bg-white rounded-full blur-xs"></div>
+              <div class="sun-orb absolute top-4 right-6 w-14 h-14 rounded-full bg-yellow-300/80 blur-sm animate-pulse"></div>
+            </div>
+
+  <!-- TOP HUD BAR: SCORE, SPEED, ACCURACY, HEARTS, PAUSE -->
+            <div class="relative z-20 w-full p-2 sm:p-2.5 bg-slate-900/90 backdrop-blur-md text-white border-b-2 border-amber-400/50 flex flex-wrap items-center justify-between gap-2 text-xs font-mono shadow-md">
+              <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <!-- Score -->
+                <div class="flex items-center gap-1 bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 rounded-lg">
+                  <span class="text-amber-400 font-bold">🏆 Skor:</span>
+                  <span id="typing-hud-score" class="text-yellow-300 font-black text-sm">0</span>
+                </div>
+
+  <!-- WPM (Kecepatan) -->
+                <div class="flex items-center gap-1 bg-blue-500/20 border border-blue-400/40 px-2 py-0.5 rounded-lg">
+                  <span class="text-blue-400 font-bold">⚡ WPM:</span>
+                  <span id="typing-hud-wpm" class="text-sky-300 font-black text-sm">0</span>
+                </div>
+
+  <!-- Akurasi -->
+                <div class="flex items-center gap-1 bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 rounded-lg">
+                  <span class="text-emerald-400 font-bold">🎯 Akurasi:</span>
+                  <span id="typing-hud-acc" class="text-emerald-300 font-black text-sm">100%</span>
+                </div>
+
+  <!-- Combo Streak -->
+                <div id="typing-hud-combo-wrap" class="hidden flex items-center gap-1 bg-rose-500/25 border border-rose-400/50 px-2 py-0.5 rounded-lg animate-bounce">
+                  <span class="text-rose-400 font-bold">🔥</span>
+                  <span id="typing-hud-combo" class="text-rose-300 font-black">2x Combo</span>
+                </div>
+
+  </div>
+
+  <!-- Right HUD: Lives & Controls -->
+              <div class="flex items-center gap-1.5">
+                <!-- Hearts / Nyawa -->
+                <div class="flex items-center gap-1 bg-slate-800/90 border border-slate-700 px-2 py-0.5 rounded-lg">
+                  <span id="typing-hud-lives" class="text-rose-500 tracking-wider text-sm">❤️❤️❤️</span>
+                </div>
+
+  <!-- Pause / Resume -->
+                <button type="button" onclick="togglePauseTypingHero()" id="btn-typing-pause" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-amber-300 border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Jeda / Lanjutkan Game">
+                  <i id="typing-pause-icon" class="fa-solid fa-pause text-xs"></i>
+                </button>
+                <!-- Restart -->
+                <button type="button" onclick="restartTypingHeroGame()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center transition cursor-pointer" title="Mulai Ulang Game">
+                  <i class="fa-solid fa-rotate-left text-xs"></i>
+                </button>
+              </div>
+
+  </div>
+
+  <!-- LAPISAN BALON TERBANG (BALLOON FLIGHT LAYER) -->
+            <div id="typing-balloons-layer" class="relative z-10 flex-1 min-h-[190px] w-full overflow-hidden">
+              <!-- Balon-balon diinjeksi secara dinamis oleh typingHeroEngine -->
+            </div>
+
+  <!-- TANAH RUMPUT & ZONA BATAS (BOTTOM GROUND ZONE) -->
+            <div class="relative z-20 w-full h-9 sm:h-10 bg-gradient-to-t from-emerald-600 via-emerald-500 to-emerald-400 border-t-3 border-emerald-300/80 flex items-center justify-between px-3 text-emerald-950 font-title font-bold text-xs shadow-inner">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="text-sm">🌱</span>
+                <span class="truncate">Ketik hurufnya sebelum balon menyentuh rumput!</span>
+              </div>
+
+  <div id="typing-target-indicator" class="hidden shrink-0 bg-white/95 text-slate-900 px-2.5 py-0.5 rounded-full shadow-xs text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse border border-blue-300">
+                <span>Fokus:</span>
+                <span id="typing-target-word" class="text-blue-700 font-black">---</span>
+              </div>
+
+  </div>
+
+  <!-- OVERLAY 1: START SCREEN OVERLAY -->
+            <div id="typing-overlay-start" class="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-3xl shadow-lg shadow-amber-500/30 mb-2 animate-bounce">
+                ⌨️
+              </div>
+
+  <h3 class="font-title font-black text-xl sm:text-2xl text-yellow-300">
+                Pahlawan Mengetik Cepat
+              </h3>
+              <p class="text-xs text-slate-200 max-w-md mt-1 leading-relaxed">
+                Balon kata melayang turun. Ketik di keyboardmu sebelum menyentuh tanah! Layar telah <b>terkunci statis</b> agar tidak bergeser saat mengetik.
+              </p>
+
+              <!-- Level Preview Pills -->
+              <div class="flex items-center justify-center gap-2 mt-3.5 flex-wrap">
+                <button type="button" onclick="pilihLevelTypingHero(1); mulaiTypingHeroGame();" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  🌱 Mulai Level 1: Pemula
+                </button>
+                <button type="button" onclick="pilihLevelTypingHero(2); mulaiTypingHeroGame();" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  ⚡ Mulai Level 2: Shortcut Word
+                </button>
+                <button type="button" onclick="pilihLevelTypingHero(3); mulaiTypingHeroGame();" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  🏆 Mulai Level 3: Juara 10 Jari
+                </button>
+              </div>
+
+  <!-- Shortcut Cheat Note -->
+              <div class="mt-2.5 text-[10px] text-amber-200 bg-amber-950/60 border border-amber-500/40 rounded-lg px-2.5 py-1 max-w-sm">
+                💡 Di Level 2, tekan kombinasi sungguhan: <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>!
+              </div>
+
+  </div>
+
+  <!-- OVERLAY 2: GAME OVER / VICTORY OVERLAY -->
+            <div id="typing-overlay-gameover" class="hidden absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white">
+              <div id="typing-end-icon" class="text-5xl mb-2 animate-bounce">🏆</div>
+              <h3 id="typing-end-title" class="font-title font-black text-xl sm:text-2xl text-yellow-300">Permainan Selesai!</h3>
+              <p id="typing-end-desc" class="text-xs text-slate-300 max-w-md mt-1 leading-relaxed">
+                Kerja luar biasa! Kamu berhasil mengetik dengan lincah dan tepat.
+              </p>
+
+              <!-- Stat Box -->
+              <div class="grid grid-cols-3 gap-2.5 my-3.5 w-full max-w-sm font-mono text-center">
+                <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-700">
+                  <span class="text-[9px] text-slate-400 block font-bold">TOTAL SKOR</span>
+                  <span id="typing-final-score" class="text-lg font-black text-yellow-300">0</span>
+                </div>
+
+  <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-700">
+                  <span class="text-[9px] text-slate-400 block font-bold">KECEPATAN</span>
+                  <span id="typing-final-wpm" class="text-lg font-black text-sky-300">0 WPM</span>
+                </div>
+
+  <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-700">
+                  <span class="text-[9px] text-slate-400 block font-bold">AKURASI</span>
+                  <span id="typing-final-acc" class="text-lg font-black text-emerald-300">100%</span>
+                </div>
+
+  </div>
+
+  <!-- Action Buttons -->
+              <div class="flex items-center gap-2.5">
+                <button type="button" onclick="mulaiTypingHeroGame()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-title font-black text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  Main Lagi 🔄
+                </button>
+                <button type="button" onclick="lanjutLevelTypingHeroBerikutnya()" id="btn-typing-next-level" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-title font-bold text-xs shadow-md transition transform hover:scale-105 active:scale-95 cursor-pointer">
+                  Lanjut Level Berikutnya 🚀
+                </button>
+              </div>
+
+  </div>
+
+  </div>
+
+  <!-- PANDUAN KEYBOARD VIRTUAL 10 JARI (TOUCH TYPING INTERAKTIF) -->
+          <div class="bg-slate-900 rounded-2xl p-2.5 sm:p-3 border border-slate-700 shadow-lg space-y-1.5 select-none text-white">
+            
+            <!-- Header Keyboard & Indikator Jari Aktif -->
+            <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shadow-xs font-black">
+                  ⌨️
+                </span>
+                <span class="font-title font-bold text-xs text-slate-200">Panduan Tuts 10 Jari</span>
+              </div>
+
+  <!-- Indikator Jari Aktif yang Harus Ditekan -->
+              <div id="typing-finger-guide-pill" class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded-xl border border-slate-700 text-xs font-mono">
+                <span class="text-amber-300 font-bold">👉 Tuts:</span>
+                <span id="typing-finger-name" class="font-bold text-yellow-300">Siap Mengetik</span>
+              </div>
+
+  </div>
+
+  <!-- Virtual Keyboard Rows Container -->
+            <div id="typing-virtual-keyboard" class="flex flex-col items-center gap-1 w-full overflow-x-auto custom-scroll">
+              <!-- Rendered via JS renderTypingVirtualKeyboard() -->
+            </div>
+
+  <!-- Legenda Warna Jari (Compact 10 Finger Legend) -->
+            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1.5 border-t border-slate-800/80 text-[10px] text-slate-300">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Kelingking (Q/A/Z/Ctrl)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Manis (W/S/X)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-400"></span> Tengah (E/D/C)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Telunjuk Kiri</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-teal-400"></span> Telunjuk Kanan</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Spasi (Ibu Jari)</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span> <b>Target Aktif</b></span>
+            </div>
+
+  </div>
+
+  </div>
+
+  <!-- KOLOM KANAN (KAMUS SHORTCUT & KONTROL CEPAT) - 4 KOLOM -->
+        <div class="lg:col-span-4 space-y-2.5">
+          
+          <!-- Card 1: Kamus Pintasan Keyboard MS Word (TP 2.2) -->
+          <div id="typing-shortcut-card" class="bg-white rounded-2xl p-3.5 border-2 border-slate-200 shadow-lg space-y-2 flex flex-col justify-between">
+            <div class="border-b border-slate-100 pb-2 flex items-center justify-between">
+              <div>
+                <h3 class="font-title font-bold text-sm text-slate-800 flex items-center gap-1.5">
+                  <i class="fa-solid fa-bolt text-amber-500"></i>
+                  <span>Kamus Shortcut MS Word</span>
+                </h3>
+                <p class="text-[10px] text-slate-500">Hafalkan pintasan ini untuk Level 2!</p>
+              </div>
+
+  <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-mono font-bold text-[11px] border border-blue-200">
+                10 Pintasan
+              </span>
+            </div>
+
+  <!-- List Shortcut Cards with Clean Internal Scroll -->
+            <div class="space-y-1.5 max-h-[295px] overflow-y-auto pr-1 custom-scroll text-xs">
+              
+              <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-blue-700 text-xs">Ctrl + B</kbd>
+                  <span class="font-bold text-slate-800">Bold (Tebal)</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Menebalkan teks</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-purple-700 text-xs">Ctrl + I</kbd>
+                  <span class="font-bold text-slate-800 italic">Italic (Miring)</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Memiringkan teks</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-emerald-700 text-xs">Ctrl + U</kbd>
+                  <span class="font-bold text-slate-800 underline">Underline</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Garis bawah teks</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-amber-700 text-xs">Ctrl + S</kbd>
+                  <span class="font-bold text-slate-800">Save (Simpan)</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Simpan dokumen</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-rose-700 text-xs">Ctrl + Z</kbd>
+                  <span class="font-bold text-slate-800">Undo</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Batalkan langkah</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-indigo-700 text-xs">Ctrl + C</kbd>
+                  <span class="font-bold text-slate-800">Copy (Salin)</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Salin teks</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-teal-700 text-xs">Ctrl + V</kbd>
+                  <span class="font-bold text-slate-800">Paste (Tempel)</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Menempel teks</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-cyan-700 text-xs">Ctrl + A</kbd>
+                  <span class="font-bold text-slate-800">Select All</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Pilih semua teks</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-blue-800 text-xs">Ctrl + P</kbd>
+                  <span class="font-bold text-slate-800">Print</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Cetak dokumen</span>
+              </div>
+
+  <div class="p-2 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 transition flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <kbd class="px-2 py-0.5 bg-white rounded-lg border border-slate-300 shadow-2xs font-mono font-black text-emerald-800 text-xs">Ctrl + N</kbd>
+                  <span class="font-bold text-slate-800">New Document</span>
+                </div>
+
+  <span class="text-[10px] text-slate-500">Dokumen baru</span>
+              </div>
+
+  </div>
+
+  <!-- Tombol Buka Lab MS Word -->
+            <button onclick="switchTab('msword')" class="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-title font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-file-word"></i>
+              <span>Praktikkan di Lab MS Word</span>
+            </button>
+          </div>
+
+  <!-- Card 2: Skor Rekor Terbaikmu (Compact) -->
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-2.5 border-2 border-amber-200 shadow-2xs space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="text-base">🎖️</span>
+                <h4 class="font-title font-bold text-slate-800 text-xs">Rekor Terbaikmu</h4>
+              </div>
+
+  <span id="typing-best-badge" class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px]">
+                Pemula
+              </span>
+            </div>
+
+  <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2 bg-white rounded-xl border border-amber-200 shadow-2xs">
+                <span class="text-[10px] text-slate-500 block">Skor Tertinggi:</span>
+                <b id="typing-record-score" class="text-amber-700 text-sm">0</b>
+              </div>
+
+  <div class="p-2 bg-white rounded-xl border border-amber-200 shadow-2xs">
+                <span class="text-[10px] text-slate-500 block">WPM Tertinggi:</span>
+                <b id="typing-record-wpm" class="text-amber-700 text-sm">0 WPM</b>
+              </div>
+
+  </div>
+
+  </div>
+
+  </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 6 SD: 4 PILAR COMPUTATIONAL THINKING -->
+      <!-- Tampil eksklusif saat siswa Kelas 6 aktif (Berbeda Total dari Kelas 4) -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas6" class="hidden space-y-6">
+        
+        <!-- Header Section Info Kelas 6 -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border-2 border-emerald-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🧠
+            </div>
+
+  <div>
+              <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Kurikulum KKA (Koding &amp; AI) • Fase C (Kelas 6 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                4 Pilar Computational Thinking: Mari Berpikir Seperti Ahli Komputer!
+              </h3>
+            </div>
+
+  </div>
+
+  <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="bukaModalGambarMateri('materi_ct_kelas6.jpg', '4 Pilar Computational Thinking (Panduan untuk Siswa Kelas 6 SD)')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/50 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-image text-emerald-400"></i> <span>Lihat Infografis</span>
+            </button>
+            <button type="button" onclick="switchTab('modul'); pilihTingkatModul('kelas6');" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/40 font-title font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+              <i class="fa-solid fa-book-open"></i> <span>Modul Belajar</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan6')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0">
+              <span>Ruang Komputasi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+
+  </div>
+
+  <!-- Grid 4 Pilar Sesuai Gambar Infografis -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          
+          <!-- Pilar 1: Dekomposisi -->
+          <div class="bg-white rounded-3xl border-2 border-sky-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-sky-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧩
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200">
+                  Pilar 1
+                </span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                1. Dekomposisi
+              </h4>
+              <span class="text-xs font-bold text-sky-600 block mb-2">(Memecah Masalah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membagi masalah rumit menjadi bagian-bagian yang lebih kecil dan mudah dikelola.
+              </p>
+              <div class="mt-3 p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 text-[11px] text-sky-950 space-y-1">
+                <b>Contoh: Liburan Keluarga</b>
+                <p class="text-[10px] text-slate-600">1. Pesan tiket, 2. Siapkan koper, 3. Pilih tempat tujuan.</p>
+              </div>
+
+  </div>
+
+  <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-dekomposisi')" class="w-full py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-puzzle-piece"></i> <span>Mulai Misi Dekomposisi</span>
+              </button>
+            </div>
+
+  </div>
+
+  <!-- Pilar 2: Pengenalan Pola -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🧸
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Pilar 2
+                </span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                2. Pengenalan Pola
+              </h4>
+              <span class="text-xs font-bold text-emerald-600 block mb-2">(Menemukan Kesamaan)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Menemukan keteraturan atau tren dalam berbagai masalah atau data.
+              </p>
+              <div class="mt-3 p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-[11px] text-emerald-950 space-y-1">
+                <b>Contoh: Sortir Mainan</b>
+                <p class="text-[10px] text-slate-600">Boneka di satu kotak, mobil di kotak lain, balok di kotak ketiga.</p>
+              </div>
+
+  </div>
+
+  <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-pola')" class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-shapes"></i> <span>Mainkan Sortir Pola</span>
+              </button>
+            </div>
+
+  </div>
+
+  <!-- Pilar 3: Abstraksi -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  🗺️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                  Pilar 3
+                </span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                3. Abstraksi
+              </h4>
+              <span class="text-xs font-bold text-amber-600 block mb-2">(Memilih Informasi)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Memilih informasi penting dan mengabaikan detail yang tidak diperlukan.
+              </p>
+              <div class="mt-3 p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 text-[11px] text-amber-950 space-y-1">
+                <b>Contoh: Peta Digital GPS</b>
+                <p class="text-[10px] text-slate-600">Hanya perlu melihat jalan dan belokan, bukan semua jenis pohon.</p>
+              </div>
+
+  </div>
+
+  <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-abstraksi')" class="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-filter"></i> <span>Uji Filter Peta GPS</span>
+              </button>
+            </div>
+
+  </div>
+
+  <!-- Pilar 4: Algoritma -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs group-hover:scale-110 transition">
+                  ✈️
+                </span>
+                <span class="text-[10px] font-mono font-bold bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full border border-orange-200">
+                  Pilar 4
+                </span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">
+                4. Algoritma
+              </h4>
+              <span class="text-xs font-bold text-orange-600 block mb-2">(Urutan Langkah)</span>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Membuat serangkaian langkah logis yang tersusun rapi untuk menyelesaikan tugas.
+              </p>
+              <div class="mt-3 p-2.5 bg-orange-50/70 rounded-xl border border-orange-100 text-[11px] text-orange-950 space-y-1">
+                <b>Contoh: Origami Pesawat</b>
+                <p class="text-[10px] text-slate-600">1. Lipat dua &rarr; 2. Lipat sudut &rarr; 3. Lipat sayap &rarr; 4. Terbangkan!</p>
+              </div>
+
+  </div>
+
+  <div class="pt-4 mt-3 border-t border-slate-100">
+              <button type="button" onclick="bukaPetualangan6Zona('zona-algoritma')" class="w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                <i class="fa-solid fa-paper-plane"></i> <span>Puzzle Origami Pesawat</span>
+              </button>
+            </div>
+
+  </div>
+
+  </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+      <!-- KARTU KHUSUS BERANDA KELAS 5 SD: PORTOFOLIO DIGITAL      -->
+      <!-- Tampil eksklusif saat siswa Kelas 5 aktif                -->
+      <!-- ======================================================== -->
+      <div id="beranda-fitur-cards-kelas5" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 rounded-3xl bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 border-2 border-purple-400/40 text-white shadow-xl">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 border border-purple-400/40 flex items-center justify-center text-2xl font-black shrink-0">
+              🚀
+            </div>
+
+  <div>
+              <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-yellow-300"></i> Portofolio Digital • Fase C (Kelas 5 SD)
+              </span>
+              <h3 class="font-title font-black text-lg sm:text-xl text-white mt-0.5 leading-snug">
+                Portofolio Digital &amp; Kuis EXCODE AI (Koding &amp; AI)
+              </h3>
+            </div>
+
+  </div>
+
+  <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto shrink-0">
+            <button type="button" onclick="if(typeof bukaKuisKelas5==='function') bukaKuisKelas5(); else switchTab('kuis');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-robot text-yellow-300"></i> <span>Kuis EXCODE AI 🚀</span>
+            </button>
+            <button type="button" onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-keyboard text-slate-950"></i> <span>Ketik Cepat ⌨️</span>
+            </button>
+            <button type="button" onclick="switchTab('petualangan5')" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-title font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>Portofolio 4 Misi</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+          <!-- Menu 1 -->
+          <div class="bg-white rounded-3xl border-2 border-orange-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-orange-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl shadow-xs">📊</span>
+                <span class="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">Menu 1</span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">1. Presentasi Digital</h4>
+              <p class="text-xs text-slate-500 mt-1">Komparasi 2 berkas: PowerPoint Mandiri vs Bantuan Gemini AI.</p>
+            </div>
+
+  <button type="button" onclick="bukaPetualanganZona('zona-presentasi')" class="mt-4 w-full py-2 px-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Presentasi &gt;
+            </button>
+          </div>
+
+  <!-- Menu 2 -->
+          <div class="bg-white rounded-3xl border-2 border-amber-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-amber-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">🏆</span>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Menu 2</span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">2. Sertifikat Hour of Code</h4>
+              <p class="text-xs text-slate-500 mt-1">Unggah bukti kelulusan tantangan coding internasional.</p>
+            </div>
+
+  <button type="button" onclick="bukaPetualanganZona('zona-sertifikat')" class="mt-4 w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-title font-bold text-xs transition cursor-pointer">
+              Buka Sertifikat &gt;
+            </button>
+          </div>
+
+  <!-- Menu 3 -->
+          <div class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-emerald-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-xs">🎨</span>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Menu 3</span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">3. Poster Lingkungan</h4>
+              <p class="text-xs text-slate-500 mt-1">Desain poster Canva format gambar .PNG resolusi tinggi.</p>
+            </div>
+
+  <button type="button" onclick="bukaPetualanganZona('zona-poster')" class="mt-4 w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Poster &gt;
+            </button>
+          </div>
+
+  <!-- Menu 4 -->
+          <div class="bg-white rounded-3xl border-2 border-purple-200 p-5 shadow-smooth flex flex-col justify-between hover:shadow-xl hover:border-purple-400 transition">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-xs">🎮</span>
+                <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">Menu 4</span>
+              </div>
+
+  <h4 class="font-title font-bold text-base text-slate-900 leading-snug">4. Game & Coding</h4>
+              <p class="text-xs text-slate-500 mt-1">Misi Game AI Pulau Tekno atau rancang karya Scratch (.sb3).</p>
+            </div>
+
+  <button type="button" onclick="bukaPetualanganZona('zona-scratch')" class="mt-4 w-full py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-title font-bold text-xs transition cursor-pointer">
+              Buka Game &amp; Coding &gt;
+            </button>
+          </div>
+
+  </div>
+
+        <!-- Kartu Khusus Mengetik Cepat Kelas 5 -->
+        <div onclick="switchTab('ketik'); if(typeof setAktifNavKelas5==='function') setAktifNavKelas5('ketik');" class="p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 border-2 border-amber-400/50 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900/90 transition shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center text-2xl font-black shadow-md group-hover:scale-110 transition shrink-0">
+              ⌨️
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Keterampilan Digital</span>
+                <span class="text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">Latihan 10 Jari</span>
+              </div>
+              <h4 class="font-title font-black text-base sm:text-lg text-white mt-0.5 group-hover:text-amber-300 transition">
+                Pahlawan Mengetik Cepat (Typing Hero) ⚡
+              </h4>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Latih kecepatan dan akurasi mengetik 10 jari kamu untuk menunjang pembuatan presentasi, poster, dan koding!
+              </p>
+            </div>
+          </div>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-title font-black text-xs sm:text-sm shadow-md transition group-hover:scale-105 shrink-0 pointer-events-none">
+            <span>Mulai Latihan Mengetik ⌨️</span>
+          </button>
+        </div>
+
+  </div>
+
+  <!-- MODAL PANDUAN CARA BERMAIN TYPING HERO -->
+      <div id="modal-panduan-typing" class="fixed inset-0 z-[999999] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">📖</span>
+              <h3 class="font-title font-bold text-lg text-slate-800">Cara Bermain: Pahlawan Mengetik Cepat</h3>
+            </div>
+
+  <button onclick="tutupModalPanduanTypingHero()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+  <div class="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-2.5">
+              <span class="text-xl">🎈</span>
+              <div>
+                <b class="text-amber-950 block">1. Balon Kata Melayang Turun</b>
+                <span>Perhatikan kata-kata atau shortcut yang turun dari langit. Ketik hurufnya sebelum balon menyentuh rumput hijau di bawah.</span>
+              </div>
+
+  </div>
+
+  <div class="p-3 bg-blue-50 rounded-2xl border border-blue-200 flex items-start gap-2.5">
+              <span class="text-xl">⌨️</span>
+              <div>
+                <b class="text-blue-950 block">2. Gunakan Keyboard Komputer / Laptop</b>
+                <span>Ketik huruf pertama dari kata tersebut. Setelah kamu mengetik huruf pertama, fokus akan terkunci pada balon itu sampai kata selesai dan balon meletus (POP!).</span>
+              </div>
+
+  </div>
+
+  <div class="p-3 bg-purple-50 rounded-2xl border border-purple-200 flex items-start gap-2.5">
+              <span class="text-xl">⚡</span>
+              <div>
+                <b class="text-purple-950 block">3. Tantangan Shortcut Word (Level 2)</b>
+                <span>Tekan kombinasi tombol pintasan nyata seperti <b>Ctrl + B</b>, <b>Ctrl + S</b>, atau <b>Ctrl + Z</b>. Cara terbaik menghafal shortcut MS Word secara otomatis!</span>
+              </div>
+
+  </div>
+
+  <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-start gap-2.5">
+              <span class="text-xl">🖐️</span>
+              <div>
+                <b class="text-emerald-950 block">4. Panduan 10 Jari Edukatif</b>
+                <span>Lihat keyboard visual di bawah arena. Tombol yang harus ditekan akan bersinar dan memberi tahu jari tangan mana yang harus digunakan.</span>
+              </div>
+
+  </div>
+
+  </div>
+
+  <div class="pt-2">
+            <button onclick="tutupModalPanduanTypingHero()" class="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-title font-bold text-sm shadow-md transition cursor-pointer">
+              Mengerti & Siap Bermain! 🚀
+            </button>
+          </div>
+
+  </div>
+
+  </div>
+
+  </section>
+<script id="engine-typing-hero-core">
+    (function() {
+      'use strict';
+
+      // 1. SOUND SYNTHESIZER (WEB AUDIO API - ZERO EXTERNAL ASSET)
+      var audioCtx = null;
+      function getAudioCtx() {
+        if (!audioCtx) {
+          var AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtxClass) {
+            audioCtx = new AudioCtxClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function() {});
+        }
+        return audioCtx;
+      }
+
+      function safePlay(type) {
+        try {
+          var ctx = getAudioCtx();
+          if (!ctx) return;
+          var t = ctx.currentTime;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          if (type === 'type') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(650, t);
+            osc.frequency.exponentialRampToValueAtTime(880, t + 0.05);
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+            osc.start(t);
+            osc.stop(t + 0.05);
+          } else if (type === 'pop') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(450, t);
+            osc.frequency.exponentialRampToValueAtTime(90, t + 0.16);
+            gain.gain.setValueAtTime(0.35, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+            osc.start(t);
+            osc.stop(t + 0.16);
+          } else if (type === 'shortcut') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, t);
+            osc.frequency.setValueAtTime(659.25, t + 0.08);
+            osc.frequency.setValueAtTime(783.99, t + 0.16);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.start(t);
+            osc.stop(t + 0.3);
+          } else if (type === 'miss') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(190, t);
+            osc.frequency.linearRampToValueAtTime(80, t + 0.22);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+            osc.start(t);
+            osc.stop(t + 0.22);
+          } else if (type === 'victory') {
+            var notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach(function(freq, idx) {
+              var o = ctx.createOscillator();
+              var g = ctx.createGain();
+              o.connect(g);
+              g.connect(ctx.destination);
+              o.type = 'triangle';
+              o.frequency.setValueAtTime(freq, t + idx * 0.11);
+              g.gain.setValueAtTime(0.22, t + idx * 0.11);
+              g.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.11 + 0.35);
+              o.start(t + idx * 0.11);
+              o.stop(t + idx * 0.11 + 0.35);
+            });
+          }
+        } catch(e) {}
+      }
+
+      function safeToast(msg, type) {
+        if (typeof window.tampilkanToast === 'function') {
+          window.tampilkanToast(msg, type);
+        }
+      }
+
+      // 2. DATA LEVEL & CONFIG
+      var LEVEL_DATA = {
+        1: {
+          name: 'Pemula (Kata Pendek)',
+          targetScore: 100,
+          speed: 0.85,
+          spawnInterval: 2800,
+          words: [
+            'BUKU', 'KATA', 'BACA', 'KITA', 'GURU', 'RAJIN', 'SANTUN', 'SOPAN',
+            'RAMAH', 'PINTAR', 'BELAJAR', 'JUJUR', 'DAMAI', 'SAYANG', 'IKHLAS',
+            'CERIA', 'HEBAT', 'BISA', 'ADIL', 'RUKUN', 'TERTIB', 'BERSIH'
+          ]
+        },
+        2: {
+          name: 'Tantangan Shortcut MS Word',
+          targetScore: 120,
+          speed: 0.80,
+          spawnInterval: 3200,
+          shortcuts: [
+            { key: 'B', text: 'Ctrl+B', label: 'Bold (Tebal)' },
+            { key: 'I', text: 'Ctrl+I', label: 'Italic (Miring)' },
+            { key: 'U', text: 'Ctrl+U', label: 'Underline (Garis Bawah)' },
+            { key: 'S', text: 'Ctrl+S', label: 'Save (Simpan)' },
+            { key: 'Z', text: 'Ctrl+Z', label: 'Undo (Kembalikan)' },
+            { key: 'C', text: 'Ctrl+C', label: 'Copy (Salin)' },
+            { key: 'V', text: 'Ctrl+V', label: 'Paste (Tempel)' },
+            { key: 'A', text: 'Ctrl+A', label: 'Select All' },
+            { key: 'P', text: 'Ctrl+P', label: 'Print (Cetak)' },
+            { key: 'N', text: 'Ctrl+N', label: 'New Document' }
+          ]
+        },
+        3: {
+          name: 'Juara 10 Jari Cepat',
+          targetScore: 180,
+          speed: 1.45,
+          spawnInterval: 2200,
+          words: [
+            'KOMPUTER', 'KEYBOARD', 'DOKUMEN', 'PARAGRAF', 'INTERNET', 'TEKNOLOGI',
+            'ALGORITMA', 'KREATIVITAS', 'TZU CHI', 'INDONESIA', 'CINTA KASIH',
+            'BUDI PEKERTI', 'LESTARIKAN', 'BERSYUKUR', 'KOLABORASI', 'INFORMATIKA'
+          ]
+        }
+      };
+
+      // 3. FINGER GUIDE MAP
+      var FINGER_MAP = {
+        '1': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'Q': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'A': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'Z': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+        'CTRL': { finger: 'Kelingking Kiri', color: 'bg-rose-500' },
+
+        '2': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+        'W': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+        'S': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+        'X': { finger: 'Jari Manis Kiri', color: 'bg-amber-500' },
+
+        '3': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+        'E': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+        'D': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+        'C': { finger: 'Jari Tengah Kiri', color: 'bg-yellow-500' },
+
+        '4': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        '5': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'R': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'T': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'F': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'G': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'V': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+        'B': { finger: 'Telunjuk Kiri', color: 'bg-emerald-500' },
+
+        ' ': { finger: 'Ibu Jari (Spasi)', color: 'bg-blue-500' },
+
+        '6': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        '7': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'Y': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'U': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'H': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'J': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'N': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+        'M': { finger: 'Telunjuk Kanan', color: 'bg-teal-500' },
+
+        '8': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+        'I': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+        'K': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+        ',': { finger: 'Jari Tengah Kanan', color: 'bg-sky-500' },
+
+        '9': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+        'O': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+        'L': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+        '.': { finger: 'Jari Manis Kanan', color: 'bg-indigo-500' },
+
+        '0': { finger: 'Kelingking Kanan', color: 'bg-purple-500' },
+        'P': { finger: 'Kelingking Kanan', color: 'bg-purple-500' },
+        ';': { finger: 'Kelingking Kanan', color: 'bg-purple-500' },
+        '/': { finger: 'Kelingking Kanan', color: 'bg-purple-500' }
+      };
+
+      var BALLOON_PALETTES = [
+        { bg: 'from-rose-500 to-red-600', border: 'border-rose-300', text: 'text-white' },
+        { bg: 'from-amber-400 to-orange-500', border: 'border-amber-200', text: 'text-slate-950' },
+        { bg: 'from-emerald-400 to-teal-600', border: 'border-emerald-200', text: 'text-white' },
+        { bg: 'from-sky-400 to-blue-600', border: 'border-sky-200', text: 'text-white' },
+        { bg: 'from-purple-500 to-indigo-600', border: 'border-purple-200', text: 'text-white' },
+        { bg: 'from-pink-400 to-rose-500', border: 'border-pink-200', text: 'text-white' }
+      ];
+
+      // 4. GAME STATE
+      var typingState = {
+        level: 1,
+        score: 0,
+        lives: 3,
+        combo: 0,
+        maxCombo: 0,
+        keystrokesTotal: 0,
+        keystrokesCorrect: 0,
+        wordsCompleted: 0,
+        startTime: null,
+        isPlaying: false,
+        isPaused: false,
+        balloons: [],
+        activeBalloonId: null,
+        nextBalloonId: 1,
+        lastSpawnTime: 0,
+        lastFrameTime: 0,
+        animFrameId: null
+      };
+
+      // 5. VIRTUAL KEYBOARD
+      var KEYBOARD_ROWS = [
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+        ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';'],
+        ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.']
+      ];
+
+      function renderTypingVirtualKeyboard() {
+        var container = document.getElementById('typing-virtual-keyboard');
+        if (!container) return;
+
+        var html = '';
+        KEYBOARD_ROWS.forEach(function(row) {
+          html += '<div class="flex items-center justify-center gap-1 sm:gap-1.5 w-full">';
+          row.forEach(function(k) {
+            var f = FINGER_MAP[k] || { finger: '', color: 'bg-slate-700' };
+            var safeId = (k === ',' ? 'comma' : (k === '.' ? 'dot' : (k === ';' ? 'semicolon' : k)));
+            html += '<button type="button" id="vkey-' + safeId + '" onclick="window.onVirtualKeyClick(\'' + k + '\')" class="vkey-btn w-6.5 h-7 sm:w-8 sm:h-8 rounded-lg font-mono font-bold text-xs text-white flex items-center justify-center transition-all duration-150 ' + f.color + ' shadow-2xs active:scale-95 border border-white/20 hover:brightness-110 cursor-pointer" title="' + k + ' (' + f.finger + ')">' + k + '</button>';
+          });
+          html += '</div>';
+        });
+
+        html += '<div class="flex items-center justify-center gap-1.5 w-full pt-0.5">';
+        html += '<button type="button" id="vkey-CTRL" onclick="window.onVirtualKeyClick(\'CTRL\')" class="vkey-btn px-3 sm:px-4 h-7 sm:h-8 rounded-lg font-mono font-bold text-xs text-white bg-rose-500 shadow-2xs border border-white/20 cursor-pointer hover:brightness-110" title="Ctrl (Kelingking Kiri)">Ctrl</button>';
+        html += '<button type="button" id="vkey-SPACE" onclick="window.onVirtualKeyClick(\' \')" class="vkey-btn flex-1 max-w-xs h-7 sm:h-8 rounded-lg font-mono font-bold text-xs text-white bg-blue-500 shadow-2xs border border-white/20 cursor-pointer hover:brightness-110" title="Spasi (Ibu Jari)">Spasi</button>';
+        html += '</div>';
+
+        container.innerHTML = html;
+      }
+
+      function highlightVirtualKey(key, isPressed) {
+        if (!key) return;
+        var cleanKey = key.toUpperCase();
+        var idKey = (cleanKey === ',' ? 'comma' : (cleanKey === '.' ? 'dot' : (cleanKey === ';' ? 'semicolon' : (cleanKey === ' ' ? 'SPACE' : cleanKey))));
+        var el = document.getElementById('vkey-' + idKey);
+        if (!el) return;
+
+        if (isPressed) {
+          el.classList.add('ring-4', 'ring-yellow-300', 'scale-110', 'brightness-125');
+          setTimeout(function() {
+            if (el) el.classList.remove('ring-4', 'ring-yellow-300', 'scale-110', 'brightness-125');
+          }, 150);
+        }
+      }
+
+      function updateFingerGuide() {
+        var pill = document.getElementById('typing-finger-name');
+        if (!pill) return;
+
+        var targetKey = null;
+        var targetLabel = '';
+
+        if (typingState.level === 2) {
+          if (typingState.balloons.length > 0) {
+            var activeB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; }) || typingState.balloons[0];
+            if (activeB && activeB.isShortcut) {
+              targetKey = activeB.shortcutKey;
+              var f = FINGER_MAP[targetKey] ? FINGER_MAP[targetKey].finger : 'Jari';
+              targetLabel = 'Ctrl (Kelingking Kiri) + ' + targetKey + ' (' + f + ')';
+            }
+          }
+        } else {
+          if (typingState.balloons.length > 0) {
+            var activeB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; }) || typingState.balloons[0];
+            if (activeB) {
+              var nextChar = activeB.word.charAt(activeB.typedIndex);
+              if (nextChar) {
+                targetKey = nextChar.toUpperCase();
+                var f = FINGER_MAP[targetKey] ? FINGER_MAP[targetKey].finger : 'Jari';
+                targetLabel = targetKey + ' (' + f + ')';
+              }
+            }
+          }
+        }
+
+        if (targetKey && targetLabel) {
+          pill.innerText = targetLabel;
+          var cleanKey = targetKey === ' ' ? 'SPACE' : (targetKey === ',' ? 'comma' : (targetKey === '.' ? 'dot' : (targetKey === ';' ? 'semicolon' : targetKey)));
+          document.querySelectorAll('.vkey-btn').forEach(function(b) { b.classList.remove('ring-2', 'ring-yellow-400', 'animate-pulse'); });
+          var targetEl = document.getElementById('vkey-' + cleanKey);
+          if (targetEl) targetEl.classList.add('ring-2', 'ring-yellow-400', 'animate-pulse');
+          if (typingState.level === 2) {
+            var ctrlEl = document.getElementById('vkey-CTRL');
+            if (ctrlEl) ctrlEl.classList.add('ring-2', 'ring-yellow-400', 'animate-pulse');
+          }
+        } else {
+          pill.innerText = 'Siap Mengetik';
+          document.querySelectorAll('.vkey-btn').forEach(function(b) { b.classList.remove('ring-2', 'ring-yellow-400', 'animate-pulse'); });
+        }
+      }
+
+      // 6. SPAWN & DOM MANAGEMENT (SMOOTH & ZERO RECREATION)
+      function spawnBalloon() {
+        var layer = document.getElementById('typing-balloons-layer');
+        if (!layer) return;
+
+        var lvlConf = LEVEL_DATA[typingState.level] || LEVEL_DATA[1];
+        var arenaWidth = (layer.clientWidth && layer.clientWidth > 100) ? layer.clientWidth : 600;
+
+        var maxX = Math.max(50, arenaWidth - 140);
+        var spawnX = 20 + Math.floor(Math.random() * (maxX - 20));
+
+        var newBalloon = {
+          id: typingState.nextBalloonId++,
+          x: spawnX,
+          y: 5,
+          speed: lvlConf.speed * (0.85 + Math.random() * 0.3),
+          typedIndex: 0,
+          palette: BALLOON_PALETTES[Math.floor(Math.random() * BALLOON_PALETTES.length)],
+          isShortcut: false
+        };
+
+        if (typingState.level === 2 && lvlConf.shortcuts) {
+          var item = lvlConf.shortcuts[Math.floor(Math.random() * lvlConf.shortcuts.length)];
+          newBalloon.isShortcut = true;
+          newBalloon.shortcutKey = item.key.toUpperCase();
+          newBalloon.word = item.text;
+          newBalloon.label = item.label;
+        } else {
+          var wordPool = lvlConf.words;
+          newBalloon.word = wordPool[Math.floor(Math.random() * wordPool.length)].toUpperCase();
+        }
+
+        typingState.balloons.push(newBalloon);
+
+        var bDiv = document.createElement('div');
+        bDiv.id = 'balloon-' + newBalloon.id;
+        bDiv.className = 'typing-balloon absolute select-none z-10';
+        bDiv.style.left = newBalloon.x + 'px';
+        bDiv.style.top = newBalloon.y + 'px';
+        bDiv.onclick = function() { window.onBalloonClick(newBalloon.id); };
+
+        var wordHtml = '';
+        if (newBalloon.isShortcut) {
+          wordHtml = '<div class="flex items-center gap-1 font-mono font-black text-sm"><span class="text-yellow-200">Ctrl</span><span>+</span><span class="text-white bg-black/30 px-1.5 py-0.5 rounded border border-white/40">' + newBalloon.shortcutKey + '</span></div>' +
+                     '<div class="text-[9px] text-amber-100 font-sans font-bold leading-tight mt-0.5 truncate max-w-[120px]">' + (newBalloon.label || '') + '</div>';
+        } else {
+          wordHtml = '<span class="balloon-word-label font-mono font-black text-sm tracking-wider text-white drop-shadow">' + newBalloon.word + '</span>';
+        }
+
+        bDiv.innerHTML = '<div class="relative flex flex-col items-center">' +
+                         '  <div class="balloon-sphere px-4 py-2.5 rounded-3xl bg-gradient-to-tr ' + newBalloon.palette.bg + ' border-2 ' + newBalloon.palette.border + ' shadow-xl flex flex-col items-center justify-center text-center text-white min-w-[90px]">' +
+                         '    ' + wordHtml +
+                         '  </div>
+
+  ' +
+                         '  <div class="balloon-tail w-2.5 h-2.5 bg-amber-600 rotate-45 -mt-1.5 rounded-xs"></div>' +
+                         '  <div class="balloon-string w-0.5 h-6 bg-slate-700/60 -mt-0.5"></div>' +
+                         '</div>';
+
+        layer.appendChild(bDiv);
+        updateFingerGuide();
+      }
+
+      function updateBalloonDOM(b) {
+        var el = document.getElementById('balloon-' + b.id);
+        if (!el) return;
+
+        var isActive = (b.id === typingState.activeBalloonId);
+        if (isActive) {
+          el.className = 'typing-balloon absolute select-none z-20 ring-4 ring-yellow-400 scale-105';
+        } else {
+          el.className = 'typing-balloon absolute select-none z-10';
+        }
+
+        var wordSpan = el.querySelector('.balloon-word-label');
+        if (wordSpan && !b.isShortcut) {
+          var typedPart = b.word.substring(0, b.typedIndex);
+          var restPart = b.word.substring(b.typedIndex);
+          wordSpan.innerHTML = '<span class="text-yellow-300 underline font-black drop-shadow">' + typedPart + '</span>' +
+                               '<span class="text-white drop-shadow">' + restPart + '</span>';
+        }
+
+        var ind = document.getElementById('typing-target-indicator');
+        var indWord = document.getElementById('typing-target-word');
+        if (ind && indWord) {
+          if (typingState.activeBalloonId === b.id) {
+            ind.classList.remove('hidden');
+            indWord.innerText = b.word;
+          }
+        }
+      }
+
+      // 7. GAME LOOP & ANIMATION
+      function gameLoop(currentTime) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        if (!typingState.lastFrameTime) typingState.lastFrameTime = currentTime;
+        var dt = (currentTime - typingState.lastFrameTime) / 1000;
+        if (dt > 0.1) dt = 0.1;
+        typingState.lastFrameTime = currentTime;
+
+        var lvlConf = LEVEL_DATA[typingState.level] || LEVEL_DATA[1];
+        if (currentTime - typingState.lastSpawnTime > lvlConf.spawnInterval && typingState.balloons.length < 5) {
+          spawnBalloon();
+          typingState.lastSpawnTime = currentTime;
+        }
+
+        var layer = document.getElementById('typing-balloons-layer');
+        var grassLimit = (layer && layer.clientHeight > 100) ? (layer.clientHeight - 70) : 340;
+
+        for (var i = typingState.balloons.length - 1; i >= 0; i--) {
+          var b = typingState.balloons[i];
+          b.y += b.speed * 60 * dt;
+
+          var el = document.getElementById('balloon-' + b.id);
+          if (el) {
+            el.style.top = Math.round(b.y) + 'px';
+          }
+
+          if (b.y >= grassLimit) {
+            var missedB = typingState.balloons.splice(i, 1)[0];
+            handleBalloonMissed(missedB);
+          }
+        }
+
+        updateHUDLive();
+
+        if (typingState.isPlaying && !typingState.isPaused) {
+          typingState.animFrameId = requestAnimationFrame(gameLoop);
+        }
+      }
+
+      function handleBalloonMissed(b) {
+        safePlay('miss');
+        var el = document.getElementById('balloon-' + b.id);
+        if (el && el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+
+        typingState.lives--;
+        typingState.combo = 0;
+        if (typingState.activeBalloonId === b.id) {
+          typingState.activeBalloonId = null;
+          var ind = document.getElementById('typing-target-indicator');
+          if (ind) ind.classList.add('hidden');
+        }
+
+        updateFingerGuide();
+        updateHUDLive();
+
+        safeToast('🎈 Balon "' + b.word + '" jatuh ke rumput! Sisa Nyawa: ' + typingState.lives, 'warning');
+
+        if (typingState.lives <= 0) {
+          endGame(false);
+        }
+      }
+
+      function popBalloon(b, pointsEarned) {
+        safePlay(b.isShortcut ? 'shortcut' : 'pop');
+
+        var el = document.getElementById('balloon-' + b.id);
+        if (el) {
+          el.classList.add('typing-balloon-pop');
+          setTimeout(function() {
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+          }, 350);
+        }
+
+        var layer = document.getElementById('typing-balloons-layer');
+        if (layer) {
+          var fx = document.createElement('div');
+          fx.className = 'absolute pointer-events-none text-xl sm:text-2xl font-black text-yellow-300 animate-ping z-30 font-title';
+          fx.style.left = (b.x + 10) + 'px';
+          fx.style.top = (b.y + 10) + 'px';
+          fx.innerText = b.isShortcut ? '⚡ +' + pointsEarned : '💥 +' + pointsEarned;
+          layer.appendChild(fx);
+          setTimeout(function() { if (fx.parentNode) fx.parentNode.removeChild(fx); }, 500);
+        }
+
+        typingState.score += pointsEarned;
+        typingState.wordsCompleted++;
+        typingState.combo++;
+        if (typingState.combo > typingState.maxCombo) {
+          typingState.maxCombo = typingState.combo;
+        }
+
+        typingState.balloons = typingState.balloons.filter(function(item) { return item.id !== b.id; });
+        if (typingState.activeBalloonId === b.id) {
+          typingState.activeBalloonId = null;
+          var ind = document.getElementById('typing-target-indicator');
+          if (ind) ind.classList.add('hidden');
+        }
+
+        updateFingerGuide();
+        updateHUDLive();
+
+        var lvlConf = LEVEL_DATA[typingState.level] || LEVEL_DATA[1];
+        if (typingState.score >= lvlConf.targetScore) {
+          endGame(true);
+        }
+      }
+
+      // 8. KEYBOARD & INPUT LISTENER (LAYAR STATIS & ANTI-GESER)
+      function handleKeyDown(e) {
+        var tabKetik = document.getElementById('tab-ketik');
+        if (!tabKetik || tabKetik.classList.contains('hidden')) return;
+
+        // KUNCI PERAMBAN: CEGAH SCROLL / PERGESERAN LAYAR
+        // Tombol Spasi, Panah Atas/Bawah/Kiri/Kanan, Tab, Backspace, PgUp, PgDn, Home, End
+        var scrollKeys = ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'PageUp', 'PageDown', 'Home', 'End'];
+        if (scrollKeys.indexOf(e.code) !== -1 || e.key === ' ' || e.key === 'Tab') {
+          e.preventDefault();
+        }
+
+        var isCtrl = e.ctrlKey || e.metaKey;
+        var keyUpper = (e.key || '').toUpperCase();
+
+        // Cegah shortcut bawaan browser yang memicu dialog (Print, Save, Find, Bookmark, dll)
+        if (isCtrl && ['S', 'P', 'B', 'I', 'U', 'Z', 'C', 'V', 'A', 'N', 'F', 'O', 'K', 'D'].indexOf(keyUpper) !== -1) {
+          e.preventDefault();
+        }
+
+        // Tuts Escape untuk keluar dari mode layar penuh
+        if (e.key === 'Escape' && window.isTypingFullscreen) {
+          window.toggleTypingFullscreen();
+          return;
+        }
+
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        highlightVirtualKey(keyUpper, true);
+        if (isCtrl) highlightVirtualKey('CTRL', true);
+
+        // LEVEL 2: SHORTCUTS
+        if (typingState.level === 2) {
+          if (isCtrl) {
+            var matchedBalloon = typingState.balloons.find(function(b) {
+              return b.isShortcut && b.shortcutKey === keyUpper;
+            });
+
+            if (matchedBalloon) {
+              typingState.keystrokesCorrect += 2;
+              typingState.keystrokesTotal += 2;
+              popBalloon(matchedBalloon, 30);
+              safeToast('⚡ Pintasan Berhasil: Ctrl + ' + keyUpper + ' (' + (matchedBalloon.label || '') + ')!', 'success');
+              return;
+            } else {
+              typingState.keystrokesTotal++;
+            }
+          }
+          return;
+        }
+
+        // LEVEL 1 & 3: NORMAL WORDS (HURUF ATAU KATA BERTUKAR SPASI)
+        if (e.key && e.key.length === 1 && !isCtrl) {
+          e.preventDefault(); // Kunci pergerakan browser saat mengetik karakter apapun
+          typingState.keystrokesTotal++;
+
+          if (!typingState.activeBalloonId) {
+            var candidate = typingState.balloons.find(function(b) {
+              return b.word.charAt(0) === keyUpper;
+            });
+            if (candidate) {
+              safePlay('type');
+              typingState.activeBalloonId = candidate.id;
+              candidate.typedIndex = 1;
+              typingState.keystrokesCorrect++;
+
+              if (candidate.typedIndex >= candidate.word.length) {
+                popBalloon(candidate, 20);
+              } else {
+                updateBalloonDOM(candidate);
+                updateFingerGuide();
+              }
+              return;
+            }
+          } else {
+            var targetB = typingState.balloons.find(function(b) { return b.id === typingState.activeBalloonId; });
+            if (targetB) {
+              var expectedChar = targetB.word.charAt(targetB.typedIndex);
+              if (keyUpper === expectedChar) {
+                safePlay('type');
+                targetB.typedIndex++;
+                typingState.keystrokesCorrect++;
+
+                if (targetB.typedIndex >= targetB.word.length) {
+                  popBalloon(targetB, 20);
+                } else {
+                  updateBalloonDOM(targetB);
+                  updateFingerGuide();
+                }
+                return;
+              }
+            }
+          }
+        }
+      }
+
+      window.onVirtualKeyClick = function(key) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        if (key === 'CTRL') {
+          safeToast('Tahan tombol Ctrl lalu tekan huruf yang sesuai di keyboard!', 'info');
+          return;
+        }
+
+        var fakeEvent = {
+          key: key,
+          ctrlKey: false,
+          metaKey: false,
+          preventDefault: function() {}
+        };
+        handleKeyDown(fakeEvent);
+      };
+
+      window.onBalloonClick = function(balloonId) {
+        if (!typingState.isPlaying || typingState.isPaused) return;
+
+        var b = typingState.balloons.find(function(item) { return item.id === balloonId; });
+        if (!b) return;
+
+        if (b.isShortcut) {
+          var fakeEvent = {
+            key: b.shortcutKey,
+            ctrlKey: true,
+            metaKey: false,
+            preventDefault: function() {}
+          };
+          handleKeyDown(fakeEvent);
+        } else {
+          var nextChar = b.word.charAt(b.typedIndex);
+          if (nextChar) {
+            var fakeEvent = {
+              key: nextChar,
+              ctrlKey: false,
+              metaKey: false,
+              preventDefault: function() {}
+            };
+            handleKeyDown(fakeEvent);
+          }
+        }
+      };
+
+      // 9. HUD & STATS
+      function updateHUDLive() {
+        var scoreEl = document.getElementById('typing-hud-score');
+        var wpmEl = document.getElementById('typing-hud-wpm');
+        var accEl = document.getElementById('typing-hud-acc');
+        var comboWrap = document.getElementById('typing-hud-combo-wrap');
+        var comboEl = document.getElementById('typing-hud-combo');
+        var livesEl = document.getElementById('typing-hud-lives');
+
+        if (scoreEl) scoreEl.innerText = typingState.score;
+
+        var elapsedMin = typingState.startTime ? ((Date.now() - typingState.startTime) / 60000) : 0.05;
+        if (elapsedMin < 0.05) elapsedMin = 0.05;
+        var wordsTyped = (typingState.keystrokesCorrect / 5);
+        var wpm = Math.max(0, Math.round(wordsTyped / elapsedMin));
+        if (wpmEl) wpmEl.innerText = wpm;
+
+        var acc = typingState.keystrokesTotal > 0
+          ? Math.round((typingState.keystrokesCorrect / typingState.keystrokesTotal) * 100)
+          : 100;
+        if (accEl) accEl.innerText = acc + '%';
+
+        if (comboWrap && comboEl) {
+          if (typingState.combo >= 2) {
+            comboWrap.classList.remove('hidden');
+            comboEl.innerText = typingState.combo + 'x Combo!';
+          } else {
+            comboWrap.classList.add('hidden');
+          }
+        }
+
+        if (livesEl) {
+          var hearts = '';
+          for (var i = 0; i < typingState.lives; i++) hearts += '❤️';
+          for (var j = typingState.lives; j < 3; j++) hearts += '🖤';
+          livesEl.innerText = hearts;
+        }
+      }
+
+      // 10. GAME LIFECYCLE (START, PAUSE, RESTART, END)
+      window.pilihLevelTypingHero = function(lvl) {
+        typingState.level = lvl;
+        for (var i = 1; i <= 3; i++) {
+          var btn = document.getElementById('btn-typing-lvl-' + i);
+          if (btn) {
+            if (i === lvl) {
+              btn.className = 'typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-yellow-300 text-slate-950 shadow-xs scale-105';
+            } else {
+              btn.className = 'typing-lvl-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-white hover:text-yellow-200';
+            }
+          }
+        }
+
+        var lvlConf = LEVEL_DATA[lvl] || LEVEL_DATA[1];
+        safeToast('Level aktif: ' + lvlConf.name + ' 🎯', 'info');
+        window.mulaiTypingHeroGame();
+      };
+
+      window.mulaiTypingHeroGame = function() {
+        var startOverlay = document.getElementById('typing-overlay-start');
+        var endOverlay = document.getElementById('typing-overlay-gameover');
+        if (startOverlay) startOverlay.classList.add('hidden');
+        if (endOverlay) endOverlay.classList.add('hidden');
+
+        var pauseIcon = document.getElementById('typing-pause-icon');
+        if (pauseIcon) pauseIcon.className = 'fa-solid fa-pause';
+
+        var layer = document.getElementById('typing-balloons-layer');
+        if (layer) layer.innerHTML = '';
+
+        var ind = document.getElementById('typing-target-indicator');
+        if (ind) ind.classList.add('hidden');
+
+        var now = performance.now();
+        typingState.score = 0;
+        typingState.lives = 3;
+        typingState.combo = 0;
+        typingState.maxCombo = 0;
+        typingState.keystrokesTotal = 0;
+        typingState.keystrokesCorrect = 0;
+        typingState.wordsCompleted = 0;
+        typingState.startTime = Date.now();
+        typingState.isPlaying = true;
+        typingState.isPaused = false;
+        typingState.balloons = [];
+        typingState.activeBalloonId = null;
+        typingState.lastSpawnTime = now;
+        typingState.lastFrameTime = now;
+
+        if (typingState.animFrameId) {
+          cancelAnimationFrame(typingState.animFrameId);
+        }
+
+        renderTypingVirtualKeyboard();
+        updateHUDLive();
+
+        // Spawn balon pertama seketika
+        spawnBalloon();
+
+        safeToast('🚀 Permainan dimulai! Siapkan jarimu pada keyboard!', 'success');
+        typingState.animFrameId = requestAnimationFrame(gameLoop);
+      };
+
+      window.togglePauseTypingHero = function() {
+        if (!typingState.isPlaying) {
+          window.mulaiTypingHeroGame();
+          return;
+        }
+
+        typingState.isPaused = !typingState.isPaused;
+        var icon = document.getElementById('typing-pause-icon');
+        if (icon) {
+          icon.className = typingState.isPaused ? 'fa-solid fa-play text-emerald-400' : 'fa-solid fa-pause';
+        }
+
+        if (typingState.isPaused) {
+          safeToast('Permainan dijeda ⏸️', 'info');
+        } else {
+          safeToast('Permainan dilanjutkan ▶️', 'info');
+          typingState.lastFrameTime = performance.now();
+          typingState.animFrameId = requestAnimationFrame(gameLoop);
+        }
+      };
+
+      window.pauseTypingHeroGame = function() {
+        if (typingState.isPlaying && !typingState.isPaused) {
+          typingState.isPaused = true;
+          var icon = document.getElementById('typing-pause-icon');
+          if (icon) icon.className = 'fa-solid fa-play text-emerald-400';
+        }
+      };
+
+      window.restartTypingHeroGame = function() {
+        window.mulaiTypingHeroGame();
+      };
+
+      window.lanjutLevelTypingHeroBerikutnya = function() {
+        var nextLvl = typingState.level < 3 ? (typingState.level + 1) : 1;
+        window.pilihLevelTypingHero(nextLvl);
+      };
+
+      function endGame(isVictory) {
+        typingState.isPlaying = false;
+        if (typingState.animFrameId) {
+          cancelAnimationFrame(typingState.animFrameId);
+        }
+
+        var endOverlay = document.getElementById('typing-overlay-gameover');
+        var endIcon = document.getElementById('typing-end-icon');
+        var endTitle = document.getElementById('typing-end-title');
+        var endDesc = document.getElementById('typing-end-desc');
+        var finalScore = document.getElementById('typing-final-score');
+        var finalWpm = document.getElementById('typing-final-wpm');
+        var finalAcc = document.getElementById('typing-final-acc');
+        var btnNext = document.getElementById('btn-typing-next-level');
+
+        var elapsedMin = typingState.startTime ? ((Date.now() - typingState.startTime) / 60000) : 0.05;
+        if (elapsedMin < 0.05) elapsedMin = 0.05;
+        var wpm = Math.max(0, Math.round((typingState.keystrokesCorrect / 5) / elapsedMin));
+        var acc = typingState.keystrokesTotal > 0
+          ? Math.round((typingState.keystrokesCorrect / typingState.keystrokesTotal) * 100)
+          : 100;
+
+        if (finalScore) finalScore.innerText = typingState.score;
+        if (finalWpm) finalWpm.innerText = wpm + ' WPM';
+        if (finalAcc) finalAcc.innerText = acc + '%';
+
+        try {
+          var bestScore = parseInt(localStorage.getItem('typing_hero_best_score') || '0', 10);
+          var bestWpm = parseInt(localStorage.getItem('typing_hero_best_wpm') || '0', 10);
+          if (typingState.score > bestScore) {
+            localStorage.setItem('typing_hero_best_score', typingState.score);
+          }
+          if (wpm > bestWpm) {
+            localStorage.setItem('typing_hero_best_wpm', wpm);
+          }
+          updateRecordDisplays();
+        } catch(e) {}
+
+        if (isVictory) {
+          safePlay('victory');
+          if (endIcon) endIcon.innerText = '🏆';
+          if (endTitle) endTitle.innerText = 'Luar Biasa! Misi Level Tuntas!';
+          if (endDesc) endDesc.innerText = 'Hebat sekali! Jarimu sangat lincah dan tepat mengetik kata & shortcut Word.';
+          if (btnNext) btnNext.classList.remove('hidden');
+
+          if (typeof window.tambahPoin === 'function') {
+            window.tambahPoin(20);
+          }
+          safeToast('🎉 Selamat! Target level tercapai (+20 Poin Kebaikan)', 'success');
+        } else {
+          safePlay('miss');
+          if (endIcon) endIcon.innerText = '💪';
+          if (endTitle) endTitle.innerText = 'Tetap Semangat!';
+          if (endDesc) endDesc.innerText = 'Jangan menyerah! Latih terus penempatan jarimu di keyboard agar semakin cepat.';
+          if (btnNext) btnNext.classList.add('hidden');
+        }
+
+        if (endOverlay) endOverlay.classList.remove('hidden');
+      }
+
+      function updateRecordDisplays() {
+        var recScore = document.getElementById('typing-record-score');
+        var recWpm = document.getElementById('typing-record-wpm');
+        var badge = document.getElementById('typing-best-badge');
+
+        try {
+          var s = localStorage.getItem('typing_hero_best_score') || '0';
+          var w = localStorage.getItem('typing_hero_best_wpm') || '0';
+          if (recScore) recScore.innerText = s;
+          if (recWpm) recWpm.innerText = w + ' WPM';
+
+          if (badge) {
+            var wVal = parseInt(w, 10);
+            if (wVal >= 35) {
+              badge.innerText = 'Juara 10 Jari 🏆';
+              badge.className = 'px-2.5 py-0.5 rounded-full bg-purple-200 text-purple-900 font-bold text-[10px]';
+            } else if (wVal >= 20) {
+              badge.innerText = 'Terampil ⚡';
+              badge.className = 'px-2.5 py-0.5 rounded-full bg-blue-200 text-blue-900 font-bold text-[10px]';
+            } else {
+              badge.innerText = 'Pemula 🌱';
+              badge.className = 'px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px]';
+            }
+          }
+        } catch(e) {}
+      }
+
+      // 11. MODAL PANDUAN
+      window.bukaModalPanduanTypingHero = function() {
+        var m = document.getElementById('modal-panduan-typing');
+        if (m) m.classList.remove('hidden');
+      };
+
+      window.tutupModalPanduanTypingHero = function() {
+        var m = document.getElementById('modal-panduan-typing');
+        if (m) m.classList.add('hidden');
+      };
+
+      // 11B. MODE LAYAR STATIS & FULLSCREEN THEATER ARCADE
+      window.isTypingFullscreen = false;
+      window.toggleTypingFullscreen = function() {
+        var tab = document.getElementById('tab-ketik');
+        var icon = document.getElementById('icon-typing-fullscreen');
+        var txt = document.getElementById('text-typing-fullscreen');
+        if (!tab) return;
+
+        window.isTypingFullscreen = !window.isTypingFullscreen;
+        if (window.isTypingFullscreen) {
+          tab.classList.add('tab-ketik-fullscreen');
+          document.body.classList.add('typing-screen-locked');
+          if (icon) icon.className = 'fa-solid fa-compress';
+          if (txt) txt.innerText = 'Layar Normal 🗗';
+          safeToast('Mode Layar Statis Penuh Aktif! Layar terkunci dan tidak akan bergeser 🔒 (Tekan ESC untuk kembali)', 'info');
+        } else {
+          tab.classList.remove('tab-ketik-fullscreen');
+          if (icon) icon.className = 'fa-solid fa-expand';
+          if (txt) txt.innerText = 'Layar Penuh ⛶';
+          safeToast('Kembali ke tampilan standar jendela.', 'info');
+        }
+      };
+
+      window.exitTypingFullscreen = function() {
+        if (window.isTypingFullscreen) {
+          window.toggleTypingFullscreen();
+        }
+      };
+
+      // 12. INITIALIZATION
+      window.initTypingHeroGame = function() {
+        renderTypingVirtualKeyboard();
+        updateRecordDisplays();
+        updateFingerGuide();
+
+        var startOverlay = document.getElementById('typing-overlay-start');
+        if (!typingState.isPlaying && startOverlay) {
+          startOverlay.classList.remove('hidden');
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(window.initTypingHeroGame, 100);
+        });
+      } else {
+        setTimeout(window.initTypingHeroGame, 100);
+      }
+    })();
+    </script>
+<script>
+console.log("Checking window functions:");
+console.log("pilihLevelTypingHero:", typeof window.pilihLevelTypingHero);
+console.log("mulaiTypingHeroGame:", typeof window.mulaiTypingHeroGame);
+console.log("initTypingHeroGame:", typeof window.initTypingHeroGame);
+try {
+    window.pilihLevelTypingHero(1);
+    console.log("Started successfully! isPlaying =", window.typingState ? window.typingState.isPlaying : "no state");
+} catch (e) {
+    console.error("Error starting game:", e);
+}
+</script>
+</body>
+</html>
